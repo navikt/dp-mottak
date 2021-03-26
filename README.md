@@ -1,6 +1,6 @@
 # dp-mottak
 
-Ansvar for å håndtere hendelser på tema Dagpenger via Joark og sørge for vi videre saksgang
+Ansvar for å håndtere hendelser på tema Dagpenger via Joark og sørge for videre saksgang
 
 
 ## Komme i gang
