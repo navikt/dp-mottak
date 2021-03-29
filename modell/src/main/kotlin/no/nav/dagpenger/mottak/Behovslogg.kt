@@ -54,5 +54,6 @@ class SpesifikkKontekst(internal val kontekstType: String, internal val kontekst
 }
 
 enum class Behovtype {
-    Journalpost
+    Journalpost,
+    Persondata
 }

@@ -1,13 +1,13 @@
 package no.nav.dagpenger.mottak
 
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
-import no.nav.dagpenger.mottak.meldinger.Journalpost
+import no.nav.dagpenger.mottak.meldinger.NySøknad
 import java.util.UUID
 
 class Innsending private constructor(
     private val id: UUID,
     private val journalpostId: String,
-    private var tilstand: InnsendingTilstand,
+    private var tilstand: Tilstand,
     private val behovslogg: Behovslogg
 
 ) : Behovskontekst {
@@ -23,11 +23,12 @@ class Innsending private constructor(
 
     fun journalpostId(): String = journalpostId
 
-    internal interface InnsendingTilstand : Behovskontekst {
+    interface Tilstand : Behovskontekst {
 
         val type: InnsendingTilstandType
 
         fun håndter(innsending: Innsending, joarkHendelse: JoarkHendelse) {}
+        fun håndter(innsending: Innsending, nySøknad: NySøknad) {}
         fun leaving(event: Hendelse) {}
         fun entering(innsending: Innsending, event: Hendelse) {}
 
@@ -41,7 +42,7 @@ class Innsending private constructor(
         }
     }
 
-    internal object Mottatt : InnsendingTilstand {
+    internal object Mottatt : Tilstand {
 
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.Mottatt
@@ -52,9 +53,19 @@ class Innsending private constructor(
         }
     }
 
-    internal object AvventerJournalpost : InnsendingTilstand {
+    internal object AvventerJournalpost : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AvventerJournalpost
+
+        override fun håndter(innsending: Innsending, nySøknad: NySøknad) {
+            innsending.trengerPersonData(nySøknad)
+            innsending.tilstand(nySøknad, AvventerPersondata)
+        }
+    }
+
+    internal object AvventerPersondata : Tilstand {
+        override val type: InnsendingTilstandType
+            get() = InnsendingTilstandType.AvventerPersondata
     }
 
     fun håndter(joarkHendelse: JoarkHendelse) {
@@ -62,13 +73,22 @@ class Innsending private constructor(
         tilstand.håndter(this, joarkHendelse)
     }
 
+    fun håndter(nySøknad: NySøknad) {
+        nySøknad.kontekst(this)
+        tilstand.håndter(this, nySøknad)
+    }
+
     private fun trengerJournalpost(hendelse: Hendelse) {
         hendelse.behov(Behovtype.Journalpost, "Trenger journalpost")
     }
 
+    private fun trengerPersonData(nySøknad: NySøknad) {
+        nySøknad.behov(Behovtype.Persondata, "Trenger persondata")
+    }
+
     private fun tilstand(
         event: Hendelse,
-        nyTilstand: InnsendingTilstand,
+        nyTilstand: Tilstand,
         block: () -> Unit = {}
     ) {
         if (tilstand == nyTilstand) {
@@ -79,6 +99,12 @@ class Innsending private constructor(
         block()
         event.kontekst(tilstand)
         tilstand.entering(this, event)
+    }
+
+    fun accept(visitor: InnsendingVisitor) {
+        visitor.preVisitInnsending(this, journalpostId)
+        visitor.visitTilstand(tilstand)
+        visitor.postVisitInnsending(this, journalpostId)
     }
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(

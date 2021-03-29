@@ -1,5 +1,6 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm")
@@ -27,3 +28,8 @@ tasks.test {
         events = setOf(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
     }
 }
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+}
+
