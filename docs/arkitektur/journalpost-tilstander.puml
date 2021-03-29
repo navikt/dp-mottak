@@ -1,0 +1,20 @@
+@startuml
+
+title Innløpet
+[*] --> Mottak
+note right
+this is a note
+end note
+
+Mottak : Contents - void
+Mottak --> PersonMottat
+PersonMottat: Person
+PersonMottat --> JournalPostMottat
+JournalPostMottat -> Vilkårsprøvd
+Vilkårsprøvd --> Kategorisert
+Kategorisert -> ArenaOppgaveOpprettet
+Kategorisert -> GosysOppgaveOpprettet
+ArenaOppgaveOpprettet --> FerdigStilt
+GosysOppgaveOpprettet --> FerdigStilt
+FerdigStilt --> [*]
+@enduml
