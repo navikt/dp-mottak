@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.meldinger
 
+import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.SpesifikkKontekst
 import java.time.LocalDateTime
@@ -10,12 +11,13 @@ import java.time.format.DateTimeFormatter
 private const val maksTegn = 1999
 
 class JournalpostData(
+    aktivitetslogg: Aktivitetslogg,
     private val journalpostId: String,
     private val journalpostStatus: String,
     private val aktørId: String, // Bruker? (kan vi få fnr her?)
     private val relevanteDatoer: List<RelevantDato>,
     private val dokumenter: List<DokumentInfo>
-) : Hendelse() {
+) : Hendelse(aktivitetslogg) {
 
     override fun journalpostId(): String = journalpostId
     fun aktørId(): String = aktørId

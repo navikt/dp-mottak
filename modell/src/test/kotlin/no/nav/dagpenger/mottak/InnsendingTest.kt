@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.UUID
 
 internal class InnsendingTest {
 
@@ -28,10 +27,10 @@ internal class InnsendingTest {
     fun `skal håndtere joark hendelse der journalpost er ny søknad`() {
         val journalpostId = "12345"
         val innsending = Innsending(
-            id = UUID.randomUUID(),
             journalpostId = journalpostId
         )
         val joarkHendelse = JoarkHendelse(
+            aktivitetslogg = Aktivitetslogg(),
             journalpostId = journalpostId,
             hendelseType = "MIDLERTIDIG",
             journalpostStatus = "MOTTATT"
@@ -45,6 +44,7 @@ internal class InnsendingTest {
         assertEquals(InnsendingTilstandType.AvventerJournalpostType, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
         val nySøknad = JournalpostData(
+            aktivitetslogg = Aktivitetslogg(),
             journalpostId = journalpostId,
             journalpostStatus = "MOTTATT",
             aktørId = "1234",
@@ -68,6 +68,7 @@ internal class InnsendingTest {
         assertEquals(InnsendingTilstandType.AvventerPersondataType, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
         val persondata = PersonInformasjon(
+            aktivitetslogg = Aktivitetslogg(),
             journalpostId = journalpostId,
             aktoerId = "1234",
             naturligIdent = "12345678901",
@@ -79,6 +80,7 @@ internal class InnsendingTest {
         assertEquals(InnsendingTilstandType.AvventerSøknadsdataType, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
         val søknadsdata = Søknadsdata(
+            aktivitetslogg = Aktivitetslogg(),
             journalpostId = journalpostId,
             søknadsId = "12233#",
             data = mapper.createObjectNode().also { it.put("data", "data") }
@@ -89,6 +91,7 @@ internal class InnsendingTest {
         assertEquals(InnsendingTilstandType.AvventerMinsteinntektVurderingType, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
         val vurderminsteinntektData = MinsteinntektVurderingData(
+            aktivitetslogg = Aktivitetslogg(),
             journalpostId = journalpostId,
             oppfyllerMinsteArbeidsinntekt = false
         )
@@ -98,6 +101,7 @@ internal class InnsendingTest {
         assertEquals(InnsendingTilstandType.AvventerSvarOmEksisterendeSakerType, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
         val eksisterendeSak = EksisterendesakData(
+            aktivitetslogg = Aktivitetslogg(),
             journalpostId = journalpostId,
             harEksisterendeSak = false
         )
@@ -107,6 +111,7 @@ internal class InnsendingTest {
         assertEquals(InnsendingTilstandType.AventerArenaStartVedtakType, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
         val arenaOppgave = ArenaOppgaveOpprettet(
+            aktivitetslogg = Aktivitetslogg(),
             journalpostId = journalpostId,
             oppgaveId = "1234",
             fagsakId = "9867541"
@@ -116,6 +121,7 @@ internal class InnsendingTest {
         assertEquals(InnsendingTilstandType.OppdaterJournalpostType, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
         val oppdatertJournalpost = JournalpostOppdatert(
+            aktivitetslogg = Aktivitetslogg(),
             journalpostId = journalpostId
         )
 
@@ -124,6 +130,7 @@ internal class InnsendingTest {
         assertEquals(InnsendingTilstandType.FerdigstillJournalpostType, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
         val journalpostferdigstilt = JournalpostFerdigstilt(
+            aktivitetslogg = Aktivitetslogg(),
             journalpostId = journalpostId
         )
 

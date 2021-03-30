@@ -19,10 +19,8 @@ import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import no.nav.dagpenger.mottak.meldinger.tilleggsinformasjon
-import java.util.UUID
 
 class Innsending private constructor(
-    private val id: UUID,
     private val journalpostId: String,
     private var tilstand: Tilstand,
     private var kategorisertJournalpost: KategorisertJournalpost?,
@@ -35,11 +33,9 @@ class Innsending private constructor(
     private var ferdigstilt: Boolean?
 ) : Aktivitetskontekst {
 
-    internal constructor(
-        id: UUID,
+    constructor(
         journalpostId: String
     ) : this(
-        id = id,
         journalpostId = journalpostId,
         tilstand = Mottatt,
         kategorisertJournalpost = null,

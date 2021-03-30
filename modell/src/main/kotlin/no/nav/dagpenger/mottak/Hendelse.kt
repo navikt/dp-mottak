@@ -1,12 +1,13 @@
 package no.nav.dagpenger.mottak
 
 abstract class Hendelse protected constructor(
-    internal val behovlogg: Aktivitetslogg = Aktivitetslogg()
-) : IAktivitetslogg by behovlogg, Aktivitetskontekst {
+    internal val aktivitetslogg: Aktivitetslogg = Aktivitetslogg()
+) : IAktivitetslogg by aktivitetslogg, Aktivitetskontekst {
+
     abstract fun journalpostId(): String
 
     init {
-        behovlogg.kontekst(this)
+        aktivitetslogg.kontekst(this)
     }
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst {
@@ -14,4 +15,6 @@ abstract class Hendelse protected constructor(
             SpesifikkKontekst(it, mapOf("journalpostId" to journalpostId()))
         }
     }
+
+    fun toLogString() = aktivitetslogg.toString()
 }

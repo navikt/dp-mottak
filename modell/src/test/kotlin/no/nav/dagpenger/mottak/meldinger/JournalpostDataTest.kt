@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.meldinger
 
+import no.nav.dagpenger.mottak.Aktivitetslogg
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -52,6 +53,7 @@ internal class JournalpostDataTest {
 
     private fun lagjournalpostData(brevkode: String, dato: LocalDateTime = LocalDateTime.now(), vedlegg: String = "Vedlegg: Arbeidsavtale"): JournalpostData {
         val journalpostData = JournalpostData(
+            aktivitetslogg = Aktivitetslogg(),
             journalpostId = "1234",
             journalpostStatus = "MOTTATT",
             aktørId = "21",
