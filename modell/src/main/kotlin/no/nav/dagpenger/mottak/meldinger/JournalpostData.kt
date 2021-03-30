@@ -3,7 +3,7 @@ package no.nav.dagpenger.mottak.meldinger
 import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.SpesifikkKontekst
 
-abstract class Journalpost(
+class JournalpostData(
     private val journalpostId: String,
     private val journalpostStatus: String,
     private val aktørId: String, // Bruker? (kan vi få fnr her?)
@@ -13,16 +13,18 @@ abstract class Journalpost(
     override fun journalpostId(): String = journalpostId
     fun aktørId(): String = aktørId
 
-    class DokumentInfo(tittel: String?, brevkode: String?) {
+    class DokumentInfo(tittel: String?, dokumentInfoId: String, brevkode: String?) {
         val tittel = tittel
             get() = field ?: allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
+        val dokumentInfoId = dokumentInfoId
         val brevkode = brevkode
     }
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(
-        "Journalpost",
+        "JournalpostData",
         mapOf(
-            "aktørId" to aktørId()
+            "aktørId" to aktørId(),
+            "journalpostId" to journalpostId()
         )
     )
 

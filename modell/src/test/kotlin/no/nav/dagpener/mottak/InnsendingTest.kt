@@ -5,8 +5,8 @@ import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.InnsendingVisitor
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
-import no.nav.dagpenger.mottak.meldinger.Journalpost
-import no.nav.dagpenger.mottak.meldinger.NySøknad
+import no.nav.dagpenger.mottak.meldinger.JournalpostData
+import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
@@ -34,11 +34,11 @@ class InnsendingTest {
         assertEquals(Behovtype.Journalpost, behov.type)
         assertEquals(InnsendingTilstandType.AvventerJournalpost, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
-        val nySøknad = NySøknad(
+        val nySøknad = JournalpostData(
             journalpostId = journalpostId,
             journalpostStatus = "MOTTATT",
             aktørId = "1234",
-            dokumenter = listOf(Journalpost.DokumentInfo(tittel = null, brevkode = "NAV 04-01.03"))
+            dokumenter = listOf(JournalpostData.DokumentInfo(tittel = null, dokumentInfoId = "123", brevkode = "NAV 04-01.03"))
         )
 
         innsending.håndter(nySøknad)
@@ -47,6 +47,18 @@ class InnsendingTest {
         assertEquals(Behovtype.Persondata, nySøknad.behov().first().type)
 
         assertEquals(InnsendingTilstandType.AvventerPersondata, TestInnsendingInspektør(innsending).gjeldendetilstand)
+
+        val persondata = PersonInformasjon(
+            journalpostId = journalpostId,
+            aktørId = "1234",
+            fødselsnummer = "12345678901",
+            norskTilknytning = true
+        )
+
+        innsending.håndter(persondata)
+
+        assertEquals(InnsendingTilstandType.Kategorisering, TestInnsendingInspektør(innsending).gjeldendetilstand)
+
     }
 }
 
