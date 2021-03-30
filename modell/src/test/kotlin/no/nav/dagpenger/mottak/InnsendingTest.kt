@@ -1,5 +1,7 @@
 package no.nav.dagpener.mottak
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingTilstandType
@@ -7,12 +9,17 @@ import no.nav.dagpenger.mottak.InnsendingVisitor
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.JournalpostData
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
+import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class InnsendingTest {
+internal class InnsendingTest {
+
+    companion object {
+        val mapper: ObjectMapper = jacksonObjectMapper()
+    }
 
     @Test
     fun `skal håndtere joark hendelse der journalpost er ny søknad`() {
@@ -38,7 +45,13 @@ class InnsendingTest {
             journalpostId = journalpostId,
             journalpostStatus = "MOTTATT",
             aktørId = "1234",
-            dokumenter = listOf(JournalpostData.DokumentInfo(tittel = null, dokumentInfoId = "123", brevkode = "NAV 04-01.03"))
+            dokumenter = listOf(
+                JournalpostData.DokumentInfo(
+                    kanskjetittel = null,
+                    dokumentInfoId = "123",
+                    brevkode = "NAV 04-01.03"
+                )
+            )
         )
 
         innsending.håndter(nySøknad)
@@ -57,8 +70,17 @@ class InnsendingTest {
 
         innsending.håndter(persondata)
 
-        assertEquals(InnsendingTilstandType.Kategorisering, TestInnsendingInspektør(innsending).gjeldendetilstand)
+        assertEquals(InnsendingTilstandType.AvventerSøknadsdata, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
+        val søknadsdata = Søknadsdata(
+            journalpostId = journalpostId,
+            søknadsId = "12233#",
+            data = mapper.createObjectNode().also { it.put("data", "data") }
+        )
+
+        innsending.håndter(søknadsdata)
+
+        assertEquals(InnsendingTilstandType.AvventerMinsteinntektVurdering, TestInnsendingInspektør(innsending).gjeldendetilstand)
     }
 }
 

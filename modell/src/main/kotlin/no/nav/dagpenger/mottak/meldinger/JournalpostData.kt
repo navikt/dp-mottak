@@ -7,17 +7,31 @@ class JournalpostData(
     private val journalpostId: String,
     private val journalpostStatus: String,
     private val aktørId: String, // Bruker? (kan vi få fnr her?)
-    val dokumenter: List<DokumentInfo>
+    private val dokumenter: List<DokumentInfo>
 ) : Hendelse() {
 
     override fun journalpostId(): String = journalpostId
     fun aktørId(): String = aktørId
 
-    class DokumentInfo(tittel: String?, dokumentInfoId: String, brevkode: String?) {
-        val tittel = tittel
-            get() = field ?: allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
+    class DokumentInfo(kanskjetittel: String?, dokumentInfoId: String, brevkode: String) {
+        val tittel = kanskjetittel ?: allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
         val dokumentInfoId = dokumentInfoId
         val brevkode = brevkode
+    }
+
+    fun journalpost(): KategorisertJournalpost {
+
+        val brevkode = dokumenter.firstOrNull()?.brevkode
+        val jpDokumenter = dokumenter.map { KategorisertJournalpost.Dokument(it.tittel, it.dokumentInfoId, it.brevkode) }
+
+        return when (brevkode) {
+            in listOf("NAV 04-01.03", "NAV 04-01.04") -> KategorisertJournalpost.NySøknad(
+                journalpostId = journalpostId,
+                journalpostStatus = journalpostStatus,
+                dokumenter = jpDokumenter
+            )
+            else -> TODO("Ikke kategorisert flere enn ny søknad")
+        }
     }
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(
@@ -77,5 +91,28 @@ class JournalpostData(
             "NAVe 04-01.04" to "Ettersendelse til søknad om dagpenger ved permittering",
             "NAV 90-00.08" to "Klage og anke"
         )
+    }
+
+    sealed class KategorisertJournalpost {
+
+        companion object {
+            fun nySøknad(brevkode: String?) = brevkode in listOf("NAV 04-01.03", "NAV 04-01.04")
+        }
+
+        abstract fun journalpostId(): String
+        abstract fun journalpostStatus(): String
+        abstract fun dokumenter(): List<Dokument>
+
+        data class NySøknad(
+            val journalpostId: String,
+            val journalpostStatus: String,
+            val dokumenter: List<Dokument>
+        ) : KategorisertJournalpost() {
+            override fun journalpostId(): String = journalpostId
+            override fun journalpostStatus(): String = journalpostStatus
+            override fun dokumenter(): List<Dokument> = dokumenter
+        }
+
+        data class Dokument(val tittel: String, val dokumentInfoId: String, val brevkode: String)
     }
 }

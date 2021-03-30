@@ -1,27 +1,55 @@
 package no.nav.dagpenger.mottak
 
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.MinsteinntektVurdering
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Søknadsdata
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.JournalpostData
+import no.nav.dagpenger.mottak.meldinger.JournalpostData.KategorisertJournalpost
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import java.util.UUID
 
 class Innsending private constructor(
     private val id: UUID,
     private val journalpostId: String,
-    private var tilstand: Tilstand
+    private var tilstand: Tilstand,
+    private var kategorisertJournalpost: KategorisertJournalpost?,
+    private var søknad: no.nav.dagpenger.mottak.meldinger.Søknadsdata.Søknad?
 ) : Aktivitetskontekst {
+
     internal constructor(
         id: UUID,
         journalpostId: String
     ) : this(
         id = id,
         journalpostId = journalpostId,
-        tilstand = Mottatt
+        tilstand = Mottatt,
+        kategorisertJournalpost = null,
+        søknad = null
     )
 
     fun journalpostId(): String = journalpostId
+
+    fun håndter(joarkHendelse: JoarkHendelse) {
+        joarkHendelse.kontekst(this)
+        tilstand.håndter(this, joarkHendelse)
+    }
+
+    fun håndter(journalpostData: JournalpostData) {
+        journalpostData.kontekst(this)
+        tilstand.håndter(this, journalpostData)
+    }
+
+    fun håndter(personInformasjon: PersonInformasjon) {
+        personInformasjon.kontekst(this)
+        tilstand.håndter(this, personInformasjon)
+    }
+
+    fun håndter(søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
+        søknadsdata.kontekst(this)
+        tilstand.håndter(this, søknadsdata)
+    }
 
     interface Tilstand : Aktivitetskontekst {
 
@@ -39,6 +67,10 @@ class Innsending private constructor(
             personInformasjon.warn("Forventet ikke PersonInformasjon i %s", type.name)
         }
 
+        fun håndter(innsending: Innsending, søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
+            søknadsdata.warn("Forventet ikke Søknadsdata i %s", type.name)
+        }
+
         fun leaving(event: Hendelse) {}
         fun entering(innsending: Innsending, event: Hendelse) {}
 
@@ -53,7 +85,6 @@ class Innsending private constructor(
     }
 
     internal object Mottatt : Tilstand {
-
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.Mottatt
 
@@ -68,6 +99,7 @@ class Innsending private constructor(
             get() = InnsendingTilstandType.AvventerJournalpost
 
         override fun håndter(innsending: Innsending, journalpostData: JournalpostData) {
+            innsending.kategorisertJournalpost = journalpostData.journalpost()
             innsending.trengerPersonData(journalpostData)
             innsending.tilstand(journalpostData, AvventerPersondata)
         }
@@ -79,7 +111,6 @@ class Innsending private constructor(
 
         override fun håndter(innsending: Innsending, personInformasjon: PersonInformasjon) {
             innsending.tilstand(personInformasjon, JournalpostKategorisering)
-
         }
     }
 
@@ -89,23 +120,45 @@ class Innsending private constructor(
 
         override fun entering(innsending: Innsending, event: Hendelse) {
             event.info("Skal kategorisere journalpost")
+            when (innsending.kategorisertJournalpost) {
+                is KategorisertJournalpost.NySøknad -> innsending.tilstand(event, AvventerSøknadsdata)
+                else -> TODO("IKKE KATEGORISERT ")
+            }
         }
     }
 
-    fun håndter(joarkHendelse: JoarkHendelse) {
-        joarkHendelse.kontekst(this)
-        tilstand.håndter(this, joarkHendelse)
+    internal object AvventerSøknadsdata : Tilstand {
+        override val type: InnsendingTilstandType
+            get() = InnsendingTilstandType.AvventerSøknadsdata
+
+        override fun entering(innsending: Innsending, event: Hendelse) {
+            innsending.trengerSøknadsdata(event)
+        }
+
+        override fun håndter(innsending: Innsending, søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
+            søknadsdata.info("Fikk Søknadsdata for ${innsending.kategorisertJournalpost?.javaClass?.name}")
+            innsending.søknad = søknadsdata.søknad()
+            innsending.tilstand(søknadsdata, AventerMinsteinntektVurdering)
+        }
     }
 
-    fun håndter(journalpostData: JournalpostData) {
-        journalpostData.kontekst(this)
-        tilstand.håndter(this, journalpostData)
+    internal object AventerMinsteinntektVurdering : Tilstand {
+        override val type: InnsendingTilstandType
+            get() = InnsendingTilstandType.AvventerMinsteinntektVurdering
+
+        override fun entering(innsending: Innsending, event: Hendelse) {
+            innsending.trengerMinsteinntektVurdering(event)
+        }
     }
 
-
-    fun håndter(personInformasjon: PersonInformasjon) {
-        personInformasjon.kontekst(this)
-        tilstand.håndter(this, personInformasjon)
+    private fun trengerSøknadsdata(hendelse: Hendelse) {
+        val jp = requireNotNull(kategorisertJournalpost) { " Journalpost må være satt i ${tilstand.type} " }
+        hendelse.behov(
+            Søknadsdata, "Trenger søknadsdata",
+            mapOf(
+                "dokumentInfoId" to jp.dokumenter().first().brevkode
+            )
+        )
     }
 
     private fun trengerJournalpost(hendelse: Hendelse) {
@@ -114,6 +167,10 @@ class Innsending private constructor(
 
     private fun trengerPersonData(hendelse: Hendelse) {
         hendelse.behov(Persondata, "Trenger persondata")
+    }
+
+    private fun trengerMinsteinntektVurdering(hendelse: Hendelse) {
+        hendelse.behov(MinsteinntektVurdering, "Trenger vurdering av minste arbeidsinntekt")
     }
 
     private fun tilstand(
@@ -131,7 +188,7 @@ class Innsending private constructor(
         tilstand.entering(this, event)
     }
 
-    fun accept(visitor: InnsendingVisitor) {
+    internal fun accept(visitor: InnsendingVisitor) {
         visitor.preVisitInnsending(this, journalpostId)
         visitor.visitTilstand(tilstand)
         visitor.postVisitInnsending(this, journalpostId)
@@ -143,5 +200,4 @@ class Innsending private constructor(
             "journalpostId" to journalpostId
         )
     )
-
 }

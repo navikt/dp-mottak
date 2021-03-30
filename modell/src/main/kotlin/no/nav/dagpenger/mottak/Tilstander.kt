@@ -4,5 +4,7 @@ enum class InnsendingTilstandType {
     Mottatt,
     AvventerJournalpost,
     AvventerPersondata,
-    Kategorisering
+    Kategorisering,
+    AvventerSøknadsdata,
+    AvventerMinsteinntektVurdering
 }

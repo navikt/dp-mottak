@@ -175,7 +175,9 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
 
             enum class Behovtype {
                 Journalpost,
-                Persondata
+                Persondata,
+                Søknadsdata,
+                MinsteinntektVurdering
             }
         }
 
