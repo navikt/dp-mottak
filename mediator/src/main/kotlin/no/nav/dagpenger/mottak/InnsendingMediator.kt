@@ -5,7 +5,7 @@ import no.nav.dagpenger.mottak.db.InnsendingRepository
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.helse.rapids_rivers.RapidsConnection
 
-private val log = KotlinLogging.logger {}
+private val logg = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 internal class InnsendingMediator(

@@ -1,10 +1,13 @@
 package no.nav.dagpenger.mottak
 
 import mu.KLogger
+import mu.KotlinLogging
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.time.LocalDateTime
 import java.util.UUID
+
+private val logg = KotlinLogging.logger {}
 
 class BehovMediator(
     private val rapidsConnection: RapidsConnection,
@@ -45,6 +48,7 @@ class BehovMediator(
                 .also {
                     sikkerLogg.info { "Sender $id som ${it.toJson()}" }
                     rapidsConnection.publish(hendelse.journalpostId(), it.toJson())
+                    logg.info { "Sender behov ${behovsliste.joinToString { it }}" }
                 }
         }
     }
