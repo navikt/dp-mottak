@@ -5,6 +5,9 @@ import no.nav.dagpenger.mottak.SpesifikkKontekst
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+
+private const val maksTegn = 1999
 
 class JournalpostData(
     private val journalpostId: String,
@@ -114,11 +117,6 @@ class JournalpostData(
     }
 
     sealed class KategorisertJournalpost {
-
-        companion object {
-            fun nySøknad(brevkode: String?) = brevkode in listOf("NAV 04-01.03", "NAV 04-01.04")
-        }
-
         abstract fun journalpostId(): String
         abstract fun journalpostStatus(): String
         abstract fun dokumenter(): List<Dokument>
@@ -137,5 +135,32 @@ class JournalpostData(
         }
 
         data class Dokument(val tittel: String, val dokumentInfoId: String, val brevkode: String)
+    }
+}
+
+fun JournalpostData.KategorisertJournalpost.tilleggsinformasjon(): String {
+    val titler = dokumenter().map { it.tittel }
+    val hovedDokument = titler.first()
+    val vedlegg = titler.drop(1)
+
+    val formatertVedlegg =
+        if (vedlegg.isNotEmpty()) {
+            vedlegg.joinToString(prefix = "- ", separator = "\n- ", postfix = "\n")
+        } else {
+            ""
+        }
+
+    val formatertDato = datoRegistrert().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+    val datoBeskrivelse = "Registrert dato: ${formatertDato}\n"
+
+    val informasjon = "Hoveddokument: ${hovedDokument}\n" +
+        formatertVedlegg +
+        datoBeskrivelse +
+        "Dokumentet er skannet inn og journalført automatisk av digitale dagpenger. Gjennomfør rutinen \"Etterkontroll av automatisk journalførte dokumenter\"."
+
+    return if (informasjon.length > maksTegn) {
+        "Hoveddokument: ${hovedDokument}\nRegistrert dato: ${formatertDato}\nDokumentet er skannet inn og journalført automatisk av digitale dagpenger. Gjennomfør rutinen \"Etterkontroll av automatisk journalførte dokumenter\"."
+    } else {
+        informasjon
     }
 }

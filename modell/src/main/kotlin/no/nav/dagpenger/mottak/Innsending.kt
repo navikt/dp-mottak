@@ -18,6 +18,7 @@ import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
+import no.nav.dagpenger.mottak.meldinger.tilleggsinformasjon
 import java.util.UUID
 
 class Innsending private constructor(
@@ -322,11 +323,13 @@ class Innsending private constructor(
     }
 
     private fun oppretteArenaStartVedtak(hendelse: Hendelse, oppgavebenk: OppgaveBenk) {
+        val journalpost = requireNotNull(kategorisertJournalpost)
         val parametre = mapOf(
             "fødselsnummer" to "personen!",
             "behandlendeEnhetId" to oppgavebenk.id,
             "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
-            "registrertDato" to requireNotNull(kategorisertJournalpost).datoRegistrert()
+            "registrertDato" to journalpost.datoRegistrert(),
+            "tilleggsinformasjon" to journalpost.tilleggsinformasjon()
         )
         hendelse.behov(OpprettStartVedtakOppgave, "Oppretter oppgave og sak for journalpost $journalpostId", parametre)
     }
