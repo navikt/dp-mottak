@@ -1,15 +1,15 @@
-package no.nav.dagpener.mottak
+package no.nav.dagpenger.mottak
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.dagpener.mottak.meldinger.EksisterendesakData
-import no.nav.dagpener.mottak.meldinger.MinsteinntektVurderingData
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
-import no.nav.dagpenger.mottak.Innsending
-import no.nav.dagpenger.mottak.InnsendingTilstandType
-import no.nav.dagpenger.mottak.InnsendingVisitor
+import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.EksisterendesakData
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.JournalpostData
+import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
+import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
+import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -42,7 +42,7 @@ internal class InnsendingTest {
         assertFalse(joarkHendelse.behov().isEmpty())
         val behov = joarkHendelse.behov().first()
         assertEquals(Behovtype.Journalpost, behov.type)
-        assertEquals(InnsendingTilstandType.AvventerJournalpost, TestInnsendingInspektør(innsending).gjeldendetilstand)
+        assertEquals(InnsendingTilstandType.AvventerJournalpostType, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
         val nySøknad = JournalpostData(
             journalpostId = journalpostId,
@@ -65,18 +65,18 @@ internal class InnsendingTest {
         assertFalse(nySøknad.behov().isEmpty())
         assertEquals(Behovtype.Persondata, nySøknad.behov().first().type)
 
-        assertEquals(InnsendingTilstandType.AvventerPersondata, TestInnsendingInspektør(innsending).gjeldendetilstand)
+        assertEquals(InnsendingTilstandType.AvventerPersondataType, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
         val persondata = PersonInformasjon(
             journalpostId = journalpostId,
-            aktørId = "1234",
-            fødselsnummer = "12345678901",
+            aktoerId = "1234",
+            naturligIdent = "12345678901",
             norskTilknytning = true
         )
 
         innsending.håndter(persondata)
 
-        assertEquals(InnsendingTilstandType.AvventerSøknadsdata, TestInnsendingInspektør(innsending).gjeldendetilstand)
+        assertEquals(InnsendingTilstandType.AvventerSøknadsdataType, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
         val søknadsdata = Søknadsdata(
             journalpostId = journalpostId,
@@ -86,7 +86,7 @@ internal class InnsendingTest {
 
         innsending.håndter(søknadsdata)
 
-        assertEquals(InnsendingTilstandType.AvventerMinsteinntektVurdering, TestInnsendingInspektør(innsending).gjeldendetilstand)
+        assertEquals(InnsendingTilstandType.AvventerMinsteinntektVurderingType, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
         val vurderminsteinntektData = MinsteinntektVurderingData(
             journalpostId = journalpostId,
@@ -95,7 +95,7 @@ internal class InnsendingTest {
 
         innsending.håndter(vurderminsteinntektData)
 
-        assertEquals(InnsendingTilstandType.AvventerSvarOmEksisterendeSaker, TestInnsendingInspektør(innsending).gjeldendetilstand)
+        assertEquals(InnsendingTilstandType.AvventerSvarOmEksisterendeSakerType, TestInnsendingInspektør(innsending).gjeldendetilstand)
 
         val eksisterendeSak = EksisterendesakData(
             journalpostId = journalpostId,
@@ -104,7 +104,32 @@ internal class InnsendingTest {
 
         innsending.håndter(eksisterendeSak)
 
-        assertEquals(InnsendingTilstandType.AventerArenaStartVedtak, TestInnsendingInspektør(innsending).gjeldendetilstand)
+        assertEquals(InnsendingTilstandType.AventerArenaStartVedtakType, TestInnsendingInspektør(innsending).gjeldendetilstand)
+
+        val arenaOppgave = ArenaOppgaveOpprettet(
+            journalpostId = journalpostId,
+            oppgaveId = "1234",
+            fagsakId = "9867541"
+        )
+
+        innsending.håndter(arenaOppgave)
+        assertEquals(InnsendingTilstandType.OppdaterJournalpostType, TestInnsendingInspektør(innsending).gjeldendetilstand)
+
+        val oppdatertJournalpost = JournalpostOppdatert(
+            journalpostId = journalpostId
+        )
+
+        innsending.håndter(oppdatertJournalpost)
+
+        assertEquals(InnsendingTilstandType.FerdigstillJournalpostType, TestInnsendingInspektør(innsending).gjeldendetilstand)
+
+        val journalpostferdigstilt = JournalpostFerdigstilt(
+            journalpostId = journalpostId
+        )
+
+        innsending.håndter(journalpostferdigstilt)
+
+        assertEquals(InnsendingTilstandType.JournalførtType, TestInnsendingInspektør(innsending).gjeldendetilstand)
     }
 }
 

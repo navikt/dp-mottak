@@ -1,4 +1,4 @@
-package no.nav.dagpener.mottak.meldinger
+package no.nav.dagpenger.mottak.meldinger
 
 import no.nav.dagpenger.mottak.Hendelse
 
