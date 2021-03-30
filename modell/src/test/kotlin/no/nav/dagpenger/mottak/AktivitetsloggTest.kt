@@ -14,25 +14,25 @@ internal class AktivitetsloggTest {
     private lateinit var person: TestKontekst
 
     @BeforeEach
-    internal fun setUp() {
+    fun setUp() {
         person = TestKontekst("Innsending")
         aktivitetslogg = Aktivitetslogg()
     }
 
     @Test
-    internal fun `inneholder original melding`() {
+    fun `inneholder original melding`() {
         val infomelding = "info message"
         aktivitetslogg.info(infomelding)
         assertInfo(infomelding)
     }
 
     @Test
-    internal fun `har ingen feil ved default`() {
+    fun `har ingen feil ved default`() {
         assertFalse(aktivitetslogg.hasErrors())
     }
 
     @Test
-    internal fun `severe oppdaget og kaster exception`() {
+    fun `severe oppdaget og kaster exception`() {
         val melding = "Severe error"
         assertThrows<Aktivitetslogg.AktivitetException> { aktivitetslogg.severe(melding) }
         assertTrue(aktivitetslogg.hasErrors())
@@ -41,7 +41,7 @@ internal class AktivitetsloggTest {
     }
 
     @Test
-    internal fun `error oppdaget`() {
+    fun `error oppdaget`() {
         val melding = "Error"
         aktivitetslogg.error(melding)
         assertTrue(aktivitetslogg.hasErrors())
@@ -50,7 +50,7 @@ internal class AktivitetsloggTest {
     }
 
     @Test
-    internal fun `warning oppdaget`() {
+    fun `warning oppdaget`() {
         val melding = "Warning explanation"
         aktivitetslogg.warn(melding)
         assertFalse(aktivitetslogg.hasErrors())
@@ -59,7 +59,7 @@ internal class AktivitetsloggTest {
     }
 
     @Test
-    internal fun `Melding sendt til forelder`() {
+    fun `Melding sendt til forelder`() {
         val hendelse = TestHendelse(
             "Hendelse",
             aktivitetslogg.barn()
@@ -77,17 +77,17 @@ internal class AktivitetsloggTest {
     }
 
     @Test
-    internal fun `Melding sendt fra barnebarn til forelder`() {
+    fun `Melding sendt fra barnebarn til forelder`() {
         val hendelse = TestHendelse(
             "Hendelse",
             aktivitetslogg.barn()
         )
         hendelse.kontekst(person)
         val arbeidsgiver =
-            TestKontekst("Arbeidsgiver")
+            TestKontekst("Melding")
         hendelse.kontekst(arbeidsgiver)
         val vedtaksperiode =
-            TestKontekst("Vedtaksperiode")
+            TestKontekst("Soknad")
         hendelse.kontekst(vedtaksperiode)
         "info message".also {
             hendelse.info(it)
@@ -99,14 +99,14 @@ internal class AktivitetsloggTest {
             assertError(it, hendelse.logg)
             assertError(it, aktivitetslogg)
             assertError("Hendelse", aktivitetslogg)
-            assertError("Vedtaksperiode", aktivitetslogg)
-            assertError("Arbeidsgiver", aktivitetslogg)
-            assertError("Person", aktivitetslogg)
+            assertError("Soknad", aktivitetslogg)
+            assertError("Melding", aktivitetslogg)
+            assertError("Innsending", aktivitetslogg)
         }
     }
 
     @Test
-    internal fun `Vis bare arbeidsgiveraktivitet`() {
+    fun `Vis bare arbeidsgiveraktivitet`() {
         val hendelse1 = TestHendelse(
             "Hendelse1",
             aktivitetslogg.barn()
@@ -140,7 +140,7 @@ internal class AktivitetsloggTest {
     }
 
     @Test
-    internal fun `Behov kan ha detaljer`() {
+    fun `Behov kan ha detaljer`() {
         val hendelse1 = TestHendelse(
             "Hendelse1",
             aktivitetslogg.barn()

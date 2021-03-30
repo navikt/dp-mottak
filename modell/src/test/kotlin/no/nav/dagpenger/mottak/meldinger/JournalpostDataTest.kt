@@ -3,6 +3,7 @@ package no.nav.dagpenger.mottak.meldinger
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import java.time.LocalDateTime
 
 internal class JournalpostDataTest {
 
@@ -17,6 +18,9 @@ internal class JournalpostDataTest {
             journalpostId = "1234",
             journalpostStatus = "MOTTATT",
             aktørId = "21",
+            relevanteDatoer = listOf(
+                JournalpostData.RelevantDato(LocalDateTime.now().toString(), JournalpostData.Datotype.DATO_REGISTRERT)
+            ),
             dokumenter = listOf(
                 JournalpostData.DokumentInfo(
                     kanskjetittel = null,

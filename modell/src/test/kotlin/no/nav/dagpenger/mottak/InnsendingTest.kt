@@ -2,6 +2,8 @@ package no.nav.dagpener.mottak
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.dagpener.mottak.meldinger.EksisterendesakData
+import no.nav.dagpener.mottak.meldinger.MinsteinntektVurderingData
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingTilstandType
@@ -13,6 +15,7 @@ import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 import java.util.UUID
 
 internal class InnsendingTest {
@@ -45,6 +48,9 @@ internal class InnsendingTest {
             journalpostId = journalpostId,
             journalpostStatus = "MOTTATT",
             aktørId = "1234",
+            relevanteDatoer = listOf(
+                JournalpostData.RelevantDato(LocalDateTime.now().toString(), JournalpostData.Datotype.DATO_REGISTRERT)
+            ),
             dokumenter = listOf(
                 JournalpostData.DokumentInfo(
                     kanskjetittel = null,
@@ -81,6 +87,24 @@ internal class InnsendingTest {
         innsending.håndter(søknadsdata)
 
         assertEquals(InnsendingTilstandType.AvventerMinsteinntektVurdering, TestInnsendingInspektør(innsending).gjeldendetilstand)
+
+        val vurderminsteinntektData = MinsteinntektVurderingData(
+            journalpostId = journalpostId,
+            oppfyllerMinsteArbeidsinntekt = false
+        )
+
+        innsending.håndter(vurderminsteinntektData)
+
+        assertEquals(InnsendingTilstandType.AvventerSvarOmEksisterendeSaker, TestInnsendingInspektør(innsending).gjeldendetilstand)
+
+        val eksisterendeSak = EksisterendesakData(
+            journalpostId = journalpostId,
+            harEksisterendeSak = false
+        )
+
+        innsending.håndter(eksisterendeSak)
+
+        assertEquals(InnsendingTilstandType.AventerArenaStartVedtak, TestInnsendingInspektør(innsending).gjeldendetilstand)
     }
 }
 

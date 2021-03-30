@@ -2,11 +2,15 @@ package no.nav.dagpenger.mottak.meldinger
 
 import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.SpesifikkKontekst
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class JournalpostData(
     private val journalpostId: String,
     private val journalpostStatus: String,
     private val aktørId: String, // Bruker? (kan vi få fnr her?)
+    private val relevanteDatoer: List<RelevantDato>,
     private val dokumenter: List<DokumentInfo>
 ) : Hendelse() {
 
@@ -19,16 +23,32 @@ class JournalpostData(
         val brevkode = brevkode
     }
 
+    data class RelevantDato(
+        val dato: String,
+        val datotype: Datotype
+    )
+
+    enum class Datotype {
+        DATO_SENDT_PRINT, DATO_EKSPEDERT, DATO_JOURNALFOERT,
+        DATO_REGISTRERT, DATO_AVS_RETUR, DATO_DOKUMENT
+    }
+
     fun journalpost(): KategorisertJournalpost {
 
         val brevkode = dokumenter.firstOrNull()?.brevkode
-        val jpDokumenter = dokumenter.map { KategorisertJournalpost.Dokument(it.tittel, it.dokumentInfoId, it.brevkode) }
+        val jpDokumenter =
+            dokumenter.map { KategorisertJournalpost.Dokument(it.tittel, it.dokumentInfoId, it.brevkode) }
+        val oslo = ZoneId.of("Europe/Oslo")
+        val datoRegistrert = relevanteDatoer.find { dato -> dato.datotype == Datotype.DATO_REGISTRERT }?.let {
+            LocalDateTime.parse(it.dato).atZone(oslo)
+        } ?: LocalDateTime.now().atZone(oslo)
 
         return when (brevkode) {
             in listOf("NAV 04-01.03", "NAV 04-01.04") -> KategorisertJournalpost.NySøknad(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
-                dokumenter = jpDokumenter
+                dokumenter = jpDokumenter,
+                datoRegistrert = datoRegistrert
             )
             else -> TODO("Ikke kategorisert flere enn ny søknad")
         }
@@ -102,15 +122,18 @@ class JournalpostData(
         abstract fun journalpostId(): String
         abstract fun journalpostStatus(): String
         abstract fun dokumenter(): List<Dokument>
+        abstract fun datoRegistrert(): ZonedDateTime
 
         data class NySøknad(
             val journalpostId: String,
             val journalpostStatus: String,
-            val dokumenter: List<Dokument>
+            val dokumenter: List<Dokument>,
+            val datoRegistrert: ZonedDateTime
         ) : KategorisertJournalpost() {
             override fun journalpostId(): String = journalpostId
             override fun journalpostStatus(): String = journalpostStatus
             override fun dokumenter(): List<Dokument> = dokumenter
+            override fun datoRegistrert(): ZonedDateTime = datoRegistrert
         }
 
         data class Dokument(val tittel: String, val dokumentInfoId: String, val brevkode: String)

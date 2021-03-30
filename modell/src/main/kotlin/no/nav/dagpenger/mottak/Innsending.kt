@@ -1,7 +1,11 @@
 package no.nav.dagpenger.mottak
 
+import no.nav.dagpener.mottak.meldinger.EksisterendesakData
+import no.nav.dagpener.mottak.meldinger.MinsteinntektVurderingData
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.EksisterendeSaker
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.MinsteinntektVurdering
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettStartVedtakOppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Søknadsdata
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
@@ -15,7 +19,9 @@ class Innsending private constructor(
     private val journalpostId: String,
     private var tilstand: Tilstand,
     private var kategorisertJournalpost: KategorisertJournalpost?,
-    private var søknad: no.nav.dagpenger.mottak.meldinger.Søknadsdata.Søknad?
+    private var søknad: no.nav.dagpenger.mottak.meldinger.Søknadsdata.Søknad?,
+    private var oppfyllerMinsteArbeidsinntekt: Boolean?,
+    private var eksisterendeSaker: Boolean?
 ) : Aktivitetskontekst {
 
     internal constructor(
@@ -26,7 +32,9 @@ class Innsending private constructor(
         journalpostId = journalpostId,
         tilstand = Mottatt,
         kategorisertJournalpost = null,
-        søknad = null
+        søknad = null,
+        oppfyllerMinsteArbeidsinntekt = null,
+        eksisterendeSaker = null
     )
 
     fun journalpostId(): String = journalpostId
@@ -51,6 +59,16 @@ class Innsending private constructor(
         tilstand.håndter(this, søknadsdata)
     }
 
+    fun håndter(vurderminsteinntektData: MinsteinntektVurderingData) {
+        vurderminsteinntektData.kontekst(this)
+        tilstand.håndter(this, vurderminsteinntektData)
+    }
+
+    fun håndter(eksisterendeSak: EksisterendesakData) {
+        eksisterendeSak.kontekst(this)
+        tilstand.håndter(this, eksisterendeSak)
+    }
+
     interface Tilstand : Aktivitetskontekst {
 
         val type: InnsendingTilstandType
@@ -69,6 +87,14 @@ class Innsending private constructor(
 
         fun håndter(innsending: Innsending, søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
             søknadsdata.warn("Forventet ikke Søknadsdata i %s", type.name)
+        }
+
+        fun håndter(innsending: Innsending, vurderminsteinntektData: MinsteinntektVurderingData) {
+            vurderminsteinntektData.warn("Forventet ikke MinsteinntektVurderingData i %s", type.name)
+        }
+
+        fun håndter(innsending: Innsending, eksisterendeSak: EksisterendesakData) {
+            eksisterendeSak.warn("Forventet ikke Eksisterendesak i %s", type.name)
         }
 
         fun leaving(event: Hendelse) {}
@@ -149,6 +175,36 @@ class Innsending private constructor(
         override fun entering(innsending: Innsending, event: Hendelse) {
             innsending.trengerMinsteinntektVurdering(event)
         }
+
+        override fun håndter(innsending: Innsending, vurderminsteinntektData: MinsteinntektVurderingData) {
+            vurderminsteinntektData.info("Fikk minsteinntekt vurdering, vurderingen er ${vurderminsteinntektData.oppfyllerMinsteArbeidsinntekt()}")
+            innsending.oppfyllerMinsteArbeidsinntekt = vurderminsteinntektData.oppfyllerMinsteArbeidsinntekt()
+            innsending.tilstand(vurderminsteinntektData, AvventerSvarOmEksisterendeSaker)
+        }
+    }
+
+    internal object AvventerSvarOmEksisterendeSaker : Tilstand {
+        override val type: InnsendingTilstandType
+            get() = InnsendingTilstandType.AvventerSvarOmEksisterendeSaker
+
+        override fun entering(innsending: Innsending, event: Hendelse) {
+            innsending.trengerEksisterendeSaker(event)
+        }
+
+        override fun håndter(innsending: Innsending, eksisterendeSak: EksisterendesakData) {
+            eksisterendeSak.info("Fikk info om eksisterende saker: ${eksisterendeSak.harEksisterendeSaker()}")
+            innsending.eksisterendeSaker = eksisterendeSak.harEksisterendeSaker()
+            innsending.tilstand(eksisterendeSak, AventerArenaStartVedtak)
+        }
+    }
+
+    internal object AventerArenaStartVedtak : Tilstand {
+        override val type: InnsendingTilstandType
+            get() = InnsendingTilstandType.AventerArenaStartVedtak
+
+        override fun entering(innsending: Innsending, event: Hendelse) {
+            innsending.oppretteArenaStartVedtak(event, innsending.oppgaveBeskrivelseOgBenk())
+        }
     }
 
     private fun trengerSøknadsdata(hendelse: Hendelse) {
@@ -171,6 +227,20 @@ class Innsending private constructor(
 
     private fun trengerMinsteinntektVurdering(hendelse: Hendelse) {
         hendelse.behov(MinsteinntektVurdering, "Trenger vurdering av minste arbeidsinntekt")
+    }
+
+    private fun trengerEksisterendeSaker(hendelse: Hendelse) {
+        hendelse.behov(EksisterendeSaker, "Trenger opplysninger om eksisterende saker")
+    }
+
+    private fun oppretteArenaStartVedtak(hendelse: Hendelse, oppgavebenk: OppgaveBenk) {
+        val parametre = mapOf(
+            "fødselsnummer" to "personen!",
+            "behandlendeEnhetId" to oppgavebenk.id,
+            "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
+            "registrertDato" to requireNotNull(kategorisertJournalpost).datoRegistrert()
+        )
+        hendelse.behov(OpprettStartVedtakOppgave, "Trenger opplysninger om eksisterende saker", parametre)
     }
 
     private fun tilstand(
@@ -200,4 +270,43 @@ class Innsending private constructor(
             "journalpostId" to journalpostId
         )
     )
+
+    private data class OppgaveBenk(
+        val id: String,
+        val beskrivelse: String
+    )
+
+    private fun oppgaveBeskrivelseOgBenk(): OppgaveBenk {
+        val kanAvslåsPåMinsteinntekt = this.oppfyllerMinsteArbeidsinntekt == false
+        val søknad =
+            Søknad.fromJson(requireNotNull(this.søknad) { " Søknadsdata må være satt på dette tidspunktet" }.data)
+        // val koronaRegelverkMinsteinntektBrukt =
+        //     packet.getNullableBoolean(PacketKeys.KORONAREGELVERK_MINSTEINNTEKT_BRUKT) == true
+        val konkurs = søknad.harAvsluttetArbeidsforholdFraKonkurs()
+        val grenseArbeider = søknad.erGrenseArbeider()
+        val eøsArbeidsforhold = søknad.harEøsArbeidsforhold()
+        val inntektFraFangstFisk = søknad.harInntektFraFangstOgFiske()
+        val harAvtjentVerneplikt = søknad.harAvtjentVerneplikt()
+        val erPermittertFraFiskeforedling = søknad.erPermittertFraFiskeForedling()
+        //  val diskresjonskodeBenk = packet.getStringValue(PacketKeys.BEHANDLENDE_ENHET) == "2103"
+
+        return OppgaveBenk("bla bla", "Beskrivelse")
+        // return when {
+        //     diskresjonskodeBenk -> OppgaveBenk(tildeltEnhetsNrFrom(packet), henvendelse(packet).oppgavebeskrivelse)
+        //     eøsArbeidsforhold -> OppgaveBenk("4470", "MULIG SAMMENLEGGING - EØS\n")
+        //     harAvtjentVerneplikt -> OppgaveBenk(packet.getStringValue(PacketKeys.BEHANDLENDE_ENHET), "VERNEPLIKT\n")
+        //     inntektFraFangstFisk -> OppgaveBenk(
+        //         packet.getStringValue(PacketKeys.BEHANDLENDE_ENHET),
+        //         "FANGST OG FISKE\n"
+        //     )
+        //     grenseArbeider -> OppgaveBenk("4465", "EØS\n")
+        //     konkurs -> OppgaveBenk("4401", "Konkurs\n")
+        //     erPermittertFraFiskeforedling -> OppgaveBenk("4454", "FISK\n")
+        //     kanAvslåsPåMinsteinntekt -> OppgaveBenk(
+        //         packet.finnEnhetForHurtigAvslag(),
+        //         if (koronaRegelverkMinsteinntektBrukt) "Minsteinntekt - mulig avslag - korona\n" else "Minsteinntekt - mulig avslag\n"
+        //     )
+        //     else -> OppgaveBenk(tildeltEnhetsNrFrom(packet), henvendelse(packet).oppgavebeskrivelse)
+        // }
+    }
 }
