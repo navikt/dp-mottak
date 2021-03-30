@@ -1,5 +1,7 @@
 package no.nav.dagpenger.mottak
 
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.NySøknad
 import java.util.UUID
@@ -7,28 +9,30 @@ import java.util.UUID
 class Innsending private constructor(
     private val id: UUID,
     private val journalpostId: String,
-    private var tilstand: Tilstand,
-    private val behovslogg: Behovslogg
-
-) : Behovskontekst {
+    private var tilstand: Tilstand
+) : Aktivitetskontekst {
     internal constructor(
         id: UUID,
         journalpostId: String
     ) : this(
         id = id,
         journalpostId = journalpostId,
-        tilstand = Mottatt,
-        behovslogg = Behovslogg()
+        tilstand = Mottatt
     )
 
     fun journalpostId(): String = journalpostId
 
-    interface Tilstand : Behovskontekst {
+    interface Tilstand : Aktivitetskontekst {
 
         val type: InnsendingTilstandType
 
-        fun håndter(innsending: Innsending, joarkHendelse: JoarkHendelse) {}
-        fun håndter(innsending: Innsending, nySøknad: NySøknad) {}
+        fun håndter(innsending: Innsending, joarkHendelse: JoarkHendelse) {
+            joarkHendelse.warn("Forventet ikke JoarkHendelse i %s", type.name)
+        }
+
+        fun håndter(innsending: Innsending, nySøknad: NySøknad) {
+            nySøknad.warn("Forventet ikke NySøknad i %s", type.name)
+        }
         fun leaving(event: Hendelse) {}
         fun entering(innsending: Innsending, event: Hendelse) {}
 
@@ -79,11 +83,11 @@ class Innsending private constructor(
     }
 
     private fun trengerJournalpost(hendelse: Hendelse) {
-        hendelse.behov(Behovtype.Journalpost, "Trenger journalpost")
+        hendelse.behov(Journalpost, "Trenger journalpost")
     }
 
     private fun trengerPersonData(nySøknad: NySøknad) {
-        nySøknad.behov(Behovtype.Persondata, "Trenger persondata")
+        nySøknad.behov(Persondata, "Trenger persondata")
     }
 
     private fun tilstand(

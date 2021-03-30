@@ -1,6 +1,6 @@
 package no.nav.dagpener.mottak
 
-import no.nav.dagpenger.mottak.Behovtype
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.InnsendingVisitor
@@ -58,7 +58,7 @@ internal class TestInnsendingInspektør(innsending: Innsending) : InnsendingVisi
         innsending.accept(this)
     }
 
-    override fun visitTilstand(tilstand: Innsending.Tilstand) {
-        gjeldendetilstand = tilstand.type
+    override fun visitTilstand(tilstandType: Innsending.Tilstand) {
+        gjeldendetilstand = tilstandType.type
     }
 }
