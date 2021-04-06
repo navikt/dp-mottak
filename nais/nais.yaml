@@ -1,0 +1,31 @@
+apiVersion: nais.io/v1alpha1
+kind: Application
+metadata:
+  name: dp-mottak
+  namespace: teamdagpenger
+  labels:
+    team: teamdagpenger
+spec:
+  image: teamdagpenger
+  port: 8080
+  liveness:
+    path: /isalive
+  readiness:
+    path: /isready
+  prometheus:
+    enabled: true
+    path: /metrics
+  replicas:
+    min: 1
+    max: 2
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+    requests:
+      cpu: 400m
+      memory: 512Mi
+  secureLogs:
+    enabled: true
+  kafka:
+    pool: {{kafka_pool}}

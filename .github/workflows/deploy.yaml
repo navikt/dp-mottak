@@ -2,6 +2,9 @@ name: Build and deploy
 
 on: [push]
 
+env:
+  IMAGE: docker.pkg.github.com/${{ github.repository }}/dp-mottak:${{ github.sha }}
+
 
 jobs:
   build:
@@ -28,3 +31,61 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build --info
+
+      - name: Build and Publish Docker image
+        if: github.ref == 'refs/heads/master'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          docker build -t $IMAGE .
+          docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} -p ${GITHUB_TOKEN}
+          docker push $IMAGE
+
+      - name: Archive NAIS yaml
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v1
+        with:
+          name: nais-yaml
+          path: nais
+
+  deploy-dev:
+    name: Deploy to dev
+    needs: [build]
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch NAIS yaml
+        uses: actions/download-artifact@v1
+        with:
+          name: nais-yaml
+          path: nais
+
+      - uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-gcp
+          RESOURCE: nais/alerts.yaml,nais/nais.yaml
+          VARS: nais/dev-vars.yaml
+          VAR: alerts_slack_channel=#team-dagpenger-alert-non-prod
+          PRINT_PAYLOAD: true
+
+#  deploy-prod:
+#    name: Deploy to Production
+#    needs: [deploy-dev]
+#    if: github.ref == 'refs/heads/master'
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Fetch NAIS yaml
+#        uses: actions/download-artifact@v1
+#        with:
+#          name: nais-yaml
+#          path: nais
+#
+#      - uses: nais/deploy/actions/deploy@v1
+#        env:
+#          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+#          CLUSTER: prod-gcp
+#          RESOURCE: nais/alerts.yaml,nais/nais.yaml
+#          VARS: nais/prod-vars.yaml
+#          VAR: alerts_slack_channel=#team-dagpenger-alert
+#          PRINT_PAYLOAD: true

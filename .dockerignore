@@ -1,0 +1,5 @@
+# Ignore everything
+**
+
+# Except build jar
+!mediator/build/libs/*.jar

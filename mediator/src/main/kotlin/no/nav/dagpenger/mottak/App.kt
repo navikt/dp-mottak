@@ -1,5 +1,5 @@
 package no.nav.dagpenger.mottak
 
 fun main() {
-    println("Hello world")
+    ApplicationBuilder(Configuration.asMap()).start()
 }
