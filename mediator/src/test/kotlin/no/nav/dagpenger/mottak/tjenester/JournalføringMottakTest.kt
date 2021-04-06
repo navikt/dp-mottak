@@ -18,8 +18,8 @@ internal class JournalføringMottakTest {
     @Test
     fun `Skal motta joarkhendelse sende behov om Journalpost`() {
         val journalføringMottak = JournalføringMottak(
-            testRapid,
-            mediator
+            mediator,
+            testRapid
         )
         testRapid.sendTestMessage(joarkMelding())
         val behovMessage = testRapid.inspektør.message(0)

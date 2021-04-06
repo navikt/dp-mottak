@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak
 
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
+import no.nav.dagpenger.mottak.tjenester.JournalføringMottak
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 
@@ -14,7 +15,8 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
     ).build().apply {
-        InnsendingMediator(innsendingRepository, this)
+        val mediator = InnsendingMediator(innsendingRepository, this)
+        JournalføringMottak(mediator, this)
     }
 
     init {
