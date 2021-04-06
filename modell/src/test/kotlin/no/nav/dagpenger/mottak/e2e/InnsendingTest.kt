@@ -1,7 +1,16 @@
-package no.nav.dagpenger.mottak
+package no.nav.dagpenger.mottak.e2e
 
-import no.nav.dagpenger.mottak.e2e.AbstractEndeTilEndeTest
-import org.junit.jupiter.api.Assertions.assertEquals
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerJournalpostType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerMinsteinntektVurderingType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerPersondataType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerSvarOmEksisterendeSakerType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerSøknadsdataType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.FerdigstillJournalpostType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.JournalførtType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.MottattType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.OppdaterJournalpostType
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -29,17 +38,17 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJournalpostFerdigstilt()
 
         assertTilstander(
-            InnsendingTilstandType.MottattType,
-            InnsendingTilstandType.AvventerJournalpostType,
-            InnsendingTilstandType.AvventerPersondataType,
-            InnsendingTilstandType.KategoriseringType,
-            InnsendingTilstandType.AvventerSøknadsdataType,
-            InnsendingTilstandType.AvventerMinsteinntektVurderingType,
-            InnsendingTilstandType.AvventerSvarOmEksisterendeSakerType,
-            InnsendingTilstandType.AventerArenaStartVedtakType,
-            InnsendingTilstandType.OppdaterJournalpostType,
-            InnsendingTilstandType.FerdigstillJournalpostType,
-            InnsendingTilstandType.JournalførtType
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            AvventerSøknadsdataType,
+            AvventerMinsteinntektVurderingType,
+            AvventerSvarOmEksisterendeSakerType,
+            AventerArenaStartVedtakType,
+            OppdaterJournalpostType,
+            FerdigstillJournalpostType,
+            JournalførtType
         )
 
         inspektør.also {
