@@ -5,6 +5,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Ferdigst
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.MinsteinntektVurdering
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettStartVedtakOppgave
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettVurderhenvendelsOppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Søknadsdata
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
@@ -12,13 +13,11 @@ import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
 import no.nav.dagpenger.mottak.meldinger.EksisterendesakData
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.JournalpostData
-import no.nav.dagpenger.mottak.meldinger.JournalpostData.KategorisertJournalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
-import no.nav.dagpenger.mottak.meldinger.tilleggsinformasjon
 import java.time.Duration
 
 class Innsending private constructor(
@@ -194,20 +193,21 @@ class Innsending private constructor(
 
         override fun håndter(innsending: Innsending, personInformasjon: PersonInformasjon) {
             innsending.person = personInformasjon.person()
-            innsending.tilstand(personInformasjon, JournalpostKategorisering)
+            innsending.tilstand(personInformasjon, Kategorisering)
         }
     }
 
-    internal object JournalpostKategorisering : Tilstand {
+    internal object Kategorisering : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.KategoriseringType
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, event: Hendelse) {
-            event.info("Skal kategorisere journalpost")
+            event.info("Kategorisert journalpost til ${innsending.kategorisertJournalpost?.javaClass?.simpleName} ")
             when (innsending.kategorisertJournalpost) {
-                is KategorisertJournalpost.NySøknad -> innsending.tilstand(event, AvventerSøknadsdata)
+                is NySøknad -> innsending.tilstand(event, AvventerSøknadsdata)
+                is Gjenopptak -> innsending.tilstand(event, AvventerSøknadsdata)
                 else -> TODO("IKKE KATEGORISERT ")
             }
         }
@@ -224,9 +224,13 @@ class Innsending private constructor(
         }
 
         override fun håndter(innsending: Innsending, søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
-            søknadsdata.info("Fikk Søknadsdata for ${innsending.kategorisertJournalpost?.javaClass?.name}")
+            val kategorisertJournalpost = requireNotNull(innsending.kategorisertJournalpost) { " Journalpost må være kategorisert på dette tidspunktet " }
+            søknadsdata.info("Fikk Søknadsdata for ${kategorisertJournalpost.javaClass.name}")
             innsending.søknad = søknadsdata.søknad()
-            innsending.tilstand(søknadsdata, AventerMinsteinntektVurdering)
+            when (kategorisertJournalpost) {
+                is NySøknad -> innsending.tilstand(søknadsdata, AventerMinsteinntektVurdering)
+                is Gjenopptak -> innsending.tilstand(søknadsdata, AventerArenaVurderHendendelse)
+            }
         }
     }
 
@@ -271,7 +275,24 @@ class Innsending private constructor(
             get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, event: Hendelse) {
-            innsending.oppretteArenaStartVedtak(event, innsending.oppgaveBeskrivelseOgBenk())
+            innsending.oppretteArenaStartVedtakOppgave(event)
+        }
+
+        override fun håndter(innsending: Innsending, arenaOppgave: ArenaOppgaveOpprettet) {
+            innsending.arenaSak = arenaOppgave.arenaSak()
+            innsending.tilstand(arenaOppgave, OppdaterJournalpost)
+        }
+    }
+
+    internal object AventerArenaVurderHendendelse : Tilstand {
+
+        override val type: InnsendingTilstandType
+            get() = InnsendingTilstandType.AventerArenaVurderHendendelseType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
+
+        override fun entering(innsending: Innsending, event: Hendelse) {
+            innsending.oppretteArenaVurderHenvendelseOppgave(event)
         }
 
         override fun håndter(innsending: Innsending, arenaOppgave: ArenaOppgaveOpprettet) {
@@ -352,16 +373,34 @@ class Innsending private constructor(
         hendelse.behov(EksisterendeSaker, "Trenger opplysninger om eksisterende saker")
     }
 
-    private fun oppretteArenaStartVedtak(hendelse: Hendelse, oppgavebenk: OppgaveBenk) {
+    private fun oppretteArenaStartVedtakOppgave(hendelse: Hendelse) {
         val journalpost = requireNotNull(kategorisertJournalpost)
+        val søknad = requireNotNull(søknad)
+        val oppgavebenk = journalpost.oppgaveBenk(person, Søknad.fromJson(søknad.data), oppfyllerMinsteArbeidsinntekt)
         val parametre = mapOf(
             "fødselsnummer" to "personen!",
             "behandlendeEnhetId" to oppgavebenk.id,
             "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
-            "registrertDato" to journalpost.datoRegistrert(),
-            "tilleggsinformasjon" to journalpost.tilleggsinformasjon()
+            "registrertDato" to oppgavebenk.datoRegistrert,
+            "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon
         )
         hendelse.behov(OpprettStartVedtakOppgave, "Oppretter oppgave og sak for journalpost $journalpostId", parametre)
+    }
+
+    private fun oppretteArenaVurderHenvendelseOppgave(
+        hendelse: Hendelse
+    ) {
+        val journalpost = requireNotNull(kategorisertJournalpost)
+        val oppgavebenk = journalpost.oppgaveBenk(person)
+        val parametre = mapOf(
+            "fødselsnummer" to "personen!",
+            "behandlendeEnhetId" to oppgavebenk.id,
+            "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
+            "registrertDato" to oppgavebenk.datoRegistrert,
+            "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon
+        )
+
+        hendelse.behov(OpprettVurderhenvendelsOppgave, "Oppretter oppgave og sak for journalpost $journalpostId", parametre)
     }
 
     private fun oppdatereJournalpost(hendelse: Hendelse) {
@@ -415,7 +454,6 @@ class Innsending private constructor(
                 )
             )
         }
-
     }
 
     internal fun accept(visitor: InnsendingVisitor) {
@@ -436,43 +474,4 @@ class Innsending private constructor(
             "journalpostId" to journalpostId
         )
     )
-
-    private data class OppgaveBenk(
-        val id: String,
-        val beskrivelse: String
-    )
-
-    private fun oppgaveBeskrivelseOgBenk(): OppgaveBenk {
-        val kanAvslåsPåMinsteinntekt = this.oppfyllerMinsteArbeidsinntekt == false
-        val søknad =
-            Søknad.fromJson(requireNotNull(this.søknad) { " Søknadsdata må være satt på dette tidspunktet" }.data)
-        // val koronaRegelverkMinsteinntektBrukt =
-        //     packet.getNullableBoolean(PacketKeys.KORONAREGELVERK_MINSTEINNTEKT_BRUKT) == true
-        val konkurs = søknad.harAvsluttetArbeidsforholdFraKonkurs()
-        val grenseArbeider = søknad.erGrenseArbeider()
-        val eøsArbeidsforhold = søknad.harEøsArbeidsforhold()
-        val inntektFraFangstFisk = søknad.harInntektFraFangstOgFiske()
-        val harAvtjentVerneplikt = søknad.harAvtjentVerneplikt()
-        val erPermittertFraFiskeforedling = søknad.erPermittertFraFiskeForedling()
-        //  val diskresjonskodeBenk = packet.getStringValue(PacketKeys.BEHANDLENDE_ENHET) == "2103"
-
-        return OppgaveBenk("bla bla", "Beskrivelse")
-        // return when {
-        //     diskresjonskodeBenk -> OppgaveBenk(tildeltEnhetsNrFrom(packet), henvendelse(packet).oppgavebeskrivelse)
-        //     eøsArbeidsforhold -> OppgaveBenk("4470", "MULIG SAMMENLEGGING - EØS\n")
-        //     harAvtjentVerneplikt -> OppgaveBenk(packet.getStringValue(PacketKeys.BEHANDLENDE_ENHET), "VERNEPLIKT\n")
-        //     inntektFraFangstFisk -> OppgaveBenk(
-        //         packet.getStringValue(PacketKeys.BEHANDLENDE_ENHET),
-        //         "FANGST OG FISKE\n"
-        //     )
-        //     grenseArbeider -> OppgaveBenk("4465", "EØS\n")
-        //     konkurs -> OppgaveBenk("4401", "Konkurs\n")
-        //     erPermittertFraFiskeforedling -> OppgaveBenk("4454", "FISK\n")
-        //     kanAvslåsPåMinsteinntekt -> OppgaveBenk(
-        //         packet.finnEnhetForHurtigAvslag(),
-        //         if (koronaRegelverkMinsteinntektBrukt) "Minsteinntekt - mulig avslag - korona\n" else "Minsteinntekt - mulig avslag\n"
-        //     )
-        //     else -> OppgaveBenk(tildeltEnhetsNrFrom(packet), henvendelse(packet).oppgavebeskrivelse)
-        // }
-    }
 }

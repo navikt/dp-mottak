@@ -12,7 +12,5 @@ interface InnsendingObserver {
         val timeout: Duration,
     )
 
-
     fun tilstandEndret(event: InnsendingEndretTilstandEvent) {}
-
 }

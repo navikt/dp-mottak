@@ -21,8 +21,4 @@ class TestInnsendingInspektør(innsending: Innsending) : InnsendingVisitor {
     override fun visitInnsendingAktivitetslogg(aktivitetslogg: Aktivitetslogg) {
         innsendingLogg = aktivitetslogg
     }
-
-
-
-
 }

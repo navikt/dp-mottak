@@ -1,14 +1,14 @@
 package no.nav.dagpenger.mottak.meldinger
 
 import no.nav.dagpenger.mottak.Aktivitetslogg
+import no.nav.dagpenger.mottak.Dokument
+import no.nav.dagpenger.mottak.Gjenopptak
 import no.nav.dagpenger.mottak.Hendelse
+import no.nav.dagpenger.mottak.KategorisertJournalpost
+import no.nav.dagpenger.mottak.NySøknad
 import no.nav.dagpenger.mottak.SpesifikkKontekst
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-
-private const val maksTegn = 1999
 
 class JournalpostData(
     aktivitetslogg: Aktivitetslogg,
@@ -42,14 +42,20 @@ class JournalpostData(
 
         val brevkode = dokumenter.firstOrNull()?.brevkode
         val jpDokumenter =
-            dokumenter.map { KategorisertJournalpost.Dokument(it.tittel, it.dokumentInfoId, it.brevkode) }
+            dokumenter.map { Dokument(it.tittel, it.dokumentInfoId, it.brevkode) }
         val oslo = ZoneId.of("Europe/Oslo")
         val datoRegistrert = relevanteDatoer.find { dato -> dato.datotype == Datotype.DATO_REGISTRERT }?.let {
             LocalDateTime.parse(it.dato).atZone(oslo)
         } ?: LocalDateTime.now().atZone(oslo)
 
         return when (brevkode) {
-            in listOf("NAV 04-01.03", "NAV 04-01.04") -> KategorisertJournalpost.NySøknad(
+            in setOf("NAV 04-01.03", "NAV 04-01.04") -> NySøknad(
+                journalpostId = journalpostId,
+                journalpostStatus = journalpostStatus,
+                dokumenter = jpDokumenter,
+                datoRegistrert = datoRegistrert
+            )
+            in setOf("NAV 04-16.03", "NAV 04-16.04") -> Gjenopptak(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
                 dokumenter = jpDokumenter,
@@ -116,53 +122,5 @@ class JournalpostData(
             "NAVe 04-01.04" to "Ettersendelse til søknad om dagpenger ved permittering",
             "NAV 90-00.08" to "Klage og anke"
         )
-    }
-
-    sealed class KategorisertJournalpost {
-        abstract fun journalpostId(): String
-        abstract fun journalpostStatus(): String
-        abstract fun dokumenter(): List<Dokument>
-        abstract fun datoRegistrert(): ZonedDateTime
-
-        data class NySøknad(
-            val journalpostId: String,
-            val journalpostStatus: String,
-            val dokumenter: List<Dokument>,
-            val datoRegistrert: ZonedDateTime
-        ) : KategorisertJournalpost() {
-            override fun journalpostId(): String = journalpostId
-            override fun journalpostStatus(): String = journalpostStatus
-            override fun dokumenter(): List<Dokument> = dokumenter
-            override fun datoRegistrert(): ZonedDateTime = datoRegistrert
-        }
-
-        data class Dokument(val tittel: String, val dokumentInfoId: String, val brevkode: String)
-    }
-}
-
-fun JournalpostData.KategorisertJournalpost.tilleggsinformasjon(): String {
-    val titler = dokumenter().map { it.tittel }
-    val hovedDokument = titler.first()
-    val vedlegg = titler.drop(1)
-
-    val formatertVedlegg =
-        if (vedlegg.isNotEmpty()) {
-            vedlegg.joinToString(prefix = "- ", separator = "\n- ", postfix = "\n")
-        } else {
-            ""
-        }
-
-    val formatertDato = datoRegistrert().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-    val datoBeskrivelse = "Registrert dato: ${formatertDato}\n"
-
-    val informasjon = "Hoveddokument: ${hovedDokument}\n" +
-        formatertVedlegg +
-        datoBeskrivelse +
-        "Dokumentet er skannet inn og journalført automatisk av digitale dagpenger. Gjennomfør rutinen \"Etterkontroll av automatisk journalførte dokumenter\"."
-
-    return if (informasjon.length > maksTegn) {
-        "Hoveddokument: ${hovedDokument}\nRegistrert dato: ${formatertDato}\nDokumentet er skannet inn og journalført automatisk av digitale dagpenger. Gjennomfør rutinen \"Etterkontroll av automatisk journalførte dokumenter\"."
-    } else {
-        informasjon
     }
 }

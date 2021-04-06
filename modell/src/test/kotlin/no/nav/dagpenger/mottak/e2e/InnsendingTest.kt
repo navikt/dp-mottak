@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.e2e
 
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaVurderHendendelseType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerJournalpostType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerMinsteinntektVurderingType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerPersondataType
@@ -46,6 +47,42 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerMinsteinntektVurderingType,
             AvventerSvarOmEksisterendeSakerType,
             AventerArenaStartVedtakType,
+            OppdaterJournalpostType,
+            FerdigstillJournalpostType,
+            JournalførtType
+        )
+
+        inspektør.also {
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["NAV 04-16.03", "NAV 04-16.04"])
+    fun `skal håndtere joark hendelse der journalpost er gjennopptak`(brevkode: String) {
+        håndterJoarkHendelse()
+
+        håndterJournalpostData(brevkode)
+
+        håndterPersonInformasjon()
+
+        håndterSøknadsdata()
+
+        håndterArenaOppgaveOpprettet()
+
+        håndterJournalpostOppdatert()
+
+        håndterJournalpostFerdigstilt()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            AvventerSøknadsdataType,
+            AventerArenaVurderHendendelseType,
             OppdaterJournalpostType,
             FerdigstillJournalpostType,
             JournalførtType

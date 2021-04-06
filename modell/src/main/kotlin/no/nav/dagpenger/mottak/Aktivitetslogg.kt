@@ -185,6 +185,7 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
                 MinsteinntektVurdering,
                 EksisterendeSaker,
                 OpprettStartVedtakOppgave,
+                OpprettVurderhenvendelsOppgave,
                 Oppdaterjournalpost,
                 Ferdigstill
             }

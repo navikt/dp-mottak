@@ -48,7 +48,6 @@ abstract class AbstractEndeTilEndeTest {
         assertFalse(inspektør.innsendingLogg.hasErrors(), inspektør.innsendingLogg.toString())
     }
 
-
     protected fun assertMessages(inspektør: TestInnsendingInspektør) {
         assertTrue(inspektør.innsendingLogg.hasMessages(), inspektør.innsendingLogg.toString())
     }
@@ -57,7 +56,7 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(joarkhendelse())
     }
 
-    protected fun håndterJournalpostData(brevkode: String =  "NAV 04-01.03") {
+    protected fun håndterJournalpostData(brevkode: String = "NAV 04-01.03") {
         innsending.håndter(journalpostData(brevkode))
     }
 
@@ -125,7 +124,6 @@ abstract class AbstractEndeTilEndeTest {
         data = mapper.createObjectNode().also { it.put("data", "data") }
     )
 
-
     private fun personInformasjon(): PersonInformasjon = PersonInformasjon(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
@@ -134,7 +132,7 @@ abstract class AbstractEndeTilEndeTest {
         norskTilknytning = true
     )
 
-    private fun journalpostData(brevkode: String): JournalpostData =  JournalpostData(
+    private fun journalpostData(brevkode: String): JournalpostData = JournalpostData(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
         journalpostStatus = "MOTTATT",
@@ -151,11 +149,10 @@ abstract class AbstractEndeTilEndeTest {
         )
     )
 
-    private fun joarkhendelse() : JoarkHendelse = JoarkHendelse(
+    private fun joarkhendelse(): JoarkHendelse = JoarkHendelse(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
         hendelseType = "MIDLERTIDIG",
         journalpostStatus = "MOTTATT"
     )
-
 }
