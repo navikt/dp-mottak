@@ -1,8 +1,8 @@
 apiVersion: nais.io/v1
 kind: Alert
 metadata:
-  name: dp-mottak-alert
-  namespace: default
+  name: dp-mottak
+  namespace: teamdagpenger
   labels:
     team: teamdagpenger
 spec:
