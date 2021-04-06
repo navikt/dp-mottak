@@ -20,19 +20,19 @@ internal class JournalføringMottak(
 
     init {
         River(rapidsConnection).apply {
-            validate(River.PacketValidation { it.requireKey("journalpostId") })
-            validate(River.PacketValidation { it.requireKey("journalpostStatus") })
-            validate(River.PacketValidation { it.interestedIn("temaNytt", "hendelsesType", "mottaksKanal", "behandlingstema") })
+            validate { it.requireKey("journalpostId") }
+            validate { it.requireKey("journalpostStatus") }
+            validate { it.interestedIn("temaNytt", "hendelsesType", "mottaksKanal", "behandlingstema") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         logg.info(
             """Received journalpost with journalpost id: ${packet["journalpostId"].asText()} 
-                        |tema: ${packet["temaNytt"]}, 
-                        |hendelsesType: ${packet["hendelsesType"]}, 
-                        |mottakskanal, ${packet["mottaksKanal"]}, 
-                        |behandlingstema: ${packet["behandlingstema"]}""".trimMargin()
+                        |tema: ${packet["temaNytt"].asText()}, 
+                        |hendelsesType: ${packet["hendelsesType"].asText()}, 
+                        |mottakskanal, ${packet["mottaksKanal"].asText()}, 
+                        |behandlingstema: ${packet["behandlingstema"].asText()}""".trimMargin()
         )
 
         val joarkHendelse = JoarkHendelse(
@@ -47,6 +47,6 @@ internal class JournalføringMottak(
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {
-        logg.error { problems }
+        logg.info { problems }
     }
 }

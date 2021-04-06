@@ -19,6 +19,7 @@ import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import no.nav.dagpenger.mottak.meldinger.tilleggsinformasjon
+import java.time.Duration
 
 class Innsending private constructor(
     private val journalpostId: String,
@@ -30,8 +31,11 @@ class Innsending private constructor(
     private var person: Person?,
     private var arenaSak: ArenaSak?,
     private var oppdatertJournalpost: Boolean?,
-    private var ferdigstilt: Boolean?
+    private var ferdigstilt: Boolean?,
+    internal val aktivitetslogg: Aktivitetslogg
 ) : Aktivitetskontekst {
+
+    private val observers = mutableSetOf<InnsendingObserver>()
 
     constructor(
         journalpostId: String
@@ -45,60 +49,68 @@ class Innsending private constructor(
         person = null,
         arenaSak = null,
         oppdatertJournalpost = null,
-        ferdigstilt = null
+        ferdigstilt = null,
+        aktivitetslogg = Aktivitetslogg()
     )
 
     fun journalpostId(): String = journalpostId
 
     fun håndter(joarkHendelse: JoarkHendelse) {
-        joarkHendelse.kontekst(this)
+        kontekst(joarkHendelse, "Registrert joark hendelse")
         tilstand.håndter(this, joarkHendelse)
     }
 
     fun håndter(journalpostData: JournalpostData) {
-        journalpostData.kontekst(this)
+        kontekst(journalpostData, "Mottatt informasjon om journalpost")
         tilstand.håndter(this, journalpostData)
     }
 
     fun håndter(personInformasjon: PersonInformasjon) {
         // @todo: må håndtere der vi rett og slett ikke får tak i person
-        personInformasjon.kontekst(this)
+        kontekst(personInformasjon, "Mottatt informasjon om person")
         tilstand.håndter(this, personInformasjon)
     }
 
     fun håndter(søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
-        søknadsdata.kontekst(this)
+        kontekst(søknadsdata, "Mottatt søknadsdata")
         tilstand.håndter(this, søknadsdata)
     }
 
     fun håndter(vurderminsteinntektData: MinsteinntektVurderingData) {
-        vurderminsteinntektData.kontekst(this)
+        kontekst(vurderminsteinntektData, "Mottatt informasjon vurdering om minste arbeidsinntekt")
         tilstand.håndter(this, vurderminsteinntektData)
     }
 
     fun håndter(eksisterendeSak: EksisterendesakData) {
-        eksisterendeSak.kontekst(this)
+        kontekst(eksisterendeSak, "Mottatt informasjon om eksisterende saker")
         tilstand.håndter(this, eksisterendeSak)
     }
 
     fun håndter(arenaOppgave: ArenaOppgaveOpprettet) {
-        arenaOppgave.kontekst(this)
+        kontekst(arenaOppgave, "Mottatt informasjon om opprettet Arena oppgave")
         tilstand.håndter(this, arenaOppgave)
     }
 
     fun håndter(oppdatertJournalpost: JournalpostOppdatert) {
-        oppdatertJournalpost.kontekst(this)
+        kontekst(oppdatertJournalpost, "Mottatt informasjon om oppdatert journalpost")
         tilstand.håndter(this, oppdatertJournalpost)
     }
 
     fun håndter(journalpostferdigstilt: JournalpostFerdigstilt) {
-        journalpostferdigstilt.kontekst(this)
+        kontekst(journalpostferdigstilt, "Mottatt informasjon om ferdigstilt journalpost")
         tilstand.håndter(this, journalpostferdigstilt)
+    }
+
+    private fun kontekst(hendelse: Hendelse, melding: String) {
+        hendelse.kontekst(this)
+        hendelse.kontekst(this.tilstand)
+        hendelse.info(melding)
     }
 
     interface Tilstand : Aktivitetskontekst {
 
         val type: InnsendingTilstandType
+        val timeout: Duration
 
         fun håndter(innsending: Innsending, joarkHendelse: JoarkHendelse) {
             joarkHendelse.warn("Forventet ikke JoarkHendelse i %s", type.name)
@@ -152,6 +164,8 @@ class Innsending private constructor(
     internal object Mottatt : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.MottattType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
 
         override fun håndter(innsending: Innsending, joarkHendelse: JoarkHendelse) {
             innsending.trengerJournalpost(joarkHendelse)
@@ -162,6 +176,8 @@ class Innsending private constructor(
     internal object AvventerJournalpost : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AvventerJournalpostType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
 
         override fun håndter(innsending: Innsending, journalpostData: JournalpostData) {
             innsending.kategorisertJournalpost = journalpostData.journalpost()
@@ -173,6 +189,8 @@ class Innsending private constructor(
     internal object AvventerPersondata : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AvventerPersondataType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
 
         override fun håndter(innsending: Innsending, personInformasjon: PersonInformasjon) {
             innsending.person = personInformasjon.person()
@@ -183,6 +201,8 @@ class Innsending private constructor(
     internal object JournalpostKategorisering : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.KategoriseringType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, event: Hendelse) {
             event.info("Skal kategorisere journalpost")
@@ -196,6 +216,8 @@ class Innsending private constructor(
     internal object AvventerSøknadsdata : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AvventerSøknadsdataType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, event: Hendelse) {
             innsending.trengerSøknadsdata(event)
@@ -211,6 +233,8 @@ class Innsending private constructor(
     internal object AventerMinsteinntektVurdering : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AvventerMinsteinntektVurderingType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, event: Hendelse) {
             innsending.trengerMinsteinntektVurdering(event)
@@ -226,6 +250,8 @@ class Innsending private constructor(
     internal object AvventerSvarOmEksisterendeSaker : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AvventerSvarOmEksisterendeSakerType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, event: Hendelse) {
             innsending.trengerEksisterendeSaker(event)
@@ -241,6 +267,8 @@ class Innsending private constructor(
     internal object AventerArenaStartVedtak : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AventerArenaStartVedtakType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, event: Hendelse) {
             innsending.oppretteArenaStartVedtak(event, innsending.oppgaveBeskrivelseOgBenk())
@@ -255,6 +283,8 @@ class Innsending private constructor(
     internal object OppdaterJournalpost : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.OppdaterJournalpostType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, hendelse: Hendelse) {
             innsending.oppdatereJournalpost(hendelse)
@@ -269,6 +299,8 @@ class Innsending private constructor(
     internal object FerdigstillJournalpost : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.FerdigstillJournalpostType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, event: Hendelse) {
             innsending.ferdigstillJournalpost(event)
@@ -284,6 +316,8 @@ class Innsending private constructor(
     internal object Journalført : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.JournalførtType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, event: Hendelse) {
             if (innsending.oppdatertJournalpost == false && innsending.ferdigstilt == false) {
@@ -354,16 +388,46 @@ class Innsending private constructor(
             return // Already in this state => ignore
         }
         tilstand.leaving(event)
+        val previousState = tilstand
         tilstand = nyTilstand
         block()
         event.kontekst(tilstand)
+        emitTilstandEndret(tilstand.type, event.aktivitetslogg, previousState.type, tilstand.timeout)
         tilstand.entering(this, event)
+    }
+
+    private fun emitTilstandEndret(
+        gjeldendeTilstand: InnsendingTilstandType,
+        aktivitetslogg: Aktivitetslogg,
+        forrigeTilstand: InnsendingTilstandType,
+        timeout: Duration
+    ) {
+
+        observers.forEach {
+            it.tilstandEndret(
+                InnsendingObserver.InnsendingEndretTilstandEvent(
+                    journalpostId = journalpostId,
+                    gjeldendeTilstand = gjeldendeTilstand,
+                    forrigeTilstand = forrigeTilstand,
+                    aktivitetslogg = aktivitetslogg,
+                    timeout = timeout
+
+                )
+            )
+        }
+
     }
 
     internal fun accept(visitor: InnsendingVisitor) {
         visitor.preVisitInnsending(this, journalpostId)
         visitor.visitTilstand(tilstand)
+        visitor.visitInnsendingAktivitetslogg(aktivitetslogg)
+        aktivitetslogg.accept(visitor)
         visitor.postVisitInnsending(this, journalpostId)
+    }
+
+    fun addObserver(observer: InnsendingObserver) {
+        observers.add(observer)
     }
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(
