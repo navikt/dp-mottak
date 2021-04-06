@@ -7,18 +7,21 @@ import java.time.format.DateTimeFormatter
 private const val maksTegn = 1999
 
 sealed class KategorisertJournalpost {
-    protected abstract fun henvendelseNavn(): String
+    private val behandlendeEnhetForDiskresjonskoder = "2103"
     abstract fun journalpostId(): String
     abstract fun journalpostStatus(): String
     abstract fun dokumenter(): List<Dokument>
     abstract fun datoRegistrert(): ZonedDateTime
-    protected open fun finnOppgaveBenk(søknad: Søknad?, oppfyllerMinsteArbeidsinntekt: Boolean?): OppgaveBenk =
-        OppgaveBenk(brevkode(), henvendelseNavn(), datoRegistrert(), tilleggsinformasjon())
+    protected abstract fun henvendelseNavn(): String
+    protected open fun finnOppgaveBenk(søknad: Søknad?, oppfyllerMinsteArbeidsinntekt: Boolean?, person: Person?): OppgaveBenk =
+        OppgaveBenk(behandlendeEnhet(person), henvendelseNavn(), datoRegistrert(), tilleggsinformasjon())
 
-    protected fun brevkode(): String {
-        return when (dokumenter().firstOrNull()?.brevkode ?: "ukjent") {
-            in PERMITTERING_BREVKODER -> "4455"
-            in UTLAND_BREVKODER -> "4470"
+    protected fun behandlendeEnhet(person: Person?): String {
+        val brevkode = dokumenter().firstOrNull()?.brevkode ?: "ukjent"
+        return when {
+            brevkode in PERMITTERING_BREVKODER && person?.norskTilknytning == false -> "4465"
+            brevkode in PERMITTERING_BREVKODER -> "4455"
+            brevkode in UTLAND_BREVKODER -> "4470"
             else -> "4450"
         }
     }
@@ -28,10 +31,11 @@ sealed class KategorisertJournalpost {
         søknad: Søknad? = null,
         oppfyllerMinsteArbeidsinntekt: Boolean? = null
     ): OppgaveBenk {
-        val oppgaveBenk = finnOppgaveBenk(søknad, oppfyllerMinsteArbeidsinntekt)
+        val oppgaveBenk = finnOppgaveBenk(søknad, oppfyllerMinsteArbeidsinntekt, person)
+
         return when (person?.diskresjonskode) {
-            "STRENGT_FORTROLIG_UTLAND" -> oppgaveBenk.copy(id = "2103", beskrivelse = henvendelseNavn())
-            "STRENGT_FORTROLIG" -> oppgaveBenk.copy(id = "2103", beskrivelse = henvendelseNavn())
+            "STRENGT_FORTROLIG_UTLAND" -> oppgaveBenk.copy(id = behandlendeEnhetForDiskresjonskoder, beskrivelse = henvendelseNavn())
+            "STRENGT_FORTROLIG" -> oppgaveBenk.copy(id = behandlendeEnhetForDiskresjonskoder, beskrivelse = henvendelseNavn())
             else -> oppgaveBenk
         }
     }
@@ -97,7 +101,7 @@ data class NySøknad(
     override fun journalpostStatus(): String = journalpostStatus
     override fun dokumenter(): List<Dokument> = dokumenter
     override fun datoRegistrert(): ZonedDateTime = datoRegistrert
-    override fun finnOppgaveBenk(søknad: Søknad?, oppfyllerMinsteArbeidsinntekt: Boolean?): OppgaveBenk {
+    override fun finnOppgaveBenk(søknad: Søknad?, oppfyllerMinsteArbeidsinntekt: Boolean?, person: Person?): OppgaveBenk {
         requireNotNull(søknad) { " Søknadsdata må være satt på dette tidspunktet" }
         // val koronaRegelverkMinsteinntektBrukt =
         //     packet.getNullableBoolean(PacketKeys.KORONAREGELVERK_MINSTEINNTEKT_BRUKT) == true
@@ -116,13 +120,13 @@ data class NySøknad(
                 tilleggsinformasjon()
             )
             harAvtjentVerneplikt -> OppgaveBenk(
-                brevkode(),
+                behandlendeEnhet(person),
                 "VERNEPLIKT\n",
                 datoRegistrert(),
                 tilleggsinformasjon()
             )
             inntektFraFangstFisk -> OppgaveBenk(
-                brevkode(),
+                behandlendeEnhet(person),
                 "FANGST OG FISKE\n",
                 datoRegistrert(),
                 tilleggsinformasjon()
@@ -143,13 +147,13 @@ data class NySøknad(
                 tilleggsinformasjon()
             )
             kanAvslåsPåMinsteinntekt -> OppgaveBenk(
-                finnEnhetForHurtigAvslag(),
+                finnEnhetForHurtigAvslag(person),
                 "Minsteinntekt - mulig avslag\n", // if (koronaRegelverkMinsteinntektBrukt) "Minsteinntekt - mulig avslag - korona\n" else
                 datoRegistrert(),
                 tilleggsinformasjon()
             )
             else -> OppgaveBenk(
-                brevkode(),
+                behandlendeEnhet(person),
                 henvendelseNavn(),
                 datoRegistrert(),
                 tilleggsinformasjon()
@@ -157,10 +161,10 @@ data class NySøknad(
         }
     }
 
-    private fun finnEnhetForHurtigAvslag() = when (brevkode()) {
+    private fun finnEnhetForHurtigAvslag(person: Person?) = when (behandlendeEnhet(person)) {
         "4450" -> "4451"
         "4455" -> "4456"
-        else -> brevkode()
+        else -> behandlendeEnhet(person)
     }
 }
 
@@ -171,7 +175,6 @@ data class Gjenopptak(
     val datoRegistrert: ZonedDateTime
 ) : KategorisertJournalpost() {
     override fun henvendelseNavn(): String = "Gjenopptak\n"
-
     override fun journalpostId(): String = journalpostId
     override fun journalpostStatus(): String = journalpostStatus
     override fun dokumenter(): List<Dokument> = dokumenter

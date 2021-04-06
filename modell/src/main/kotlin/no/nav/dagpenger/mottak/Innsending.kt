@@ -5,7 +5,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Ferdigst
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.MinsteinntektVurdering
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettStartVedtakOppgave
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettVurderhenvendelsOppgave
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettVurderhenvendelseOppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Søknadsdata
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
@@ -400,7 +400,7 @@ class Innsending private constructor(
             "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon
         )
 
-        hendelse.behov(OpprettVurderhenvendelsOppgave, "Oppretter oppgave og sak for journalpost $journalpostId", parametre)
+        hendelse.behov(OpprettVurderhenvendelseOppgave, "Oppretter oppgave og sak for journalpost $journalpostId", parametre)
     }
 
     private fun oppdatereJournalpost(hendelse: Hendelse) {

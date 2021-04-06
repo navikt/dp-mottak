@@ -61,7 +61,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
     @ParameterizedTest
     @ValueSource(strings = ["NAV 04-16.03", "NAV 04-16.04"])
-    fun `skal håndtere joark hendelse der journalpost er gjennopptak`(brevkode: String) {
+    fun `skal håndtere joark hendelse der journalpost er gjenopptak`(brevkode: String) {
         håndterJoarkHendelse()
 
         håndterJournalpostData(brevkode)

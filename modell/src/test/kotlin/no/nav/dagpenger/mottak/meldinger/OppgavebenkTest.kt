@@ -13,11 +13,12 @@ import no.nav.dagpenger.mottak.harInntektFraFangstOgFiske
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class OppgavebenkTest {
     private val jp = lagjournalpostData("NAV 04-01.03").journalpost()
-    private val beskyttetPerson = PersonInformasjon.Person("12344", "12345678901", false, "STRENGT_FORTROLIG")
-    private val person = PersonInformasjon.Person("12344", "12345678901", false, null)
+    private val person = PersonInformasjon.Person("12344", "12345678901", true, null)
 
     @Test
     fun `Finn riktig oppgave beskrivelse og benk når søker har eøs arbeidsforhold de siste 3 årene `() {
@@ -34,15 +35,16 @@ class OppgavebenkTest {
         }
     }
 
-    @Test
-    fun `Bruk original benk når bruker har diskresjonskode`() {
+    @ParameterizedTest
+    @ValueSource(strings = ["STRENGT_FORTROLIG_UTLAND", "STRENGT_FORTROLIG"])
+    fun `Bruk original benk når bruker har diskresjonskode`(diskresjonskode: String) {
         withSøknad(
             harAvtjentVerneplikt = true,
             harInntektFraFangstOgFiske = true,
             erGrenseArbeider = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
-            val oppgaveBenk = jp.oppgaveBenk(person = beskyttetPerson, søknad = it)
+            val oppgaveBenk = jp.oppgaveBenk(person = person.copy(diskresjonskode = diskresjonskode), søknad = it)
             assertEquals("2103", oppgaveBenk.id)
             assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
         }
@@ -130,11 +132,20 @@ class OppgavebenkTest {
         }
     }
 
+    @Test
+    fun `Finn riktig oppgave beskrivelse og person ikke har norsk tilknytning ved permittering`() {
+        withSøknad {
+            val oppgaveBenk = lagjournalpostData("NAV 04-01.04").journalpost().oppgaveBenk(person = person.copy(norskTilknytning = false), søknad = it)
+            assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
+            assertEquals("4465", oppgaveBenk.id)
+        }
+    }
+
     @Test @Disabled("TODO: Få inne koronaregler")
     fun `Finn riktig oppgave beskrivelse og benk ved oppfyller minsteinntekt ved korona regler`() {
         withSøknad {
             val oppgaveBenk = jp.oppgaveBenk(person = person, søknad = it, oppfyllerMinsteArbeidsinntekt = false)
-            assertEquals("Minsteinntekt - mulig avslag - korona\n\n", oppgaveBenk.beskrivelse)
+            assertEquals("Minsteinntekt - mulig avslag - korona\n", oppgaveBenk.beskrivelse)
             assertEquals("4451", oppgaveBenk.id)
         }
     }
