@@ -38,6 +38,22 @@ class JournalpostData(
         DATO_REGISTRERT, DATO_AVS_RETUR, DATO_DOKUMENT
     }
 
+    /**
+     *
+     * @todos  Fra joark mottak
+    "NAV 04-06.05" to Henvendelsestype.UTDANNING,
+    "NAV 04-06.08" to Henvendelsestype.ETABLERING,
+    "NAV 90-00.08" to Henvendelsestype.KLAGE_ANKE,
+    "NAVe 04-16.04" to Henvendelsestype.ETTERSENDELSE,
+    "NAVe 04-16.03" to Henvendelsestype.ETTERSENDELSE,
+    "NAVe 04-01.03" to Henvendelsestype.ETTERSENDELSE,
+    "NAVe 04-01.04" to Henvendelsestype.ETTERSENDELSE
+
+     + Klage og anke fra lønnskompensasjon
+     + Manuell
+
+     **/
+
     fun journalpost(): KategorisertJournalpost {
 
         val brevkode = dokumenter.firstOrNull()?.brevkode

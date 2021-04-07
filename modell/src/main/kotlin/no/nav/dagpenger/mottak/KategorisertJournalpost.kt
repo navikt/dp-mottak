@@ -148,7 +148,7 @@ data class NySøknad(
             )
             kanAvslåsPåMinsteinntekt -> OppgaveBenk(
                 finnEnhetForHurtigAvslag(person),
-                "Minsteinntekt - mulig avslag\n", // if (koronaRegelverkMinsteinntektBrukt) "Minsteinntekt - mulig avslag - korona\n" else
+                "Minsteinntekt - mulig avslag\n", // if (koronaRegelverkMinsteinntektBrukt) "Minsteinntekt - mulig avslag - korona\n" else "Minsteinntekt - mulig avslag\n"
                 datoRegistrert(),
                 tilleggsinformasjon()
             )

@@ -12,6 +12,7 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType.JournalførtType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.MottattType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.OppdaterJournalpostType
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -93,5 +94,13 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertMessages(it)
             println(it.innsendingLogg.toString())
         }
+
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["NAV 04-16.03", "NAV 04-16.04"])
+    fun `skal håndtere joark hendelse der journalpost er utdanning`(brevkode: String) {
+
+    }
+
 }
