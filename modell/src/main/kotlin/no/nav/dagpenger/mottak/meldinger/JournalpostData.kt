@@ -7,6 +7,7 @@ import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.KategorisertJournalpost
 import no.nav.dagpenger.mottak.NySøknad
 import no.nav.dagpenger.mottak.SpesifikkKontekst
+import no.nav.dagpenger.mottak.Utdanning
 import java.time.LocalDateTime
 import java.time.ZoneId
 
@@ -40,14 +41,14 @@ class JournalpostData(
 
     /**
      *
-     * @todos  Fra joark mottak
-    "NAV 04-06.05" to Henvendelsestype.UTDANNING,
-    "NAV 04-06.08" to Henvendelsestype.ETABLERING,
-    "NAV 90-00.08" to Henvendelsestype.KLAGE_ANKE,
-    "NAVe 04-16.04" to Henvendelsestype.ETTERSENDELSE,
-    "NAVe 04-16.03" to Henvendelsestype.ETTERSENDELSE,
-    "NAVe 04-01.03" to Henvendelsestype.ETTERSENDELSE,
-    "NAVe 04-01.04" to Henvendelsestype.ETTERSENDELSE
+     * @todos Fra joark mottak
+     "NAV 04-06.05" to Henvendelsestype.UTDANNING,
+     "NAV 04-06.08" to Henvendelsestype.ETABLERING,
+     "NAV 90-00.08" to Henvendelsestype.KLAGE_ANKE,
+     "NAVe 04-16.04" to Henvendelsestype.ETTERSENDELSE,
+     "NAVe 04-16.03" to Henvendelsestype.ETTERSENDELSE,
+     "NAVe 04-01.03" to Henvendelsestype.ETTERSENDELSE,
+     "NAVe 04-01.04" to Henvendelsestype.ETTERSENDELSE
 
      + Klage og anke fra lønnskompensasjon
      + Manuell
@@ -72,6 +73,12 @@ class JournalpostData(
                 datoRegistrert = datoRegistrert
             )
             in setOf("NAV 04-16.03", "NAV 04-16.04") -> Gjenopptak(
+                journalpostId = journalpostId,
+                journalpostStatus = journalpostStatus,
+                dokumenter = jpDokumenter,
+                datoRegistrert = datoRegistrert
+            )
+            in setOf("NAV 04-06.05") -> Utdanning(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
                 dokumenter = jpDokumenter,

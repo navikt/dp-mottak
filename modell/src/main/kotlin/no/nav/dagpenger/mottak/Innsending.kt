@@ -208,6 +208,7 @@ class Innsending private constructor(
             when (innsending.kategorisertJournalpost) {
                 is NySøknad -> innsending.tilstand(event, AvventerSøknadsdata)
                 is Gjenopptak -> innsending.tilstand(event, AvventerSøknadsdata)
+                is Utdanning -> innsending.tilstand(event, AventerArenaOppgave)
                 else -> TODO("IKKE KATEGORISERT ")
             }
         }
@@ -229,7 +230,7 @@ class Innsending private constructor(
             innsending.søknad = søknadsdata.søknad()
             when (kategorisertJournalpost) {
                 is NySøknad -> innsending.tilstand(søknadsdata, AventerMinsteinntektVurdering)
-                is Gjenopptak -> innsending.tilstand(søknadsdata, AventerArenaVurderHendendelse)
+                is Gjenopptak -> innsending.tilstand(søknadsdata, AventerArenaOppgave)
             }
         }
     }
@@ -284,10 +285,10 @@ class Innsending private constructor(
         }
     }
 
-    internal object AventerArenaVurderHendendelse : Tilstand {
+    internal object AventerArenaOppgave : Tilstand {
 
         override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.AventerArenaVurderHendendelseType
+            get() = InnsendingTilstandType.AventerArenaOppgaveType
         override val timeout: Duration
             get() = Duration.ofDays(1)
 

@@ -1,7 +1,7 @@
 package no.nav.dagpenger.mottak.e2e
 
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaOppgaveType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakType
-import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaVurderHendendelseType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerJournalpostType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerMinsteinntektVurderingType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerPersondataType
@@ -12,7 +12,6 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType.JournalførtType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.MottattType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.OppdaterJournalpostType
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -83,7 +82,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerPersondataType,
             KategoriseringType,
             AvventerSøknadsdataType,
-            AventerArenaVurderHendendelseType,
+            AventerArenaOppgaveType,
             OppdaterJournalpostType,
             FerdigstillJournalpostType,
             JournalførtType
@@ -94,13 +93,33 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertMessages(it)
             println(it.innsendingLogg.toString())
         }
-
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["NAV 04-16.03", "NAV 04-16.04"])
+    @ValueSource(strings = ["NAV 04-06.05"])
     fun `skal håndtere joark hendelse der journalpost er utdanning`(brevkode: String) {
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode)
+        håndterPersonInformasjon()
+        håndterArenaOppgaveOpprettet()
+        håndterJournalpostOppdatert()
+        håndterJournalpostFerdigstilt()
 
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            AventerArenaOppgaveType,
+            OppdaterJournalpostType,
+            FerdigstillJournalpostType,
+            JournalførtType
+        )
+
+        inspektør.also {
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+        }
     }
-
 }

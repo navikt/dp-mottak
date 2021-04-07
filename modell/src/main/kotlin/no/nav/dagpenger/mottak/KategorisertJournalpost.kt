@@ -6,14 +6,23 @@ import java.time.format.DateTimeFormatter
 
 private const val maksTegn = 1999
 
-sealed class KategorisertJournalpost {
+sealed class KategorisertJournalpost(
+    open val journalpostId: String,
+    open val journalpostStatus: String,
+    open val dokumenter: List<Dokument>,
+    open val datoRegistrert: ZonedDateTime
+) {
     private val behandlendeEnhetForDiskresjonskoder = "2103"
-    abstract fun journalpostId(): String
-    abstract fun journalpostStatus(): String
-    abstract fun dokumenter(): List<Dokument>
-    abstract fun datoRegistrert(): ZonedDateTime
+    fun journalpostId(): String = journalpostId
+    // fun journalpostStatus(): String = journalpostStatus
+    fun dokumenter(): List<Dokument> = dokumenter
+    fun datoRegistrert(): ZonedDateTime = datoRegistrert
     protected abstract fun henvendelseNavn(): String
-    protected open fun finnOppgaveBenk(søknad: Søknad?, oppfyllerMinsteArbeidsinntekt: Boolean?, person: Person?): OppgaveBenk =
+    protected open fun finnOppgaveBenk(
+        søknad: Søknad?,
+        oppfyllerMinsteArbeidsinntekt: Boolean?,
+        person: Person?
+    ): OppgaveBenk =
         OppgaveBenk(behandlendeEnhet(person), henvendelseNavn(), datoRegistrert(), tilleggsinformasjon())
 
     protected fun behandlendeEnhet(person: Person?): String {
@@ -34,8 +43,14 @@ sealed class KategorisertJournalpost {
         val oppgaveBenk = finnOppgaveBenk(søknad, oppfyllerMinsteArbeidsinntekt, person)
 
         return when (person?.diskresjonskode) {
-            "STRENGT_FORTROLIG_UTLAND" -> oppgaveBenk.copy(id = behandlendeEnhetForDiskresjonskoder, beskrivelse = henvendelseNavn())
-            "STRENGT_FORTROLIG" -> oppgaveBenk.copy(id = behandlendeEnhetForDiskresjonskoder, beskrivelse = henvendelseNavn())
+            "STRENGT_FORTROLIG_UTLAND" -> oppgaveBenk.copy(
+                id = behandlendeEnhetForDiskresjonskoder,
+                beskrivelse = henvendelseNavn()
+            )
+            "STRENGT_FORTROLIG" -> oppgaveBenk.copy(
+                id = behandlendeEnhetForDiskresjonskoder,
+                beskrivelse = henvendelseNavn()
+            )
             else -> oppgaveBenk
         }
     }
@@ -89,19 +104,18 @@ sealed class KategorisertJournalpost {
 }
 
 data class NySøknad(
-    val journalpostId: String,
-    val journalpostStatus: String,
-    val dokumenter: List<Dokument>,
-    val datoRegistrert: ZonedDateTime
-) : KategorisertJournalpost() {
+    override val journalpostId: String,
+    override val journalpostStatus: String,
+    override val dokumenter: List<Dokument>,
+    override val datoRegistrert: ZonedDateTime
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
     override fun henvendelseNavn(): String =
         "Start Vedtaksbehandling - automatisk journalført.\n"
-
-    override fun journalpostId(): String = journalpostId
-    override fun journalpostStatus(): String = journalpostStatus
-    override fun dokumenter(): List<Dokument> = dokumenter
-    override fun datoRegistrert(): ZonedDateTime = datoRegistrert
-    override fun finnOppgaveBenk(søknad: Søknad?, oppfyllerMinsteArbeidsinntekt: Boolean?, person: Person?): OppgaveBenk {
+    override fun finnOppgaveBenk(
+        søknad: Søknad?,
+        oppfyllerMinsteArbeidsinntekt: Boolean?,
+        person: Person?
+    ): OppgaveBenk {
         requireNotNull(søknad) { " Søknadsdata må være satt på dette tidspunktet" }
         // val koronaRegelverkMinsteinntektBrukt =
         //     packet.getNullableBoolean(PacketKeys.KORONAREGELVERK_MINSTEINNTEKT_BRUKT) == true
@@ -169,16 +183,21 @@ data class NySøknad(
 }
 
 data class Gjenopptak(
-    val journalpostId: String,
-    val journalpostStatus: String,
-    val dokumenter: List<Dokument>,
-    val datoRegistrert: ZonedDateTime
-) : KategorisertJournalpost() {
+    override val journalpostId: String,
+    override val journalpostStatus: String,
+    override val dokumenter: List<Dokument>,
+    override val datoRegistrert: ZonedDateTime
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
     override fun henvendelseNavn(): String = "Gjenopptak\n"
-    override fun journalpostId(): String = journalpostId
-    override fun journalpostStatus(): String = journalpostStatus
-    override fun dokumenter(): List<Dokument> = dokumenter
-    override fun datoRegistrert(): ZonedDateTime = datoRegistrert
+}
+
+data class Utdanning(
+    override val journalpostId: String,
+    override val journalpostStatus: String,
+    override val dokumenter: List<Dokument>,
+    override val datoRegistrert: ZonedDateTime
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
+    override fun henvendelseNavn(): String = "Utdanning\n"
 }
 
 data class Dokument(val tittel: String, val dokumentInfoId: String, val brevkode: String)
