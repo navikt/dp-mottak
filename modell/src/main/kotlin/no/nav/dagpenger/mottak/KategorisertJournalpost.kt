@@ -200,7 +200,6 @@ data class Utdanning(
     override fun henvendelseNavn(): String = "Utdanning\n"
 }
 
-
 data class Etablering(
     override val journalpostId: String,
     override val journalpostStatus: String,
@@ -210,6 +209,22 @@ data class Etablering(
     override fun henvendelseNavn(): String = "Etablering\n"
 }
 
+data class Klage(
+    override val journalpostId: String,
+    override val journalpostStatus: String,
+    override val dokumenter: List<Dokument>,
+    override val datoRegistrert: ZonedDateTime
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
+    override fun henvendelseNavn(): String = "Klage\n"
+}
 
+data class Ettersending(
+    override val journalpostId: String,
+    override val journalpostStatus: String,
+    override val dokumenter: List<Dokument>,
+    override val datoRegistrert: ZonedDateTime
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
+    override fun henvendelseNavn(): String = "Ettersending\n"
+}
 
 data class Dokument(val tittel: String, val dokumentInfoId: String, val brevkode: String)

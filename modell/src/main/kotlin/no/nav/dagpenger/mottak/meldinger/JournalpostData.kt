@@ -3,9 +3,11 @@ package no.nav.dagpenger.mottak.meldinger
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Dokument
 import no.nav.dagpenger.mottak.Etablering
+import no.nav.dagpenger.mottak.Ettersending
 import no.nav.dagpenger.mottak.Gjenopptak
 import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.KategorisertJournalpost
+import no.nav.dagpenger.mottak.Klage
 import no.nav.dagpenger.mottak.NySøknad
 import no.nav.dagpenger.mottak.SpesifikkKontekst
 import no.nav.dagpenger.mottak.Utdanning
@@ -85,6 +87,18 @@ class JournalpostData(
                 datoRegistrert = datoRegistrert
             )
             in setOf("NAV 04-06.08") -> Etablering(
+                journalpostId = journalpostId,
+                journalpostStatus = journalpostStatus,
+                dokumenter = jpDokumenter,
+                datoRegistrert = datoRegistrert
+            )
+            in setOf("NAV 90-00.08") -> Klage(
+                journalpostId = journalpostId,
+                journalpostStatus = journalpostStatus,
+                dokumenter = jpDokumenter,
+                datoRegistrert = datoRegistrert
+            )
+            in setOf("NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04") -> Ettersending(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
                 dokumenter = jpDokumenter,

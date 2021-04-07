@@ -123,7 +123,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         }
     }
 
-
     @ParameterizedTest
     @ValueSource(strings = ["NAV 04-06.08"])
     fun `skal håndtere joark hendelse der journalpost er etablering`(brevkode: String) {
@@ -152,5 +151,17 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = ["NAV 90-00.08"])
+    fun `skal håndtere joark hendelse der journalpost er klage eller anke`(brevkode: String) {
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode)
+    }
 
+    @ParameterizedTest
+    @ValueSource(strings = ["NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04"])
+    fun `skal håndtere joark hendelse der journalpost er klage eller ettersendelse`(brevkode: String) {
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode)
+    }
 }
