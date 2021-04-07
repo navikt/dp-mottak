@@ -96,8 +96,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["NAV 04-06.05"])
-    fun `skal håndtere joark hendelse der journalpost er utdanning`(brevkode: String) {
+    @ValueSource(strings = ["NAV 04-06.08", "NAV 90-00.08", "NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04", "NAV 04-06.05"])
+    fun `skal håndtere joark hendelsene etablering, klage, ettersending og utdanning`(brevkode: String) {
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
@@ -121,47 +121,5 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertMessages(it)
             println(it.innsendingLogg.toString())
         }
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = ["NAV 04-06.08"])
-    fun `skal håndtere joark hendelse der journalpost er etablering`(brevkode: String) {
-        håndterJoarkHendelse()
-        håndterJournalpostData(brevkode)
-        håndterPersonInformasjon()
-        håndterArenaOppgaveOpprettet()
-        håndterJournalpostOppdatert()
-        håndterJournalpostFerdigstilt()
-
-        assertTilstander(
-            MottattType,
-            AvventerJournalpostType,
-            AvventerPersondataType,
-            KategoriseringType,
-            AventerArenaOppgaveType,
-            OppdaterJournalpostType,
-            FerdigstillJournalpostType,
-            JournalførtType
-        )
-
-        inspektør.also {
-            assertNoErrors(it)
-            assertMessages(it)
-            println(it.innsendingLogg.toString())
-        }
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = ["NAV 90-00.08"])
-    fun `skal håndtere joark hendelse der journalpost er klage eller anke`(brevkode: String) {
-        håndterJoarkHendelse()
-        håndterJournalpostData(brevkode)
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = ["NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04"])
-    fun `skal håndtere joark hendelse der journalpost er klage eller ettersendelse`(brevkode: String) {
-        håndterJoarkHendelse()
-        håndterJournalpostData(brevkode)
     }
 }

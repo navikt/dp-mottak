@@ -210,6 +210,8 @@ class Innsending private constructor(
                 is Gjenopptak -> innsending.tilstand(event, AvventerSøknadsdata)
                 is Utdanning -> innsending.tilstand(event, AventerArenaOppgave)
                 is Etablering -> innsending.tilstand(event, AventerArenaOppgave)
+                is Klage -> innsending.tilstand(event, AventerArenaOppgave)
+                is Ettersending -> innsending.tilstand(event, AventerArenaOppgave)
                 else -> TODO("IKKE KATEGORISERT ")
             }
         }
