@@ -97,7 +97,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
     @ParameterizedTest
     @ValueSource(strings = ["NAV 04-06.05"])
-    fun `skal håndtere joark hendelse der journalpost er etablering`(brevkode: String) {
+    fun `skal håndtere joark hendelse der journalpost er utdanning`(brevkode: String) {
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
@@ -126,7 +126,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
     @ParameterizedTest
     @ValueSource(strings = ["NAV 04-06.08"])
-    fun `skal håndtere joark hendelse der journalpost er utdanning`(brevkode: String) {
+    fun `skal håndtere joark hendelse der journalpost er etablering`(brevkode: String) {
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
