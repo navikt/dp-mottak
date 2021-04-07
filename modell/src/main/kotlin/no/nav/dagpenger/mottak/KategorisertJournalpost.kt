@@ -14,6 +14,7 @@ sealed class KategorisertJournalpost(
 ) {
     private val behandlendeEnhetForDiskresjonskoder = "2103"
     fun journalpostId(): String = journalpostId
+
     // fun journalpostStatus(): String = journalpostStatus
     fun dokumenter(): List<Dokument> = dokumenter
     fun datoRegistrert(): ZonedDateTime = datoRegistrert
@@ -111,6 +112,7 @@ data class NySøknad(
 ) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
     override fun henvendelseNavn(): String =
         "Start Vedtaksbehandling - automatisk journalført.\n"
+
     override fun finnOppgaveBenk(
         søknad: Søknad?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
@@ -225,6 +227,15 @@ data class Ettersending(
     override val datoRegistrert: ZonedDateTime
 ) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
     override fun henvendelseNavn(): String = "Ettersending\n"
+}
+
+data class UkjentSkjemaKode(
+    override val journalpostId: String,
+    override val journalpostStatus: String,
+    override val dokumenter: List<Dokument>,
+    override val datoRegistrert: ZonedDateTime
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
+    override fun henvendelseNavn(): String = "${dokumenter.first().tittel}\n"
 }
 
 data class Dokument(val tittel: String, val dokumentInfoId: String, val brevkode: String)

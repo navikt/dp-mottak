@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak
 
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.EksisterendeSaker
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Ferdigstill
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Gosysoppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.MinsteinntektVurdering
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettStartVedtakOppgave
@@ -11,9 +12,9 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Søknads
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
 import no.nav.dagpenger.mottak.meldinger.EksisterendesakData
+import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.JournalpostData
-import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
@@ -95,9 +96,14 @@ class Innsending private constructor(
         tilstand.håndter(this, oppdatertJournalpost)
     }
 
-    fun håndter(journalpostferdigstilt: JournalpostFerdigstilt) {
+    fun håndter(journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt) {
         kontekst(journalpostferdigstilt, "Mottatt informasjon om ferdigstilt journalpost")
         tilstand.håndter(this, journalpostferdigstilt)
+    }
+
+    fun håndter(gosysoppgaveopprettet: GosysOppgaveOpprettet) {
+        kontekst(gosysoppgaveopprettet, "Mottat informasjon om opprettet gosys oppgave")
+        tilstand.håndter(this, gosysoppgaveopprettet)
     }
 
     private fun kontekst(hendelse: Hendelse, melding: String) {
@@ -138,12 +144,15 @@ class Innsending private constructor(
         fun håndter(innsending: Innsending, arenaOppgave: ArenaOppgaveOpprettet) {
             arenaOppgave.warn("Forventet ikke ArenaOppgaveOpprettet i %s", type.name)
         }
+        fun håndter(innsending: Innsending, gosysOppgave: GosysOppgaveOpprettet) {
+            gosysOppgave.warn("Forventet ikke GosysOppgaveOpprettet i %s", type.name)
+        }
 
         fun håndter(innsending: Innsending, oppdatertJournalpost: JournalpostOppdatert) {
             oppdatertJournalpost.warn("Forventet ikke ArenaOppgaveOpprettet i %s", type.name)
         }
 
-        fun håndter(innsending: Innsending, journalpostferdigstilt: JournalpostFerdigstilt) {
+        fun håndter(innsending: Innsending, journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt) {
             journalpostferdigstilt.warn("Forventet ikke JournalpostFerdigstilt i %s", type.name)
         }
 
@@ -212,6 +221,7 @@ class Innsending private constructor(
                 is Etablering -> innsending.tilstand(event, AventerArenaOppgave)
                 is Klage -> innsending.tilstand(event, AventerArenaOppgave)
                 is Ettersending -> innsending.tilstand(event, AventerArenaOppgave)
+                is UkjentSkjemaKode -> innsending.tilstand(event, AvventerGosysOppgave)
                 else -> TODO("IKKE KATEGORISERT ")
             }
         }
@@ -228,7 +238,8 @@ class Innsending private constructor(
         }
 
         override fun håndter(innsending: Innsending, søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
-            val kategorisertJournalpost = requireNotNull(innsending.kategorisertJournalpost) { " Journalpost må være kategorisert på dette tidspunktet " }
+            val kategorisertJournalpost =
+                requireNotNull(innsending.kategorisertJournalpost) { " Journalpost må være kategorisert på dette tidspunktet " }
             søknadsdata.info("Fikk Søknadsdata for ${kategorisertJournalpost.javaClass.name}")
             innsending.søknad = søknadsdata.søknad()
             when (kategorisertJournalpost) {
@@ -305,6 +316,21 @@ class Innsending private constructor(
         }
     }
 
+    internal object AvventerGosysOppgave : Tilstand {
+        override val type: InnsendingTilstandType
+            get() = InnsendingTilstandType.AvventerGosysType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
+
+        override fun entering(innsending: Innsending, event: Hendelse) {
+            innsending.opprettGosysOppgave(event)
+        }
+
+        override fun håndter(innsending: Innsending, gosysOppgave: GosysOppgaveOpprettet) {
+            innsending.tilstand(gosysOppgave, JournalpostFerdigstilt)
+        }
+    }
+
     internal object OppdaterJournalpost : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.OppdaterJournalpostType
@@ -331,16 +357,16 @@ class Innsending private constructor(
             innsending.ferdigstillJournalpost(event)
         }
 
-        override fun håndter(innsending: Innsending, journalpostferdigstilt: JournalpostFerdigstilt) {
+        override fun håndter(innsending: Innsending, journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt) {
             innsending.ferdigstilt = true
             journalpostferdigstilt.info("Ferdigstilte journalpost ${innsending.journalpostId}")
-            innsending.tilstand(journalpostferdigstilt, Journalført)
+            innsending.tilstand(journalpostferdigstilt, JournalpostFerdigstilt)
         }
     }
 
-    internal object Journalført : Tilstand {
+    internal object JournalpostFerdigstilt : Tilstand {
         override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.JournalførtType
+            get() = InnsendingTilstandType.JournalpostFerdigstiltType
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
@@ -404,7 +430,11 @@ class Innsending private constructor(
             "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon
         )
 
-        hendelse.behov(OpprettVurderhenvendelseOppgave, "Oppretter oppgave og sak for journalpost $journalpostId", parametre)
+        hendelse.behov(
+            OpprettVurderhenvendelseOppgave,
+            "Oppretter oppgave og sak for journalpost $journalpostId",
+            parametre
+        )
     }
 
     private fun oppdatereJournalpost(hendelse: Hendelse) {
@@ -419,6 +449,12 @@ class Innsending private constructor(
     private fun ferdigstillJournalpost(hendelse: Hendelse) {
         hendelse.behov(
             Ferdigstill, "Ferdigstiller journalpost $journalpostId"
+        )
+    }
+
+    private fun opprettGosysOppgave(hendelse: Hendelse) {
+        hendelse.behov(
+            Gosysoppgave, "Oppretter gosysoppgave for journalpost $journalpostId"
         )
     }
 

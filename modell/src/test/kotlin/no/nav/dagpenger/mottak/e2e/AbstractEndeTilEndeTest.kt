@@ -7,6 +7,7 @@ import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.EksisterendesakData
+import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.JournalpostData
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
@@ -80,6 +81,10 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(arenaOppgaveOpprettet())
     }
 
+    protected fun håndterGosysOppgaveOpprettet() {
+        innsending.håndter(gosysOppgaveOpprettet())
+    }
+
     protected fun håndterJournalpostOppdatert() {
         innsending.håndter(journalpostOppdatert())
     }
@@ -103,6 +108,11 @@ abstract class AbstractEndeTilEndeTest {
         journalpostId = JOURNALPOST_ID,
         oppgaveId = "1234",
         fagsakId = "9867541"
+    )
+
+    private fun gosysOppgaveOpprettet(): GosysOppgaveOpprettet = GosysOppgaveOpprettet(
+        aktivitetslogg = Aktivitetslogg(),
+        journalpostId = JOURNALPOST_ID
     )
 
     private fun eksisterendesakData(): EksisterendesakData = EksisterendesakData(

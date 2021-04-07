@@ -187,7 +187,8 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
                 OpprettStartVedtakOppgave,
                 OpprettVurderhenvendelseOppgave,
                 Oppdaterjournalpost,
-                Ferdigstill
+                Ferdigstill,
+                Gosysoppgave
             }
         }
 

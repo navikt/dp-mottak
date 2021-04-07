@@ -2,16 +2,18 @@ package no.nav.dagpenger.mottak.e2e
 
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaOppgaveType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerGosysType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerJournalpostType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerMinsteinntektVurderingType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerPersondataType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerSvarOmEksisterendeSakerType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerSøknadsdataType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.FerdigstillJournalpostType
-import no.nav.dagpenger.mottak.InnsendingTilstandType.JournalførtType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.JournalpostFerdigstiltType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.MottattType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.OppdaterJournalpostType
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -49,7 +51,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AventerArenaStartVedtakType,
             OppdaterJournalpostType,
             FerdigstillJournalpostType,
-            JournalførtType
+            JournalpostFerdigstiltType
         )
 
         inspektør.also {
@@ -85,7 +87,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AventerArenaOppgaveType,
             OppdaterJournalpostType,
             FerdigstillJournalpostType,
-            JournalførtType
+            JournalpostFerdigstiltType
         )
 
         inspektør.also {
@@ -113,7 +115,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AventerArenaOppgaveType,
             OppdaterJournalpostType,
             FerdigstillJournalpostType,
-            JournalførtType
+            JournalpostFerdigstiltType
         )
 
         inspektør.also {
@@ -121,5 +123,22 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertMessages(it)
             println(it.innsendingLogg.toString())
         }
+    }
+
+    @Test
+    fun `skal håndtere ukjente brevkoder`() {
+        håndterJoarkHendelse()
+        håndterJournalpostData("Fritekstkode")
+        håndterPersonInformasjon()
+        håndterGosysOppgaveOpprettet()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            AvventerGosysType,
+            JournalpostFerdigstiltType
+        )
     }
 }

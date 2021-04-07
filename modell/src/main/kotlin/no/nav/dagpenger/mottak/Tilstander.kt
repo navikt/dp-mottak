@@ -11,6 +11,7 @@ enum class InnsendingTilstandType {
     AventerArenaStartVedtakType,
     OppdaterJournalpostType,
     FerdigstillJournalpostType,
-    JournalførtType,
-    AventerArenaOppgaveType
+    JournalpostFerdigstiltType,
+    AventerArenaOppgaveType,
+    AvventerGosysType
 }

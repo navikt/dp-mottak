@@ -10,6 +10,7 @@ import no.nav.dagpenger.mottak.KategorisertJournalpost
 import no.nav.dagpenger.mottak.Klage
 import no.nav.dagpenger.mottak.NySøknad
 import no.nav.dagpenger.mottak.SpesifikkKontekst
+import no.nav.dagpenger.mottak.UkjentSkjemaKode
 import no.nav.dagpenger.mottak.Utdanning
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -52,9 +53,11 @@ class JournalpostData(
      "NAVe 04-01.03" to Henvendelsestype.ETTERSENDELSE,
      "NAVe 04-01.04" to Henvendelsestype.ETTERSENDELSE
 
-     + Klage og anke fra lønnskompensasjon
-     + Manuell
-
+     + "NAV 90-00.08" og behandlingstema == "ab0438" to Henvendelsestype.KLAGE_ANKE_LONNSKOMPENSASJON
+     + ukjent skjemaid -> Henvendelsestype.MANUELL_UKJENT_SKJEMA_ID
+     + ukjent fødselsnummmer -> Henvendelsestype.MANUELL_UKJENT_SKJEMA_ID
+     + manuell klage/anke?
+     + gjenopptak korona
      **/
 
     fun journalpost(): KategorisertJournalpost {
@@ -104,7 +107,12 @@ class JournalpostData(
                 dokumenter = jpDokumenter,
                 datoRegistrert = datoRegistrert
             )
-            else -> TODO("Ikke kategorisert flere enn ny søknad")
+            else -> UkjentSkjemaKode(
+                journalpostId = journalpostId,
+                journalpostStatus = journalpostStatus,
+                dokumenter = jpDokumenter,
+                datoRegistrert = datoRegistrert
+            )
         }
     }
 
