@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak.meldinger
 
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Dokument
+import no.nav.dagpenger.mottak.Etablering
 import no.nav.dagpenger.mottak.Gjenopptak
 import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.KategorisertJournalpost
@@ -42,7 +43,6 @@ class JournalpostData(
     /**
      *
      * @todos Fra joark mottak
-     "NAV 04-06.05" to Henvendelsestype.UTDANNING,
      "NAV 04-06.08" to Henvendelsestype.ETABLERING,
      "NAV 90-00.08" to Henvendelsestype.KLAGE_ANKE,
      "NAVe 04-16.04" to Henvendelsestype.ETTERSENDELSE,
@@ -79,6 +79,12 @@ class JournalpostData(
                 datoRegistrert = datoRegistrert
             )
             in setOf("NAV 04-06.05") -> Utdanning(
+                journalpostId = journalpostId,
+                journalpostStatus = journalpostStatus,
+                dokumenter = jpDokumenter,
+                datoRegistrert = datoRegistrert
+            )
+            in setOf("NAV 04-06.08") -> Etablering(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
                 dokumenter = jpDokumenter,

@@ -97,6 +97,35 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
     @ParameterizedTest
     @ValueSource(strings = ["NAV 04-06.05"])
+    fun `skal håndtere joark hendelse der journalpost er etablering`(brevkode: String) {
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode)
+        håndterPersonInformasjon()
+        håndterArenaOppgaveOpprettet()
+        håndterJournalpostOppdatert()
+        håndterJournalpostFerdigstilt()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            AventerArenaOppgaveType,
+            OppdaterJournalpostType,
+            FerdigstillJournalpostType,
+            JournalførtType
+        )
+
+        inspektør.also {
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+        }
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(strings = ["NAV 04-06.08"])
     fun `skal håndtere joark hendelse der journalpost er utdanning`(brevkode: String) {
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode)
@@ -122,4 +151,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             println(it.innsendingLogg.toString())
         }
     }
+
+
 }

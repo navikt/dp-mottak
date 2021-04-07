@@ -209,6 +209,7 @@ class Innsending private constructor(
                 is NySøknad -> innsending.tilstand(event, AvventerSøknadsdata)
                 is Gjenopptak -> innsending.tilstand(event, AvventerSøknadsdata)
                 is Utdanning -> innsending.tilstand(event, AventerArenaOppgave)
+                is Etablering -> innsending.tilstand(event, AventerArenaOppgave)
                 else -> TODO("IKKE KATEGORISERT ")
             }
         }
