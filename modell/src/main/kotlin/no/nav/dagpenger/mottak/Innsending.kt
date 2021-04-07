@@ -156,8 +156,8 @@ class Innsending private constructor(
             journalpostferdigstilt.warn("Forventet ikke JournalpostFerdigstilt i %s", type.name)
         }
 
-        fun leaving(event: Hendelse) {}
-        fun entering(innsending: Innsending, event: Hendelse) {}
+        fun leaving(hendelse: Hendelse) {}
+        fun entering(innsending: Innsending, hendelse: Hendelse) {}
 
         override fun toSpesifikkKontekst(): SpesifikkKontekst {
             return SpesifikkKontekst(
@@ -212,16 +212,16 @@ class Innsending private constructor(
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
-        override fun entering(innsending: Innsending, event: Hendelse) {
-            event.info("Kategorisert journalpost til ${innsending.kategorisertJournalpost?.javaClass?.simpleName} ")
+        override fun entering(innsending: Innsending, hendelse: Hendelse) {
+            hendelse.info("Kategorisert journalpost til ${innsending.kategorisertJournalpost?.javaClass?.simpleName} ")
             when (innsending.kategorisertJournalpost) {
-                is NySøknad -> innsending.tilstand(event, AvventerSøknadsdata)
-                is Gjenopptak -> innsending.tilstand(event, AvventerSøknadsdata)
-                is Utdanning -> innsending.tilstand(event, AventerArenaOppgave)
-                is Etablering -> innsending.tilstand(event, AventerArenaOppgave)
-                is Klage -> innsending.tilstand(event, AventerArenaOppgave)
-                is Ettersending -> innsending.tilstand(event, AventerArenaOppgave)
-                is UkjentSkjemaKode -> innsending.tilstand(event, AvventerGosysOppgave)
+                is NySøknad -> innsending.tilstand(hendelse, AvventerSøknadsdata)
+                is Gjenopptak -> innsending.tilstand(hendelse, AvventerSøknadsdata)
+                is Utdanning -> innsending.tilstand(hendelse, AventerArenaOppgave)
+                is Etablering -> innsending.tilstand(hendelse, AventerArenaOppgave)
+                is Klage -> innsending.tilstand(hendelse, AventerArenaOppgave)
+                is Ettersending -> innsending.tilstand(hendelse, AventerArenaOppgave)
+                is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 else -> TODO("IKKE KATEGORISERT ")
             }
         }
@@ -233,8 +233,8 @@ class Innsending private constructor(
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
-        override fun entering(innsending: Innsending, event: Hendelse) {
-            innsending.trengerSøknadsdata(event)
+        override fun entering(innsending: Innsending, hendelse: Hendelse) {
+            innsending.trengerSøknadsdata(hendelse)
         }
 
         override fun håndter(innsending: Innsending, søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
@@ -245,6 +245,7 @@ class Innsending private constructor(
             when (kategorisertJournalpost) {
                 is NySøknad -> innsending.tilstand(søknadsdata, AventerMinsteinntektVurdering)
                 is Gjenopptak -> innsending.tilstand(søknadsdata, AventerArenaOppgave)
+                else -> søknadsdata.severe("Forventet kun søknadsdata for NySøknad og Gjenopptak")
             }
         }
     }
@@ -255,8 +256,8 @@ class Innsending private constructor(
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
-        override fun entering(innsending: Innsending, event: Hendelse) {
-            innsending.trengerMinsteinntektVurdering(event)
+        override fun entering(innsending: Innsending, hendelse: Hendelse) {
+            innsending.trengerMinsteinntektVurdering(hendelse)
         }
 
         override fun håndter(innsending: Innsending, vurderminsteinntektData: MinsteinntektVurderingData) {
@@ -272,8 +273,8 @@ class Innsending private constructor(
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
-        override fun entering(innsending: Innsending, event: Hendelse) {
-            innsending.trengerEksisterendeSaker(event)
+        override fun entering(innsending: Innsending, hendelse: Hendelse) {
+            innsending.trengerEksisterendeSaker(hendelse)
         }
 
         override fun håndter(innsending: Innsending, eksisterendeSak: EksisterendesakData) {
@@ -289,8 +290,8 @@ class Innsending private constructor(
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
-        override fun entering(innsending: Innsending, event: Hendelse) {
-            innsending.oppretteArenaStartVedtakOppgave(event)
+        override fun entering(innsending: Innsending, hendelse: Hendelse) {
+            innsending.oppretteArenaStartVedtakOppgave(hendelse)
         }
 
         override fun håndter(innsending: Innsending, arenaOppgave: ArenaOppgaveOpprettet) {
@@ -306,8 +307,8 @@ class Innsending private constructor(
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
-        override fun entering(innsending: Innsending, event: Hendelse) {
-            innsending.oppretteArenaVurderHenvendelseOppgave(event)
+        override fun entering(innsending: Innsending, hendelse: Hendelse) {
+            innsending.oppretteArenaVurderHenvendelseOppgave(hendelse)
         }
 
         override fun håndter(innsending: Innsending, arenaOppgave: ArenaOppgaveOpprettet) {
@@ -322,8 +323,8 @@ class Innsending private constructor(
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
-        override fun entering(innsending: Innsending, event: Hendelse) {
-            innsending.opprettGosysOppgave(event)
+        override fun entering(innsending: Innsending, hendelse: Hendelse) {
+            innsending.opprettGosysOppgave(hendelse)
         }
 
         override fun håndter(innsending: Innsending, gosysOppgave: GosysOppgaveOpprettet) {
@@ -353,8 +354,8 @@ class Innsending private constructor(
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
-        override fun entering(innsending: Innsending, event: Hendelse) {
-            innsending.ferdigstillJournalpost(event)
+        override fun entering(innsending: Innsending, hendelse: Hendelse) {
+            innsending.ferdigstillJournalpost(hendelse)
         }
 
         override fun håndter(innsending: Innsending, journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt) {
@@ -370,9 +371,9 @@ class Innsending private constructor(
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
-        override fun entering(innsending: Innsending, event: Hendelse) {
+        override fun entering(innsending: Innsending, hendelse: Hendelse) {
             if (innsending.oppdatertJournalpost == false && innsending.ferdigstilt == false) {
-                event.severe("Forventet at journalpost var oppdatert og ferdigstilt på i tilstand $type")
+                hendelse.severe("Forventet at journalpost var oppdatert og ferdigstilt på i tilstand $type")
             }
         }
     }
