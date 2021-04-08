@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.e2e
 
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Gosysoppgave
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaOppgaveType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerGosysType
@@ -13,6 +14,7 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType.JournalpostFerdigstiltType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.MottattType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.OppdaterJournalpostType
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -140,6 +142,12 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerGosysType,
             JournalpostFerdigstiltType
         )
+
+        inspektør.also {
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+        }
     }
 
     @Test
@@ -157,5 +165,29 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerGosysType,
             JournalpostFerdigstiltType
         )
+        inspektør.also { it ->
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+            val gosysBehov = it.innsendingLogg.behov().find { behov ->
+                behov.type == Gosysoppgave
+            }
+            assertContains(
+                listOf(
+                    "fødselsnummer",
+                    "behandlendeEnhetId",
+                    "oppgavebeskrivelse",
+                    "registrertDato",
+                    "tilleggsinformasjon",
+                ),
+                gosysBehov!!.detaljer()
+            )
+        }
+    }
+
+    private fun assertContains(keys: List<String>, map: Map<String, Any>) {
+        keys.forEach {
+            assertTrue(map.containsKey(it), "Fant ikke nøkkel $it i $map ")
+        }
     }
 }

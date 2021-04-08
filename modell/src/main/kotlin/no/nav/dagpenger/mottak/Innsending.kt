@@ -463,8 +463,21 @@ class Innsending private constructor(
     }
 
     private fun opprettGosysOppgave(hendelse: Hendelse) {
+        val journalpost = requireNotNull(kategorisertJournalpost)
+        val oppgavebenk = journalpost.oppgaveBenk(person)
+
+        // TODO — finn ut av parametre til gosys
+        val parametre = mapOf(
+            "fødselsnummer" to "personen!",
+            "behandlendeEnhetId" to oppgavebenk.id,
+            "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
+            "registrertDato" to oppgavebenk.datoRegistrert,
+            "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon
+        )
+
         hendelse.behov(
-            Gosysoppgave, "Oppretter gosysoppgave for journalpost $journalpostId"
+            Gosysoppgave, "Oppretter gosysoppgave for journalpost $journalpostId",
+            parametre
         )
     }
 
