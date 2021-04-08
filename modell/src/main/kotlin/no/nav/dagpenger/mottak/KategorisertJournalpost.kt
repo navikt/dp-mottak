@@ -227,6 +227,16 @@ data class KlageOgAnkeLønnskompensasjon(
     override val datoRegistrert: ZonedDateTime
 ) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
     override fun henvendelseNavn(): String = "Klage og anke — Lønnskompensasjon\n"
+    override fun finnOppgaveBenk(
+        søknad: Søknad?,
+        oppfyllerMinsteArbeidsinntekt: Boolean?,
+        person: Person?
+    ) = OppgaveBenk(
+        beskrivelse = henvendelseNavn(),
+        id = "4486",
+        datoRegistrert = datoRegistrert,
+        tilleggsinformasjon = tilleggsinformasjon()
+    )
 }
 
 data class Ettersending(

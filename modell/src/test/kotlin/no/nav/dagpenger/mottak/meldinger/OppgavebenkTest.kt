@@ -126,7 +126,8 @@ class OppgavebenkTest {
     @Test
     fun `Finn riktig oppgave beskrivelse og benk ved oppfyller minsteinntekt ved permittering   `() {
         withSøknad {
-            val oppgaveBenk = lagjournalpostData("NAV 04-01.04").journalpost().oppgaveBenk(person = person, søknad = it, oppfyllerMinsteArbeidsinntekt = false)
+            val oppgaveBenk = lagjournalpostData("NAV 04-01.04").journalpost()
+                .oppgaveBenk(person = person, søknad = it, oppfyllerMinsteArbeidsinntekt = false)
             assertEquals("Minsteinntekt - mulig avslag\n", oppgaveBenk.beskrivelse)
             assertEquals("4456", oppgaveBenk.id)
         }
@@ -135,13 +136,24 @@ class OppgavebenkTest {
     @Test
     fun `Finn riktig oppgave beskrivelse og person ikke har norsk tilknytning ved permittering`() {
         withSøknad {
-            val oppgaveBenk = lagjournalpostData("NAV 04-01.04").journalpost().oppgaveBenk(person = person.copy(norskTilknytning = false), søknad = it)
+            val oppgaveBenk = lagjournalpostData("NAV 04-01.04").journalpost()
+                .oppgaveBenk(person = person.copy(norskTilknytning = false), søknad = it)
             assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
             assertEquals("4465", oppgaveBenk.id)
         }
     }
 
-    @Test @Disabled("TODO: Få inne koronaregler")
+    @Test
+    fun `Finner riktig benk for klage og anke når behandligstema er lønnskompensasjon`() {
+        val jp = lagjournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0438").journalpost()
+        jp.oppgaveBenk(person = person, søknad = null, oppfyllerMinsteArbeidsinntekt = null).also {
+            assertEquals("Klage og anke — Lønnskompensasjon\n", it.beskrivelse)
+            assertEquals("4486", it.id)
+        }
+    }
+
+    @Test
+    @Disabled("TODO: Få inne koronaregler")
     fun `Finn riktig oppgave beskrivelse og benk ved oppfyller minsteinntekt ved korona regler`() {
         withSøknad {
             val oppgaveBenk = jp.oppgaveBenk(person = person, søknad = it, oppfyllerMinsteArbeidsinntekt = false)

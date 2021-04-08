@@ -3,7 +3,12 @@ package no.nav.dagpenger.mottak.meldinger
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import java.time.LocalDateTime
 
-internal fun lagjournalpostData(brevkode: String, dato: LocalDateTime = LocalDateTime.now(), vedlegg: String = "Vedlegg: Arbeidsavtale"): JournalpostData {
+internal fun lagjournalpostData(
+    brevkode: String,
+    dato: LocalDateTime = LocalDateTime.now(),
+    vedlegg: String = "Vedlegg: Arbeidsavtale",
+    behandlingstema: String? = null
+): JournalpostData {
     val journalpostData = JournalpostData(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = "1234",
@@ -24,7 +29,7 @@ internal fun lagjournalpostData(brevkode: String, dato: LocalDateTime = LocalDat
                 brevkode = "N6"
             )
         ),
-        behandlingstema = null
+        behandlingstema = behandlingstema
     )
     return journalpostData
 }
