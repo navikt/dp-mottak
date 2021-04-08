@@ -185,6 +185,37 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(
+        strings = [
+            "NAV 04-01.03",
+            "NAV 04-01.04",
+            "NAV 04-16.03",
+            "NAV 04-16.04",
+            "NAV 04-06.08",
+            "NAV 90-00.08",
+            "NAVe 04-16.04",
+            "NAVe 04-16.03",
+            "NAVe 04-01.03",
+            "NAVe 04-01.04",
+            "NAV 04-06.05",
+            "ukjent"
+        ]
+    )
+    fun `skal håndtere journalpost uten bruker`(brevkode: String) {
+
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode = brevkode, bruker = null)
+        håndterGosysOppgaveOpprettet()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerGosysType,
+            JournalpostFerdigstiltType
+        )
+    }
+
     private fun assertContains(keys: List<String>, map: Map<String, Any>) {
         keys.forEach {
             assertTrue(map.containsKey(it), "Fant ikke nøkkel $it i $map ")

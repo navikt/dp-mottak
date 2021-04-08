@@ -10,14 +10,14 @@ sealed class KategorisertJournalpost(
     open val journalpostId: String,
     open val journalpostStatus: String,
     open val dokumenter: List<Dokument>,
-    open val datoRegistrert: ZonedDateTime
+    open val datoRegistrert: ZonedDateTime,
+    open val journalpostbruker: Journalpostbruker?
 ) {
     private val behandlendeEnhetForDiskresjonskoder = "2103"
     fun journalpostId(): String = journalpostId
-
-    // fun journalpostStatus(): String = journalpostStatus
     fun dokumenter(): List<Dokument> = dokumenter
     fun datoRegistrert(): ZonedDateTime = datoRegistrert
+    fun journalpostbruker(): Journalpostbruker? = journalpostbruker
     protected abstract fun henvendelseNavn(): String
     protected open fun finnOppgaveBenk(
         søknad: Søknad?,
@@ -96,6 +96,18 @@ sealed class KategorisertJournalpost(
         }
     }
 
+    data class Journalpostbruker(
+        val id: String,
+        val type: Type,
+
+    ) {
+        enum class Type {
+            organisasjon,
+            aktørId,
+            fødselsnummer
+        }
+    }
+
     data class OppgaveBenk(
         val id: String,
         val beskrivelse: String,
@@ -108,8 +120,9 @@ data class NySøknad(
     override val journalpostId: String,
     override val journalpostStatus: String,
     override val dokumenter: List<Dokument>,
-    override val datoRegistrert: ZonedDateTime
-) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
+    override val datoRegistrert: ZonedDateTime,
+    override val journalpostbruker: Journalpostbruker?
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert, journalpostbruker) {
     override fun henvendelseNavn(): String =
         "Start Vedtaksbehandling - automatisk journalført.\n"
 
@@ -188,8 +201,9 @@ data class Gjenopptak(
     override val journalpostId: String,
     override val journalpostStatus: String,
     override val dokumenter: List<Dokument>,
-    override val datoRegistrert: ZonedDateTime
-) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
+    override val datoRegistrert: ZonedDateTime,
+    override val journalpostbruker: Journalpostbruker?
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert, journalpostbruker) {
     override fun henvendelseNavn(): String = "Gjenopptak\n"
 }
 
@@ -197,8 +211,9 @@ data class Utdanning(
     override val journalpostId: String,
     override val journalpostStatus: String,
     override val dokumenter: List<Dokument>,
-    override val datoRegistrert: ZonedDateTime
-) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
+    override val datoRegistrert: ZonedDateTime,
+    override val journalpostbruker: Journalpostbruker?
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert, journalpostbruker) {
     override fun henvendelseNavn(): String = "Utdanning\n"
 }
 
@@ -206,8 +221,9 @@ data class Etablering(
     override val journalpostId: String,
     override val journalpostStatus: String,
     override val dokumenter: List<Dokument>,
-    override val datoRegistrert: ZonedDateTime
-) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
+    override val datoRegistrert: ZonedDateTime,
+    override val journalpostbruker: Journalpostbruker?
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert, journalpostbruker) {
     override fun henvendelseNavn(): String = "Etablering\n"
 }
 
@@ -215,8 +231,9 @@ data class KlageOgAnke(
     override val journalpostId: String,
     override val journalpostStatus: String,
     override val dokumenter: List<Dokument>,
-    override val datoRegistrert: ZonedDateTime
-) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
+    override val datoRegistrert: ZonedDateTime,
+    override val journalpostbruker: Journalpostbruker?
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert, journalpostbruker) {
     override fun henvendelseNavn(): String = "Klage og anke\n"
 }
 
@@ -224,8 +241,9 @@ data class KlageOgAnkeLønnskompensasjon(
     override val journalpostId: String,
     override val journalpostStatus: String,
     override val dokumenter: List<Dokument>,
-    override val datoRegistrert: ZonedDateTime
-) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
+    override val datoRegistrert: ZonedDateTime,
+    override val journalpostbruker: Journalpostbruker?
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert, journalpostbruker) {
     override fun henvendelseNavn(): String = "Klage og anke — Lønnskompensasjon\n"
     override fun finnOppgaveBenk(
         søknad: Søknad?,
@@ -243,8 +261,9 @@ data class Ettersending(
     override val journalpostId: String,
     override val journalpostStatus: String,
     override val dokumenter: List<Dokument>,
-    override val datoRegistrert: ZonedDateTime
-) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
+    override val datoRegistrert: ZonedDateTime,
+    override val journalpostbruker: Journalpostbruker?
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert, journalpostbruker) {
     override fun henvendelseNavn(): String = "Ettersending\n"
 }
 
@@ -252,8 +271,9 @@ data class UkjentSkjemaKode(
     override val journalpostId: String,
     override val journalpostStatus: String,
     override val dokumenter: List<Dokument>,
-    override val datoRegistrert: ZonedDateTime
-) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
+    override val datoRegistrert: ZonedDateTime,
+    override val journalpostbruker: Journalpostbruker?
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert, journalpostbruker) {
     override fun henvendelseNavn(): String = "${dokumenter.first().tittel}\n"
 }
 

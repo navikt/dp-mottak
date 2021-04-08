@@ -13,7 +13,7 @@ internal fun lagjournalpostData(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = "1234",
         journalpostStatus = "MOTTATT",
-        aktørId = "21",
+        bruker = JournalpostData.Bruker(id = "1234", type = JournalpostData.BrukerType.AKTOERID),
         relevanteDatoer = listOf(
             JournalpostData.RelevantDato(dato.toString(), JournalpostData.Datotype.DATO_REGISTRERT)
         ),

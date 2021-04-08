@@ -7,6 +7,8 @@ import no.nav.dagpenger.mottak.Ettersending
 import no.nav.dagpenger.mottak.Gjenopptak
 import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.KategorisertJournalpost
+import no.nav.dagpenger.mottak.KategorisertJournalpost.Journalpostbruker
+import no.nav.dagpenger.mottak.KategorisertJournalpost.Journalpostbruker.Type
 import no.nav.dagpenger.mottak.KlageOgAnke
 import no.nav.dagpenger.mottak.KlageOgAnkeLønnskompensasjon
 import no.nav.dagpenger.mottak.NySøknad
@@ -21,14 +23,13 @@ class JournalpostData(
     aktivitetslogg: Aktivitetslogg,
     private val journalpostId: String,
     private val journalpostStatus: String,
-    private val aktørId: String, // Bruker? (kan vi få fnr her?)
+    private val bruker: Bruker?,
     private val behandlingstema: String?,
     private val relevanteDatoer: List<RelevantDato>,
     private val dokumenter: List<DokumentInfo>
 ) : Hendelse(aktivitetslogg) {
 
     override fun journalpostId(): String = journalpostId
-    fun aktørId(): String = aktørId
 
     class DokumentInfo(kanskjetittel: String?, dokumentInfoId: String, brevkode: String) {
         val tittel = kanskjetittel ?: allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
@@ -44,6 +45,19 @@ class JournalpostData(
     enum class Datotype {
         DATO_SENDT_PRINT, DATO_EKSPEDERT, DATO_JOURNALFOERT,
         DATO_REGISTRERT, DATO_AVS_RETUR, DATO_DOKUMENT
+    }
+
+    data class Bruker(
+        val type: BrukerType,
+        val id: String
+    ) {
+        override fun toString(): String {
+            return "Bruker(type=$type, id='<REDACTED>')"
+        }
+    }
+
+    enum class BrukerType {
+        ORGNR, AKTOERID, FNR
     }
 
     /**
@@ -74,68 +88,87 @@ class JournalpostData(
             LocalDateTime.parse(it.dato).atZone(oslo)
         } ?: LocalDateTime.now().atZone(oslo)
 
+        val journalpostbruker = bruker?.let {
+            Journalpostbruker(
+                id = it.id,
+                type = when (it.type) {
+                    BrukerType.ORGNR -> Type.organisasjon
+                    BrukerType.AKTOERID -> Type.aktørId
+                    BrukerType.FNR -> Type.fødselsnummer
+                }
+            )
+        }
+
         return when (brevkode) {
             in setOf("NAV 04-01.03", "NAV 04-01.04") -> NySøknad(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
                 dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert
+                datoRegistrert = datoRegistrert,
+                journalpostbruker = journalpostbruker
             )
             in setOf("NAV 04-16.03", "NAV 04-16.04") -> Gjenopptak(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
                 dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert
+                datoRegistrert = datoRegistrert,
+                journalpostbruker = journalpostbruker
             )
             in setOf("NAV 04-06.05") -> Utdanning(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
                 dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert
+                datoRegistrert = datoRegistrert,
+                journalpostbruker = journalpostbruker
             )
             in setOf("NAV 04-06.08") -> Etablering(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
                 dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert
+                datoRegistrert = datoRegistrert,
+                journalpostbruker = journalpostbruker
             )
-            in setOf("NAV 90-00.08") -> klageOgAnkeType(jpDokumenter, datoRegistrert)
+            in setOf("NAV 90-00.08") -> klageOgAnkeType(jpDokumenter, datoRegistrert, journalpostbruker)
             in setOf("NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04") -> Ettersending(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
                 dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert
+                datoRegistrert = datoRegistrert,
+                journalpostbruker = journalpostbruker
             )
             else -> UkjentSkjemaKode(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
                 dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert
+                datoRegistrert = datoRegistrert,
+                journalpostbruker = journalpostbruker
             )
         }
     }
 
     private fun klageOgAnkeType(
         jpDokumenter: List<Dokument>,
-        datoRegistrert: ZonedDateTime
+        datoRegistrert: ZonedDateTime,
+        journalpostbruker: Journalpostbruker?
     ) = if (this.behandlingstema == "ab0438") {
         KlageOgAnkeLønnskompensasjon(
             journalpostId = journalpostId,
             journalpostStatus = journalpostStatus,
             dokumenter = jpDokumenter,
-            datoRegistrert = datoRegistrert
+            datoRegistrert = datoRegistrert,
+            journalpostbruker = journalpostbruker
         )
     } else KlageOgAnke(
         journalpostId = journalpostId,
         journalpostStatus = journalpostStatus,
         dokumenter = jpDokumenter,
-        datoRegistrert = datoRegistrert
+        datoRegistrert = datoRegistrert,
+        journalpostbruker = journalpostbruker
     )
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(
         "JournalpostData",
         mapOf(
-            "aktørId" to aktørId(),
             "journalpostId" to journalpostId()
         )
     )

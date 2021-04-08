@@ -193,8 +193,12 @@ class Innsending private constructor(
 
         override fun håndter(innsending: Innsending, journalpostData: JournalpostData) {
             innsending.kategorisertJournalpost = journalpostData.journalpost()
-            innsending.trengerPersonData(journalpostData)
-            innsending.tilstand(journalpostData, AvventerPersondata)
+            if (innsending.kategorisertJournalpost?.journalpostbruker() == null) {
+                journalpostData.warn("Journalpost uten bruker")
+                innsending.tilstand(journalpostData, AvventerGosysOppgave)
+            } else {
+                innsending.tilstand(journalpostData, AvventerPersondata)
+            }
         }
     }
 
@@ -203,6 +207,10 @@ class Innsending private constructor(
             get() = InnsendingTilstandType.AvventerPersondataType
         override val timeout: Duration
             get() = Duration.ofDays(1)
+
+        override fun entering(innsending: Innsending, hendelse: Hendelse) {
+            innsending.trengerPersonData(hendelse)
+        }
 
         override fun håndter(innsending: Innsending, personInformasjon: PersonInformasjon) {
             innsending.person = personInformasjon.person()

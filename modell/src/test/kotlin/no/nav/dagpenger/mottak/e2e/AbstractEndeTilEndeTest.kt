@@ -10,6 +10,7 @@ import no.nav.dagpenger.mottak.meldinger.EksisterendesakData
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.JournalpostData
+import no.nav.dagpenger.mottak.meldinger.JournalpostData.Bruker
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
@@ -58,11 +59,16 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(joarkhendelse())
     }
 
-    protected fun håndterJournalpostData(brevkode: String = "NAV 04-01.03", behandlingstema: String? = null) {
+    protected fun håndterJournalpostData(
+        brevkode: String = "NAV 04-01.03",
+        behandlingstema: String? = null,
+        bruker: Bruker? = Bruker(id = "1234", type = JournalpostData.BrukerType.AKTOERID)
+    ) {
         innsending.håndter(
             journalpostData(
                 brevkode = brevkode,
-                behandlingstema = behandlingstema
+                behandlingstema = behandlingstema,
+                bruker = bruker
             )
         )
     }
@@ -148,11 +154,15 @@ abstract class AbstractEndeTilEndeTest {
         norskTilknytning = true
     )
 
-    private fun journalpostData(brevkode: String, behandlingstema: String? = null): JournalpostData = JournalpostData(
+    private fun journalpostData(
+        brevkode: String,
+        behandlingstema: String? = null,
+        bruker: Bruker?
+    ): JournalpostData = JournalpostData(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
         journalpostStatus = "MOTTATT",
-        aktørId = "1234",
+        bruker = bruker,
         behandlingstema = behandlingstema,
         relevanteDatoer = listOf(
             JournalpostData.RelevantDato(LocalDateTime.now().toString(), JournalpostData.Datotype.DATO_REGISTRERT)
