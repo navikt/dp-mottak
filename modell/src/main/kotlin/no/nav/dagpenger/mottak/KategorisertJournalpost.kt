@@ -13,7 +13,6 @@ sealed class KategorisertJournalpost(
     open val datoRegistrert: ZonedDateTime,
     open val journalpostbruker: Journalpostbruker?
 ) {
-    private val behandlendeEnhetForDiskresjonskoder = "2103"
     fun journalpostId(): String = journalpostId
     fun dokumenter(): List<Dokument> = dokumenter
     fun datoRegistrert(): ZonedDateTime = datoRegistrert
@@ -44,12 +43,8 @@ sealed class KategorisertJournalpost(
         val oppgaveBenk = finnOppgaveBenk(søknad, oppfyllerMinsteArbeidsinntekt, person)
 
         return when (person?.diskresjonskode) {
-            "STRENGT_FORTROLIG_UTLAND" -> oppgaveBenk.copy(
-                id = behandlendeEnhetForDiskresjonskoder,
-                beskrivelse = henvendelseNavn()
-            )
-            "STRENGT_FORTROLIG" -> oppgaveBenk.copy(
-                id = behandlendeEnhetForDiskresjonskoder,
+            true -> oppgaveBenk.copy(
+                id = "2103",
                 beskrivelse = henvendelseNavn()
             )
             else -> oppgaveBenk

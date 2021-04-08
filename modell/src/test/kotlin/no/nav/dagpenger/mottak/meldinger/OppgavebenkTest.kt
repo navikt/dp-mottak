@@ -13,12 +13,10 @@ import no.nav.dagpenger.mottak.harInntektFraFangstOgFiske
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 
 class OppgavebenkTest {
     private val jp = lagjournalpostData("NAV 04-01.03").journalpost()
-    private val person = PersonInformasjon.Person("12344", "12345678901", true, null)
+    private val person = PersonInformasjon.Person("12344", "12345678901", norskTilknytning = true, diskresjonskode = false)
 
     @Test
     fun `Finn riktig oppgave beskrivelse og benk når søker har eøs arbeidsforhold de siste 3 årene `() {
@@ -35,16 +33,15 @@ class OppgavebenkTest {
         }
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = ["STRENGT_FORTROLIG_UTLAND", "STRENGT_FORTROLIG"])
-    fun `Bruk original benk når bruker har diskresjonskode`(diskresjonskode: String) {
+    @Test
+    fun `Bruk original benk når bruker har diskresjonskode`() {
         withSøknad(
             harAvtjentVerneplikt = true,
             harInntektFraFangstOgFiske = true,
             erGrenseArbeider = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
-            val oppgaveBenk = jp.oppgaveBenk(person = person.copy(diskresjonskode = diskresjonskode), søknad = it)
+            val oppgaveBenk = jp.oppgaveBenk(person = person.copy(diskresjonskode = true), søknad = it)
             assertEquals("2103", oppgaveBenk.id)
             assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
         }

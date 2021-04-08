@@ -149,8 +149,8 @@ abstract class AbstractEndeTilEndeTest {
     private fun personInformasjon(): PersonInformasjon = PersonInformasjon(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
-        aktoerId = AKTØRID,
-        naturligIdent = UNG_PERSON_FNR_2018,
+        aktørId = AKTØRID,
+        fødselsnummer = UNG_PERSON_FNR_2018,
         norskTilknytning = true
     )
 

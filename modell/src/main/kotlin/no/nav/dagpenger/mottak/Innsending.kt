@@ -193,12 +193,7 @@ class Innsending private constructor(
 
         override fun håndter(innsending: Innsending, journalpostData: JournalpostData) {
             innsending.kategorisertJournalpost = journalpostData.journalpost()
-            if (innsending.kategorisertJournalpost?.journalpostbruker() == null) {
-                journalpostData.warn("Journalpost uten bruker")
-                innsending.tilstand(journalpostData, AvventerGosysOppgave)
-            } else {
-                innsending.tilstand(journalpostData, AvventerPersondata)
-            }
+            innsending.tilstand(journalpostData, AvventerPersondata)
         }
     }
 

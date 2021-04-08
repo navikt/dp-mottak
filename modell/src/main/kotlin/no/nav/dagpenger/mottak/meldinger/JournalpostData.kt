@@ -100,6 +100,7 @@ class JournalpostData(
         }
 
         return when (brevkode) {
+
             in setOf("NAV 04-01.03", "NAV 04-01.04") -> NySøknad(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
