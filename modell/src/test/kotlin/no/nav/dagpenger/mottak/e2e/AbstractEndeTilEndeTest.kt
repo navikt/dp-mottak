@@ -33,6 +33,7 @@ abstract class AbstractEndeTilEndeTest {
     protected lateinit var innsending: Innsending
     protected lateinit var observatør: TestObservatør
     protected val inspektør get() = TestInnsendingInspektør(innsending)
+
     @BeforeEach
     internal fun setup() {
         innsending = Innsending(JOURNALPOST_ID)
@@ -57,8 +58,13 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(joarkhendelse())
     }
 
-    protected fun håndterJournalpostData(brevkode: String = "NAV 04-01.03") {
-        innsending.håndter(journalpostData(brevkode))
+    protected fun håndterJournalpostData(brevkode: String = "NAV 04-01.03", behandlingstema: String? = null) {
+        innsending.håndter(
+            journalpostData(
+                brevkode = brevkode,
+                behandlingstema = behandlingstema
+            )
+        )
     }
 
     protected fun håndterPersonInformasjon() {
@@ -142,11 +148,12 @@ abstract class AbstractEndeTilEndeTest {
         norskTilknytning = true
     )
 
-    private fun journalpostData(brevkode: String): JournalpostData = JournalpostData(
+    private fun journalpostData(brevkode: String, behandlingstema: String? = null): JournalpostData = JournalpostData(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
         journalpostStatus = "MOTTATT",
         aktørId = "1234",
+        behandlingstema = behandlingstema,
         relevanteDatoer = listOf(
             JournalpostData.RelevantDato(LocalDateTime.now().toString(), JournalpostData.Datotype.DATO_REGISTRERT)
         ),

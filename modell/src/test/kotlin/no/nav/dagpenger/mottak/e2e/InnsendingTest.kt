@@ -141,4 +141,21 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             JournalpostFerdigstiltType
         )
     }
+
+    @Test
+    fun `skal håndtere klage og anke for lønnskompensasjon`() {
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0438")
+        håndterPersonInformasjon()
+        håndterGosysOppgaveOpprettet()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            AvventerGosysType,
+            JournalpostFerdigstiltType
+        )
+    }
 }

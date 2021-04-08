@@ -7,19 +7,22 @@ import no.nav.dagpenger.mottak.Ettersending
 import no.nav.dagpenger.mottak.Gjenopptak
 import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.KategorisertJournalpost
-import no.nav.dagpenger.mottak.Klage
+import no.nav.dagpenger.mottak.KlageOgAnke
+import no.nav.dagpenger.mottak.KlageOgAnkeLønnskompensasjon
 import no.nav.dagpenger.mottak.NySøknad
 import no.nav.dagpenger.mottak.SpesifikkKontekst
 import no.nav.dagpenger.mottak.UkjentSkjemaKode
 import no.nav.dagpenger.mottak.Utdanning
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class JournalpostData(
     aktivitetslogg: Aktivitetslogg,
     private val journalpostId: String,
     private val journalpostStatus: String,
     private val aktørId: String, // Bruker? (kan vi få fnr her?)
+    private val behandlingstema: String?,
     private val relevanteDatoer: List<RelevantDato>,
     private val dokumenter: List<DokumentInfo>
 ) : Hendelse(aktivitetslogg) {
@@ -58,6 +61,7 @@ class JournalpostData(
      + ukjent fødselsnummmer -> Henvendelsestype.MANUELL_UKJENT_SKJEMA_ID
      + manuell klage/anke?
      + gjenopptak korona
+     * mappe opp hvilke opplysninger gosys trenger pr type
      **/
 
     fun journalpost(): KategorisertJournalpost {
@@ -95,12 +99,7 @@ class JournalpostData(
                 dokumenter = jpDokumenter,
                 datoRegistrert = datoRegistrert
             )
-            in setOf("NAV 90-00.08") -> Klage(
-                journalpostId = journalpostId,
-                journalpostStatus = journalpostStatus,
-                dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert
-            )
+            in setOf("NAV 90-00.08") -> klageOgAnkeType(jpDokumenter, datoRegistrert)
             in setOf("NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04") -> Ettersending(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
@@ -115,6 +114,23 @@ class JournalpostData(
             )
         }
     }
+
+    private fun klageOgAnkeType(
+        jpDokumenter: List<Dokument>,
+        datoRegistrert: ZonedDateTime
+    ) = if (this.behandlingstema == "ab0438") {
+        KlageOgAnkeLønnskompensasjon(
+            journalpostId = journalpostId,
+            journalpostStatus = journalpostStatus,
+            dokumenter = jpDokumenter,
+            datoRegistrert = datoRegistrert
+        )
+    } else KlageOgAnke(
+        journalpostId = journalpostId,
+        journalpostStatus = journalpostStatus,
+        dokumenter = jpDokumenter,
+        datoRegistrert = datoRegistrert
+    )
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(
         "JournalpostData",

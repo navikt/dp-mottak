@@ -23,7 +23,8 @@ internal fun lagjournalpostData(brevkode: String, dato: LocalDateTime = LocalDat
                 dokumentInfoId = "12234",
                 brevkode = "N6"
             )
-        )
+        ),
+        behandlingstema = null
     )
     return journalpostData
 }

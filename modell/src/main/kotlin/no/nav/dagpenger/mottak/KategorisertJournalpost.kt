@@ -211,13 +211,22 @@ data class Etablering(
     override fun henvendelseNavn(): String = "Etablering\n"
 }
 
-data class Klage(
+data class KlageOgAnke(
     override val journalpostId: String,
     override val journalpostStatus: String,
     override val dokumenter: List<Dokument>,
     override val datoRegistrert: ZonedDateTime
 ) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
-    override fun henvendelseNavn(): String = "Klage\n"
+    override fun henvendelseNavn(): String = "Klage og anke\n"
+}
+
+data class KlageOgAnkeLønnskompensasjon(
+    override val journalpostId: String,
+    override val journalpostStatus: String,
+    override val dokumenter: List<Dokument>,
+    override val datoRegistrert: ZonedDateTime
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert) {
+    override fun henvendelseNavn(): String = "Klage og anke — Lønnskompensasjon\n"
 }
 
 data class Ettersending(

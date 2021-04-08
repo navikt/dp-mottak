@@ -144,6 +144,7 @@ class Innsending private constructor(
         fun håndter(innsending: Innsending, arenaOppgave: ArenaOppgaveOpprettet) {
             arenaOppgave.warn("Forventet ikke ArenaOppgaveOpprettet i %s", type.name)
         }
+
         fun håndter(innsending: Innsending, gosysOppgave: GosysOppgaveOpprettet) {
             gosysOppgave.warn("Forventet ikke GosysOppgaveOpprettet i %s", type.name)
         }
@@ -152,7 +153,10 @@ class Innsending private constructor(
             oppdatertJournalpost.warn("Forventet ikke ArenaOppgaveOpprettet i %s", type.name)
         }
 
-        fun håndter(innsending: Innsending, journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt) {
+        fun håndter(
+            innsending: Innsending,
+            journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
+        ) {
             journalpostferdigstilt.warn("Forventet ikke JournalpostFerdigstilt i %s", type.name)
         }
 
@@ -213,16 +217,18 @@ class Innsending private constructor(
             get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, hendelse: Hendelse) {
-            hendelse.info("Kategorisert journalpost til ${innsending.kategorisertJournalpost?.javaClass?.simpleName} ")
+            val hendelseType = innsending.kategorisertJournalpost?.javaClass?.simpleName
+            hendelse.info("Kategorisert journalpost til $hendelseType ")
             when (innsending.kategorisertJournalpost) {
                 is NySøknad -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Gjenopptak -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Utdanning -> innsending.tilstand(hendelse, AventerArenaOppgave)
                 is Etablering -> innsending.tilstand(hendelse, AventerArenaOppgave)
-                is Klage -> innsending.tilstand(hendelse, AventerArenaOppgave)
+                is KlageOgAnke -> innsending.tilstand(hendelse, AventerArenaOppgave)
+                is KlageOgAnkeLønnskompensasjon -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is Ettersending -> innsending.tilstand(hendelse, AventerArenaOppgave)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
-                else -> TODO("IKKE KATEGORISERT ")
+                else -> hendelse.severe("Ukjent hendelse kategorisering $hendelseType")
             }
         }
     }
@@ -358,7 +364,10 @@ class Innsending private constructor(
             innsending.ferdigstillJournalpost(hendelse)
         }
 
-        override fun håndter(innsending: Innsending, journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt) {
+        override fun håndter(
+            innsending: Innsending,
+            journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
+        ) {
             innsending.ferdigstilt = true
             journalpostferdigstilt.info("Ferdigstilte journalpost ${innsending.journalpostId}")
             innsending.tilstand(journalpostferdigstilt, JournalpostFerdigstilt)
