@@ -24,7 +24,7 @@ import java.time.Duration
 class Innsending private constructor(
     private val journalpostId: String,
     private var tilstand: Tilstand,
-    private var kategorisertJournalpost: KategorisertJournalpost?,
+    private var journalpostData: JournalpostData?,
     private var søknad: no.nav.dagpenger.mottak.meldinger.Søknadsdata.Søknad?,
     private var oppfyllerMinsteArbeidsinntekt: Boolean?,
     private var eksisterendeSaker: Boolean?,
@@ -42,7 +42,7 @@ class Innsending private constructor(
     ) : this(
         journalpostId = journalpostId,
         tilstand = Mottatt,
-        kategorisertJournalpost = null,
+        journalpostData = null,
         søknad = null,
         oppfyllerMinsteArbeidsinntekt = null,
         eksisterendeSaker = null,
@@ -56,52 +56,61 @@ class Innsending private constructor(
     fun journalpostId(): String = journalpostId
 
     fun håndter(joarkHendelse: JoarkHendelse) {
+        if (journalpostId != joarkHendelse.journalpostId()) return
         kontekst(joarkHendelse, "Registrert joark hendelse")
         tilstand.håndter(this, joarkHendelse)
     }
 
     fun håndter(journalpostData: JournalpostData) {
+        if (journalpostId != journalpostData.journalpostId()) return
         kontekst(journalpostData, "Mottatt informasjon om journalpost")
         tilstand.håndter(this, journalpostData)
     }
 
     fun håndter(personInformasjon: PersonInformasjon) {
-        // @todo: må håndtere der vi rett og slett ikke får tak i person
+        if (journalpostId != personInformasjon.journalpostId()) return
         kontekst(personInformasjon, "Mottatt informasjon om person")
         tilstand.håndter(this, personInformasjon)
     }
 
     fun håndter(søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
+        if (journalpostId != søknadsdata.journalpostId()) return
         kontekst(søknadsdata, "Mottatt søknadsdata")
         tilstand.håndter(this, søknadsdata)
     }
 
     fun håndter(vurderminsteinntektData: MinsteinntektVurderingData) {
+        if (journalpostId != vurderminsteinntektData.journalpostId()) return
         kontekst(vurderminsteinntektData, "Mottatt informasjon vurdering om minste arbeidsinntekt")
         tilstand.håndter(this, vurderminsteinntektData)
     }
 
     fun håndter(eksisterendeSak: EksisterendesakData) {
+        if (journalpostId != eksisterendeSak.journalpostId()) return
         kontekst(eksisterendeSak, "Mottatt informasjon om eksisterende saker")
         tilstand.håndter(this, eksisterendeSak)
     }
 
     fun håndter(arenaOppgave: ArenaOppgaveOpprettet) {
+        if (journalpostId != arenaOppgave.journalpostId()) return
         kontekst(arenaOppgave, "Mottatt informasjon om opprettet Arena oppgave")
         tilstand.håndter(this, arenaOppgave)
     }
 
     fun håndter(oppdatertJournalpost: JournalpostOppdatert) {
+        if (journalpostId != oppdatertJournalpost.journalpostId()) return
         kontekst(oppdatertJournalpost, "Mottatt informasjon om oppdatert journalpost")
         tilstand.håndter(this, oppdatertJournalpost)
     }
 
     fun håndter(journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt) {
+        if (journalpostId != journalpostferdigstilt.journalpostId()) return
         kontekst(journalpostferdigstilt, "Mottatt informasjon om ferdigstilt journalpost")
         tilstand.håndter(this, journalpostferdigstilt)
     }
 
     fun håndter(gosysoppgaveopprettet: GosysOppgaveOpprettet) {
+        if (journalpostId != gosysoppgaveopprettet.journalpostId()) return
         kontekst(gosysoppgaveopprettet, "Mottatt informasjon om opprettet Gosys oppgave")
         tilstand.håndter(this, gosysoppgaveopprettet)
     }
@@ -192,8 +201,8 @@ class Innsending private constructor(
             get() = Duration.ofDays(1)
 
         override fun håndter(innsending: Innsending, journalpostData: JournalpostData) {
-            innsending.kategorisertJournalpost = journalpostData.journalpost()
-            when (innsending.kategorisertJournalpost) {
+            innsending.journalpostData = journalpostData
+            when (requireNotNull(innsending.journalpostData).kategorisertJournalpost()) {
                 is UtenBruker -> {
                     journalpostData.warn("Journalpost uten registrert bruker")
                     innsending.tilstand(journalpostData, Kategorisering)
@@ -226,9 +235,10 @@ class Innsending private constructor(
             get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, hendelse: Hendelse) {
-            val hendelseType = innsending.kategorisertJournalpost?.javaClass?.simpleName
+            val journalpostData = requireNotNull(innsending.journalpostData) { " Journalpost må være innhentet " }
+            val hendelseType = journalpostData.javaClass.simpleName
             hendelse.info("Kategorisert journalpost til $hendelseType ")
-            when (innsending.kategorisertJournalpost) {
+            when (journalpostData.kategorisertJournalpost()) {
                 is NySøknad -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Gjenopptak -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Utdanning -> innsending.tilstand(hendelse, AventerArenaOppgave)
@@ -238,7 +248,6 @@ class Innsending private constructor(
                 is Ettersending -> innsending.tilstand(hendelse, AventerArenaOppgave)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UtenBruker -> innsending.tilstand(hendelse, AvventerGosysOppgave)
-                else -> hendelse.severe("Ukjent hendelse kategorisering $hendelseType")
             }
         }
     }
@@ -255,7 +264,10 @@ class Innsending private constructor(
 
         override fun håndter(innsending: Innsending, søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
             val kategorisertJournalpost =
-                requireNotNull(innsending.kategorisertJournalpost) { " Journalpost må være kategorisert på dette tidspunktet " }
+                requireNotNull(
+                    innsending.journalpostData,
+                    { " Journalpost må være kategorisert på dette tidspunktet " }
+                ).kategorisertJournalpost()
             søknadsdata.info("Fikk Søknadsdata for ${kategorisertJournalpost.javaClass.name}")
             innsending.søknad = søknadsdata.søknad()
             when (kategorisertJournalpost) {
@@ -398,7 +410,7 @@ class Innsending private constructor(
     }
 
     private fun trengerSøknadsdata(hendelse: Hendelse) {
-        val jp = requireNotNull(kategorisertJournalpost) { " Journalpost må være satt i ${tilstand.type} " }
+        val jp = requireNotNull(journalpostData) { " Journalpost må være satt i ${tilstand.type} " }
         hendelse.behov(
             Søknadsdata, "Trenger søknadsdata",
             mapOf(
@@ -424,7 +436,7 @@ class Innsending private constructor(
     }
 
     private fun oppretteArenaStartVedtakOppgave(hendelse: Hendelse) {
-        val journalpost = requireNotNull(kategorisertJournalpost)
+        val journalpost = requireNotNull(journalpostData).kategorisertJournalpost()
         val søknad = requireNotNull(søknad)
         val oppgavebenk = journalpost.oppgaveBenk(person, Søknad.fromJson(søknad.data), oppfyllerMinsteArbeidsinntekt)
         val parametre = mapOf(
@@ -440,7 +452,7 @@ class Innsending private constructor(
     private fun oppretteArenaVurderHenvendelseOppgave(
         hendelse: Hendelse
     ) {
-        val journalpost = requireNotNull(kategorisertJournalpost)
+        val journalpost = requireNotNull(journalpostData).kategorisertJournalpost()
         val oppgavebenk = journalpost.oppgaveBenk(person)
         val parametre = mapOf(
             "fødselsnummer" to "personen!",
@@ -473,7 +485,7 @@ class Innsending private constructor(
     }
 
     private fun opprettGosysOppgave(hendelse: Hendelse) {
-        val journalpost = requireNotNull(kategorisertJournalpost)
+        val journalpost = requireNotNull(journalpostData).kategorisertJournalpost()
         val oppgavebenk = journalpost.oppgaveBenk(person)
 
         // TODO — finn ut av parametre til gosys

@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class OppgavebenkTest {
-    private val jp = lagjournalpostData("NAV 04-01.03").journalpost()
+    private val jp = lagjournalpostData("NAV 04-01.03").kategorisertJournalpost()
     private val person = PersonInformasjon.Person("12344", "12345678901", norskTilknytning = true, diskresjonskode = false)
 
     @Test
@@ -123,7 +123,7 @@ class OppgavebenkTest {
     @Test
     fun `Finn riktig oppgave beskrivelse og benk ved oppfyller minsteinntekt ved permittering   `() {
         withSøknad {
-            val oppgaveBenk = lagjournalpostData("NAV 04-01.04").journalpost()
+            val oppgaveBenk = lagjournalpostData("NAV 04-01.04").kategorisertJournalpost()
                 .oppgaveBenk(person = person, søknad = it, oppfyllerMinsteArbeidsinntekt = false)
             assertEquals("Minsteinntekt - mulig avslag\n", oppgaveBenk.beskrivelse)
             assertEquals("4456", oppgaveBenk.id)
@@ -133,7 +133,7 @@ class OppgavebenkTest {
     @Test
     fun `Finn riktig oppgave beskrivelse og person ikke har norsk tilknytning ved permittering`() {
         withSøknad {
-            val oppgaveBenk = lagjournalpostData("NAV 04-01.04").journalpost()
+            val oppgaveBenk = lagjournalpostData("NAV 04-01.04").kategorisertJournalpost()
                 .oppgaveBenk(person = person.copy(norskTilknytning = false), søknad = it)
             assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
             assertEquals("4465", oppgaveBenk.id)
@@ -142,7 +142,7 @@ class OppgavebenkTest {
 
     @Test
     fun `Finner riktig benk for klage og anke når behandligstema er lønnskompensasjon`() {
-        val jp = lagjournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0438").journalpost()
+        val jp = lagjournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0438").kategorisertJournalpost()
         jp.oppgaveBenk(person = person, søknad = null, oppfyllerMinsteArbeidsinntekt = null).also {
             assertEquals("Klage og anke — Lønnskompensasjon\n", it.beskrivelse)
             assertEquals("4486", it.id)

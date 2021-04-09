@@ -1,14 +1,11 @@
 package no.nav.dagpenger.mottak.meldinger
 
 import no.nav.dagpenger.mottak.Aktivitetslogg
-import no.nav.dagpenger.mottak.Dokument
 import no.nav.dagpenger.mottak.Etablering
 import no.nav.dagpenger.mottak.Ettersending
 import no.nav.dagpenger.mottak.Gjenopptak
 import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.KategorisertJournalpost
-import no.nav.dagpenger.mottak.KategorisertJournalpost.Journalpostbruker
-import no.nav.dagpenger.mottak.KategorisertJournalpost.Journalpostbruker.Type
 import no.nav.dagpenger.mottak.KlageOgAnke
 import no.nav.dagpenger.mottak.KlageOgAnkeLønnskompensasjon
 import no.nav.dagpenger.mottak.NySøknad
@@ -30,158 +27,8 @@ class JournalpostData(
     private val dokumenter: List<DokumentInfo>
 ) : Hendelse(aktivitetslogg) {
 
-    override fun journalpostId(): String = journalpostId
-
-    class DokumentInfo(kanskjetittel: String?, dokumentInfoId: String, brevkode: String) {
-        val tittel = kanskjetittel ?: allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
-        val dokumentInfoId = dokumentInfoId
-        val brevkode = brevkode
-    }
-
-    data class RelevantDato(
-        val dato: String,
-        val datotype: Datotype
-    )
-
-    enum class Datotype {
-        DATO_SENDT_PRINT, DATO_EKSPEDERT, DATO_JOURNALFOERT,
-        DATO_REGISTRERT, DATO_AVS_RETUR, DATO_DOKUMENT
-    }
-
-    data class Bruker(
-        val type: BrukerType,
-        val id: String
-    ) {
-        override fun toString(): String {
-            return "Bruker(type=$type, id='<REDACTED>')"
-        }
-    }
-
-    enum class BrukerType {
-        ORGNR, AKTOERID, FNR
-    }
-
-    /**
-     *
-     * @todos Fra joark mottak
-     "NAV 04-06.08" to Henvendelsestype.ETABLERING,
-     "NAV 90-00.08" to Henvendelsestype.KLAGE_ANKE,
-     "NAVe 04-16.04" to Henvendelsestype.ETTERSENDELSE,
-     "NAVe 04-16.03" to Henvendelsestype.ETTERSENDELSE,
-     "NAVe 04-01.03" to Henvendelsestype.ETTERSENDELSE,
-     "NAVe 04-01.04" to Henvendelsestype.ETTERSENDELSE
-
-     + "NAV 90-00.08" og behandlingstema == "ab0438" to Henvendelsestype.KLAGE_ANKE_LONNSKOMPENSASJON
-     + ukjent skjemaid -> Henvendelsestype.MANUELL_UKJENT_SKJEMA_ID
-     + ukjent fødselsnummmer -> Henvendelsestype.MANUELL_UKJENT_SKJEMA_ID
-     + manuell klage/anke?
-     + gjenopptak korona
-     * mappe opp hvilke opplysninger gosys trenger pr type
-     **/
-
-    fun journalpost(): KategorisertJournalpost {
-
-        val brevkode = dokumenter.firstOrNull()?.brevkode
-        val jpDokumenter =
-            dokumenter.map { Dokument(it.tittel, it.dokumentInfoId, it.brevkode) }
-        val oslo = ZoneId.of("Europe/Oslo")
-        val datoRegistrert = relevanteDatoer.find { dato -> dato.datotype == Datotype.DATO_REGISTRERT }?.let {
-            LocalDateTime.parse(it.dato).atZone(oslo)
-        } ?: LocalDateTime.now().atZone(oslo)
-
-        val journalpostbruker = bruker?.let {
-            Journalpostbruker(
-                id = it.id,
-                type = when (it.type) {
-                    BrukerType.ORGNR -> Type.organisasjon
-                    BrukerType.AKTOERID -> Type.aktørId
-                    BrukerType.FNR -> Type.fødselsnummer
-                }
-            )
-        }
-            ?: return UtenBruker(
-                journalpostId = journalpostId,
-                journalpostStatus = journalpostStatus,
-                dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert,
-                journalpostbruker = null
-            )
-
-        return when (brevkode) {
-            in setOf("NAV 04-01.03", "NAV 04-01.04") -> NySøknad(
-                journalpostId = journalpostId,
-                journalpostStatus = journalpostStatus,
-                dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert,
-                journalpostbruker = journalpostbruker
-            )
-            in setOf("NAV 04-16.03", "NAV 04-16.04") -> Gjenopptak(
-                journalpostId = journalpostId,
-                journalpostStatus = journalpostStatus,
-                dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert,
-                journalpostbruker = journalpostbruker
-            )
-            in setOf("NAV 04-06.05") -> Utdanning(
-                journalpostId = journalpostId,
-                journalpostStatus = journalpostStatus,
-                dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert,
-                journalpostbruker = journalpostbruker
-            )
-            in setOf("NAV 04-06.08") -> Etablering(
-                journalpostId = journalpostId,
-                journalpostStatus = journalpostStatus,
-                dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert,
-                journalpostbruker = journalpostbruker
-            )
-            in setOf("NAV 90-00.08") -> klageOgAnkeType(jpDokumenter, datoRegistrert, journalpostbruker)
-            in setOf("NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04") -> Ettersending(
-                journalpostId = journalpostId,
-                journalpostStatus = journalpostStatus,
-                dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert,
-                journalpostbruker = journalpostbruker
-            )
-            else -> UkjentSkjemaKode(
-                journalpostId = journalpostId,
-                journalpostStatus = journalpostStatus,
-                dokumenter = jpDokumenter,
-                datoRegistrert = datoRegistrert,
-                journalpostbruker = journalpostbruker
-            )
-        }
-    }
-
-    private fun klageOgAnkeType(
-        jpDokumenter: List<Dokument>,
-        datoRegistrert: ZonedDateTime,
-        journalpostbruker: Journalpostbruker?
-    ) = if (this.behandlingstema == "ab0438") {
-        KlageOgAnkeLønnskompensasjon(
-            journalpostId = journalpostId,
-            journalpostStatus = journalpostStatus,
-            dokumenter = jpDokumenter,
-            datoRegistrert = datoRegistrert,
-            journalpostbruker = journalpostbruker
-        )
-    } else KlageOgAnke(
-        journalpostId = journalpostId,
-        journalpostStatus = journalpostStatus,
-        dokumenter = jpDokumenter,
-        datoRegistrert = datoRegistrert,
-        journalpostbruker = journalpostbruker
-    )
-
-    override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(
-        "JournalpostData",
-        mapOf(
-            "journalpostId" to journalpostId()
-        )
-    )
-
     internal companion object {
+        val oslo: ZoneId = ZoneId.of("Europe/Oslo")
 
         // @todo: not sure if this belong here
         val allKnownTypes = mapOf(
@@ -231,4 +78,88 @@ class JournalpostData(
             "NAV 90-00.08" to "Klage og anke"
         )
     }
+
+    override fun journalpostId(): String = journalpostId
+    fun hovedskjema() = dokumenter.first().brevkode
+
+    fun dokumenter(): List<DokumentInfo> = dokumenter
+    fun datoRegistrert(): ZonedDateTime =
+        relevanteDatoer.find { dato -> dato.datotype == Datotype.DATO_REGISTRERT }?.let {
+            LocalDateTime.parse(it.dato).atZone(oslo)
+        } ?: LocalDateTime.now().atZone(oslo)
+
+    class DokumentInfo(kanskjetittel: String?, dokumentInfoId: String, brevkode: String) {
+        val tittel = kanskjetittel ?: allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
+        val dokumentInfoId = dokumentInfoId
+        val brevkode = brevkode
+    }
+
+    data class RelevantDato(
+        val dato: String,
+        val datotype: Datotype
+    )
+
+    enum class Datotype {
+        DATO_SENDT_PRINT, DATO_EKSPEDERT, DATO_JOURNALFOERT,
+        DATO_REGISTRERT, DATO_AVS_RETUR, DATO_DOKUMENT
+    }
+
+    data class Bruker(
+        val type: BrukerType,
+        val id: String
+    ) {
+        override fun toString(): String {
+            return "Bruker(type=$type, id='<REDACTED>')"
+        }
+    }
+
+    enum class BrukerType {
+        ORGNR, AKTOERID, FNR
+    }
+
+    /**
+     *
+     * @todos Fra joark mottak
+     "NAV 04-06.08" to Henvendelsestype.ETABLERING,
+     "NAV 90-00.08" to Henvendelsestype.KLAGE_ANKE,
+     "NAVe 04-16.04" to Henvendelsestype.ETTERSENDELSE,
+     "NAVe 04-16.03" to Henvendelsestype.ETTERSENDELSE,
+     "NAVe 04-01.03" to Henvendelsestype.ETTERSENDELSE,
+     "NAVe 04-01.04" to Henvendelsestype.ETTERSENDELSE
+
+     + "NAV 90-00.08" og behandlingstema == "ab0438" to Henvendelsestype.KLAGE_ANKE_LONNSKOMPENSASJON
+     + ukjent skjemaid -> Henvendelsestype.MANUELL_UKJENT_SKJEMA_ID
+     + ukjent fødselsnummmer -> Henvendelsestype.MANUELL_UKJENT_SKJEMA_ID
+     + manuell klage/anke?
+     + gjenopptak korona
+     * mappe opp hvilke opplysninger gosys trenger pr type
+     **/
+
+    fun kategorisertJournalpost(): KategorisertJournalpost {
+        if (bruker == null) {
+            return UtenBruker(this)
+        }
+        return when (this.hovedskjema()) {
+            in setOf("NAV 04-01.03", "NAV 04-01.04") -> NySøknad(this)
+            in setOf("NAV 04-16.03", "NAV 04-16.04") -> Gjenopptak(this)
+            in setOf("NAV 04-06.05") -> Utdanning(this)
+            in setOf("NAV 04-06.08") -> Etablering(this)
+            in setOf("NAV 90-00.08") -> klageOgAnkeType(this)
+            in setOf("NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04") -> Ettersending(this)
+            else -> UkjentSkjemaKode(this)
+        }
+    }
+
+    private fun klageOgAnkeType(
+        journalpostData: JournalpostData
+    ) = if (this.behandlingstema == "ab0438") {
+        KlageOgAnkeLønnskompensasjon(journalpostData)
+    } else KlageOgAnke(journalpostData)
+
+    override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(
+        "JournalpostData",
+        mapOf(
+            "journalpostId" to journalpostId()
+        )
+    )
 }

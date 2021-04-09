@@ -14,19 +14,19 @@ internal class KategorisertJournalpostTest {
     @ParameterizedTest
     @ValueSource(strings = ["NAV 04-01.03", "NAV 04-01.04"])
     fun `kategoriserer ny søknad`(brevkode: String) {
-        assertTrue(lagjournalpostData(brevkode).journalpost() is NySøknad)
+        assertTrue(lagjournalpostData(brevkode).kategorisertJournalpost() is NySøknad)
     }
 
     @ParameterizedTest
     @ValueSource(strings = ["NAV 04-16.03", "NAV 04-16.04"])
     fun `kategoriserer gjennopptak`(brevkode: String) {
-        assertTrue(lagjournalpostData(brevkode).journalpost() is Gjenopptak)
+        assertTrue(lagjournalpostData(brevkode).kategorisertJournalpost() is Gjenopptak)
     }
 
     @Test
     fun `Tilleggsinformasjon generert`() {
         val dato = LocalDateTime.parse("2019-12-24T12:01:57")
-        val informasjon = lagjournalpostData("NAV 04-16.03", dato).journalpost().oppgaveBenk(null).tilleggsinformasjon
+        val informasjon = lagjournalpostData("NAV 04-16.03", dato).kategorisertJournalpost().oppgaveBenk(null).tilleggsinformasjon
         assertEquals(
             "Hoveddokument: Søknad om gjenopptak av dagpenger\n" +
                 "- Vedlegg: Arbeidsavtale\n" +
@@ -40,7 +40,7 @@ internal class KategorisertJournalpostTest {
     @Test
     fun `Dropper tilleggsinformasjon over maks tegn satt`() {
         val dato = LocalDateTime.parse("2019-12-24T12:01:57")
-        val informasjon = lagjournalpostData("NAV 04-16.03", dato, getRandomString(3000)).journalpost().oppgaveBenk(null).tilleggsinformasjon
+        val informasjon = lagjournalpostData("NAV 04-16.03", dato, getRandomString(3000)).kategorisertJournalpost().oppgaveBenk(null).tilleggsinformasjon
 
         assertEquals(
             "Hoveddokument: Søknad om gjenopptak av dagpenger\n" +
