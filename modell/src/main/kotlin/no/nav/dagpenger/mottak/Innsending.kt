@@ -197,7 +197,6 @@ class Innsending private constructor(
                 is UtenBruker -> {
                     journalpostData.warn("Journalpost uten registrert bruker")
                     innsending.tilstand(journalpostData, Kategorisering)
-
                 }
                 else -> innsending.tilstand(journalpostData, AvventerPersondata)
             }
