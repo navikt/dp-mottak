@@ -32,3 +32,8 @@ spec:
   azure:
     application:
       enabled: true
+  accessPolicy:
+    outbound:
+      external:
+        - host: {{ DP_PROXY_HOST }}
+

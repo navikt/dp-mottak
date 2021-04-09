@@ -1,1 +1,2 @@
 kafka_pool: nav-prod
+DP_PROXY_HOST: dp-proxy.prod-fss-pub.nais.io
