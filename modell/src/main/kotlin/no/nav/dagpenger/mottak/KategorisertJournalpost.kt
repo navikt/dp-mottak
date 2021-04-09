@@ -207,7 +207,7 @@ data class Utdanning(
     override val journalpostStatus: String,
     override val dokumenter: List<Dokument>,
     override val datoRegistrert: ZonedDateTime,
-    override val journalpostbruker: Journalpostbruker?
+    override val journalpostbruker: Journalpostbruker
 ) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert, journalpostbruker) {
     override fun henvendelseNavn(): String = "Utdanning\n"
 }
@@ -263,6 +263,16 @@ data class Ettersending(
 }
 
 data class UkjentSkjemaKode(
+    override val journalpostId: String,
+    override val journalpostStatus: String,
+    override val dokumenter: List<Dokument>,
+    override val datoRegistrert: ZonedDateTime,
+    override val journalpostbruker: Journalpostbruker?
+) : KategorisertJournalpost(journalpostId, journalpostStatus, dokumenter, datoRegistrert, journalpostbruker) {
+    override fun henvendelseNavn(): String = "${dokumenter.first().tittel}\n"
+}
+
+data class UtenBruker(
     override val journalpostId: String,
     override val journalpostStatus: String,
     override val dokumenter: List<Dokument>,

@@ -102,7 +102,7 @@ class Innsending private constructor(
     }
 
     fun håndter(gosysoppgaveopprettet: GosysOppgaveOpprettet) {
-        kontekst(gosysoppgaveopprettet, "Mottat informasjon om opprettet gosys oppgave")
+        kontekst(gosysoppgaveopprettet, "Mottatt informasjon om opprettet Gosys oppgave")
         tilstand.håndter(this, gosysoppgaveopprettet)
     }
 
@@ -193,7 +193,14 @@ class Innsending private constructor(
 
         override fun håndter(innsending: Innsending, journalpostData: JournalpostData) {
             innsending.kategorisertJournalpost = journalpostData.journalpost()
-            innsending.tilstand(journalpostData, AvventerPersondata)
+            when (innsending.kategorisertJournalpost) {
+                is UtenBruker -> {
+                    journalpostData.warn("Journalpost uten registrert bruker")
+                    innsending.tilstand(journalpostData, Kategorisering)
+
+                }
+                else -> innsending.tilstand(journalpostData, AvventerPersondata)
+            }
         }
     }
 
@@ -231,6 +238,7 @@ class Innsending private constructor(
                 is KlageOgAnkeLønnskompensasjon -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is Ettersending -> innsending.tilstand(hendelse, AventerArenaOppgave)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
+                is UtenBruker -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 else -> hendelse.severe("Ukjent hendelse kategorisering $hendelseType")
             }
         }

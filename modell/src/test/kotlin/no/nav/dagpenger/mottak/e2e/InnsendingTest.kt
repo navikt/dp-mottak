@@ -211,9 +211,16 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         assertTilstander(
             MottattType,
             AvventerJournalpostType,
+            KategoriseringType,
             AvventerGosysType,
             JournalpostFerdigstiltType
         )
+
+        inspektør.also {
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+        }
     }
 
     private fun assertContains(keys: List<String>, map: Map<String, Any>) {

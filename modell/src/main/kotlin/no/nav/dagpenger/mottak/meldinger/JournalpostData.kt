@@ -15,6 +15,7 @@ import no.nav.dagpenger.mottak.NySøknad
 import no.nav.dagpenger.mottak.SpesifikkKontekst
 import no.nav.dagpenger.mottak.UkjentSkjemaKode
 import no.nav.dagpenger.mottak.Utdanning
+import no.nav.dagpenger.mottak.UtenBruker
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -98,9 +99,15 @@ class JournalpostData(
                 }
             )
         }
+            ?: return UtenBruker(
+                journalpostId = journalpostId,
+                journalpostStatus = journalpostStatus,
+                dokumenter = jpDokumenter,
+                datoRegistrert = datoRegistrert,
+                journalpostbruker = null
+            )
 
         return when (brevkode) {
-
             in setOf("NAV 04-01.03", "NAV 04-01.04") -> NySøknad(
                 journalpostId = journalpostId,
                 journalpostStatus = journalpostStatus,
