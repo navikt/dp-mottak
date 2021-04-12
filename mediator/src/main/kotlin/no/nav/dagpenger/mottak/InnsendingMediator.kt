@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak
 
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.db.InnsendingRepository
+import no.nav.dagpenger.mottak.meldinger.EksisterendesakData
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.JournalpostData
 import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
@@ -49,6 +50,12 @@ internal class InnsendingMediator(
     fun håndter(minsteinntektVurdering: MinsteinntektVurderingData) {
         håndter(minsteinntektVurdering) { innsending ->
             innsending.håndter(minsteinntektVurdering)
+        }
+    }
+
+    fun håndter(eksisterendeSaker: EksisterendesakData) {
+        håndter(eksisterendeSaker) { innsending ->
+            innsending.håndter(eksisterendeSaker)
         }
     }
 

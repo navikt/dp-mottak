@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak.e2e
 
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
+import no.nav.dagpenger.mottak.tjenester.EksisterendeSakerMottak
 import no.nav.dagpenger.mottak.tjenester.JournalføringMottak
 import no.nav.dagpenger.mottak.tjenester.JournalpostMottak
 import no.nav.dagpenger.mottak.tjenester.MinsteinntektVurderingMotatt
@@ -9,6 +10,7 @@ import no.nav.dagpenger.mottak.tjenester.PersondataMottak
 import no.nav.dagpenger.mottak.tjenester.SøknadsdataMottak
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime.now
 import java.util.UUID
@@ -32,10 +34,11 @@ internal class MediatorE2ETest {
         PersondataMottak(mediator, testRapid)
         SøknadsdataMottak(mediator, testRapid)
         MinsteinntektVurderingMotatt(mediator, testRapid)
+        EksisterendeSakerMottak(mediator, testRapid)
     }
 
     @Test
-    fun `Skal motta joarkhendelse sende behov om Journalpost`() {
+    fun `Skal motta hendelser og sende ut behov`() {
         håndterHendelse(joarkMelding())
         assertBehov("Journalpost", 0)
 
@@ -47,9 +50,12 @@ internal class MediatorE2ETest {
         assertBehov("MinsteinntektVurdering", 3)
         håndterHendelse(minsteinntektVurderingMotattHendelse())
         assertBehov("EksisterendeSaker", 4)
+        håndterHendelse(eksisterendeSakerMotattHendelse())
+        assertBehov("OpprettStartVedtakOppgave", 5)
     }
 
     private fun assertBehov(expectedBehov: String, indexPåMelding: Int) {
+        assertTrue(testRapid.inspektør.size == indexPåMelding + 1, "Ingen melding på index $indexPåMelding")
         testRapid.inspektør.message(indexPåMelding).also { jsonNode ->
             assertEquals(expectedBehov, jsonNode["@behov"].map { it.asText() }.first())
             assertEquals("124567", jsonNode["journalpostId"].asText())
@@ -173,6 +179,24 @@ internal class MediatorE2ETest {
           "@løsning": {
             "MinsteinntektVurdering": {
               "oppfyllerMinsteArbeidsinntekt": null
+            }
+          }
+        }
+        """.trimIndent()
+
+    //language=JSON
+    private fun eksisterendeSakerMotattHendelse(): String =
+        """{
+          "@event_name": "behov",
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "MinsteinntektVurdering"
+          ],
+          "@opprettet" : "${now()}",
+          "journalpostId": "$journalpostId",
+          "@løsning": {
+            "EksisterendeSaker": {
+              "harEksisterendeSak": false
             }
           }
         }
