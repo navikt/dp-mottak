@@ -56,6 +56,8 @@ fun Søknad.harAvsluttetArbeidsforholdFraKonkurs(): Boolean =
 fun Søknad.erPermittertFraFiskeForedling(): Boolean =
     this.avsluttetArbeidsforhold().any { it.fiskeforedling }
 
+fun Søknad.erFornyetRettighet(): Boolean = this.getBooleanFaktum("fornyetrett.onskerutvidelse", true).not()
+
 data class AvsluttetArbeidsforhold(
     val sluttårsak: Sluttårsak,
     val grensearbeider: Boolean,

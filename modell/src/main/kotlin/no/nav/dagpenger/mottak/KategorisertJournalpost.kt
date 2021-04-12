@@ -1,5 +1,7 @@
 package no.nav.dagpenger.mottak
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
 import no.nav.dagpenger.mottak.meldinger.JournalpostData
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import java.time.ZonedDateTime
@@ -89,7 +91,12 @@ sealed class KategorisertJournalpost(
         val beskrivelse: String,
         val datoRegistrert: ZonedDateTime,
         val tilleggsinformasjon: String
-    )
+    ) {
+        private companion object {
+            val objectMapper = jacksonMapperBuilder().addModule(JavaTimeModule()).build()
+        }
+        fun toJson() = objectMapper.writeValueAsString(this)
+    }
 }
 
 data class NySøknad(
@@ -162,9 +169,16 @@ data class NySøknad(
                 datoRegistrert,
                 tilleggsinformasjon()
             )
+        }.let { oppgavebenk ->
+            return if (søknad.erFornyetRettighet())
+                OppgaveBenk(
+                    "4451",
+                    "Anmodningsvedtak 538",
+                    datoRegistrert,
+                    oppgavebenk.toJson()
+                ) else oppgavebenk
         }
     }
-
     private fun finnEnhetForHurtigAvslag(person: Person?) = when (behandlendeEnhet(person)) {
         "4450" -> "4451"
         "4455" -> "4456"
@@ -176,6 +190,22 @@ data class Gjenopptak(
     override val journalpostData: JournalpostData
 ) : KategorisertJournalpost(journalpostData) {
     override fun henvendelseNavn(): String = "Gjenopptak\n"
+
+    override fun finnOppgaveBenk(
+        søknad: Søknad?,
+        oppfyllerMinsteArbeidsinntekt: Boolean?,
+        person: Person?
+    ): OppgaveBenk {
+        super.finnOppgaveBenk(søknad, oppfyllerMinsteArbeidsinntekt, person).let { oppgavebenk ->
+            return if (søknad?.erFornyetRettighet() == true)
+                OppgaveBenk(
+                    "4451",
+                    "Anmodningsvedtak 538",
+                    oppgavebenk.datoRegistrert,
+                    oppgavebenk.toJson()
+                ) else oppgavebenk
+        }
+    }
 }
 
 data class Utdanning(

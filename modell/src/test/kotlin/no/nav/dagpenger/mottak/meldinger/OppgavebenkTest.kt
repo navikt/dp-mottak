@@ -1,9 +1,11 @@
 package no.nav.dagpenger.mottak.meldinger
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import no.nav.dagpenger.mottak.Søknad
+import no.nav.dagpenger.mottak.erFornyetRettighet
 import no.nav.dagpenger.mottak.erGrenseArbeider
 import no.nav.dagpenger.mottak.erPermittertFraFiskeForedling
 import no.nav.dagpenger.mottak.harAvsluttetArbeidsforholdFraKonkurs
@@ -13,6 +15,9 @@ import no.nav.dagpenger.mottak.harInntektFraFangstOgFiske
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 
 class OppgavebenkTest {
     private val jp = lagjournalpostData("NAV 04-01.03").kategorisertJournalpost()
@@ -139,6 +144,16 @@ class OppgavebenkTest {
             assertEquals("4465", oppgaveBenk.id)
         }
     }
+    @ParameterizedTest
+    @ValueSource(strings = ["NAV 04-01.03", "NAV 04-01.04", "NAV 04-16.03", "NAV 04-16.04"])
+    fun `finner riktig benk for  fornyet rettighet`(brevkode: String) {
+        withSøknad(erFornyetRettighet = true) {
+            val oppgavebenk = lagjournalpostData(brevkode).kategorisertJournalpost().oppgaveBenk(person = person, søknad = it)
+            assertEquals("4451", oppgavebenk.id)
+            assertEquals("Anmodningsvedtak 538", oppgavebenk.beskrivelse)
+            assertDoesNotThrow { jacksonObjectMapper().readTree(oppgavebenk.tilleggsinformasjon) }
+        }
+    }
 
     @Test
     fun `Finner riktig benk for klage og anke når behandligstema er lønnskompensasjon`() {
@@ -166,6 +181,7 @@ class OppgavebenkTest {
         erGrenseArbeider: Boolean = false,
         harAvsluttetArbeidsforholdFraKonkurs: Boolean = false,
         erPermittertFraFiskeforedling: Boolean = false,
+        erFornyetRettighet: Boolean = false,
         test: (søknad: Søknad) -> Unit
     ) {
 
@@ -179,6 +195,7 @@ class OppgavebenkTest {
                 every { it.erGrenseArbeider() } returns erGrenseArbeider
                 every { it.harAvsluttetArbeidsforholdFraKonkurs() } returns harAvsluttetArbeidsforholdFraKonkurs
                 every { it.erPermittertFraFiskeForedling() } returns erPermittertFraFiskeforedling
+                every { it.erFornyetRettighet() } returns erFornyetRettighet
             }
             test(søknad)
         }
