@@ -7,9 +7,14 @@ import no.nav.dagpenger.mottak.tjenester.JournalpostMottak
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 import java.util.UUID
 
 internal class MediatorE2ETest {
+
+    private companion object {
+        val journalpostId = 124567
+    }
 
     private val testRapid = TestRapid()
     private val innsendingRepository = InMemoryInnsendingRepository()
@@ -28,31 +33,41 @@ internal class MediatorE2ETest {
             testRapid
         )
     }
+
     @Test
     fun `Skal motta joarkhendelse sende behov om Journalpost`() {
         håndterJoarkHendelse()
-        val behovMessage = testRapid.inspektør.message(0)
-        assertEquals("Journalpost", behovMessage["@behov"].map { it.asText() }.first())
-        assertEquals("124567", behovMessage["journalpostId"].asText())
+        val journalpostBehovMessage = testRapid.inspektør.message(0)
+        assertEquals("Journalpost", journalpostBehovMessage["@behov"].map { it.asText() }.first())
+        assertEquals("124567", journalpostBehovMessage["journalpostId"].asText())
         håndterJournalpostHendelse()
     }
-
-    private fun håndterJournalpostHendelse() {
-        testRapid.sendTestMessage(journalpostHendelse())
-    }
-
-    private fun journalpostHendelse(): String =
-        """
-            {
-                "@id": "${UUID.randomUUID()}",
-                
-            }
-            
-        """.trimIndent()
 
     private fun håndterJoarkHendelse() {
         testRapid.sendTestMessage(joarkMelding())
     }
+
+    private fun håndterJournalpostHendelse() {
+        testRapid.sendTestMessage(journalpostMottattHendelse())
+    }
+
+    //language=JSON
+    private fun journalpostMottattHendelse(): String =
+        """{
+          "@event_name": "behov",
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "Journalpost"
+          ],
+          "@besvart" : "${LocalDateTime.now()}",
+          "journalpostId": "$journalpostId",
+          "@løsning": {
+            "Journalpost": {
+                "id" : "må fylle inn hva som kommer her... "
+            }
+          }
+        }
+        """.trimIndent()
 
     //language=JSON
     private fun joarkMelding(): String = """
@@ -60,7 +75,7 @@ internal class MediatorE2ETest {
           "hendelsesId": "",
           "versjon": "",
           "hendelsesType": "",
-          "journalpostId": 124567,
+          "journalpostId": "$journalpostId",
           "journalpostStatus": "Mottatt",
           "temaGammelt": "DAG",
           "temaNytt": "DAG",

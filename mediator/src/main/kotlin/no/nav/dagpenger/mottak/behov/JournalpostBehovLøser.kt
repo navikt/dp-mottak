@@ -15,7 +15,7 @@ class JournalpostBehovLøser(
             validate {
                 it.demandValue("@event_name", "behov")
                 it.demandAllOrAny("@behov", listOf("Journalpost"))
-                it.forbid("@løsning")
+                it.rejectKey("@løsning")
                 it.requireKey("@id")
                 it.requireKey("journalpostId")
             }
