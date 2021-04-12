@@ -6,6 +6,7 @@ import no.nav.dagpenger.mottak.tjenester.EksisterendeSakerMottak
 import no.nav.dagpenger.mottak.tjenester.JournalføringMottak
 import no.nav.dagpenger.mottak.tjenester.JournalpostMottak
 import no.nav.dagpenger.mottak.tjenester.MinsteinntektVurderingMotatt
+import no.nav.dagpenger.mottak.tjenester.OpprettStartVedtakOppgaveMottak
 import no.nav.dagpenger.mottak.tjenester.PersondataMottak
 import no.nav.dagpenger.mottak.tjenester.SøknadsdataMottak
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -35,6 +36,7 @@ internal class MediatorE2ETest {
         SøknadsdataMottak(mediator, testRapid)
         MinsteinntektVurderingMotatt(mediator, testRapid)
         EksisterendeSakerMottak(mediator, testRapid)
+        OpprettStartVedtakOppgaveMottak(mediator, testRapid)
     }
 
     @Test
@@ -52,6 +54,8 @@ internal class MediatorE2ETest {
         assertBehov("EksisterendeSaker", 4)
         håndterHendelse(eksisterendeSakerMotattHendelse())
         assertBehov("OpprettStartVedtakOppgave", 5)
+        håndterHendelse(opprettStartVedtakMotattHendelse())
+        assertBehov("OppdaterJournalpost", 6)
     }
 
     private fun assertBehov(expectedBehov: String, indexPåMelding: Int) {
@@ -197,6 +201,25 @@ internal class MediatorE2ETest {
           "@løsning": {
             "EksisterendeSaker": {
               "harEksisterendeSak": false
+            }
+          }
+        }
+        """.trimIndent()
+
+    //language=JSON
+    private fun opprettStartVedtakMotattHendelse(): String =
+        """{
+          "@event_name": "behov",
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "OpprettStartVedtakOppgave"
+          ],
+          "@opprettet" : "${now()}",
+          "journalpostId": "$journalpostId",
+          "@løsning": {
+            "OpprettStartVedtakOppgave": {
+              "fagsakId": "12345",
+              "oppgaveId": "12345678"
             }
           }
         }

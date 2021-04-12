@@ -1,7 +1,6 @@
 package no.nav.dagpenger.mottak
 
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.EksisterendeSaker
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Ferdigstill
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Gosysoppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.MinsteinntektVurdering
@@ -472,7 +471,7 @@ class Innsending private constructor(
     private fun oppdatereJournalpost(hendelse: Hendelse) {
         val parametre = this.arenaSak?.let { mapOf("fagsakId" to it) } ?: emptyMap<String, Any>()
         hendelse.behov(
-            Aktivitetslogg.Aktivitet.Behov.Behovtype.Oppdaterjournalpost,
+            Aktivitetslogg.Aktivitet.Behov.Behovtype.OppdaterJournalpost,
             "Oppdatere journalpost for $journalpostId",
             parametre
         )
@@ -480,7 +479,7 @@ class Innsending private constructor(
 
     private fun ferdigstillJournalpost(hendelse: Hendelse) {
         hendelse.behov(
-            Ferdigstill, "Ferdigstiller journalpost $journalpostId"
+            Aktivitetslogg.Aktivitet.Behov.Behovtype.FerdigstillJournalpost, "Ferdigstiller journalpost $journalpostId"
         )
     }
 
