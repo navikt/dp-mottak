@@ -8,6 +8,8 @@ application {
 
 dependencies {
     implementation(project(":modell"))
+    implementation("com.github.navikt.dp-biblioteker:aad-klient:2021.04.09-14.32.088c6dc10b69")
+    implementation(Ktor.library("client-cio-jvm"))
 
     testImplementation(Mockk.mockk)
 }
