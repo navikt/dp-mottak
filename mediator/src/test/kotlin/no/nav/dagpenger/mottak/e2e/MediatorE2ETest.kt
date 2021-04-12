@@ -1,9 +1,11 @@
 package no.nav.dagpenger.mottak.e2e
 
 import no.nav.dagpenger.mottak.InnsendingMediator
+import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
 import no.nav.dagpenger.mottak.tjenester.EksisterendeSakerMottak
 import no.nav.dagpenger.mottak.tjenester.JournalføringMottak
+import no.nav.dagpenger.mottak.tjenester.JournalpostFerdigstiltMottak
 import no.nav.dagpenger.mottak.tjenester.JournalpostMottak
 import no.nav.dagpenger.mottak.tjenester.JournalpostOppdatertMottak
 import no.nav.dagpenger.mottak.tjenester.MinsteinntektVurderingMotatt
@@ -25,9 +27,11 @@ internal class MediatorE2ETest {
 
     private val testRapid = TestRapid()
     private val innsendingRepository = InMemoryInnsendingRepository()
+    private val testObservatør = TestObservatør()
     private val mediator = InnsendingMediator(
-        innsendingRepository,
-        testRapid
+        innsendingRepository = innsendingRepository,
+        rapidsConnection = testRapid,
+        observatører = listOf(testObservatør)
     )
 
     init {
@@ -39,6 +43,7 @@ internal class MediatorE2ETest {
         EksisterendeSakerMottak(mediator, testRapid)
         OpprettStartVedtakOppgaveMottak(mediator, testRapid)
         JournalpostOppdatertMottak(mediator, testRapid)
+        JournalpostFerdigstiltMottak(mediator, testRapid)
     }
 
     @Test
@@ -58,8 +63,11 @@ internal class MediatorE2ETest {
         assertBehov("OpprettStartVedtakOppgave", 5)
         håndterHendelse(opprettStartVedtakMotattHendelse())
         assertBehov("OppdaterJournalpost", 6)
-        håndterHendelse(oppdaterJournalpostMotattHendelse())
+        håndterHendelse(oppdatertJournalpostMotattHendelse())
         assertBehov("FerdigstillJournalpost", 7)
+        håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+        assertTrue(testRapid.inspektør.size == 8, "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}")
+        assertEquals(testObservatør.tilstander.last(), InnsendingTilstandType.InnsendingFerdigstiltType)
     }
 
     private fun assertBehov(expectedBehov: String, indexPåMelding: Int) {
@@ -230,7 +238,7 @@ internal class MediatorE2ETest {
         """.trimIndent()
 
     //language=JSON
-    private fun oppdaterJournalpostMotattHendelse(): String =
+    private fun oppdatertJournalpostMotattHendelse(): String =
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
@@ -241,6 +249,24 @@ internal class MediatorE2ETest {
           "journalpostId": "$journalpostId",
           "@løsning": {
             "OppdaterJournalpost": {
+              "journalpostId": "$journalpostId"
+            }
+          }
+        }
+        """.trimIndent()
+
+    //language=JSON
+    private fun ferdigstiltJournalpostMotattHendelse(): String =
+        """{
+          "@event_name": "behov",
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "FerdigstillJournalpost"
+          ],
+          "@opprettet" : "${now()}",
+          "journalpostId": "$journalpostId",
+          "@løsning": {
+            "FerdigstillJournalpost": {
               "journalpostId": "$journalpostId"
             }
           }

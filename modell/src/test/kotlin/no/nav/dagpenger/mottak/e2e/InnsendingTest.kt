@@ -3,14 +3,14 @@ package no.nav.dagpenger.mottak.e2e
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Gosysoppgave
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaOppgaveType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerFerdigstillJournalpostType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerGosysType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerJournalpostType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerMinsteinntektVurderingType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerPersondataType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerSvarOmEksisterendeSakerType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerSøknadsdataType
-import no.nav.dagpenger.mottak.InnsendingTilstandType.FerdigstillJournalpostType
-import no.nav.dagpenger.mottak.InnsendingTilstandType.JournalpostFerdigstiltType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.InnsendingFerdigstiltType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.MottattType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.OppdaterJournalpostType
@@ -52,8 +52,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerSvarOmEksisterendeSakerType,
             AventerArenaStartVedtakType,
             OppdaterJournalpostType,
-            FerdigstillJournalpostType,
-            JournalpostFerdigstiltType
+            AvventerFerdigstillJournalpostType,
+            InnsendingFerdigstiltType
         )
 
         inspektør.also {
@@ -88,8 +88,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerSøknadsdataType,
             AventerArenaOppgaveType,
             OppdaterJournalpostType,
-            FerdigstillJournalpostType,
-            JournalpostFerdigstiltType
+            AvventerFerdigstillJournalpostType,
+            InnsendingFerdigstiltType
         )
 
         inspektør.also {
@@ -116,8 +116,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             KategoriseringType,
             AventerArenaOppgaveType,
             OppdaterJournalpostType,
-            FerdigstillJournalpostType,
-            JournalpostFerdigstiltType
+            AvventerFerdigstillJournalpostType,
+            InnsendingFerdigstiltType
         )
 
         inspektør.also {
@@ -140,7 +140,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerPersondataType,
             KategoriseringType,
             AvventerGosysType,
-            JournalpostFerdigstiltType
+            InnsendingFerdigstiltType
         )
 
         inspektør.also {
@@ -163,7 +163,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerPersondataType,
             KategoriseringType,
             AvventerGosysType,
-            JournalpostFerdigstiltType
+            InnsendingFerdigstiltType
         )
         inspektør.also { it ->
             assertNoErrors(it)
@@ -213,7 +213,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerJournalpostType,
             KategoriseringType,
             AvventerGosysType,
-            JournalpostFerdigstiltType
+            InnsendingFerdigstiltType
         )
 
         inspektør.also {

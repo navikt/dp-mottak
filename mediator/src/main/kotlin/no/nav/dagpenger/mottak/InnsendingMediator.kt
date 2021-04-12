@@ -6,6 +6,7 @@ import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.EksisterendesakData
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.JournalpostData
+import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
@@ -17,7 +18,8 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 internal class InnsendingMediator(
     private val innsendingRepository: InnsendingRepository,
-    rapidsConnection: RapidsConnection
+    private val observatører: List<InnsendingObserver> = emptyList(),
+    rapidsConnection: RapidsConnection,
 ) {
 
     private val behovMediator: BehovMediator = BehovMediator(
@@ -73,8 +75,15 @@ internal class InnsendingMediator(
         }
     }
 
+    fun håndter(journalpostFerdigstilt: JournalpostFerdigstilt) {
+        håndter(journalpostFerdigstilt) { innsending ->
+            innsending.håndter(journalpostFerdigstilt)
+        }
+    }
+
     private fun håndter(hendelse: Hendelse, handler: (Innsending) -> Unit) {
         innsendingRepository.innsending(hendelse.journalpostId()).also { innsending ->
+            observatører.forEach { innsending.addObserver(it) }
             handler(innsending)
             finalize(innsending, hendelse)
         }

@@ -377,7 +377,7 @@ class Innsending private constructor(
 
     internal object FerdigstillJournalpost : Tilstand {
         override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.FerdigstillJournalpostType
+            get() = InnsendingTilstandType.AvventerFerdigstillJournalpostType
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
@@ -397,7 +397,7 @@ class Innsending private constructor(
 
     internal object JournalpostFerdigstilt : Tilstand {
         override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.JournalpostFerdigstiltType
+            get() = InnsendingTilstandType.InnsendingFerdigstiltType
         override val timeout: Duration
             get() = Duration.ofDays(1)
 

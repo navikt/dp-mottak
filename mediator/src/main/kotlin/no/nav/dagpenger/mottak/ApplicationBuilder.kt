@@ -18,7 +18,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     )
         .withKtorModule(proxyPing(Configuration.properties))
         .build().apply {
-            val mediator = InnsendingMediator(innsendingRepository, this)
+            val mediator = InnsendingMediator(innsendingRepository = innsendingRepository, rapidsConnection = this)
             JournalføringMottak(mediator, this)
         }
 
