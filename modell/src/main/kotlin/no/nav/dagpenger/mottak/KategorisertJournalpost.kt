@@ -170,15 +170,10 @@ data class NySøknad(
                 tilleggsinformasjon()
             )
         }.let { oppgavebenk ->
-            return if (søknad.erFornyetRettighet())
-                OppgaveBenk(
-                    "4451",
-                    "Anmodningsvedtak 538",
-                    datoRegistrert,
-                    oppgavebenk.toJson()
-                ) else oppgavebenk
+            return fornyetRettEllerOrginal(søknad, oppgavebenk)
         }
     }
+
     private fun finnEnhetForHurtigAvslag(person: Person?) = when (behandlendeEnhet(person)) {
         "4450" -> "4451"
         "4455" -> "4456"
@@ -195,17 +190,7 @@ data class Gjenopptak(
         søknad: Søknad?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
-    ): OppgaveBenk {
-        super.finnOppgaveBenk(søknad, oppfyllerMinsteArbeidsinntekt, person).let { oppgavebenk ->
-            return if (søknad?.erFornyetRettighet() == true)
-                OppgaveBenk(
-                    "4451",
-                    "Anmodningsvedtak 538",
-                    oppgavebenk.datoRegistrert,
-                    oppgavebenk.toJson()
-                ) else oppgavebenk
-        }
-    }
+    ) = fornyetRettEllerOrginal(søknad, super.finnOppgaveBenk(søknad, oppfyllerMinsteArbeidsinntekt, person))
 }
 
 data class Utdanning(
@@ -258,4 +243,17 @@ data class UtenBruker(
     override val journalpostData: JournalpostData
 ) : KategorisertJournalpost(journalpostData) {
     override fun henvendelseNavn(): String = "${journalpostData.dokumenter().first().tittel}\n"
+}
+
+private fun fornyetRettEllerOrginal(
+    søknad: Søknad?,
+    originalOppgavebenk: KategorisertJournalpost.OppgaveBenk
+): KategorisertJournalpost.OppgaveBenk {
+    return if (søknad?.erFornyetRettighet() == true)
+        KategorisertJournalpost.OppgaveBenk(
+            "4451",
+            "Anmodningsvedtak 538",
+            originalOppgavebenk.datoRegistrert,
+            originalOppgavebenk.toJson()
+        ) else originalOppgavebenk
 }
