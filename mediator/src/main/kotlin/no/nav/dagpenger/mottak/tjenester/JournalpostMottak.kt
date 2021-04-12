@@ -36,7 +36,7 @@ internal class JournalpostMottak(
                 journalpostId = packet["journalpostId"].asText(),
                 journalpostStatus = "TODO",
                 bruker = it["bruker"]?.let { jsonBruker ->
-                JournalpostData.Bruker(
+                    JournalpostData.Bruker(
                         id = jsonBruker["id"].asText(),
                         type = JournalpostData.BrukerType.valueOf(jsonBruker["type"].asText())
                     )
@@ -50,7 +50,7 @@ internal class JournalpostMottak(
                 },
                 relevanteDatoer = it["relevanteDatoer"].map { jsonDato ->
                     JournalpostData.RelevantDato(
-                       dato = jsonDato["dato"].asText(),
+                        dato = jsonDato["dato"].asText(),
                         datotype = JournalpostData.Datotype.valueOf(jsonDato["datotype"].asText())
                     )
                 },
@@ -60,11 +60,6 @@ internal class JournalpostMottak(
         }
 
         innsendingMediator.håndter(journalpostData)
-
-
-
-
-
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {

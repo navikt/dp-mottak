@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.db.InnsendingRepository
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.JournalpostData
+import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.helse.rapids_rivers.RapidsConnection
 
 private val logg = KotlinLogging.logger {}
@@ -38,6 +39,12 @@ internal class InnsendingMediator(
         }
     }
 
+    fun håndter(persondata: PersonInformasjon) {
+        håndter(persondata) { innsending ->
+            innsending.håndter(persondata)
+        }
+    }
+
     private fun finalize(innsending: Innsending, hendelse: Hendelse) {
         innsendingRepository.lagre(innsending)
         if (!hendelse.hasMessages()) return
@@ -45,6 +52,4 @@ internal class InnsendingMediator(
         sikkerlogg.info("aktivitetslogg inneholder meldinger: ${hendelse.toLogString()}")
         behovMediator.håndter(hendelse)
     }
-
-
 }

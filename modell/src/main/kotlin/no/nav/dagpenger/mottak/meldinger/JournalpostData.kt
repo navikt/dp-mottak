@@ -117,8 +117,7 @@ class JournalpostData(
         ORGNR, AKTOERID, FNR
     }
 
-
-    //@todo: Vi er avhengig av samme datastruktur som saf (journalpost), må håndtere endringer her..
+    // @todo: Vi er avhengig av samme datastruktur som saf (journalpost), må håndtere endringer her..
     fun kategorisertJournalpost(): KategorisertJournalpost {
         if (bruker == null) {
             return UtenBruker(this)

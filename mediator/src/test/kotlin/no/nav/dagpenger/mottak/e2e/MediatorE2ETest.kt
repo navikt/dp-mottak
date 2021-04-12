@@ -4,6 +4,7 @@ import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
 import no.nav.dagpenger.mottak.tjenester.JournalføringMottak
 import no.nav.dagpenger.mottak.tjenester.JournalpostMottak
+import no.nav.dagpenger.mottak.tjenester.PersondataMottak
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -32,18 +33,27 @@ internal class MediatorE2ETest {
             mediator,
             testRapid
         )
+        PersondataMottak(
+            mediator,
+            testRapid
+        )
     }
 
     @Test
     fun `Skal motta joarkhendelse sende behov om Journalpost`() {
         håndterJoarkHendelse()
-        val journalpostBehovMessage = testRapid.inspektør.message(0)
-        assertEquals("Journalpost", journalpostBehovMessage["@behov"].map { it.asText() }.first())
-        assertEquals("124567", journalpostBehovMessage["journalpostId"].asText())
+        assertBehov("Journalpost", 0)
         håndterJournalpostHendelse()
-        val personinformasjonBehov = testRapid.inspektør.message(1)
-        assertEquals("Persondata", personinformasjonBehov["@behov"].map { it.asText() }.first())
-        assertEquals("124567", personinformasjonBehov["journalpostId"].asText())
+        assertBehov("Persondata", 1)
+        håndterPersondataHendelse()
+        assertBehov("Søknadsdata", 2)
+    }
+
+    private fun assertBehov(expectedBehov: String, indexPåMelding: Int) {
+        testRapid.inspektør.message(indexPåMelding).also { jsonNode ->
+            assertEquals(expectedBehov, jsonNode["@behov"].map { it.asText() }.first())
+            assertEquals("124567", jsonNode["journalpostId"].asText())
+        }
     }
 
     private fun håndterJoarkHendelse() {
@@ -52,6 +62,10 @@ internal class MediatorE2ETest {
 
     private fun håndterJournalpostHendelse() {
         testRapid.sendTestMessage(journalpostMottattHendelse())
+    }
+
+    private fun håndterPersondataHendelse() {
+        testRapid.sendTestMessage(persondataMottattHendelse())
     }
 
     //language=JSON
@@ -90,6 +104,27 @@ internal class MediatorE2ETest {
                   }
                 ],
                 "behandlingstema" : null
+            }
+          }
+        }
+        """.trimIndent()
+
+    //language=JSON
+    private fun persondataMottattHendelse(): String =
+        """{
+          "@event_name": "behov",
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "Persondata"
+          ],
+          "@opprettet" : "${now()}",
+          "journalpostId": "$journalpostId",
+          "@løsning": {
+            "Persondata": {
+              "aktoerId": "tadda",
+              "naturligIdent": "12345678910",
+              "norskTilknytning": true,
+              "diskresjonskode": null
             }
           }
         }
