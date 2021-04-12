@@ -178,7 +178,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "behandlendeEnhetId",
                     "oppgavebeskrivelse",
                     "registrertDato",
-                    "tilleggsinformasjon",
+                    "tilleggsinformasjon"
                 ),
                 gosysBehov!!.detaljer()
             )

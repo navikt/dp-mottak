@@ -25,7 +25,7 @@ internal class InnsendingMediator(
     }
 
     private fun håndter(hendelse: Hendelse, handler: (Innsending) -> Unit) {
-        innsendingRepository.person(hendelse.journalpostId()).also { innsending ->
+        innsendingRepository.innsending(hendelse.journalpostId()).also { innsending ->
             handler(innsending)
             finalize(innsending, hendelse)
         }
