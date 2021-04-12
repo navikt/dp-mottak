@@ -4,7 +4,9 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.db.InnsendingRepository
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.JournalpostData
+import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
+import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import no.nav.helse.rapids_rivers.RapidsConnection
 
 private val logg = KotlinLogging.logger {}
@@ -32,16 +34,28 @@ internal class InnsendingMediator(
         }
     }
 
+    fun håndter(persondata: PersonInformasjon) {
+        håndter(persondata) { innsending ->
+            innsending.håndter(persondata)
+        }
+    }
+
+    fun håndter(søknadsdata: Søknadsdata) {
+        håndter(søknadsdata) { innsending ->
+            innsending.håndter(søknadsdata)
+        }
+    }
+
+    fun håndter(minsteinntektVurdering: MinsteinntektVurderingData) {
+        håndter(minsteinntektVurdering) { innsending ->
+            innsending.håndter(minsteinntektVurdering)
+        }
+    }
+
     private fun håndter(hendelse: Hendelse, handler: (Innsending) -> Unit) {
         innsendingRepository.innsending(hendelse.journalpostId()).also { innsending ->
             handler(innsending)
             finalize(innsending, hendelse)
-        }
-    }
-
-    fun håndter(persondata: PersonInformasjon) {
-        håndter(persondata) { innsending ->
-            innsending.håndter(persondata)
         }
     }
 

@@ -4,7 +4,9 @@ import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
 import no.nav.dagpenger.mottak.tjenester.JournalføringMottak
 import no.nav.dagpenger.mottak.tjenester.JournalpostMottak
+import no.nav.dagpenger.mottak.tjenester.MinsteinntektVurderingMotatt
 import no.nav.dagpenger.mottak.tjenester.PersondataMottak
+import no.nav.dagpenger.mottak.tjenester.SøknadsdataMottak
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -25,28 +27,26 @@ internal class MediatorE2ETest {
     )
 
     init {
-        JournalføringMottak(
-            mediator,
-            testRapid
-        )
-        JournalpostMottak(
-            mediator,
-            testRapid
-        )
-        PersondataMottak(
-            mediator,
-            testRapid
-        )
+        JournalføringMottak(mediator, testRapid)
+        JournalpostMottak(mediator, testRapid)
+        PersondataMottak(mediator, testRapid)
+        SøknadsdataMottak(mediator, testRapid)
+        MinsteinntektVurderingMotatt(mediator, testRapid)
     }
 
     @Test
     fun `Skal motta joarkhendelse sende behov om Journalpost`() {
-        håndterJoarkHendelse()
+        håndterHendelse(joarkMelding())
         assertBehov("Journalpost", 0)
-        håndterJournalpostHendelse()
+
+        håndterHendelse(journalpostMottattHendelse())
         assertBehov("Persondata", 1)
-        håndterPersondataHendelse()
+        håndterHendelse(persondataMottattHendelse())
         assertBehov("Søknadsdata", 2)
+        håndterHendelse(søknadsdataMottakHendelse())
+        assertBehov("MinsteinntektVurdering", 3)
+        håndterHendelse(minsteinntektVurderingMotattHendelse())
+        assertBehov("EksisterendeSaker", 4)
     }
 
     private fun assertBehov(expectedBehov: String, indexPåMelding: Int) {
@@ -56,16 +56,8 @@ internal class MediatorE2ETest {
         }
     }
 
-    private fun håndterJoarkHendelse() {
-        testRapid.sendTestMessage(joarkMelding())
-    }
-
-    private fun håndterJournalpostHendelse() {
-        testRapid.sendTestMessage(journalpostMottattHendelse())
-    }
-
-    private fun håndterPersondataHendelse() {
-        testRapid.sendTestMessage(persondataMottattHendelse())
+    private fun håndterHendelse(melding: String) {
+        testRapid.sendTestMessage(melding)
     }
 
     //language=JSON
@@ -144,4 +136,45 @@ internal class MediatorE2ETest {
           "kanalReferanseId": "vetikke"
         }
     """.trimIndent()
+
+    //language=JSON
+    private fun søknadsdataMottakHendelse(): String =
+        """{
+          "@event_name": "behov",
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "Søknadsdata"
+          ],
+          "@opprettet" : "${now()}",
+          "journalpostId": "$journalpostId",
+          "@løsning": {
+            "Søknadsdata": {
+              "søknadsId": "tadda",
+              "data": {
+                 "id": "blabla",
+                 "masse": "masse data"
+              }
+            }
+          }
+        }
+        """.trimIndent()
+
+    // todo: Koronaregelverk?
+    //language=JSON
+    private fun minsteinntektVurderingMotattHendelse(): String =
+        """{
+          "@event_name": "behov",
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "MinsteinntektVurdering"
+          ],
+          "@opprettet" : "${now()}",
+          "journalpostId": "$journalpostId",
+          "@løsning": {
+            "MinsteinntektVurdering": {
+              "oppfyllerMinsteArbeidsinntekt": null
+            }
+          }
+        }
+        """.trimIndent()
 }
