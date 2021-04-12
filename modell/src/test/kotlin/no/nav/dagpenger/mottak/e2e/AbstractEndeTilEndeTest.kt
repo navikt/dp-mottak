@@ -169,7 +169,7 @@ abstract class AbstractEndeTilEndeTest {
         ),
         dokumenter = listOf(
             JournalpostData.DokumentInfo(
-                kanskjetittel = null,
+                tittelHvisTilgjengelig = null,
                 dokumentInfoId = "123",
                 brevkode = brevkode
             )

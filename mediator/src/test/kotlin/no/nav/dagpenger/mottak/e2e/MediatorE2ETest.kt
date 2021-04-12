@@ -7,7 +7,7 @@ import no.nav.dagpenger.mottak.tjenester.JournalpostMottak
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
+import java.time.LocalDateTime.now
 import java.util.UUID
 
 internal class MediatorE2ETest {
@@ -41,6 +41,9 @@ internal class MediatorE2ETest {
         assertEquals("Journalpost", journalpostBehovMessage["@behov"].map { it.asText() }.first())
         assertEquals("124567", journalpostBehovMessage["journalpostId"].asText())
         håndterJournalpostHendelse()
+        val personinformasjonBehov = testRapid.inspektør.message(1)
+        assertEquals("Persondata", personinformasjonBehov["@behov"].map { it.asText() }.first())
+        assertEquals("124567", personinformasjonBehov["journalpostId"].asText())
     }
 
     private fun håndterJoarkHendelse() {
@@ -59,11 +62,34 @@ internal class MediatorE2ETest {
           "@behov": [
             "Journalpost"
           ],
-          "@besvart" : "${LocalDateTime.now()}",
+          "@opprettet" : "${now()}",
           "journalpostId": "$journalpostId",
           "@løsning": {
             "Journalpost": {
-                "id" : "må fylle inn hva som kommer her... "
+                "id" : "$journalpostId",
+                "bruker" : {
+                  "id": "12345678901",
+                  "type": "FNR"
+                },
+                "relevanteDatoer" : [
+                    {
+                      "dato" : "${now()}",
+                      "datotype": "DATO_REGISTRERT"
+                    }
+                ],
+                "dokumenter" : [
+                  {
+                    "tittel" : null,
+                    "dokumentInfoId" : 1234,
+                    "brevkode" : "NAV 04-01.03"
+                  },
+                   {
+                    "tittel" : null,
+                    "dokumentInfoId" : 5678,
+                    "brevkode" : "N6"
+                  }
+                ],
+                "behandlingstema" : null
             }
           }
         }

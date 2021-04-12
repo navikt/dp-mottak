@@ -88,8 +88,8 @@ class JournalpostData(
             LocalDateTime.parse(it.dato).atZone(oslo)
         } ?: LocalDateTime.now().atZone(oslo)
 
-    class DokumentInfo(kanskjetittel: String?, dokumentInfoId: String, brevkode: String) {
-        val tittel = kanskjetittel ?: allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
+    class DokumentInfo(tittelHvisTilgjengelig: String?, dokumentInfoId: String, brevkode: String) {
+        val tittel = tittelHvisTilgjengelig ?: allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
         val dokumentInfoId = dokumentInfoId
         val brevkode = brevkode
     }
@@ -117,24 +117,8 @@ class JournalpostData(
         ORGNR, AKTOERID, FNR
     }
 
-    /**
-     *
-     * @todos Fra joark mottak
-     "NAV 04-06.08" to Henvendelsestype.ETABLERING,
-     "NAV 90-00.08" to Henvendelsestype.KLAGE_ANKE,
-     "NAVe 04-16.04" to Henvendelsestype.ETTERSENDELSE,
-     "NAVe 04-16.03" to Henvendelsestype.ETTERSENDELSE,
-     "NAVe 04-01.03" to Henvendelsestype.ETTERSENDELSE,
-     "NAVe 04-01.04" to Henvendelsestype.ETTERSENDELSE
 
-     + "NAV 90-00.08" og behandlingstema == "ab0438" to Henvendelsestype.KLAGE_ANKE_LONNSKOMPENSASJON
-     + ukjent skjemaid -> Henvendelsestype.MANUELL_UKJENT_SKJEMA_ID
-     + ukjent fødselsnummmer -> Henvendelsestype.MANUELL_UKJENT_SKJEMA_ID
-     + manuell klage/anke?
-     + gjenopptak korona
-     * mappe opp hvilke opplysninger gosys trenger pr type
-     **/
-
+    //@todo: Vi er avhengig av samme datastruktur som saf (journalpost), må håndtere endringer her..
     fun kategorisertJournalpost(): KategorisertJournalpost {
         if (bruker == null) {
             return UtenBruker(this)

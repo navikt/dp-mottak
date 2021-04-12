@@ -19,12 +19,12 @@ internal fun lagjournalpostData(
         ),
         dokumenter = listOf(
             JournalpostData.DokumentInfo(
-                kanskjetittel = null,
+                tittelHvisTilgjengelig = null,
                 dokumentInfoId = "1223",
                 brevkode = brevkode
             ),
             JournalpostData.DokumentInfo(
-                kanskjetittel = vedlegg,
+                tittelHvisTilgjengelig = vedlegg,
                 dokumentInfoId = "12234",
                 brevkode = "N6"
             )
