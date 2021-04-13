@@ -5,8 +5,7 @@ import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
 import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
 import no.nav.dagpenger.mottak.proxy.HentJournalpostData
 import no.nav.dagpenger.mottak.proxy.proxyPing
-import no.nav.dagpenger.mottak.tjenester.JournalføringMottak
-import no.nav.dagpenger.mottak.tjenester.JournalpostMottak
+import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 
@@ -22,13 +21,11 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
         .withKtorModule(proxyPing(Configuration.properties))
         .build().apply {
             val mediator = InnsendingMediator(innsendingRepository = innsendingRepository, rapidsConnection = this)
+            // Behovmottakere
+            MottakMediator(mediator, this)
 
-            //Behovmottakere
-            JournalføringMottak(mediator, this)
-            JournalpostMottak(mediator, this)
-
-            //Behovløsere
-            JournalpostBehovLøser(this, HentJournalpostData(Configuration.properties))
+            // Behovløsere
+            JournalpostBehovLøser(HentJournalpostData(Configuration.properties), this)
         }
 
     init {

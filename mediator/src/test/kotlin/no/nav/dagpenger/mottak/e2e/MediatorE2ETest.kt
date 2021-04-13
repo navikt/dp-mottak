@@ -8,7 +8,7 @@ import no.nav.dagpenger.mottak.tjenester.JournalføringMottak
 import no.nav.dagpenger.mottak.tjenester.JournalpostFerdigstiltMottak
 import no.nav.dagpenger.mottak.tjenester.JournalpostMottak
 import no.nav.dagpenger.mottak.tjenester.JournalpostOppdatertMottak
-import no.nav.dagpenger.mottak.tjenester.MinsteinntektVurderingMotatt
+import no.nav.dagpenger.mottak.tjenester.MinsteinntektVurderingMottak
 import no.nav.dagpenger.mottak.tjenester.OpprettStartVedtakOppgaveMottak
 import no.nav.dagpenger.mottak.tjenester.PersondataMottak
 import no.nav.dagpenger.mottak.tjenester.SøknadsdataMottak
@@ -39,7 +39,7 @@ internal class MediatorE2ETest {
         JournalpostMottak(mediator, testRapid)
         PersondataMottak(mediator, testRapid)
         SøknadsdataMottak(mediator, testRapid)
-        MinsteinntektVurderingMotatt(mediator, testRapid)
+        MinsteinntektVurderingMottak(mediator, testRapid)
         EksisterendeSakerMottak(mediator, testRapid)
         OpprettStartVedtakOppgaveMottak(mediator, testRapid)
         JournalpostOppdatertMottak(mediator, testRapid)

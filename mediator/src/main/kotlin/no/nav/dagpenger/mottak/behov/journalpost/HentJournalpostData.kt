@@ -11,6 +11,8 @@ import io.ktor.http.HttpMethod
 import no.nav.dagpenger.aad.api.ClientCredentialsClient
 import no.nav.dagpenger.mottak.Configuration.dpProxyScope
 import no.nav.dagpenger.mottak.Configuration.dpProxyUrl
+import no.nav.dagpenger.mottak.behov.GraphqlQuery
+import no.nav.dagpenger.mottak.behov.journalpost.Saf
 
 internal interface JournalpostArkiv {
     suspend fun hentJournalpost(journalpostId: String): Saf.Journalpost

@@ -1,4 +1,4 @@
-package no.nav.dagpenger.mottak.proxy
+package no.nav.dagpenger.mottak.behov.journalpost
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper

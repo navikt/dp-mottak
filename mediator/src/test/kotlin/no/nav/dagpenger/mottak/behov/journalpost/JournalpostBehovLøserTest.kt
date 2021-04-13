@@ -1,7 +1,6 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
 import no.nav.dagpenger.mottak.proxy.JournalpostArkiv
-import no.nav.dagpenger.mottak.proxy.Saf
 import no.nav.helse.rapids_rivers.asLocalDateTime
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals

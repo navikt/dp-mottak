@@ -11,8 +11,8 @@ import no.nav.helse.rapids_rivers.River
 private val logger = KotlinLogging.logger { }
 
 internal class JournalpostBehovLøser(
-    rapidsConnection: RapidsConnection,
-    private val journalpostArkiv: JournalpostArkiv
+    private val journalpostArkiv: JournalpostArkiv,
+    rapidsConnection: RapidsConnection
 ) : River.PacketListener {
 
     init {
