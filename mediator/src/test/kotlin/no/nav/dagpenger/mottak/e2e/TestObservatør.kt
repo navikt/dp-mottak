@@ -3,7 +3,7 @@ package no.nav.dagpenger.mottak.e2e
 import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 
-class TestObservatør : InnsendingObserver {
+internal class TestObservatør : InnsendingObserver {
 
     internal val tilstander = mutableListOf<InnsendingTilstandType>()
 

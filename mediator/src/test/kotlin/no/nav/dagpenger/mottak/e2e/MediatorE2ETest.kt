@@ -22,7 +22,7 @@ import java.util.UUID
 internal class MediatorE2ETest {
 
     private companion object {
-        val journalpostId = 124567
+        val JOURNALPOST_ID = 124567
     }
 
     private val testRapid = TestRapid()
@@ -50,7 +50,6 @@ internal class MediatorE2ETest {
     fun `Skal motta hendelser og sende ut behov`() {
         håndterHendelse(joarkMelding())
         assertBehov("Journalpost", 0)
-
         håndterHendelse(journalpostMottattHendelse())
         assertBehov("Persondata", 1)
         håndterHendelse(persondataMottattHendelse())
@@ -74,7 +73,7 @@ internal class MediatorE2ETest {
         assertTrue(testRapid.inspektør.size == indexPåMelding + 1, "Ingen melding på index $indexPåMelding")
         testRapid.inspektør.message(indexPåMelding).also { jsonNode ->
             assertEquals(expectedBehov, jsonNode["@behov"].map { it.asText() }.first())
-            assertEquals("124567", jsonNode["journalpostId"].asText())
+            assertEquals(JOURNALPOST_ID.toString(), jsonNode["journalpostId"].asText())
         }
     }
 
@@ -91,10 +90,10 @@ internal class MediatorE2ETest {
             "Journalpost"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$journalpostId",
+          "journalpostId": "$JOURNALPOST_ID",
           "@løsning": {
             "Journalpost": {
-                "id" : "$journalpostId",
+                "id" : "$JOURNALPOST_ID",
                 "bruker" : {
                   "id": "12345678901",
                   "type": "FNR"
@@ -132,7 +131,7 @@ internal class MediatorE2ETest {
             "Persondata"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$journalpostId",
+          "journalpostId": "$JOURNALPOST_ID",
           "@løsning": {
             "Persondata": {
               "aktoerId": "tadda",
@@ -150,7 +149,7 @@ internal class MediatorE2ETest {
           "hendelsesId": "",
           "versjon": "",
           "hendelsesType": "",
-          "journalpostId": "$journalpostId",
+          "journalpostId": "$JOURNALPOST_ID",
           "journalpostStatus": "Mottatt",
           "temaGammelt": "DAG",
           "temaNytt": "DAG",
@@ -168,7 +167,7 @@ internal class MediatorE2ETest {
             "Søknadsdata"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$journalpostId",
+          "journalpostId": "$JOURNALPOST_ID",
           "@løsning": {
             "Søknadsdata": {
               "søknadsId": "tadda",
@@ -191,7 +190,7 @@ internal class MediatorE2ETest {
             "MinsteinntektVurdering"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$journalpostId",
+          "journalpostId": "$JOURNALPOST_ID",
           "@løsning": {
             "MinsteinntektVurdering": {
               "oppfyllerMinsteArbeidsinntekt": null
@@ -209,7 +208,7 @@ internal class MediatorE2ETest {
             "MinsteinntektVurdering"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$journalpostId",
+          "journalpostId": "$JOURNALPOST_ID",
           "@løsning": {
             "EksisterendeSaker": {
               "harEksisterendeSak": false
@@ -227,7 +226,7 @@ internal class MediatorE2ETest {
             "OpprettStartVedtakOppgave"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$journalpostId",
+          "journalpostId": "$JOURNALPOST_ID",
           "@løsning": {
             "OpprettStartVedtakOppgave": {
               "fagsakId": "12345",
@@ -246,10 +245,10 @@ internal class MediatorE2ETest {
             "OppdaterJournalpost"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$journalpostId",
+          "journalpostId": "$JOURNALPOST_ID",
           "@løsning": {
             "OppdaterJournalpost": {
-              "journalpostId": "$journalpostId"
+              "journalpostId": "$JOURNALPOST_ID"
             }
           }
         }
@@ -264,10 +263,10 @@ internal class MediatorE2ETest {
             "FerdigstillJournalpost"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$journalpostId",
+          "journalpostId": "$JOURNALPOST_ID",
           "@løsning": {
             "FerdigstillJournalpost": {
-              "journalpostId": "$journalpostId"
+              "journalpostId": "$JOURNALPOST_ID"
             }
           }
         }
