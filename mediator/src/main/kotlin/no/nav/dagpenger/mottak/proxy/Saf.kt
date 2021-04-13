@@ -45,7 +45,17 @@ internal class Saf {
 
         internal companion object {
             private val objectMapper = jacksonObjectMapper()
-            fun fromJson(json: String): Journalpost = objectMapper.readValue<Journalpost>(json, Journalpost::class.java)
+            fun fromGraphQlJson(json: String): Journalpost =
+                objectMapper.readValue(json, GraphQlJournalpostResponse::class.java).data?.journalpost ?: throw IllegalArgumentException("SAF response har ingen data")
+        }
+
+        private data class GraphQlJournalpostResponse(val data: Data?, val errors: List<String>?) {
+            init {
+                if (errors?.isNotEmpty() == true) {
+                    throw IllegalArgumentException("SAF returnerte liste med feil: ${errors.joinToString("\n")}")
+                }
+            }
+            class Data(val journalpost: Journalpost)
         }
     }
 

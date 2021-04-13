@@ -7,6 +7,8 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
+import java.lang.IllegalArgumentException
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -16,33 +18,36 @@ internal class JournalpostBehovLøserTest {
         val JOURNALPOST_ID = "124567"
 
         //language=JSON
-        val journalpostJson = """
-                {
-                    "journalpostId": "${JournalpostBehovLøserTest.JOURNALPOST_ID}",
-                    "bruker": {
-                      "id": "12345678901",
-                      "type": "FNR"
+        val journalpostJson = """{
+              "data": {
+                "journalpost": {
+                  "journalpostId": "${JournalpostBehovLøserTest.JOURNALPOST_ID}",
+                  "bruker": {
+                    "id": "12345678901",
+                    "type": "FNR"
+                  },
+                  "relevanteDatoer": [
+                    {
+                      "dato": "${LocalDateTime.now()}",
+                      "datotype": "DATO_REGISTRERT"
+                    }
+                  ],
+                  "dokumenter": [
+                    {
+                      "tittel": null,
+                      "dokumentInfoId": 1234,
+                      "brevkode": "NAV 04-01.03"
                     },
-                    "relevanteDatoer": [
-                      {
-                        "dato": "${LocalDateTime.now()}",
-                        "datotype": "DATO_REGISTRERT"
-                      }
-                    ],
-                    "dokumenter": [
-                      {
-                        "tittel": null,
-                        "dokumentInfoId": 1234,
-                        "brevkode": "NAV 04-01.03"
-                      },
-                      {
-                        "tittel": null,
-                        "dokumentInfoId": 5678,
-                        "brevkode": "N6"
-                      }
-                    ],
-                    "behandlingstema": null
-                  }"""
+                    {
+                      "tittel": null,
+                      "dokumentInfoId": 5678,
+                      "brevkode": "N6"
+                    }
+                  ],
+                  "behandlingstema": null
+                }
+              }
+            }"""
     }
 
     private val testRapid = TestRapid()
@@ -52,7 +57,7 @@ internal class JournalpostBehovLøserTest {
             rapidsConnection = testRapid,
             journalpostArkiv = object : JournalpostArkiv {
                 override suspend fun hentJournalpost(journalpostId: String): Saf.Journalpost =
-                    Saf.Journalpost.fromJson(journalpostJson)
+                    Saf.Journalpost.fromGraphQlJson(journalpostJson)
             }
         )
     }
@@ -65,6 +70,13 @@ internal class JournalpostBehovLøserTest {
             assertEquals(1, size)
             assertEquals("124567", field(0, "@løsning")["Journalpost"]["journalpostId"].asText())
             assertDoesNotThrow { field(0, "@løsning")["Journalpost"]["relevanteDatoer"][0]["dato"].asLocalDateTime() }
+        }
+    }
+
+    @Test
+    fun `Kaster excpetion om error liste ikke er tom`() {
+        assertThrows<IllegalArgumentException> {
+            Saf.Journalpost.fromGraphQlJson("""{"errors": ["Her er en error"],"data":null}""".trimIndent())
         }
     }
 

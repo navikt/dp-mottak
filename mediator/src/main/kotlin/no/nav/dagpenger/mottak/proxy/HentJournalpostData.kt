@@ -64,6 +64,6 @@ internal class HentJournalpostData(config: Configuration) : JournalpostArkiv {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
             body = JournalPostQuery(journalpostId).toJson()
         }.let {
-            Saf.Journalpost.fromJson(it)
+            Saf.Journalpost.fromGraphQlJson(it)
         }
 }
