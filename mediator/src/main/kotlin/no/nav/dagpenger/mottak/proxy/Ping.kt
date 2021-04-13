@@ -25,7 +25,7 @@ internal fun proxyPing(configuration: Configuration): Application.() -> Unit {
     }
     val proxyPingClient = HttpClient() {
         install(DefaultRequest) {
-            this.url("${configuration.dpProxyUrl()}/proxy/v1/ping")
+            this.url("${configuration.dpProxyUrl()}/proxy/v1/ping") // endre til riktig url
             method = HttpMethod.Get
         }
     }
@@ -33,7 +33,7 @@ internal fun proxyPing(configuration: Configuration): Application.() -> Unit {
         routing {
             get("/internal/proxyping") {
                 proxyPingClient.request<String>() {
-                    header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
+                    header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}") // ! Viktig; sett opp
                 }.let {
                     call.respondText(it)
                 }

@@ -1,32 +1,74 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
+import no.nav.dagpenger.mottak.proxy.JournalpostArkiv
+import no.nav.dagpenger.mottak.proxy.Saf
+import no.nav.helse.rapids_rivers.asLocalDateTime
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDateTime
 import java.util.UUID
 
 internal class JournalpostBehovLøserTest {
 
     private companion object {
-        val JOURNALPOST_ID = 124567
+        val JOURNALPOST_ID = "124567"
+
+        //language=JSON
+        val journalpostJson = """
+                {
+                    "journalpostId": "${JournalpostBehovLøserTest.JOURNALPOST_ID}",
+                    "bruker": {
+                      "id": "12345678901",
+                      "type": "FNR"
+                    },
+                    "relevanteDatoer": [
+                      {
+                        "dato": "${LocalDateTime.now()}",
+                        "datotype": "DATO_REGISTRERT"
+                      }
+                    ],
+                    "dokumenter": [
+                      {
+                        "tittel": null,
+                        "dokumentInfoId": 1234,
+                        "brevkode": "NAV 04-01.03"
+                      },
+                      {
+                        "tittel": null,
+                        "dokumentInfoId": 5678,
+                        "brevkode": "N6"
+                      }
+                    ],
+                    "behandlingstema": null
+                  }"""
     }
 
     private val testRapid = TestRapid()
 
-    private val journalpostBehovLøser = JournalpostBehovLøser(
-        rapidsConnection = testRapid
-    )
-
-    @Test
-    fun `test `() {
-        testRapid.sendTestMessage(journalpostBehov())
-
-
-
+    init {
+        JournalpostBehovLøser(
+            rapidsConnection = testRapid,
+            journalpostArkiv = object : JournalpostArkiv {
+                override suspend fun hentJournalpost(journalpostId: String): Saf.Journalpost =
+                    Saf.Journalpost.fromJson(journalpostJson)
+            }
+        )
     }
 
-    //language=JSON
-    private fun journalpostBehov() : String =
+    @Test
+    fun `Skal hente saf post og legge på kafka `() {
+        testRapid.sendTestMessage(journalpostBehov())
+        assertEquals(testRapid.inspektør.size, 1)
+        with(testRapid.inspektør) {
+            assertEquals(1, size)
+            assertEquals("124567", field(0, "@løsning")["Journalpost"]["journalpostId"].asText())
+            assertDoesNotThrow { field(0, "@løsning")["Journalpost"]["relevanteDatoer"][0]["dato"].asLocalDateTime() }
+        }
+    }
+
+    private fun journalpostBehov(): String =
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
@@ -37,5 +79,4 @@ internal class JournalpostBehovLøserTest {
           "journalpostId": "$JOURNALPOST_ID"
         }
         """.trimIndent()
-
 }

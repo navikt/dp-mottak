@@ -1,7 +1,9 @@
 package no.nav.dagpenger.mottak
 
 import mu.KotlinLogging
+import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
 import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
+import no.nav.dagpenger.mottak.proxy.HentJournalpostData
 import no.nav.dagpenger.mottak.proxy.proxyPing
 import no.nav.dagpenger.mottak.tjenester.JournalføringMottak
 import no.nav.helse.rapids_rivers.RapidApplication
@@ -20,6 +22,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
         .build().apply {
             val mediator = InnsendingMediator(innsendingRepository = innsendingRepository, rapidsConnection = this)
             JournalføringMottak(mediator, this)
+            JournalpostBehovLøser(this, HentJournalpostData(Configuration.properties))
         }
 
     init {

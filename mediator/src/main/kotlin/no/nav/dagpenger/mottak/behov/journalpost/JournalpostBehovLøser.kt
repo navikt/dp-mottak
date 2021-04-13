@@ -1,13 +1,18 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
+import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
+import no.nav.dagpenger.mottak.proxy.JournalpostArkiv
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-class JournalpostBehovLøser(
+private val logger = KotlinLogging.logger {  }
+
+internal class JournalpostBehovLøser(
     rapidsConnection: RapidsConnection,
-    // journalpostclient
+    private val journalpostArkiv: JournalpostArkiv
 ) : River.PacketListener {
 
     init {
@@ -24,11 +29,10 @@ class JournalpostBehovLøser(
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
 
-        // hente journalpost
-        // legge på pakka
-
-        // løsning på pakka
-
-        TODO("not implemented")
+        runBlocking { journalpostArkiv.hentJournalpost(packet["journalpostId"].asText()) }.also {
+            packet["@løsning"] = mapOf("Journalpost" to it)
+            context.publish(packet.toJson())
+            logger.info("Løst behov Journalpost for journalpost med id ${it.journalpostId}")
+        }
     }
 }
