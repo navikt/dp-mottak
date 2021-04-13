@@ -1,6 +1,14 @@
 package no.nav.dagpenger.mottak.e2e
 
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Gosysoppgave
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.FerdigstillJournalpost
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.MinsteinntektVurdering
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OppdaterJournalpost
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettGosysoppgave
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettStartVedtakOppgave
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettVurderhenvendelseOppgave
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Søknadsdata
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaOppgaveType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerFerdigstillJournalpostType
@@ -14,7 +22,6 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType.InnsendingFerdigstiltType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.MottattType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.OppdaterJournalpostType
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -27,20 +34,45 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJoarkHendelse()
 
         håndterJournalpostData(brevkode)
+        assertBehovDetaljer(Journalpost)
 
         håndterPersonInformasjon()
+        assertBehovDetaljer(Persondata, setOf("brukerId"))
 
         håndterSøknadsdata()
+        assertBehovDetaljer(Søknadsdata, setOf("dokumentInfoId"))
 
         håndterMinsteinntektVurderingData()
+        assertBehovDetaljer(MinsteinntektVurdering, setOf("aktørId"))
 
         håndterEksisterendesakData()
+        assertBehovDetaljer(MinsteinntektVurdering, setOf("aktørId"))
 
         håndterArenaOppgaveOpprettet()
+        assertBehovDetaljer(
+            OpprettStartVedtakOppgave,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "behandlendeEnhetId",
+                "oppgavebeskrivelse",
+                "registrertDato",
+                "tilleggsinformasjon"
+            )
+        )
 
         håndterJournalpostOppdatert()
+        assertBehovDetaljer(
+            OppdaterJournalpost,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "fagsakId"
+            )
+        )
 
         håndterJournalpostFerdigstilt()
+        assertBehovDetaljer(FerdigstillJournalpost)
 
         assertTilstander(
             MottattType,
@@ -69,16 +101,39 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJoarkHendelse()
 
         håndterJournalpostData(brevkode)
+        assertBehovDetaljer(Journalpost)
 
         håndterPersonInformasjon()
+        assertBehovDetaljer(Persondata, setOf("brukerId"))
 
         håndterSøknadsdata()
+        assertBehovDetaljer(Søknadsdata, setOf("dokumentInfoId"))
 
         håndterArenaOppgaveOpprettet()
+        assertBehovDetaljer(
+            OpprettVurderhenvendelseOppgave,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "behandlendeEnhetId",
+                "oppgavebeskrivelse",
+                "registrertDato",
+                "tilleggsinformasjon"
+            )
+        )
 
         håndterJournalpostOppdatert()
+        assertBehovDetaljer(
+            OppdaterJournalpost,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "fagsakId"
+            )
+        )
 
         håndterJournalpostFerdigstilt()
+        assertBehovDetaljer(FerdigstillJournalpost)
 
         assertTilstander(
             MottattType,
@@ -106,7 +161,26 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
         håndterArenaOppgaveOpprettet()
+        assertBehovDetaljer(
+            OpprettVurderhenvendelseOppgave,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "behandlendeEnhetId",
+                "oppgavebeskrivelse",
+                "registrertDato",
+                "tilleggsinformasjon"
+            )
+        )
         håndterJournalpostOppdatert()
+        assertBehovDetaljer(
+            OppdaterJournalpost,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "fagsakId"
+            )
+        )
         håndterJournalpostFerdigstilt()
 
         assertTilstander(
@@ -156,7 +230,28 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0438")
         håndterPersonInformasjon()
         håndterGosysOppgaveOpprettet()
-
+        assertBehovDetaljer(
+            OpprettGosysoppgave,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "behandlendeEnhetId",
+                "oppgavebeskrivelse",
+                "registrertDato",
+                "tilleggsinformasjon"
+            )
+        )
+        assertBehovDetaljer(
+            OpprettGosysoppgave,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "behandlendeEnhetId",
+                "oppgavebeskrivelse",
+                "registrertDato",
+                "tilleggsinformasjon"
+            )
+        )
         assertTilstander(
             MottattType,
             AvventerJournalpostType,
@@ -169,19 +264,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNoErrors(it)
             assertMessages(it)
             println(it.innsendingLogg.toString())
-            val gosysBehov = it.innsendingLogg.behov().find { behov ->
-                behov.type == Gosysoppgave
-            }
-            assertContains(
-                listOf(
-                    "fødselsnummer",
-                    "behandlendeEnhetId",
-                    "oppgavebeskrivelse",
-                    "registrertDato",
-                    "tilleggsinformasjon"
-                ),
-                gosysBehov!!.detaljer()
-            )
         }
     }
 
@@ -207,6 +289,15 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode = brevkode, bruker = null)
         håndterGosysOppgaveOpprettet()
+        assertBehovDetaljer(
+            OpprettGosysoppgave,
+            setOf(
+                "behandlendeEnhetId",
+                "oppgavebeskrivelse",
+                "registrertDato",
+                "tilleggsinformasjon"
+            )
+        )
 
         assertTilstander(
             MottattType,
@@ -220,12 +311,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNoErrors(it)
             assertMessages(it)
             println(it.innsendingLogg.toString())
-        }
-    }
-
-    private fun assertContains(keys: List<String>, map: Map<String, Any>) {
-        keys.forEach {
-            assertTrue(map.containsKey(it), "Fant ikke nøkkel $it i $map ")
         }
     }
 }

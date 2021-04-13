@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-class JournalpostData(
+class Journalpost(
     aktivitetslogg: Aktivitetslogg,
     private val journalpostId: String,
     private val journalpostStatus: String,
@@ -81,6 +81,7 @@ class JournalpostData(
 
     override fun journalpostId(): String = journalpostId
     fun hovedskjema() = dokumenter.first().brevkode
+    fun bruker() = bruker
 
     fun dokumenter(): List<DokumentInfo> = dokumenter
     fun datoRegistrert(): ZonedDateTime =
@@ -134,10 +135,10 @@ class JournalpostData(
     }
 
     private fun klageOgAnkeType(
-        journalpostData: JournalpostData
+        journalpost: Journalpost
     ) = if (this.behandlingstema == "ab0438") {
-        KlageOgAnkeLønnskompensasjon(journalpostData)
-    } else KlageOgAnke(journalpostData)
+        KlageOgAnkeLønnskompensasjon(journalpost)
+    } else KlageOgAnke(journalpost)
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(
         "JournalpostData",

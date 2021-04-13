@@ -1,21 +1,13 @@
 package no.nav.dagpenger.mottak
 
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.EksisterendeSaker
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Gosysoppgave
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.MinsteinntektVurdering
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettStartVedtakOppgave
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettVurderhenvendelseOppgave
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Søknadsdata
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.* // ktlint-disable no-wildcard-imports
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
-import no.nav.dagpenger.mottak.meldinger.EksisterendesakData
+import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
-import no.nav.dagpenger.mottak.meldinger.JournalpostData
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
-import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
+import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import java.time.Duration
@@ -23,7 +15,7 @@ import java.time.Duration
 class Innsending private constructor(
     private val journalpostId: String,
     private var tilstand: Tilstand,
-    private var journalpostData: JournalpostData?,
+    private var journalpost: no.nav.dagpenger.mottak.meldinger.Journalpost?,
     private var søknad: no.nav.dagpenger.mottak.meldinger.Søknadsdata.Søknad?,
     private var oppfyllerMinsteArbeidsinntekt: Boolean?,
     private var eksisterendeSaker: Boolean?,
@@ -41,7 +33,7 @@ class Innsending private constructor(
     ) : this(
         journalpostId = journalpostId,
         tilstand = Mottatt,
-        journalpostData = null,
+        journalpost = null,
         søknad = null,
         oppfyllerMinsteArbeidsinntekt = null,
         eksisterendeSaker = null,
@@ -60,10 +52,10 @@ class Innsending private constructor(
         tilstand.håndter(this, joarkHendelse)
     }
 
-    fun håndter(journalpostData: JournalpostData) {
-        if (journalpostId != journalpostData.journalpostId()) return
-        kontekst(journalpostData, "Mottatt informasjon om journalpost")
-        tilstand.håndter(this, journalpostData)
+    fun håndter(journalpost: no.nav.dagpenger.mottak.meldinger.Journalpost) {
+        if (journalpostId != journalpost.journalpostId()) return
+        kontekst(journalpost, "Mottatt informasjon om journalpost")
+        tilstand.håndter(this, journalpost)
     }
 
     fun håndter(personInformasjon: PersonInformasjon) {
@@ -78,13 +70,13 @@ class Innsending private constructor(
         tilstand.håndter(this, søknadsdata)
     }
 
-    fun håndter(vurderminsteinntektData: MinsteinntektVurderingData) {
+    fun håndter(vurderminsteinntektData: MinsteinntektArbeidsinntektVurdert) {
         if (journalpostId != vurderminsteinntektData.journalpostId()) return
         kontekst(vurderminsteinntektData, "Mottatt informasjon vurdering om minste arbeidsinntekt")
         tilstand.håndter(this, vurderminsteinntektData)
     }
 
-    fun håndter(eksisterendeSak: EksisterendesakData) {
+    fun håndter(eksisterendeSak: Eksisterendesaker) {
         if (journalpostId != eksisterendeSak.journalpostId()) return
         kontekst(eksisterendeSak, "Mottatt informasjon om eksisterende saker")
         tilstand.håndter(this, eksisterendeSak)
@@ -129,8 +121,8 @@ class Innsending private constructor(
             joarkHendelse.warn("Forventet ikke JoarkHendelse i %s", type.name)
         }
 
-        fun håndter(innsending: Innsending, journalpostData: JournalpostData) {
-            journalpostData.warn("Forventet ikke JournalpostData i %s", type.name)
+        fun håndter(innsending: Innsending, journalpost: no.nav.dagpenger.mottak.meldinger.Journalpost) {
+            journalpost.warn("Forventet ikke JournalpostData i %s", type.name)
         }
 
         fun håndter(innsending: Innsending, personInformasjon: PersonInformasjon) {
@@ -141,11 +133,11 @@ class Innsending private constructor(
             søknadsdata.warn("Forventet ikke Søknadsdata i %s", type.name)
         }
 
-        fun håndter(innsending: Innsending, vurderminsteinntektData: MinsteinntektVurderingData) {
+        fun håndter(innsending: Innsending, vurderminsteinntektData: MinsteinntektArbeidsinntektVurdert) {
             vurderminsteinntektData.warn("Forventet ikke MinsteinntektVurderingData i %s", type.name)
         }
 
-        fun håndter(innsending: Innsending, eksisterendeSak: EksisterendesakData) {
+        fun håndter(innsending: Innsending, eksisterendeSak: Eksisterendesaker) {
             eksisterendeSak.warn("Forventet ikke Eksisterendesak i %s", type.name)
         }
 
@@ -199,14 +191,14 @@ class Innsending private constructor(
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
-        override fun håndter(innsending: Innsending, journalpostData: JournalpostData) {
-            innsending.journalpostData = journalpostData
-            when (requireNotNull(innsending.journalpostData).kategorisertJournalpost()) {
+        override fun håndter(innsending: Innsending, journalpost: no.nav.dagpenger.mottak.meldinger.Journalpost) {
+            innsending.journalpost = journalpost
+            when (requireNotNull(innsending.journalpost).kategorisertJournalpost()) {
                 is UtenBruker -> {
-                    journalpostData.warn("Journalpost uten registrert bruker")
-                    innsending.tilstand(journalpostData, Kategorisering)
+                    journalpost.warn("Journalpost uten registrert bruker")
+                    innsending.tilstand(journalpost, Kategorisering)
                 }
-                else -> innsending.tilstand(journalpostData, AvventerPersondata)
+                else -> innsending.tilstand(journalpost, AvventerPersondata)
             }
         }
     }
@@ -234,7 +226,7 @@ class Innsending private constructor(
             get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, hendelse: Hendelse) {
-            val journalpostData = requireNotNull(innsending.journalpostData) { " Journalpost må være innhentet " }
+            val journalpostData = requireNotNull(innsending.journalpost) { " Journalpost må være innhentet " }
             val hendelseType = journalpostData.javaClass.simpleName
             hendelse.info("Kategorisert journalpost til $hendelseType ")
             when (journalpostData.kategorisertJournalpost()) {
@@ -264,7 +256,7 @@ class Innsending private constructor(
         override fun håndter(innsending: Innsending, søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
             val kategorisertJournalpost =
                 requireNotNull(
-                    innsending.journalpostData,
+                    innsending.journalpost,
                     { " Journalpost må være kategorisert på dette tidspunktet " }
                 ).kategorisertJournalpost()
             søknadsdata.info("Fikk Søknadsdata for ${kategorisertJournalpost.javaClass.name}")
@@ -287,7 +279,7 @@ class Innsending private constructor(
             innsending.trengerMinsteinntektVurdering(hendelse)
         }
 
-        override fun håndter(innsending: Innsending, vurderminsteinntektData: MinsteinntektVurderingData) {
+        override fun håndter(innsending: Innsending, vurderminsteinntektData: MinsteinntektArbeidsinntektVurdert) {
             vurderminsteinntektData.info("Fikk minsteinntekt vurdering, vurderingen er ${vurderminsteinntektData.oppfyllerMinsteArbeidsinntekt()}")
             innsending.oppfyllerMinsteArbeidsinntekt = vurderminsteinntektData.oppfyllerMinsteArbeidsinntekt()
             innsending.tilstand(vurderminsteinntektData, AvventerSvarOmEksisterendeSaker)
@@ -304,7 +296,7 @@ class Innsending private constructor(
             innsending.trengerEksisterendeSaker(hendelse)
         }
 
-        override fun håndter(innsending: Innsending, eksisterendeSak: EksisterendesakData) {
+        override fun håndter(innsending: Innsending, eksisterendeSak: Eksisterendesaker) {
             eksisterendeSak.info("Fikk info om eksisterende saker: ${eksisterendeSak.harEksisterendeSaker()}")
             innsending.eksisterendeSaker = eksisterendeSak.harEksisterendeSaker()
             innsending.tilstand(eksisterendeSak, AventerArenaStartVedtak)
@@ -409,9 +401,9 @@ class Innsending private constructor(
     }
 
     private fun trengerSøknadsdata(hendelse: Hendelse) {
-        val jp = requireNotNull(journalpostData) { " Journalpost må være satt i ${tilstand.type} " }
+        val jp = requireNotNull(journalpost) { " Journalpost må være satt i ${tilstand.type} " }
         hendelse.behov(
-            Søknadsdata, "Trenger søknadsdata",
+            Behovtype.Søknadsdata, "Trenger søknadsdata",
             mapOf(
                 "dokumentInfoId" to jp.dokumenter().first().brevkode
             )
@@ -419,42 +411,58 @@ class Innsending private constructor(
     }
 
     private fun trengerJournalpost(hendelse: Hendelse) {
-        hendelse.behov(Journalpost, "Trenger journalpost")
+        hendelse.behov(Behovtype.Journalpost, "Trenger journalpost")
     }
 
     private fun trengerPersonData(hendelse: Hendelse) {
-        hendelse.behov(Persondata, "Trenger persondata")
+        val brukerId = requireNotNull(journalpost?.bruker()?.id) { "Bruker må eksistere på journalpost ved behov ${Behovtype.Persondata.name}" }
+        hendelse.behov(
+            Behovtype.Persondata, "Trenger persondata",
+            mapOf(
+                "brukerId" to brukerId
+            )
+        )
     }
 
     private fun trengerMinsteinntektVurdering(hendelse: Hendelse) {
-        hendelse.behov(MinsteinntektVurdering, "Trenger vurdering av minste arbeidsinntekt")
+        val person = requireNotNull(person) { "Person må eksistere på innsending ved behov ${Behovtype.MinsteinntektVurdering.name}" }
+        hendelse.behov(
+            Behovtype.MinsteinntektVurdering, "Trenger vurdering av minste arbeidsinntekt",
+            mapOf(
+                "aktørId" to person.aktørId
+            )
+        )
     }
 
     private fun trengerEksisterendeSaker(hendelse: Hendelse) {
-        hendelse.behov(EksisterendeSaker, "Trenger opplysninger om eksisterende saker")
+        hendelse.behov(Behovtype.EksisterendeSaker, "Trenger opplysninger om eksisterende saker")
     }
 
     private fun oppretteArenaStartVedtakOppgave(hendelse: Hendelse) {
-        val journalpost = requireNotNull(journalpostData).kategorisertJournalpost()
+        val journalpost = requireNotNull(journalpost).kategorisertJournalpost()
         val søknad = requireNotNull(søknad)
+        val person = requireNotNull(person)
         val oppgavebenk = journalpost.oppgaveBenk(person, Søknad.fromJson(søknad.data), oppfyllerMinsteArbeidsinntekt)
         val parametre = mapOf(
-            "fødselsnummer" to "personen!",
+            "fødselsnummer" to person.fødselsnummer,
+            "aktørId" to person.aktørId,
             "behandlendeEnhetId" to oppgavebenk.id,
             "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
             "registrertDato" to oppgavebenk.datoRegistrert,
             "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon
         )
-        hendelse.behov(OpprettStartVedtakOppgave, "Oppretter oppgave og sak for journalpost $journalpostId", parametre)
+        hendelse.behov(Behovtype.OpprettStartVedtakOppgave, "Oppretter oppgave og sak for journalpost $journalpostId", parametre)
     }
 
     private fun oppretteArenaVurderHenvendelseOppgave(
         hendelse: Hendelse
     ) {
-        val journalpost = requireNotNull(journalpostData).kategorisertJournalpost()
+        val journalpost = requireNotNull(journalpost).kategorisertJournalpost()
+        val person = requireNotNull(person)
         val oppgavebenk = journalpost.oppgaveBenk(person)
         val parametre = mapOf(
-            "fødselsnummer" to "personen!",
+            "fødselsnummer" to person.fødselsnummer,
+            "aktørId" to person.aktørId,
             "behandlendeEnhetId" to oppgavebenk.id,
             "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
             "registrertDato" to oppgavebenk.datoRegistrert,
@@ -462,16 +470,22 @@ class Innsending private constructor(
         )
 
         hendelse.behov(
-            OpprettVurderhenvendelseOppgave,
+            Behovtype.OpprettVurderhenvendelseOppgave,
             "Oppretter oppgave og sak for journalpost $journalpostId",
             parametre
         )
     }
 
     private fun oppdatereJournalpost(hendelse: Hendelse) {
-        val parametre = this.arenaSak?.let { mapOf("fagsakId" to it) } ?: emptyMap<String, Any>()
+        val person = requireNotNull(person)
+        val arenaSak = requireNotNull(arenaSak)
+        val parametre = mapOf(
+            "fagsakId" to arenaSak.fagsakId,
+            "aktørId" to person.aktørId,
+            "fødselsnummer" to person.fødselsnummer
+        )
         hendelse.behov(
-            Aktivitetslogg.Aktivitet.Behov.Behovtype.OppdaterJournalpost,
+            Behovtype.OppdaterJournalpost,
             "Oppdatere journalpost for $journalpostId",
             parametre
         )
@@ -479,25 +493,30 @@ class Innsending private constructor(
 
     private fun ferdigstillJournalpost(hendelse: Hendelse) {
         hendelse.behov(
-            Aktivitetslogg.Aktivitet.Behov.Behovtype.FerdigstillJournalpost, "Ferdigstiller journalpost $journalpostId"
+            Behovtype.FerdigstillJournalpost, "Ferdigstiller journalpost $journalpostId"
         )
     }
 
     private fun opprettGosysOppgave(hendelse: Hendelse) {
-        val journalpost = requireNotNull(journalpostData).kategorisertJournalpost()
+        val journalpost = requireNotNull(journalpost).kategorisertJournalpost()
         val oppgavebenk = journalpost.oppgaveBenk(person)
+        val person = person?.let {
+            mapOf(
+                "fødselsnummer" to it.fødselsnummer,
+                "aktørId" to it.aktørId,
+            )
+        } ?: emptyMap()
 
         // TODO — finn ut av parametre til gosys
         val parametre = mapOf(
-            "fødselsnummer" to "personen!",
             "behandlendeEnhetId" to oppgavebenk.id,
             "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
             "registrertDato" to oppgavebenk.datoRegistrert,
             "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon
-        )
+        ) + person
 
         hendelse.behov(
-            Gosysoppgave, "Oppretter gosysoppgave for journalpost $journalpostId",
+            Behovtype.OpprettGosysoppgave, "Oppretter gosysoppgave for journalpost $journalpostId",
             parametre
         )
     }

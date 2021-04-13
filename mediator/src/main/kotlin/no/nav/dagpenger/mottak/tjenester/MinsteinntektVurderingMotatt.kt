@@ -5,7 +5,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.InnsendingMediator
-import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
+import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
@@ -29,7 +29,7 @@ internal class MinsteinntektVurderingMotatt(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val minsteinntektVurdering = MinsteinntektVurderingData(
+        val minsteinntektVurdering = MinsteinntektArbeidsinntektVurdert(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = packet["journalpostId"].asText(),
             oppfyllerMinsteArbeidsinntekt = packet["@løsning.${Behovtype.MinsteinntektVurdering.name}"]["oppfyllerMinsteArbeidsinntekt"]?.asBoolean()

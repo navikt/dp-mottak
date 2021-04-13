@@ -3,12 +3,12 @@ package no.nav.dagpenger.mottak
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.db.InnsendingRepository
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.EksisterendesakData
+import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
-import no.nav.dagpenger.mottak.meldinger.JournalpostData
+import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
-import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
+import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -33,9 +33,9 @@ internal class InnsendingMediator(
         }
     }
 
-    fun håndter(journalpostData: JournalpostData) {
-        håndter(journalpostData) { innsending ->
-            innsending.håndter(journalpostData)
+    fun håndter(journalpost: Journalpost) {
+        håndter(journalpost) { innsending ->
+            innsending.håndter(journalpost)
         }
     }
 
@@ -51,13 +51,13 @@ internal class InnsendingMediator(
         }
     }
 
-    fun håndter(minsteinntektVurdering: MinsteinntektVurderingData) {
+    fun håndter(minsteinntektVurdering: MinsteinntektArbeidsinntektVurdert) {
         håndter(minsteinntektVurdering) { innsending ->
             innsending.håndter(minsteinntektVurdering)
         }
     }
 
-    fun håndter(eksisterendeSaker: EksisterendesakData) {
+    fun håndter(eksisterendeSaker: Eksisterendesaker) {
         håndter(eksisterendeSaker) { innsending ->
             innsending.håndter(eksisterendeSaker)
         }

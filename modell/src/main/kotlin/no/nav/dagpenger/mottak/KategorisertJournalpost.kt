@@ -2,7 +2,7 @@ package no.nav.dagpenger.mottak
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
-import no.nav.dagpenger.mottak.meldinger.JournalpostData
+import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter
 private const val maksTegn = 1999
 
 sealed class KategorisertJournalpost(
-    open val journalpostData: JournalpostData
+    open val journalpost: Journalpost
 ) {
     protected abstract fun henvendelseNavn(): String
     protected open fun finnOppgaveBenk(
@@ -18,10 +18,10 @@ sealed class KategorisertJournalpost(
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ): OppgaveBenk =
-        OppgaveBenk(behandlendeEnhet(person), henvendelseNavn(), journalpostData.datoRegistrert(), tilleggsinformasjon())
+        OppgaveBenk(behandlendeEnhet(person), henvendelseNavn(), journalpost.datoRegistrert(), tilleggsinformasjon())
 
     protected fun behandlendeEnhet(person: Person?): String {
-        val brevkode = journalpostData.dokumenter().firstOrNull()?.brevkode ?: "ukjent"
+        val brevkode = journalpost.dokumenter().firstOrNull()?.brevkode ?: "ukjent"
         return when {
             brevkode in PERMITTERING_BREVKODER && person?.norskTilknytning == false -> "4465"
             brevkode in PERMITTERING_BREVKODER -> "4455"
@@ -60,7 +60,7 @@ sealed class KategorisertJournalpost(
         listOf("NAV 04-02.01", "NAVe 04-02.01", "NAV 04-02.03", "NAV 04-02.05", "NAVe 04-02.05")
 
     fun tilleggsinformasjon(): String {
-        val titler = journalpostData.dokumenter().map { it.tittel }
+        val titler = journalpost.dokumenter().map { it.tittel }
         val hovedDokument = titler.first()
         val vedlegg = titler.drop(1)
 
@@ -71,7 +71,7 @@ sealed class KategorisertJournalpost(
                 ""
             }
 
-        val formatertDato = journalpostData.datoRegistrert().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+        val formatertDato = journalpost.datoRegistrert().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
         val datoBeskrivelse = "Registrert dato: ${formatertDato}\n"
 
         val informasjon = "Hoveddokument: ${hovedDokument}\n" +
@@ -100,8 +100,8 @@ sealed class KategorisertJournalpost(
 }
 
 data class NySøknad(
-    override val journalpostData: JournalpostData
-) : KategorisertJournalpost(journalpostData) {
+    override val journalpost: Journalpost
+) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String =
         "Start Vedtaksbehandling - automatisk journalført.\n"
 
@@ -120,7 +120,7 @@ data class NySøknad(
         val inntektFraFangstFisk = søknad.harInntektFraFangstOgFiske()
         val harAvtjentVerneplikt = søknad.harAvtjentVerneplikt()
         val erPermittertFraFiskeforedling = søknad.erPermittertFraFiskeForedling()
-        val datoRegistrert = journalpostData.datoRegistrert()
+        val datoRegistrert = journalpost.datoRegistrert()
         return when {
             eøsArbeidsforhold -> {
                 OppgaveBenk(
@@ -182,8 +182,8 @@ data class NySøknad(
 }
 
 data class Gjenopptak(
-    override val journalpostData: JournalpostData
-) : KategorisertJournalpost(journalpostData) {
+    override val journalpost: Journalpost
+) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Gjenopptak\n"
 
     override fun finnOppgaveBenk(
@@ -194,26 +194,26 @@ data class Gjenopptak(
 }
 
 data class Utdanning(
-    override val journalpostData: JournalpostData
-) : KategorisertJournalpost(journalpostData) {
+    override val journalpost: Journalpost
+) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Utdanning\n"
 }
 
 data class Etablering(
-    override val journalpostData: JournalpostData
-) : KategorisertJournalpost(journalpostData) {
+    override val journalpost: Journalpost
+) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Etablering\n"
 }
 
 data class KlageOgAnke(
-    override val journalpostData: JournalpostData
-) : KategorisertJournalpost(journalpostData) {
+    override val journalpost: Journalpost
+) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage og anke\n"
 }
 
 data class KlageOgAnkeLønnskompensasjon(
-    override val journalpostData: JournalpostData
-) : KategorisertJournalpost(journalpostData) {
+    override val journalpost: Journalpost
+) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage og anke — Lønnskompensasjon\n"
     override fun finnOppgaveBenk(
         søknad: Søknad?,
@@ -222,27 +222,27 @@ data class KlageOgAnkeLønnskompensasjon(
     ) = OppgaveBenk(
         beskrivelse = henvendelseNavn(),
         id = "4486",
-        datoRegistrert = journalpostData.datoRegistrert(),
+        datoRegistrert = journalpost.datoRegistrert(),
         tilleggsinformasjon = tilleggsinformasjon()
     )
 }
 
 data class Ettersending(
-    override val journalpostData: JournalpostData
-) : KategorisertJournalpost(journalpostData) {
+    override val journalpost: Journalpost
+) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Ettersending\n"
 }
 
 data class UkjentSkjemaKode(
-    override val journalpostData: JournalpostData
-) : KategorisertJournalpost(journalpostData) {
-    override fun henvendelseNavn(): String = "${journalpostData.dokumenter().first().tittel}\n"
+    override val journalpost: Journalpost
+) : KategorisertJournalpost(journalpost) {
+    override fun henvendelseNavn(): String = "${journalpost.dokumenter().first().tittel}\n"
 }
 
 data class UtenBruker(
-    override val journalpostData: JournalpostData
-) : KategorisertJournalpost(journalpostData) {
-    override fun henvendelseNavn(): String = "${journalpostData.dokumenter().first().tittel}\n"
+    override val journalpost: Journalpost
+) : KategorisertJournalpost(journalpost) {
+    override fun henvendelseNavn(): String = "${journalpost.dokumenter().first().tittel}\n"
 }
 
 private fun fornyetRettEllerOrginal(

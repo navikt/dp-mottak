@@ -3,20 +3,22 @@ package no.nav.dagpenger.mottak.e2e
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.dagpenger.mottak.Aktivitetslogg
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.EksisterendesakData
+import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
-import no.nav.dagpenger.mottak.meldinger.JournalpostData
-import no.nav.dagpenger.mottak.meldinger.JournalpostData.Bruker
+import no.nav.dagpenger.mottak.meldinger.Journalpost
+import no.nav.dagpenger.mottak.meldinger.Journalpost.Bruker
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
-import no.nav.dagpenger.mottak.meldinger.MinsteinntektVurderingData
+import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -55,6 +57,18 @@ abstract class AbstractEndeTilEndeTest {
         assertTrue(inspektør.innsendingLogg.hasMessages(), inspektør.innsendingLogg.toString())
     }
 
+    protected fun assertBehovDetaljer(type: Behovtype, detaljer: Set<String> = emptySet()) {
+
+        val behov = inspektør.innsendingLogg.behov().find { behov ->
+            behov.type == type
+        } ?: throw AssertionError("Fant ikke behov ${type.name} i etterspurte behov")
+
+        assertEquals(
+            detaljer + setOf("tilstand", "journalpostId"),
+            behov.detaljer().keys + behov.kontekster.flatMap { it.kontekstMap.keys }
+        )
+    }
+
     protected fun håndterJoarkHendelse() {
         innsending.håndter(joarkhendelse())
     }
@@ -62,7 +76,7 @@ abstract class AbstractEndeTilEndeTest {
     protected fun håndterJournalpostData(
         brevkode: String = "NAV 04-01.03",
         behandlingstema: String? = null,
-        bruker: Bruker? = Bruker(id = "1234", type = JournalpostData.BrukerType.AKTOERID)
+        bruker: Bruker? = Bruker(id = "1234", type = Journalpost.BrukerType.AKTOERID)
     ) {
         innsending.håndter(
             journalpostData(
@@ -127,13 +141,13 @@ abstract class AbstractEndeTilEndeTest {
         journalpostId = JOURNALPOST_ID
     )
 
-    private fun eksisterendesakData(): EksisterendesakData = EksisterendesakData(
+    private fun eksisterendesakData(): Eksisterendesaker = Eksisterendesaker(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
         harEksisterendeSak = false
     )
 
-    private fun minsteinntektVurderingData(): MinsteinntektVurderingData = MinsteinntektVurderingData(
+    private fun minsteinntektVurderingData(): MinsteinntektArbeidsinntektVurdert = MinsteinntektArbeidsinntektVurdert(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
         oppfyllerMinsteArbeidsinntekt = false
@@ -158,17 +172,17 @@ abstract class AbstractEndeTilEndeTest {
         brevkode: String,
         behandlingstema: String? = null,
         bruker: Bruker?
-    ): JournalpostData = JournalpostData(
+    ): Journalpost = Journalpost(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
         journalpostStatus = "MOTTATT",
         bruker = bruker,
         behandlingstema = behandlingstema,
         relevanteDatoer = listOf(
-            JournalpostData.RelevantDato(LocalDateTime.now().toString(), JournalpostData.Datotype.DATO_REGISTRERT)
+            Journalpost.RelevantDato(LocalDateTime.now().toString(), Journalpost.Datotype.DATO_REGISTRERT)
         ),
         dokumenter = listOf(
-            JournalpostData.DokumentInfo(
+            Journalpost.DokumentInfo(
                 tittelHvisTilgjengelig = null,
                 dokumentInfoId = "123",
                 brevkode = brevkode

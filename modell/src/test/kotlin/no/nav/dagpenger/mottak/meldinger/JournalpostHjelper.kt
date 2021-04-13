@@ -8,22 +8,22 @@ internal fun lagjournalpostData(
     dato: LocalDateTime = LocalDateTime.now(),
     vedlegg: String = "Vedlegg: Arbeidsavtale",
     behandlingstema: String? = null
-): JournalpostData {
-    val journalpostData = JournalpostData(
+): Journalpost {
+    val journalpostData = Journalpost(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = "1234",
         journalpostStatus = "MOTTATT",
-        bruker = JournalpostData.Bruker(id = "1234", type = JournalpostData.BrukerType.AKTOERID),
+        bruker = Journalpost.Bruker(id = "1234", type = Journalpost.BrukerType.AKTOERID),
         relevanteDatoer = listOf(
-            JournalpostData.RelevantDato(dato.toString(), JournalpostData.Datotype.DATO_REGISTRERT)
+            Journalpost.RelevantDato(dato.toString(), Journalpost.Datotype.DATO_REGISTRERT)
         ),
         dokumenter = listOf(
-            JournalpostData.DokumentInfo(
+            Journalpost.DokumentInfo(
                 tittelHvisTilgjengelig = null,
                 dokumentInfoId = "1223",
                 brevkode = brevkode
             ),
-            JournalpostData.DokumentInfo(
+            Journalpost.DokumentInfo(
                 tittelHvisTilgjengelig = vedlegg,
                 dokumentInfoId = "12234",
                 brevkode = "N6"

@@ -188,7 +188,7 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
                 OpprettVurderhenvendelseOppgave,
                 OppdaterJournalpost,
                 FerdigstillJournalpost,
-                Gosysoppgave
+                OpprettGosysoppgave
             }
         }
 
