@@ -75,7 +75,7 @@ internal class JournalpostBehovLøserTest {
 
     @Test
     fun `Kaster excpetion om error liste ikke er tom`() {
-        assertThrows<IllegalArgumentException> {
+        assertThrows<Throwable> {
             Saf.Journalpost.fromGraphQlJson("""{"errors": ["Her er en error"],"data":null}""".trimIndent())
         }
     }
