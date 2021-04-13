@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.proxy
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
 internal class Saf {
@@ -37,14 +38,17 @@ internal class Saf {
         val bruker: Bruker?,
         val tittel: String?,
         val datoOpprettet: String?,
-        val journalforendeEnhet: String?,
+        val journalfoerendeEnhet: String?,
         val relevanteDatoer: List<RelevantDato>,
         val dokumenter: List<DokumentInfo>,
         val behandlingstema: String? = null
     ) {
 
         internal companion object {
-            private val objectMapper = jacksonObjectMapper()
+            private val objectMapper = jacksonObjectMapper().also {
+                it.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            }
+
             fun fromGraphQlJson(json: String): Journalpost =
                 objectMapper.readValue(json, GraphQlJournalpostResponse::class.java).data?.journalpost ?: throw IllegalArgumentException("SAF response har ingen data")
         }
