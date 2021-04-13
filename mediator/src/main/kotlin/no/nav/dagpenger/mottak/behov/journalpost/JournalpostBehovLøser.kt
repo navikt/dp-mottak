@@ -1,4 +1,4 @@
-package no.nav.dagpenger.mottak.behov
+package no.nav.dagpenger.mottak.behov.journalpost
 
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
