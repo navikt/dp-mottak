@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.proxy
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.features.DefaultRequest
@@ -18,11 +19,12 @@ internal interface JournalpostArkiv {
     suspend fun hentJournalpost(journalpostId: String): Saf.Journalpost
 }
 
-internal data class JournalPostQuery(val journalpostId: String) : GraphqlQuery(
+internal data class JournalPostQuery(@JsonIgnore val journalpostId: String) : GraphqlQuery(
+    //language=Graphql
     query =
     """ 
-            query {
-                journalpost(journalpostId: "$journalpostId") {
+            query(${'$'}journalpostId: String!) {
+                journalpost(journalpostId: ${'$'}journalpostId) {
                     journalstatus
                     journalpostId
                     journalfoerendeEnhet
@@ -44,7 +46,9 @@ internal data class JournalPostQuery(val journalpostId: String) : GraphqlQuery(
                 }
             }
     """.trimIndent(),
-    variables = null
+    variables = mapOf(
+        "journalpostId" to journalpostId
+    )
 )
 
 internal class HentJournalpostData(config: Configuration) : JournalpostArkiv {
