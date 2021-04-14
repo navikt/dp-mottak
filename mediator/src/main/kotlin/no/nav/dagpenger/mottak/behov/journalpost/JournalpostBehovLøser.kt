@@ -2,7 +2,6 @@ package no.nav.dagpenger.mottak.behov.journalpost
 
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import no.nav.dagpenger.mottak.behov.journalpost.JournalpostArkiv
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
