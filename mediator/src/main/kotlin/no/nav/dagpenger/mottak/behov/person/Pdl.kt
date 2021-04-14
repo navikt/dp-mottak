@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.behov.person
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
@@ -44,7 +45,7 @@ internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
     }
 }
 
-internal data class PersonQuery(val id: String) : GraphqlQuery(
+internal data class PersonQuery(@JsonIgnore val id: String) : GraphqlQuery(
     //language=Graphql
     query =
     """query {
