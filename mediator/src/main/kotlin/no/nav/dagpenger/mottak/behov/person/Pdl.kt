@@ -115,6 +115,7 @@ internal class Pdl {
 
         override fun deserialize(p: JsonParser, ctxt: DeserializationContext?): Person {
             val node: JsonNode = p.readValueAsTree()
+            // if errors not
             return kotlin.runCatching {
                 Person(
                     navn = node.personNavn(),

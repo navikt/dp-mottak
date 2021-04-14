@@ -118,8 +118,8 @@ internal class MediatorE2ETest {
           "journalpostId": "$JOURNALPOST_ID",
           "@løsning": {
             "Persondata": {
-              "aktoerId": "tadda",
-              "naturligIdent": "12345678910",
+              "aktørId": "tadda",
+              "fødselsnummer": "12345678910",
               "norskTilknytning": true,
               "diskresjonskode": null
             }

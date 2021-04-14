@@ -33,8 +33,8 @@ internal class PersondataMottak(
             PersonInformasjon(
                 aktivitetslogg = Aktivitetslogg(),
                 journalpostId = packet["journalpostId"].asText(),
-                aktørId = it["aktoerId"].asText(),
-                fødselsnummer = it["naturligIdent"].asText(),
+                aktørId = it["aktørId"].asText(),
+                fødselsnummer = it["fødselsnummer"].asText(),
                 norskTilknytning = it["norskTilknytning"].asBoolean(),
                 diskresjonskode = it["diskresjonskode"].textValue()
             )
