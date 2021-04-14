@@ -63,10 +63,11 @@ internal class JournalpostBehovLøserTest {
     @Test
     fun `Skal hente saf post og legge på kafka `() {
         testRapid.sendTestMessage(journalpostBehov())
-        assertEquals(testRapid.inspektør.size, 1)
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertEquals("124567", field(0, "@løsning")["Journalpost"]["journalpostId"].asText())
+            assertEquals("NAV 04-01.03", field(0, "@løsning")["Journalpost"]["dokumenter"][0]["brevkode"].asText())
+            assertEquals("N6", field(0, "@løsning")["Journalpost"]["dokumenter"][1]["brevkode"].asText())
             assertDoesNotThrow { field(0, "@løsning")["Journalpost"]["relevanteDatoer"][0]["dato"].asLocalDateTime() }
         }
     }

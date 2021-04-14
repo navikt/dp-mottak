@@ -3,15 +3,7 @@ package no.nav.dagpenger.mottak.e2e
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
-import no.nav.dagpenger.mottak.tjenester.EksisterendeSakerMottak
-import no.nav.dagpenger.mottak.tjenester.JournalføringMottak
-import no.nav.dagpenger.mottak.tjenester.JournalpostFerdigstiltMottak
-import no.nav.dagpenger.mottak.tjenester.JournalpostMottak
-import no.nav.dagpenger.mottak.tjenester.JournalpostOppdatertMottak
-import no.nav.dagpenger.mottak.tjenester.MinsteinntektVurderingMottak
-import no.nav.dagpenger.mottak.tjenester.OpprettStartVedtakOppgaveMottak
-import no.nav.dagpenger.mottak.tjenester.PersondataMottak
-import no.nav.dagpenger.mottak.tjenester.SøknadsdataMottak
+import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -28,22 +20,14 @@ internal class MediatorE2ETest {
     private val testRapid = TestRapid()
     private val innsendingRepository = InMemoryInnsendingRepository()
     private val testObservatør = TestObservatør()
-    private val mediator = InnsendingMediator(
+    private val innsendingMediator = InnsendingMediator(
         innsendingRepository = innsendingRepository,
         rapidsConnection = testRapid,
         observatører = listOf(testObservatør)
     )
 
     init {
-        JournalføringMottak(mediator, testRapid)
-        JournalpostMottak(mediator, testRapid)
-        PersondataMottak(mediator, testRapid)
-        SøknadsdataMottak(mediator, testRapid)
-        MinsteinntektVurderingMottak(mediator, testRapid)
-        EksisterendeSakerMottak(mediator, testRapid)
-        OpprettStartVedtakOppgaveMottak(mediator, testRapid)
-        JournalpostOppdatertMottak(mediator, testRapid)
-        JournalpostFerdigstiltMottak(mediator, testRapid)
+        MottakMediator(innsendingMediator, testRapid)
     }
 
     @Test

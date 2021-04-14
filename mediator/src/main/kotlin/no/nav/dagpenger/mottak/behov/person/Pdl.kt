@@ -5,9 +5,73 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.natpryce.konfig.Configuration
+import io.ktor.client.HttpClient
+import io.ktor.client.features.DefaultRequest
+import io.ktor.client.request.header
+import io.ktor.client.request.request
+import io.ktor.client.request.url
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import mu.KotlinLogging
+import no.nav.dagpenger.aad.api.ClientCredentialsClient
+import no.nav.dagpenger.mottak.Configuration.dpProxyScope
+import no.nav.dagpenger.mottak.Configuration.dpProxyUrl
+import no.nav.dagpenger.mottak.behov.GraphqlQuery
+import no.nav.dagpenger.mottak.behov.GraphqlQuery.Companion.jacksonJsonAdapter
 
 private val sikkerLogg = KotlinLogging.logger("tjenestekall")
+
+internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
+    private val tokenProvider = ClientCredentialsClient(config) {
+        scope {
+            add(config.dpProxyScope())
+        }
+    }
+    private val proxyPdlClient = HttpClient() {
+        install(DefaultRequest) {
+            this.url("${config.dpProxyUrl()}/proxy/v1/pdl/graphql")
+            method = HttpMethod.Post
+        }
+    }
+
+    override suspend fun hentPerson(id: String): Pdl.Person = proxyPdlClient.request<String> {
+        header("Content-Type", "application/json")
+        header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
+        body = PersonQuery(id).toJson()
+    }.let {
+        Pdl.Person.fromGraphQlJson(it)
+    }
+}
+
+internal data class PersonQuery(val id: String) : GraphqlQuery(
+    query =
+    """ 
+            query(${'$'}ident: ID!) {
+  hentPerson(${'$'}ident) {
+      navn {
+        fornavn,
+        mellomnavn,
+        etternavn
+      },
+    adressebeskyttelse{
+     gradering 
+    }
+    }
+    hentGeografiskTilknytning(${'$'}ident){
+    gtLand
+  }
+      hentIdenter(${'$'}ident, grupper: [AKTORID,FOLKEREGISTERIDENT]) {
+    identer {
+      ident,
+      gruppe
+    }
+    }                }
+    """.trimIndent(),
+    variables = mapOf(
+        "ident" to id
+    )
+)
 
 internal class Pdl {
 
@@ -18,7 +82,12 @@ internal class Pdl {
         val fødselsnummer: String,
         val norskTilknytning: Boolean,
         val diskresjonskode: String?
-    )
+    ) {
+        internal companion object {
+            fun fromGraphQlJson(json: String): Person =
+                jacksonJsonAdapter.readValue(json, Person::class.java)
+        }
+    }
 
     object PersonDeserializer : JsonDeserializer<Person>() {
         internal fun JsonNode.aktørId() = this.ident("AKTORID")

@@ -1,17 +1,14 @@
-package no.nav.dagpenger.mottak.behov.journalpost
+package no.nav.dagpenger.mottak.behov.person
 
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import no.nav.dagpenger.mottak.proxy.JournalpostArkiv
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-private val logger = KotlinLogging.logger { }
-
-internal class JournalpostBehovLøser(
-    private val journalpostArkiv: JournalpostArkiv,
+internal class PersondataBehovLøser(
+    private val personOppslag: PersonOppslag,
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
 
@@ -23,19 +20,19 @@ internal class JournalpostBehovLøser(
         River(rapidsConnection).apply {
             validate {
                 it.demandValue("@event_name", "behov")
-                it.demandAllOrAny("@behov", listOf("Journalpost"))
+                it.demandAllOrAny("@behov", listOf("Persondata"))
                 it.rejectKey("@løsning")
                 it.requireKey("@id", "journalpostId")
+                it.requireKey("brukerId")
             }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-
-        runBlocking { journalpostArkiv.hentJournalpost(packet["journalpostId"].asText()) }.also {
-            packet["@løsning"] = mapOf("Journalpost" to it)
+        runBlocking { personOppslag.hentPerson(packet["brukerId"].asText()) }.also {
+            packet["@løsning"] = mapOf("Persondata" to it)
             context.publish(packet.toJson())
-            logger.info("Løst behov Journalpost for journalpost med id ${it.journalpostId}")
+            logger.info("Løst behov Persondata for journalpost med id ${packet["journalpostId"]}")
         }
     }
 }

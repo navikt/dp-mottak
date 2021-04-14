@@ -1,11 +1,11 @@
 package no.nav.dagpenger.mottak.behov.person
 
+import no.nav.dagpenger.mottak.behov.GraphqlQuery.Companion.jacksonJsonAdapter
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.aktørId
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.diskresjonsKode
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.fødselsnummer
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.norskTilknyting
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.personNavn
-import no.nav.dagpenger.mottak.behov.GraphqlQuery.Companion.jacksonJsonAdapter
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
