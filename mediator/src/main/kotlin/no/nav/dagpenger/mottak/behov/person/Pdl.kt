@@ -47,8 +47,8 @@ internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
 internal data class PersonQuery(val id: String) : GraphqlQuery(
     //language=Graphql
     query =
-    """query {
-    hentPerson(${'$'}ident: ID!) {
+    """query(${'$'}ident: ID!) {
+    hentPerson(ident: ${'$'}ident) {
         navn {
             fornavn,
             mellomnavn,
@@ -58,10 +58,10 @@ internal data class PersonQuery(val id: String) : GraphqlQuery(
             gradering
         }
     }
-    hentGeografiskTilknytning(${'$'}ident: ID!){
+    hentGeografiskTilknytning(ident: ${'$'}ident){
         gtLand
     }
-    hentIdenter(${'$'}ident: ID!, grupper: [AKTORID,FOLKEREGISTERIDENT]) {
+    hentIdenter(ident: ${'$'}ident, grupper: [AKTORID,FOLKEREGISTERIDENT]) {
         identer {
             ident,
             gruppe
