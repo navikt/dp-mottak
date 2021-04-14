@@ -35,7 +35,7 @@ internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
         }
     }
 
-    override suspend fun hentPerson(id: String): Pdl.Person = proxyPdlClient.request<String> {
+    override suspend fun hentPerson(id: String): Pdl.Person? = proxyPdlClient.request<String> {
         header("Content-Type", "application/json")
         header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
         body = PersonQuery(id).toJson().also { sikkerLogg.info { it } }
@@ -83,7 +83,7 @@ internal class Pdl {
         val diskresjonskode: String?
     ) {
         internal companion object {
-            fun fromGraphQlJson(json: String): Person =
+            fun fromGraphQlJson(json: String): Person? =
                 jacksonJsonAdapter.readValue(json, Person::class.java)
         }
     }
