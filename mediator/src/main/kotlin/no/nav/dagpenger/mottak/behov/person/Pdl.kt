@@ -113,9 +113,8 @@ internal class Pdl {
             return findValue("identer").first { it.path("gruppe").asText() == type }.get("ident").asText()
         }
 
-        override fun deserialize(p: JsonParser, ctxt: DeserializationContext?): Person {
+        override fun deserialize(p: JsonParser, ctxt: DeserializationContext?): Person? {
             val node: JsonNode = p.readValueAsTree()
-            // if errors not
             return kotlin.runCatching {
                 Person(
                     navn = node.personNavn(),
@@ -129,10 +128,16 @@ internal class Pdl {
                     it
                 },
                 onFailure = {
-                    sikkerLogg.info(node.toString())
-                    throw it
+                    if (ukjentPersonIdent(node)) return null
+                    else {
+                        sikkerLogg.info(node.toString())
+                        throw it
+                    }
                 }
             )
         }
+
+        private fun ukjentPersonIdent(node: JsonNode) =
+            node["errors"].any { it["message"].asText() == "Fant ikke person" }
     }
 }

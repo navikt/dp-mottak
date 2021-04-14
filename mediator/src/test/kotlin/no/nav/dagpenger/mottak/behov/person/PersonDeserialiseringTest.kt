@@ -79,4 +79,71 @@ internal class PersonDeserialiseringTest {
             jacksonJsonAdapter.readTree("""{ "data": { "hentPerson": { "adressebeskyttelse":[] } } } """.trimIndent())
         assertNull(ingenBeskyttelseJson.diskresjonsKode())
     }
+
+    @Test
+    fun `Person ikke funnet skal returnere null objekt`() {
+        jacksonJsonAdapter.readValue(fantIkkePersonResponse, Pdl.Person::class.java).also {
+            assertNull(it)
+        }
+    }
 }
+
+@Language("JSON")
+val fantIkkePersonResponse =
+    """{
+  "errors": [
+    {
+      "message": "Fant ikke person",
+      "locations": [
+        {
+          "line": 2,
+          "column": 5
+        }
+      ],
+      "path": [
+        "hentPerson"
+      ],
+      "extensions": {
+        "code": "not_found",
+        "classification": "ExecutionAborted"
+      }
+    },
+    {
+      "message": "Fant ikke person",
+      "locations": [
+        {
+          "line": 12,
+          "column": 5
+        }
+      ],
+      "path": [
+        "hentGeografiskTilknytning"
+      ],
+      "extensions": {
+        "code": "not_found",
+        "classification": "ExecutionAborted"
+      }
+    },
+    {
+      "message": "Fant ikke person",
+      "locations": [
+        {
+          "line": 15,
+          "column": 5
+        }
+      ],
+      "path": [
+        "hentIdenter"
+      ],
+      "extensions": {
+        "code": "not_found",
+        "classification": "ExecutionAborted"
+      }
+    }
+  ],
+  "data": {
+    "hentPerson": null,
+    "hentGeografiskTilknytning": null,
+    "hentIdenter": null
+  }
+}"""

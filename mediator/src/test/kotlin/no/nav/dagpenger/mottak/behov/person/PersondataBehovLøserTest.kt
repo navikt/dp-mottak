@@ -1,7 +1,9 @@
 package no.nav.dagpenger.mottak.behov.person
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.UUID
@@ -13,7 +15,13 @@ internal class PersondataBehovLøserTest {
 
     private val testRapid = TestRapid()
 
-    init {
+    @BeforeEach
+    fun `clear rapid`() {
+        testRapid.reset()
+    }
+
+    @Test
+    fun `Skal løse persondata behov`() {
         PersondataBehovLøser(
             rapidsConnection = testRapid,
             personOppslag = object : PersonOppslag {
@@ -26,17 +34,28 @@ internal class PersondataBehovLøserTest {
                 )
             }
         )
+        testRapid.sendTestMessage(persondataBehov())
+        with(testRapid.inspektør) {
+            assertEquals(1, size)
+            assertEquals("12345678", field(0, "@løsning")["Persondata"]["aktørId"].asText())
+            assertEquals("1234567891", field(0, "@løsning")["Persondata"]["fødselsnummer"].asText())
+            assertEquals("true", field(0, "@løsning")["Persondata"]["norskTilknytning"].asText())
+            assertEquals("diskresjonskode", field(0, "@løsning")["Persondata"]["diskresjonskode"].asText())
+        }
     }
 
     @Test
-    fun `Skal løse persondata behov`() {
+    fun `Skal løse persondata behov hvis person ikke er funnet`() {
+        PersondataBehovLøser(
+            rapidsConnection = testRapid,
+            personOppslag = object : PersonOppslag {
+                override suspend fun hentPerson(id: String): Pdl.Person? = null
+            }
+        )
         testRapid.sendTestMessage(persondataBehov())
         with(testRapid.inspektør) {
-            Assertions.assertEquals(1, size)
-            Assertions.assertEquals("12345678", field(0, "@løsning")["Persondata"]["aktørId"].asText())
-            Assertions.assertEquals("1234567891", field(0, "@løsning")["Persondata"]["fødselsnummer"].asText())
-            Assertions.assertEquals("true", field(0, "@løsning")["Persondata"]["norskTilknytning"].asText())
-            Assertions.assertEquals("diskresjonskode", field(0, "@løsning")["Persondata"]["diskresjonskode"].asText())
+            assertEquals(1, size)
+            assertTrue(field(0, "@løsning")["Persondata"].isNull)
         }
     }
 
