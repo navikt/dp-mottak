@@ -48,7 +48,7 @@ internal data class PersonQuery(val id: String) : GraphqlQuery(
     //language=Graphql
     query =
     """query {
-    hentPerson(ident "$id") {
+    hentPerson(${'$'}ident: ID!) {
         navn {
             fornavn,
             mellomnavn,
