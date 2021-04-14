@@ -5,7 +5,7 @@ import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.person.PdlPersondataOppslag
 import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
 import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
-import no.nav.dagpenger.mottak.proxy.HentJournalpostData
+import no.nav.dagpenger.mottak.behov.journalpost.HentJournalpostData
 import no.nav.dagpenger.mottak.proxy.proxyPing
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import no.nav.helse.rapids_rivers.RapidApplication
