@@ -49,7 +49,7 @@ internal data class PersonQuery(@JsonIgnore val id: String) : GraphqlQuery(
     //language=Graphql
     query =
     """query {
-    hentPerson(ident "$id") {
+    hentPerson(ident: "$id") {
         navn {
             fornavn,
             mellomnavn,
