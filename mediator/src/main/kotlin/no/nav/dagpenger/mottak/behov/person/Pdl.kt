@@ -38,39 +38,38 @@ internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
     override suspend fun hentPerson(id: String): Pdl.Person = proxyPdlClient.request<String> {
         header("Content-Type", "application/json")
         header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
-        body = PersonQuery(id).toJson()
+        body = PersonQuery(id).toJson().also { sikkerLogg.info { it } }
     }.let {
         Pdl.Person.fromGraphQlJson(it)
     }
 }
 
 internal data class PersonQuery(val id: String) : GraphqlQuery(
+    //language=Graphql
     query =
-    """ 
-            query {
-  hentPerson(ident: "$id") {
-      navn {
-        fornavn,
-        mellomnavn,
-        etternavn
-      },
-    adressebeskyttelse{
-     gradering 
-    }
+    """query {
+    hentPerson(ident "$id") {
+        navn {
+            fornavn,
+            mellomnavn,
+            etternavn
+        },
+        adressebeskyttelse{
+            gradering
+        }
     }
     hentGeografiskTilknytning(ident: "$id"){
-    gtLand
-  }
-      hentIdenter(ident: "$id", grupper: [AKTORID,FOLKEREGISTERIDENT]) {
-    identer {
-      ident,
-      gruppe
+        gtLand
     }
-    }                }
+    hentIdenter(ident: "$id", grupper: [AKTORID,FOLKEREGISTERIDENT]) {
+        identer {
+            ident,
+            gruppe
+        }
+    }                
+}
     """.trimIndent(),
-    variables = mapOf(
-        "ident" to id
-    )
+    variables = null
 )
 
 internal class Pdl {
