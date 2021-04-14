@@ -10,6 +10,7 @@ import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
+import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import no.nav.helse.rapids_rivers.RapidsConnection
 
@@ -78,6 +79,12 @@ internal class InnsendingMediator(
     fun håndter(journalpostFerdigstilt: JournalpostFerdigstilt) {
         håndter(journalpostFerdigstilt) { innsending ->
             innsending.håndter(journalpostFerdigstilt)
+        }
+    }
+
+    fun håndter(personInformasjonIkkeFunnet: PersonInformasjonIkkeFunnet) {
+        håndter(personInformasjonIkkeFunnet) { innsending ->
+            innsending.håndter(personInformasjonIkkeFunnet)
         }
     }
 

@@ -10,6 +10,7 @@ import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
+import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import java.time.Duration
 
 class Innsending private constructor(
@@ -62,6 +63,12 @@ class Innsending private constructor(
         if (journalpostId != personInformasjon.journalpostId()) return
         kontekst(personInformasjon, "Mottatt informasjon om person")
         tilstand.håndter(this, personInformasjon)
+    }
+
+    fun håndter(personInformasjonIkkeFunnet: PersonInformasjonIkkeFunnet) {
+        if (journalpostId != personInformasjonIkkeFunnet.journalpostId()) return
+        kontekst(personInformasjonIkkeFunnet, "Mottatt informasjon om person ikke funnet")
+        tilstand.håndter(this, personInformasjonIkkeFunnet)
     }
 
     fun håndter(søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
@@ -127,6 +134,10 @@ class Innsending private constructor(
 
         fun håndter(innsending: Innsending, personInformasjon: PersonInformasjon) {
             personInformasjon.warn("Forventet ikke PersonInformasjon i %s", type.name)
+        }
+
+        fun håndter(innsending: Innsending, personInformasjonIkkeFunnet: PersonInformasjonIkkeFunnet) {
+            personInformasjonIkkeFunnet.warn("Forventet ikke PersonInformasjonIkkeFunnet i %s", type.name)
         }
 
         fun håndter(innsending: Innsending, søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
@@ -216,6 +227,10 @@ class Innsending private constructor(
         override fun håndter(innsending: Innsending, personInformasjon: PersonInformasjon) {
             innsending.person = personInformasjon.person()
             innsending.tilstand(personInformasjon, Kategorisering)
+        }
+
+        override fun håndter(innsending: Innsending, personInformasjonIkkeFunnet: PersonInformasjonIkkeFunnet) {
+            innsending.tilstand(personInformasjonIkkeFunnet, AvventerGosysOppgave)
         }
     }
 

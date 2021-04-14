@@ -313,4 +313,27 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             println(it.innsendingLogg.toString())
         }
     }
+
+    @Test
+    fun `skal håndtere at informasjon om bruker ikke er funnet`() {
+
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode = "NAVe 04-16.03")
+        håndterPersonInformasjonIkkeFunnet()
+        håndterGosysOppgaveOpprettet()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            AvventerGosysType,
+            InnsendingFerdigstiltType
+        )
+
+        inspektør.also {
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+        }
+    }
 }

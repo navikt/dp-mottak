@@ -6,6 +6,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
+import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.MessageProblems
@@ -23,24 +24,26 @@ internal class PersondataMottak(
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-            validate { it.requireKey("@løsning.${Persondata.name}") }
+            validate { it.require("@løsning.${Persondata.name}", {}) }
             validate { it.requireKey("journalpostId") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val persondata = packet["@løsning.${Persondata.name}"].let {
+
+        val persondata = packet["@løsning.${Persondata.name}"]
+        if (persondata.isNull) {
+            innsendingMediator.håndter(PersonInformasjonIkkeFunnet(Aktivitetslogg(), packet["journalpostId"].asText()))
+        } else {
             PersonInformasjon(
                 aktivitetslogg = Aktivitetslogg(),
                 journalpostId = packet["journalpostId"].asText(),
-                aktørId = it["aktørId"].asText(),
-                fødselsnummer = it["fødselsnummer"].asText(),
-                norskTilknytning = it["norskTilknytning"].asBoolean(),
-                diskresjonskode = it["diskresjonskode"].textValue()
-            )
+                aktørId = persondata["aktørId"].asText(),
+                fødselsnummer = persondata["fødselsnummer"].asText(),
+                norskTilknytning = persondata["norskTilknytning"].asBoolean(),
+                diskresjonskode = persondata["diskresjonskode"].textValue()
+            ).also { innsendingMediator.håndter(it) }
         }
-
-        innsendingMediator.håndter(persondata)
     }
 
     override fun onError(problems: MessageProblems, context: MessageContext) {

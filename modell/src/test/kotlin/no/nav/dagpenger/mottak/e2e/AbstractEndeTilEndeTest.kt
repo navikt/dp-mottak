@@ -16,6 +16,7 @@ import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
+import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -89,6 +90,9 @@ abstract class AbstractEndeTilEndeTest {
 
     protected fun håndterPersonInformasjon() {
         innsending.håndter(personInformasjon())
+    }
+    protected fun håndterPersonInformasjonIkkeFunnet() {
+        innsending.håndter(personInformasjonIkkeFunnet())
     }
 
     protected fun håndterSøknadsdata() {
@@ -166,6 +170,10 @@ abstract class AbstractEndeTilEndeTest {
         aktørId = AKTØRID,
         fødselsnummer = UNG_PERSON_FNR_2018,
         norskTilknytning = true
+    )
+    private fun personInformasjonIkkeFunnet(): PersonInformasjonIkkeFunnet = PersonInformasjonIkkeFunnet(
+        aktivitetslogg = Aktivitetslogg(),
+        journalpostId = JOURNALPOST_ID
     )
 
     private fun journalpostData(

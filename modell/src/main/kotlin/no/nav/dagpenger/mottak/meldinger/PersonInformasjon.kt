@@ -28,3 +28,8 @@ class PersonInformasjon(
         val diskresjonskode: Boolean
     )
 }
+
+class PersonInformasjonIkkeFunnet(aktivitetslogg: Aktivitetslogg, private val journalpostId: String) :
+    Hendelse(aktivitetslogg) {
+    override fun journalpostId(): String = journalpostId
+}
