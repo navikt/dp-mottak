@@ -18,6 +18,10 @@ internal interface JournalpostArkiv {
     suspend fun hentJournalpost(journalpostId: String): Saf.Journalpost
 }
 
+internal interface SøknadsArkiv {
+    suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): Saf.SøknadsData
+}
+
 internal data class JournalPostQuery(@JsonIgnore val journalpostId: String) : GraphqlQuery(
     //language=Graphql
     query =

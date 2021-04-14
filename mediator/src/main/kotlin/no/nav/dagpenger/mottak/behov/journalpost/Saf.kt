@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 
 internal class Saf {
@@ -62,6 +63,8 @@ internal class Saf {
             class Data(val journalpost: Journalpost)
         }
     }
+
+    internal data class SøknadsData(val data: JsonNode)
 
     enum class Datotype {
         DATO_SENDT_PRINT, DATO_EKSPEDERT, DATO_JOURNALFOERT,
