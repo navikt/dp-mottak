@@ -18,7 +18,7 @@ import no.nav.dagpenger.aad.api.ClientCredentialsClient
 import no.nav.dagpenger.mottak.Config.dpProxyScope
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.behov.GraphqlQuery
-import no.nav.dagpenger.mottak.behov.GraphqlQuery.Companion.jacksonJsonAdapter
+import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 
 private val sikkerLogg = KotlinLogging.logger("tjenestekall")
 

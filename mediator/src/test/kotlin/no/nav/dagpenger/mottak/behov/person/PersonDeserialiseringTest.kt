@@ -1,6 +1,6 @@
 package no.nav.dagpenger.mottak.behov.person
 
-import no.nav.dagpenger.mottak.behov.GraphqlQuery.Companion.jacksonJsonAdapter
+import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.aktørId
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.diskresjonsKode
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.fødselsnummer

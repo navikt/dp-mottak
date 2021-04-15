@@ -1,6 +1,6 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
-import no.nav.dagpenger.mottak.behov.GraphqlQuery.Companion.jacksonJsonAdapter
+import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull

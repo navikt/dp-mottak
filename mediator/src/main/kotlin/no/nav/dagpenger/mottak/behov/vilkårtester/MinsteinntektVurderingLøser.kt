@@ -31,6 +31,7 @@ internal class MinsteinntektVurderingLøser(
 
         runBlocking {
             try {
+                logger.info { "Forsøker å opprette minsteinntektvurderingsbehov i regel-api for journalpost med ${packet["journalpostId"]}" }
                 regelApiClient.startMinsteinntektVurdering(
                     aktørId = packet["aktørId"].asText(),
                     journalpostId = packet["journalpostId"].asText()

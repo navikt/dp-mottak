@@ -3,7 +3,7 @@ package no.nav.dagpenger.mottak.behov.journalpost
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.dagpenger.mottak.behov.GraphqlQuery.Companion.jacksonJsonAdapter
+import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 
 internal class Saf {
     data class Bruker(

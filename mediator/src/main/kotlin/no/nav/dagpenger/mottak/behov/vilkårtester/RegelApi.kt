@@ -11,6 +11,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.aad.api.ClientCredentialsClient
 import no.nav.dagpenger.mottak.Config.dpProxyScope
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
+import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 import java.time.LocalDate
 
 internal interface RegelApiClient {
@@ -42,7 +43,7 @@ internal class RegelApiProxy(config: Configuration) : RegelApiClient {
                 aktorId = aktørId,
                 regelkontekst = RegelKontekst(id = journalpostId, type = "soknad"),
                 beregningsdato = LocalDate.now()
-            )
+            ).toJson()
         }.also {
             logger.info { "Opprettet minsteinntekt vurdering behov for journapost med id $journalpostId, status: $it" }
         }
@@ -54,6 +55,8 @@ private data class BehovRequest(
     val regelkontekst: RegelKontekst,
     val beregningsdato: LocalDate,
     val regelverksdato: LocalDate? = beregningsdato
-)
+) {
+    fun toJson(): String = jacksonJsonAdapter.writeValueAsString(this)
+}
 
 private data class RegelKontekst(val id: String, val type: String)
