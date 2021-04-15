@@ -154,9 +154,7 @@ internal class MediatorE2ETest {
           "journalpostId": "$JOURNALPOST_ID",
           "@løsning": {
             "Søknadsdata": {
-              "søknadsId": "tadda",
-              "data": {
-                 "id": "blabla",
+                 "brukerBehandlingId": "blabla",
                  "masse": "masse data"
               }
             }
