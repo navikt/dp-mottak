@@ -9,7 +9,6 @@ import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
@@ -20,18 +19,20 @@ internal class PersondataMottak(
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
 
+    private val løsning = "@løsning.${Persondata.name}"
+
     init {
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-            validate { it.require("@løsning.${Persondata.name}", {}) }
+            validate { it.require(løsning, {}) }
             validate { it.requireKey("journalpostId") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-
-        val persondata = packet["@løsning.${Persondata.name}"]
+        logg.info { "Fått løsning for $løsning, journalpostId: ${packet["journalpostId"]}" }
+        val persondata = packet[løsning]
         if (persondata.isNull) {
             innsendingMediator.håndter(PersonInformasjonIkkeFunnet(Aktivitetslogg(), packet["journalpostId"].asText()))
         } else {
@@ -44,9 +45,5 @@ internal class PersondataMottak(
                 diskresjonskode = persondata["diskresjonskode"].textValue()
             ).also { innsendingMediator.håndter(it) }
         }
-    }
-
-    override fun onError(problems: MessageProblems, context: MessageContext) {
-        logg.info { problems }
     }
 }

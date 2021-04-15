@@ -8,7 +8,6 @@ import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
@@ -19,26 +18,25 @@ internal class MinsteinntektVurderingMottak(
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
 
+    private val løsning = "@løsning.${Behovtype.MinsteinntektVurdering.name}"
+
     init {
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-            validate { it.requireKey("@løsning.${Behovtype.MinsteinntektVurdering.name}") }
+            validate { it.requireKey(løsning) }
             validate { it.requireKey("journalpostId") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        logg.info { "Fått løsning for $løsning, journalpostId: ${packet["journalpostId"]}" }
         val minsteinntektVurdering = MinsteinntektArbeidsinntektVurdert(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = packet["journalpostId"].asText(),
-            oppfyllerMinsteArbeidsinntekt = packet["@løsning.${Behovtype.MinsteinntektVurdering.name}"]["oppfyllerMinsteArbeidsinntekt"]?.asBoolean()
+            oppfyllerMinsteArbeidsinntekt = packet[løsning]["oppfyllerMinsteArbeidsinntekt"]?.asBoolean()
         )
 
         innsendingMediator.håndter(minsteinntektVurdering)
-    }
-
-    override fun onError(problems: MessageProblems, context: MessageContext) {
-        logg.info { problems }
     }
 }

@@ -6,7 +6,6 @@ import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
@@ -44,9 +43,5 @@ internal class JournalføringMottak(
         )
 
         innsendingMediator.håndter(joarkHendelse)
-    }
-
-    override fun onError(problems: MessageProblems, context: MessageContext) {
-        logg.info { problems }
     }
 }

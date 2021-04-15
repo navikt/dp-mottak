@@ -8,7 +8,6 @@ import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
@@ -19,25 +18,23 @@ internal class JournalpostOppdatertMottak(
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
 
+    private val løsning = "@løsning.${Behovtype.OppdaterJournalpost.name}"
     init {
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-            validate { it.requireKey("@løsning.${Behovtype.OppdaterJournalpost.name}") }
+            validate { it.requireKey(løsning) }
             validate { it.requireKey("journalpostId") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        logg.info { "Fått løsning for $løsning, journalpostId: ${packet["journalpostId"]}" }
         val journalpostOppdatert = JournalpostOppdatert(
             aktivitetslogg = Aktivitetslogg(),
-            journalpostId = packet["@løsning.${Behovtype.OppdaterJournalpost.name}"]["journalpostId"].asText()
+            journalpostId = packet[løsning]["journalpostId"].asText()
         )
 
         innsendingMediator.håndter(journalpostOppdatert)
-    }
-
-    override fun onError(problems: MessageProblems, context: MessageContext) {
-        logg.info { problems }
     }
 }

@@ -8,7 +8,6 @@ import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
@@ -19,17 +18,19 @@ internal class OpprettStartVedtakOppgaveMottak(
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
 
+    private val løsning = "@løsning.${Behovtype.OpprettStartVedtakOppgave.name}"
     init {
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-            validate { it.requireKey("@løsning.${Behovtype.OpprettStartVedtakOppgave.name}") }
+            validate { it.requireKey(løsning) }
             validate { it.requireKey("journalpostId") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val arenaOppgaveOpprettetData = packet["@løsning.${Behovtype.OpprettStartVedtakOppgave.name}"].let {
+        logg.info { "Fått løsning for $løsning, journalpostId: ${packet["journalpostId"]}" }
+        val arenaOppgaveOpprettetData = packet[løsning].let {
             ArenaOppgaveOpprettet(
                 aktivitetslogg = Aktivitetslogg(),
                 journalpostId = packet["journalpostId"].asText(),
@@ -39,9 +40,5 @@ internal class OpprettStartVedtakOppgaveMottak(
         }
 
         innsendingMediator.håndter(arenaOppgaveOpprettetData)
-    }
-
-    override fun onError(problems: MessageProblems, context: MessageContext) {
-        logg.info { problems }
     }
 }
