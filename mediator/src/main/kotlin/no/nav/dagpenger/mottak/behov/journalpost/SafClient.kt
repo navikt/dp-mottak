@@ -3,12 +3,15 @@ package no.nav.dagpenger.mottak.behov.journalpost
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
+import io.ktor.client.features.ClientRequestException
 import io.ktor.client.features.DefaultRequest
 import io.ktor.client.request.header
 import io.ktor.client.request.request
 import io.ktor.client.request.url
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import mu.KotlinLogging
 import no.nav.dagpenger.aad.api.ClientCredentialsClient
 import no.nav.dagpenger.mottak.Config.dpProxyScope
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
@@ -55,6 +58,11 @@ internal data class JournalPostQuery(@JsonIgnore val journalpostId: String) : Gr
 )
 
 internal class SafClient(private val config: Configuration) : JournalpostArkiv, SøknadsArkiv {
+
+    companion object {
+        private val logger = KotlinLogging.logger {}
+    }
+
     private val tokenProvider = ClientCredentialsClient(config) {
         scope {
             add(config.dpProxyScope())
@@ -83,9 +91,18 @@ internal class SafClient(private val config: Configuration) : JournalpostArkiv, 
         }
 
     override suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): Saf.SøknadsData =
-        proxySøknadsDataClient.request<String>("${config.dpProxyUrl()}/proxy/v1/saf/rest/hentdokument/$journalpostId/$dokumentInfoId/ORIGINAL") {
-            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
-        }.let {
-            Saf.SøknadsData.fromJson(it)
+        try {
+            proxySøknadsDataClient.request<String>("${config.dpProxyUrl()}/proxy/v1/saf/rest/hentdokument/$journalpostId/$dokumentInfoId/ORIGINAL") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
+            }.let {
+                Saf.SøknadsData.fromJson(it)
+            }
+        } catch (exception: ClientRequestException) {
+            if (exception.response.status == HttpStatusCode.NotFound) {
+                logger.warn(exception) { "Fant ikke dokumentInfo for journalpostId $journalpostId med dokumentinfoId $dokumentInfoId" }
+                Saf.SøknadsData.fromJson("{}")
+            } else {
+                throw exception
+            }
         }
 }
