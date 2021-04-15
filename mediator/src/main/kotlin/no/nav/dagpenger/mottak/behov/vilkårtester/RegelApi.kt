@@ -41,7 +41,7 @@ internal class RegelApiProxy(config: Configuration) : RegelApiClient {
         proxyBehovClient.request<String> {
             body = BehovRequest(
                 aktorId = aktørId,
-                regelkontekst = RegelKontekst(id = journalpostId, type = "soknad"),
+                regelkontekst = RegelKontekst(id = journalpostId),
                 beregningsdato = LocalDate.now()
             ).toJson()
         }.also {
@@ -50,7 +50,7 @@ internal class RegelApiProxy(config: Configuration) : RegelApiClient {
     }
 }
 
-private data class BehovRequest(
+internal data class BehovRequest(
     val aktorId: String,
     val regelkontekst: RegelKontekst,
     val beregningsdato: LocalDate,
@@ -59,4 +59,4 @@ private data class BehovRequest(
     fun toJson(): String = jacksonJsonAdapter.writeValueAsString(this)
 }
 
-private data class RegelKontekst(val id: String, val type: String)
+internal data class RegelKontekst(val id: String, private val type: String = "soknad")
