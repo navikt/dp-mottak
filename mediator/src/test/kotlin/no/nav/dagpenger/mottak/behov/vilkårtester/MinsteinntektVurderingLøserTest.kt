@@ -1,8 +1,8 @@
 package no.nav.dagpenger.mottak.behov.vilkårtester
 
-import io.mockk.every
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -18,20 +18,20 @@ internal class MinsteinntektVurderingLøserTest {
     val testRapid = TestRapid()
     val regelApiClientMock = mockk<RegelApiClient>(relaxed = true)
     init {
-        MinsteinntektVurderingLøser(testRapid, regelApiClientMock)
+        MinsteinntektVurderingLøser(regelApiClientMock, testRapid)
     }
 
     @Test
     fun `Starter minsteinntektvurdering`() {
         testRapid.sendTestMessage(minsteinntektBehov())
-        verify(exactly = 1) {
+        coVerify(exactly = 1) {
             regelApiClientMock.startMinsteinntektVurdering(journalpostId = journalpostId, aktørId = aktørId)
         }
     }
 
     @Test
     fun `Starter minsteinntektvurdering og svarer med null hvis dp-regel-api er nede`() {
-        every {
+        coEvery {
             regelApiClientMock.startMinsteinntektVurdering(journalpostId = journalpostId, aktørId = aktørId)
         } throws RuntimeException()
 

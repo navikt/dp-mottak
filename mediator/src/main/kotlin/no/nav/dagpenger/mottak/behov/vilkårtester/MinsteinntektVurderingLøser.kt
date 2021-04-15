@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.behov.vilkårtester
 
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -7,8 +8,8 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
 internal class MinsteinntektVurderingLøser(
-    rapidsConnection: RapidsConnection,
-    private val regelApiClient: RegelApiClient
+    private val regelApiClient: RegelApiClient,
+    rapidsConnection: RapidsConnection
 ) : River.PacketListener {
     private companion object {
         val logger = KotlinLogging.logger { }
@@ -28,15 +29,17 @@ internal class MinsteinntektVurderingLøser(
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
 
-        try {
-            regelApiClient.startMinsteinntektVurdering(
-                aktørId = packet["aktørId"].asText(),
-                journalpostId = packet["journalpostId"].asText()
-            )
-        } catch (e: Exception) {
-            logger.warn(e) { "Feil ved start av minsteinntekts vurdering for journalpost med id ${packet["journalpostId"]}" }
-            packet["@løsning"] = mapOf("MinsteinntektVurdering" to null)
-            context.publish(packet.toJson())
+        runBlocking {
+            try {
+                regelApiClient.startMinsteinntektVurdering(
+                    aktørId = packet["aktørId"].asText(),
+                    journalpostId = packet["journalpostId"].asText()
+                )
+            } catch (e: Exception) {
+                logger.warn(e) { "Feil ved start av minsteinntekts vurdering for journalpost med id ${packet["journalpostId"]}" }
+                packet["@løsning"] = mapOf("MinsteinntektVurdering" to null)
+                context.publish(packet.toJson())
+            }
         }
     }
 }
