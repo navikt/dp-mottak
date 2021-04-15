@@ -274,7 +274,7 @@ class Innsending private constructor(
                     innsending.journalpost,
                     { " Journalpost må være kategorisert på dette tidspunktet " }
                 ).kategorisertJournalpost()
-            søknadsdata.info("Fikk Søknadsdata for ${kategorisertJournalpost.javaClass.name}")
+            søknadsdata.info("Fikk Søknadsdata for ${kategorisertJournalpost.javaClass.simpleName}")
             innsending.søknad = søknadsdata.søknad()
             when (kategorisertJournalpost) {
                 is NySøknad -> innsending.tilstand(søknadsdata, AventerMinsteinntektVurdering)
