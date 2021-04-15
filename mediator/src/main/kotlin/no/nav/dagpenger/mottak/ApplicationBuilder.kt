@@ -1,8 +1,9 @@
 package no.nav.dagpenger.mottak
 
 import mu.KotlinLogging
-import no.nav.dagpenger.mottak.behov.journalpost.HentJournalpostData
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
+import no.nav.dagpenger.mottak.behov.journalpost.SafClient
+import no.nav.dagpenger.mottak.behov.journalpost.SøknadsdataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.PdlPersondataOppslag
 import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
 import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
@@ -16,6 +17,7 @@ private val logg = KotlinLogging.logger {}
 internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.StatusListener {
 
     private val innsendingRepository = InMemoryInnsendingRepository()
+    private val safClient = SafClient(Configuration.properties)
 
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
@@ -27,8 +29,9 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             MottakMediator(mediator, this)
 
             // Behovløsere
-            JournalpostBehovLøser(HentJournalpostData(Configuration.properties), this)
+            JournalpostBehovLøser(safClient, this)
             PersondataBehovLøser(PdlPersondataOppslag(Configuration.properties), this)
+            SøknadsdataBehovLøser(safClient, this)
         }
 
     init {

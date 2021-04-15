@@ -3,6 +3,7 @@ package no.nav.dagpenger.mottak.behov.journalpost
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.dagpenger.mottak.behov.GraphqlQuery.Companion.jacksonJsonAdapter
 
 internal class Saf {
     data class Bruker(
@@ -64,7 +65,11 @@ internal class Saf {
         }
     }
 
-    internal data class SøknadsData(val data: JsonNode)
+    internal data class SøknadsData(val data: JsonNode) {
+        companion object {
+            fun fromJson(json: String) = SøknadsData(jacksonJsonAdapter.readTree(json))
+        }
+    }
 
     enum class Datotype {
         DATO_SENDT_PRINT, DATO_EKSPEDERT, DATO_JOURNALFOERT,

@@ -12,6 +12,7 @@ import io.ktor.http.HttpMethod
 import no.nav.dagpenger.aad.api.ClientCredentialsClient
 import no.nav.dagpenger.mottak.Configuration.dpProxyScope
 import no.nav.dagpenger.mottak.Configuration.dpProxyUrl
+import no.nav.dagpenger.mottak.Søknad.Companion.fromJson
 import no.nav.dagpenger.mottak.behov.GraphqlQuery
 
 internal interface JournalpostArkiv {
@@ -54,16 +55,22 @@ internal data class JournalPostQuery(@JsonIgnore val journalpostId: String) : Gr
     )
 )
 
-internal class HentJournalpostData(config: Configuration) : JournalpostArkiv {
+internal class SafClient(private val config: Configuration) : JournalpostArkiv, SøknadsArkiv {
     private val tokenProvider = ClientCredentialsClient(config) {
         scope {
             add(config.dpProxyScope())
         }
     }
-    private val proxyJoarkClient = HttpClient() {
+    private val proxyJoarkClient = HttpClient {
         install(DefaultRequest) {
             this.url("${config.dpProxyUrl()}/proxy/v1/saf/graphql")
             method = HttpMethod.Post
+        }
+    }
+
+    private val proxySøknadsDataClient = HttpClient {
+        install(DefaultRequest) {
+            method = HttpMethod.Get
         }
     }
 
@@ -74,5 +81,13 @@ internal class HentJournalpostData(config: Configuration) : JournalpostArkiv {
             body = JournalPostQuery(journalpostId).toJson()
         }.let {
             Saf.Journalpost.fromGraphQlJson(it)
+        }
+
+    override suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): Saf.SøknadsData =
+        proxySøknadsDataClient.request<String>("${config.dpProxyUrl()}/proxy/v1/saf/rest/hentdokument/$journalpostId/$dokumentInfoId/ORIGINAL") {
+            header("Content-Type", "application/json")
+            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
+        }.let {
+            Saf.SøknadsData.fromJson(it)
         }
 }
