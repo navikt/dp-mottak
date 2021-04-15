@@ -85,7 +85,6 @@ internal class SafClient(private val config: Configuration) : JournalpostArkiv, 
 
     override suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): Saf.SøknadsData =
         proxySøknadsDataClient.request<String>("${config.dpProxyUrl()}/proxy/v1/saf/rest/hentdokument/$journalpostId/$dokumentInfoId/ORIGINAL") {
-            header("Content-Type", "application/json")
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
         }.let {
             Saf.SøknadsData.fromJson(it)
