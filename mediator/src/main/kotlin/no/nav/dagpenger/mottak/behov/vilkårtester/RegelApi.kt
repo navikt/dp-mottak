@@ -6,6 +6,7 @@ import io.ktor.client.features.DefaultRequest
 import io.ktor.client.request.header
 import io.ktor.client.request.request
 import io.ktor.client.request.url
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import mu.KotlinLogging
 import no.nav.dagpenger.aad.api.ClientCredentialsClient
@@ -39,6 +40,7 @@ internal class RegelApiProxy(config: Configuration) : RegelApiClient {
 
     override suspend fun startMinsteinntektVurdering(aktørId: String, journalpostId: String) {
         proxyBehovClient.request<String> {
+            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
             body = BehovRequest(
                 aktorId = aktørId,
                 regelkontekst = RegelKontekst(id = journalpostId),
