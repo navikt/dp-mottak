@@ -110,18 +110,17 @@ data class NySøknad(
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ): OppgaveBenk {
-        requireNotNull(søknad) { " Søknadsdata må være satt på dette tidspunktet" }
         // val koronaRegelverkMinsteinntektBrukt =
         //     packet.getNullableBoolean(PacketKeys.KORONAREGELVERK_MINSTEINNTEKT_BRUKT) == true
-        val konkurs = søknad.harAvsluttetArbeidsforholdFraKonkurs()
+        val konkurs = søknad?.harAvsluttetArbeidsforholdFraKonkurs() == true
         val kanAvslåsPåMinsteinntekt = oppfyllerMinsteArbeidsinntekt == false
-        val grenseArbeider = søknad.erGrenseArbeider()
-        val eøsArbeidsforhold = søknad.harEøsArbeidsforhold()
-        val inntektFraFangstFisk = søknad.harInntektFraFangstOgFiske()
-        val harAvtjentVerneplikt = søknad.harAvtjentVerneplikt()
-        val erPermittertFraFiskeforedling = søknad.erPermittertFraFiskeForedling()
+        val grenseArbeider = søknad?.erGrenseArbeider() == true
+        val eøsArbeidsforhold = søknad?.harEøsArbeidsforhold() == true
+        val inntektFraFangstFisk = søknad?.harInntektFraFangstOgFiske() == true
+        val harAvtjentVerneplikt = søknad?.harAvtjentVerneplikt() == true
+        val erPermittertFraFiskeforedling = søknad?.erPermittertFraFiskeForedling() == true
         val datoRegistrert = journalpost.datoRegistrert()
-        return when {
+        val originalOppgavebenk = when {
             eøsArbeidsforhold -> {
                 OppgaveBenk(
                     "4470",
@@ -169,9 +168,8 @@ data class NySøknad(
                 datoRegistrert,
                 tilleggsinformasjon()
             )
-        }.let { oppgavebenk ->
-            return fornyetRettEllerOrginal(søknad, oppgavebenk)
         }
+        return fornyetRettEllerOrginal(søknad, originalOppgavebenk)
     }
 
     private fun finnEnhetForHurtigAvslag(person: Person?) = when (behandlendeEnhet(person)) {

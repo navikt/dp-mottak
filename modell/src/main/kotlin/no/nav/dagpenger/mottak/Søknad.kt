@@ -86,10 +86,10 @@ private fun asÅrsak(type: String): AvsluttetArbeidsforhold.Sluttårsak = when (
 }
 
 internal fun Søknad.harInntektFraFangstOgFiske(): Boolean =
-    this.getBooleanFaktum("egennaering.fangstogfiske", false).not() ?: false
+    this.getBooleanFaktum("egennaering.fangstogfiske", false).not()
 
 internal fun Søknad.harEøsArbeidsforhold(): Boolean =
-    this.getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not() ?: false
+    this.getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
 
 internal fun Søknad.harAvtjentVerneplikt(): Boolean =
     this.getFakta("ikkeavtjentverneplikt").getOrNull(0)?.get("value")?.asBoolean()?.not() ?: false
