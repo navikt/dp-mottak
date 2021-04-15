@@ -17,12 +17,12 @@ private val logg = KotlinLogging.logger {}
 internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.StatusListener {
 
     private val innsendingRepository = InMemoryInnsendingRepository()
-    private val safClient = SafClient(Configuration.properties)
+    private val safClient = SafClient(Config.properties)
 
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
     )
-        .withKtorModule(proxyPing(Configuration.properties))
+        .withKtorModule(proxyPing(Config.properties))
         .build().apply {
             val mediator = InnsendingMediator(innsendingRepository = innsendingRepository, rapidsConnection = this)
             // Behovmottakere
@@ -30,7 +30,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
 
             // Behovløsere
             JournalpostBehovLøser(safClient, this)
-            PersondataBehovLøser(PdlPersondataOppslag(Configuration.properties), this)
+            PersondataBehovLøser(PdlPersondataOppslag(Config.properties), this)
             SøknadsdataBehovLøser(safClient, this)
         }
 

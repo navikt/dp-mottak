@@ -242,9 +242,9 @@ class Innsending private constructor(
 
         override fun entering(innsending: Innsending, hendelse: Hendelse) {
             val journalpostData = requireNotNull(innsending.journalpost) { " Journalpost må være innhentet " }
-            val hendelseType = journalpostData.javaClass.simpleName
-            hendelse.info("Kategorisert journalpost til $hendelseType ")
-            when (journalpostData.kategorisertJournalpost()) {
+            val hendelseType = journalpostData.kategorisertJournalpost()
+            hendelse.info("Kategorisert journalpost til ${hendelseType.javaClass.simpleName}")
+            when (hendelseType) {
                 is NySøknad -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Gjenopptak -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Utdanning -> innsending.tilstand(hendelse, AventerArenaOppgave)

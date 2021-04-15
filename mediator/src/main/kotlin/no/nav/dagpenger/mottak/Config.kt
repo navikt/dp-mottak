@@ -8,7 +8,7 @@ import com.natpryce.konfig.Key
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
 
-internal object Configuration {
+internal object Config {
 
     private val defaultProperties = ConfigurationMap(
         mapOf(

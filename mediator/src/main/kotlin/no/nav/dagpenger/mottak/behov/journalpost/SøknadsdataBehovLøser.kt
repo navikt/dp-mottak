@@ -29,12 +29,16 @@ internal class SøknadsdataBehovLøser(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        runBlocking {
-            søknadsArkiv.hentSøknadsData(packet["journalpostId"].asText(), packet["dokumentInfoId"].asText()).also {
-                packet["@løsning"] = mapOf("Søknadsdata" to it.data)
-                context.publish(packet.toJson())
-                logger.info("løser behov Søknadsdata for journalpost med id ${packet["journalpostId"].asText()}")
+        try {
+            runBlocking {
+                søknadsArkiv.hentSøknadsData(packet["journalpostId"].asText(), packet["dokumentInfoId"].asText()).also {
+                    packet["@løsning"] = mapOf("Søknadsdata" to it.data)
+                    context.publish(packet.toJson())
+                    logger.info("løser behov Søknadsdata for journalpost med id ${packet["journalpostId"].asText()}")
+                }
             }
+        } catch (e: Exception) {
+            logger.error(e) { "Klarte ikke å hente søknadsdata" }
         }
     }
 }

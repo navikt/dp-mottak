@@ -14,8 +14,8 @@ import io.ktor.response.respondText
 import io.ktor.routing.get
 import io.ktor.routing.routing
 import no.nav.dagpenger.aad.api.ClientCredentialsClient
-import no.nav.dagpenger.mottak.Configuration.dpProxyScope
-import no.nav.dagpenger.mottak.Configuration.dpProxyUrl
+import no.nav.dagpenger.mottak.Config.dpProxyScope
+import no.nav.dagpenger.mottak.Config.dpProxyUrl
 
 internal fun proxyPing(configuration: Configuration): Application.() -> Unit {
     val tokenProvider = ClientCredentialsClient(configuration) {

@@ -10,9 +10,8 @@ import io.ktor.client.request.url
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import no.nav.dagpenger.aad.api.ClientCredentialsClient
-import no.nav.dagpenger.mottak.Configuration.dpProxyScope
-import no.nav.dagpenger.mottak.Configuration.dpProxyUrl
-import no.nav.dagpenger.mottak.Søknad.Companion.fromJson
+import no.nav.dagpenger.mottak.Config.dpProxyScope
+import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.behov.GraphqlQuery
 
 internal interface JournalpostArkiv {
@@ -89,9 +88,4 @@ internal class SafClient(private val config: Configuration) : JournalpostArkiv, 
         }.let {
             Saf.SøknadsData.fromJson(it)
         }
-}
-
-
-fun main() {
-
 }
