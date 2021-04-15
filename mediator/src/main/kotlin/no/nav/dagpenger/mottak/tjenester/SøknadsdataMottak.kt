@@ -33,7 +33,6 @@ internal class SøknadsdataMottak(
             Søknadsdata(
                 aktivitetslogg = Aktivitetslogg(),
                 journalpostId = packet["journalpostId"].asText(),
-                søknadsId = it["brukerBehandlingId"].asText(),
                 data = it
             )
         }

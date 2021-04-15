@@ -160,7 +160,6 @@ abstract class AbstractEndeTilEndeTest {
     private fun søknadsdata(): Søknadsdata = Søknadsdata(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
-        søknadsId = "12233#",
         data = mapper.createObjectNode().also { it.put("data", "data") }
     )
 
