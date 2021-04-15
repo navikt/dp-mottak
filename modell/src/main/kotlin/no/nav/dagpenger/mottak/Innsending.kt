@@ -420,7 +420,7 @@ class Innsending private constructor(
         hendelse.behov(
             Behovtype.Søknadsdata, "Trenger søknadsdata",
             mapOf(
-                "dokumentInfoId" to jp.dokumenter().first().brevkode
+                "dokumentInfoId" to jp.dokumenter().first().dokumentInfoId
             )
         )
     }

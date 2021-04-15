@@ -90,3 +90,8 @@ internal class SafClient(private val config: Configuration) : JournalpostArkiv, 
             Saf.SøknadsData.fromJson(it)
         }
 }
+
+
+fun main() {
+
+}
