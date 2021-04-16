@@ -18,11 +18,7 @@ internal object Config {
             "KAFKA_CONSUMER_GROUP_ID" to "dp-mottak-v1",
             "KAFKA_EXTRA_TOPIC" to "teamdagpenger.mottak.v1",
             "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
-            "KAFKA_RESET_POLICY" to "latest",
-            "AZURE_APP_CLIENT_ID" to "f2e61500-edc5-4569-8060-6239012fe4ea",
-            "AZURE_APP_CLIENT_SECRET" to "OPhN1gQP94fyU1p.2q7JT~f_fm-mxS8.Dm",
-            "AZURE_OPENID_CONFIG_TOKEN_ENDPOINT" to "https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/oauth2/v2.0/token",
-
+            "KAFKA_RESET_POLICY" to "latest"
         )
     )
     private val prodProperties = ConfigurationMap(
