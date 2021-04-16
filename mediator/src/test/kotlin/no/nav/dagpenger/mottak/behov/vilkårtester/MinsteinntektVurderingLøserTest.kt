@@ -22,10 +22,15 @@ internal class MinsteinntektVurderingLøserTest {
     }
 
     @Test
-    fun `Starter minsteinntektvurdering`() {
+    fun `Løser minsteinntekt vurdering behov`() {
         testRapid.sendTestMessage(minsteinntektBehov())
         coVerify(exactly = 1) {
             regelApiClientMock.startMinsteinntektVurdering(journalpostId = journalpostId, aktørId = aktørId)
+        }
+        testRapid.sendTestMessage(minsteinntektLøsningMessage())
+        with(testRapid.inspektør) {
+            assertEquals(1, size)
+            assertTrue(field(0, "@løsning")["MinsteinntektVurdering"]["oppfyllerMinsteArbeidsinntekt"].asBoolean())
         }
     }
 
@@ -54,4 +59,27 @@ internal class MinsteinntektVurderingLøserTest {
           "aktørId": $aktørId
         }
         """.trimIndent()
+
+    //language=JSON
+    private fun minsteinntektLøsningMessage(): String =
+        """{
+              "system_read_count": 5,
+              "system_started": "2021-04-16T13:05:11.39579",
+              "system_correlation_id": "01F3D5PAZ3NZZFE80QRX751ENK",
+              "behovId": "01F3D5PAYS0BQ6CKNBABMF3ESF",
+              "aktørId": "1000096233942",
+              "kontekstId": $journalpostId,
+              "kontekstType": "soknad",
+              "behandlingsId": "01F3D5EG005PYBB780VM233GQH",
+              "beregningsDato": "2021-04-16",
+              "antallBarn": 0.0,
+              "regelverksdato": "2021-04-16",
+              "minsteinntektResultat": {
+                "sporingsId": "01F3D5PB56XK1E0HSHFQ3QYB7M",
+                "subsumsjonsId": "01F3D5PB56KQTYX38T287QN9JV",
+                "regelIdentifikator": "Minsteinntekt.v1",
+                "oppfyllerMinsteinntekt": true,
+                "beregningsregel": "KORONA"
+              }
+            }"""
 }

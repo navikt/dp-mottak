@@ -8,7 +8,6 @@ import no.nav.helse.rapids_rivers.River
 class MinsteinntektVurderingSvar(rapidsConnection: RapidsConnection) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            // TODO
         }.register(this)
     }
 

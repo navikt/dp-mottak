@@ -16,7 +16,7 @@ internal object Config {
             "DP_PROXY_URL" to "https://dp-proxy.dev-fss-pub.nais.io",
             "HTTP_PORT" to "8080",
             "KAFKA_CONSUMER_GROUP_ID" to "dp-mottak-v1",
-            "KAFKA_EXTRA_TOPIC" to "teamdagpenger.mottak.v1",
+            "KAFKA_EXTRA_TOPIC" to "teamdagpenger.mottak.v1,teamdagpenger.regel.v1",
             "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
             "KAFKA_RESET_POLICY" to "latest"
         )
