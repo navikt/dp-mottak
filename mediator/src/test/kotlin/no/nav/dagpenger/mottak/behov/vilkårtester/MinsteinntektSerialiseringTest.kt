@@ -9,6 +9,6 @@ class MinsteinntektSerialiseringTest {
 
     @Test
     fun `skal serialisere BehovRequest riktig`() {
-        assertDoesNotThrow { BehovRequest("11111", regelkontekst, LocalDate.now()).toJson() }
+        assertDoesNotThrow { BehovRequest("11111", regelkontekst, LocalDate.now().toString()).toJson() }
     }
 }

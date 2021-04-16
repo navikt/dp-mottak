@@ -6,8 +6,11 @@ import io.ktor.client.features.DefaultRequest
 import io.ktor.client.request.header
 import io.ktor.client.request.request
 import io.ktor.client.request.url
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.contentType
 import mu.KotlinLogging
 import no.nav.dagpenger.aad.api.ClientCredentialsClient
 import no.nav.dagpenger.mottak.Config.dpProxyScope
@@ -34,20 +37,20 @@ internal class RegelApiProxy(config: Configuration) : RegelApiClient {
         install(DefaultRequest) {
             this.url("${config.dpProxyUrl()}/proxy/v1/regelapi/behov")
             method = HttpMethod.Post
-            header("Content-Type", "application/json")
         }
     }
 
     override suspend fun startMinsteinntektVurdering(aktørId: String, journalpostId: String) {
-        proxyBehovClient.request<String> {
+        proxyBehovClient.request<HttpResponse> {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
+            contentType(ContentType.Application.Json)
             body = BehovRequest(
                 aktorId = aktørId,
                 regelkontekst = RegelKontekst(id = journalpostId),
-                beregningsdato = LocalDate.now()
+                beregningsdato = LocalDate.now().toString()
             ).toJson()
-        }.also {
-            logger.info { "Opprettet minsteinntekt vurdering behov for journapost med id $journalpostId, status: $it" }
+        }.also { response ->
+            logger.info { "Opprettet minsteinntekt vurdering behov for journalpost med id $journalpostId, status: ${response.status}" }
         }
     }
 }
@@ -55,10 +58,10 @@ internal class RegelApiProxy(config: Configuration) : RegelApiClient {
 internal data class BehovRequest(
     val aktorId: String,
     val regelkontekst: RegelKontekst,
-    val beregningsdato: LocalDate,
-    val regelverksdato: LocalDate? = beregningsdato
+    val beregningsdato: String,
+    val regelverksdato: String? = beregningsdato
 ) {
-    fun toJson(): String = jacksonJsonAdapter.writeValueAsString(this)
+    fun toJson(): String = jacksonJsonAdapter.writeValueAsString(this).trimIndent()
 }
 
-internal data class RegelKontekst(val id: String, private val type: String = "soknad")
+internal data class RegelKontekst(val id: String, val type: String = "soknad")
