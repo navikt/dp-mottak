@@ -7,8 +7,9 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
+
 internal class EksisterendeSakerLøser(
-    private val arenaApiClient: ArenaApiClient,
+    private val arenaOppslag: ArenaOppslag,
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
 
@@ -29,11 +30,16 @@ internal class EksisterendeSakerLøser(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        runBlocking {
-            arenaApiClient.harEksisterendeSaker(packet["fnr"].asText()).also {
-                packet["@løsning"] = mapOf("EksisterendeSaker" to mapOf("harEksisterendeSak" to it))
-                context.publish(packet.toJson())
+        try {
+            runBlocking {
+                arenaOppslag.harEksisterendeSaker(packet["fnr"].asText()).also {
+                    packet["@løsning"] = mapOf("EksisterendeSaker" to mapOf("harEksisterendeSak" to it))
+                    context.publish(packet.toJson())
+                }
             }
+        } catch (e: Exception) {
+            logger.info { "Kunne ikke hente eksisterende saker for søknad med journalpostId ${packet["journalpostId"]}" }
+            throw e
         }
     }
 }

@@ -17,7 +17,7 @@ internal class EksisterendeSakerLøserTest {
 
     init {
         EksisterendeSakerLøser(
-            arenaApiClient = object : ArenaApiClient {
+            arenaOppslag = object : ArenaOppslag {
                 override suspend fun harEksisterendeSaker(fnr: String, virkningstidspunkt: LocalDate): Boolean = true
             },
             rapidsConnection = testRapid
