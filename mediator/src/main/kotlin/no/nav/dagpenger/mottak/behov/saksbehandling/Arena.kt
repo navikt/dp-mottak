@@ -12,7 +12,6 @@ import io.ktor.http.HttpMethod
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.Config.tokenProvider
-import no.nav.dagpenger.mottak.behov.JsonMapper
 import java.time.LocalDate
 
 interface ArenaOppslag {
@@ -41,13 +40,8 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
             parameter("fnr", fnr)
             parameter("fom", virkningstidspunkt.minusMonths(36).toString())
             parameter("tom", virkningstidspunkt.toString())
-            body = EksisterendeSakerParams(fnr, virkningstidspunkt).toJson()
         }.let {
             return it.toBoolean()
         }
-    }
-
-    private data class EksisterendeSakerParams(val fnr: String, val virkningstidspunkt: LocalDate) {
-        fun toJson(): Any = JsonMapper.jacksonJsonAdapter.writeValueAsString(this)
     }
 }
