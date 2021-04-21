@@ -4,6 +4,7 @@ import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.features.DefaultRequest
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.client.request.request
 import io.ktor.client.request.url
 import io.ktor.http.HttpHeaders
@@ -41,15 +42,17 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
     override suspend fun harEksisterendeSaker(fnr: String, virkningstidspunkt: LocalDate): Boolean {
         sikkerlogg.info { "Forsøker å hente eksisterende saker fra arena for fnr $fnr" }
         proxyArenaClient.request<String> {
-            header("Content-Type", "application/json")
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
+            parameter("fnr", fnr)
+            parameter("fom", virkningstidspunkt.minusMonths(36).toString())
+            parameter("tom", virkningstidspunkt.toString()))
             body = EksisterendeSakerParams(fnr, virkningstidspunkt).toJson()
         }.let {
             return it.toBoolean()
         }
     }
 
-    private data class EksisterendeSakerParams(val fnr: String,val virkningstidspunkt: LocalDate) {
+    private data class EksisterendeSakerParams(val fnr: String, val virkningstidspunkt: LocalDate) {
         fun toJson(): Any = JsonMapper.jacksonJsonAdapter.writeValueAsString(this)
     }
 }
