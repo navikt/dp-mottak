@@ -6,6 +6,8 @@ import no.nav.dagpenger.mottak.behov.journalpost.SafClient
 import no.nav.dagpenger.mottak.behov.journalpost.SøknadsdataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.PdlPersondataOppslag
 import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
+import no.nav.dagpenger.mottak.behov.saksbehandling.ArenaApiClient
+import no.nav.dagpenger.mottak.behov.saksbehandling.EksisterendeSakerLøser
 import no.nav.dagpenger.mottak.behov.vilkårtester.MinsteinntektVurderingLøser
 import no.nav.dagpenger.mottak.behov.vilkårtester.RegelApiProxy
 import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
@@ -21,6 +23,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val innsendingRepository = InMemoryInnsendingRepository()
     private val safClient = SafClient(Config.properties)
     private val regelApiClient = RegelApiProxy(Config.properties)
+    private val arenaApiClient = ArenaApiClient(Config.properties)
 
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
@@ -36,6 +39,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             PersondataBehovLøser(PdlPersondataOppslag(Config.properties), this)
             SøknadsdataBehovLøser(safClient, this)
             MinsteinntektVurderingLøser(regelApiClient, this)
+            EksisterendeSakerLøser(arenaApiClient, this)
         }
 
     init {
