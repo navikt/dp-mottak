@@ -10,12 +10,10 @@ import io.ktor.client.request.url
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import mu.KotlinLogging
-import no.nav.dagpenger.aad.api.ClientCredentialsClient
-import no.nav.dagpenger.mottak.Config.dpProxyScope
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
+import no.nav.dagpenger.mottak.Config.tokenProvider
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import java.time.LocalDate
-
 
 interface ArenaOppslag {
     suspend fun harEksisterendeSaker(fnr: String, virkningstidspunkt: LocalDate = LocalDate.now()): Boolean
@@ -27,11 +25,8 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
         private val sikkerlogg = KotlinLogging.logger("tjenestekall")
     }
 
-    private val tokenProvider = ClientCredentialsClient(config) {
-        scope {
-            add(config.dpProxyScope())
-        }
-    }
+    private val tokenProvider = config.tokenProvider
+
     private val proxyArenaClient = HttpClient() {
         install(DefaultRequest) {
             this.url("${config.dpProxyUrl()}/arena/sak/aktiv")
@@ -45,7 +40,7 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
             parameter("fnr", fnr)
             parameter("fom", virkningstidspunkt.minusMonths(36).toString())
-            parameter("tom", virkningstidspunkt.toString()))
+            parameter("tom", virkningstidspunkt.toString())
             body = EksisterendeSakerParams(fnr, virkningstidspunkt).toJson()
         }.let {
             return it.toBoolean()

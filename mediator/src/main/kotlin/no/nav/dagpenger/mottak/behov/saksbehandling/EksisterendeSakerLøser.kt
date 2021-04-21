@@ -7,7 +7,6 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-
 internal class EksisterendeSakerLøser(
     private val arenaOppslag: ArenaOppslag,
     rapidsConnection: RapidsConnection

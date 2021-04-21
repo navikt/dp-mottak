@@ -12,9 +12,8 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import mu.KotlinLogging
-import no.nav.dagpenger.aad.api.ClientCredentialsClient
-import no.nav.dagpenger.mottak.Config.dpProxyScope
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
+import no.nav.dagpenger.mottak.Config.tokenProvider
 import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 import java.time.LocalDate
 
@@ -28,11 +27,8 @@ internal class RegelApiProxy(config: Configuration) : RegelApiClient {
         private val logger = KotlinLogging.logger {}
     }
 
-    private val tokenProvider = ClientCredentialsClient(config) {
-        scope {
-            add(config.dpProxyScope())
-        }
-    }
+    private val tokenProvider = config.tokenProvider
+
     private val proxyBehovClient = HttpClient {
         install(DefaultRequest) {
             this.url("${config.dpProxyUrl()}/proxy/v1/regelapi/behov")
