@@ -31,10 +31,10 @@ internal class MediatorE2ETest {
     }
 
     @Test
-    fun `Skal motta hendelser og sende ut behov`() {
+    fun `Skal motta hendelser om ny søknad og sende ut behov`() {
         håndterHendelse(joarkMelding())
         assertBehov("Journalpost", 0)
-        håndterHendelse(journalpostMottattHendelse())
+        håndterHendelse(journalpostMottattHendelse(brevkode = "NAV 04-01.03"))
         assertBehov("Persondata", 1)
         håndterHendelse(persondataMottattHendelse())
         assertBehov("Søknadsdata", 2)
@@ -50,7 +50,21 @@ internal class MediatorE2ETest {
         assertBehov("FerdigstillJournalpost", 7)
         håndterHendelse(ferdigstiltJournalpostMotattHendelse())
         assertTrue(testRapid.inspektør.size == 8, "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}")
-        assertEquals(testObservatør.tilstander.last(), InnsendingTilstandType.InnsendingFerdigstiltType)
+        assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+    }
+
+    @Test
+    fun `Skal motta hendelser som fører til manuell behandling og sende ut behov`() {
+        håndterHendelse(joarkMelding())
+        assertBehov("Journalpost", 0)
+        håndterHendelse(journalpostMottattHendelse(brevkode = "ukjent"))
+        assertBehov("Persondata", 1)
+        håndterHendelse(persondataMottattHendelse())
+        assertBehov("OpprettGosysoppgave", 2)
+
+        // todo: OpprettGosysoppgave behovløser
+
+        assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
     }
 
     private fun assertBehov(expectedBehov: String, indexPåMelding: Int) {
@@ -66,7 +80,7 @@ internal class MediatorE2ETest {
     }
 
     //language=JSON
-    private fun journalpostMottattHendelse(): String =
+    private fun journalpostMottattHendelse(brevkode: String): String =
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
@@ -92,7 +106,7 @@ internal class MediatorE2ETest {
                   {
                     "tittel" : null,
                     "dokumentInfoId" : 1234,
-                    "brevkode" : "NAV 04-01.03"
+                    "brevkode" : "$brevkode"
                   },
                    {
                     "tittel" : null,
