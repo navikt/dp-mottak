@@ -7,6 +7,7 @@ import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
+import no.nav.dagpenger.aad.api.ClientCredentialsClient
 
 internal object Config {
 
@@ -33,6 +34,14 @@ internal object Config {
         when (System.getenv().getOrDefault("NAIS_CLUSTER_NAME", "LOCAL")) {
             "prod-gcp" -> systemAndEnvProperties overriding prodProperties overriding defaultProperties
             else -> systemAndEnvProperties overriding defaultProperties
+        }
+    }
+
+    val Configuration.tokenProvider by lazy {
+        ClientCredentialsClient(properties) {
+            scope {
+                add(properties.dpProxyScope())
+            }
         }
     }
 

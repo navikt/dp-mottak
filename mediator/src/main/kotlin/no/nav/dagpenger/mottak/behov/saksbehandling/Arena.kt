@@ -4,17 +4,15 @@ import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.features.DefaultRequest
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.client.request.request
 import io.ktor.client.request.url
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import mu.KotlinLogging
-import no.nav.dagpenger.aad.api.ClientCredentialsClient
-import no.nav.dagpenger.mottak.Config.dpProxyScope
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
-import no.nav.dagpenger.mottak.behov.JsonMapper
+import no.nav.dagpenger.mottak.Config.tokenProvider
 import java.time.LocalDate
-
 
 interface ArenaOppslag {
     suspend fun harEksisterendeSaker(fnr: String, virkningstidspunkt: LocalDate = LocalDate.now()): Boolean
@@ -26,11 +24,8 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
         private val sikkerlogg = KotlinLogging.logger("tjenestekall")
     }
 
-    private val tokenProvider = ClientCredentialsClient(config) {
-        scope {
-            add(config.dpProxyScope())
-        }
-    }
+    private val tokenProvider = config.tokenProvider
+
     private val proxyArenaClient = HttpClient() {
         install(DefaultRequest) {
             this.url("${config.dpProxyUrl()}/arena/sak/aktiv")
@@ -41,15 +36,12 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
     override suspend fun harEksisterendeSaker(fnr: String, virkningstidspunkt: LocalDate): Boolean {
         sikkerlogg.info { "Forsøker å hente eksisterende saker fra arena for fnr $fnr" }
         proxyArenaClient.request<String> {
-            header("Content-Type", "application/json")
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
-            body = EksisterendeSakerParams(fnr, virkningstidspunkt).toJson()
+            parameter("fnr", fnr)
+            parameter("fom", virkningstidspunkt.minusMonths(36).toString())
+            parameter("tom", virkningstidspunkt.toString())
         }.let {
             return it.toBoolean()
         }
-    }
-
-    private data class EksisterendeSakerParams(val fnr: String,val virkningstidspunkt: LocalDate) {
-        fun toJson(): Any = JsonMapper.jacksonJsonAdapter.writeValueAsString(this)
     }
 }

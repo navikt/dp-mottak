@@ -12,9 +12,8 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import mu.KotlinLogging
-import no.nav.dagpenger.aad.api.ClientCredentialsClient
-import no.nav.dagpenger.mottak.Config.dpProxyScope
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
+import no.nav.dagpenger.mottak.Config.tokenProvider
 import no.nav.dagpenger.mottak.behov.GraphqlQuery
 
 internal interface JournalpostArkiv {
@@ -63,11 +62,8 @@ internal class SafClient(private val config: Configuration) : JournalpostArkiv, 
         private val logger = KotlinLogging.logger {}
     }
 
-    private val tokenProvider = ClientCredentialsClient(config) {
-        scope {
-            add(config.dpProxyScope())
-        }
-    }
+    private val tokenProvider = config.tokenProvider
+
     private val proxyJoarkClient = HttpClient {
         install(DefaultRequest) {
             this.url("${config.dpProxyUrl()}/proxy/v1/saf/graphql")
