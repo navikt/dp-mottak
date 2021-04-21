@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.e2e
 
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.EksisterendeSaker
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.FerdigstillJournalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.MinsteinntektVurdering
@@ -46,7 +47,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         assertBehovDetaljer(MinsteinntektVurdering, setOf("aktørId"))
 
         håndterEksisterendesakData()
-        assertBehovDetaljer(MinsteinntektVurdering, setOf("aktørId"))
+        assertBehovDetaljer(EksisterendeSaker, setOf("fnr"))
 
         håndterArenaOppgaveOpprettet()
         assertBehovDetaljer(

@@ -1,6 +1,6 @@
 package no.nav.dagpenger.mottak
 
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.* // ktlint-disable no-wildcard-imports
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
 import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
@@ -430,7 +430,8 @@ class Innsending private constructor(
     }
 
     private fun trengerPersonData(hendelse: Hendelse) {
-        val brukerId = requireNotNull(journalpost?.bruker()?.id) { "Bruker må eksistere på journalpost ved behov ${Behovtype.Persondata.name}" }
+        val brukerId =
+            requireNotNull(journalpost?.bruker()?.id) { "Bruker må eksistere på journalpost ved behov ${Behovtype.Persondata.name}" }
         hendelse.behov(
             Behovtype.Persondata, "Trenger persondata",
             mapOf(
@@ -440,7 +441,8 @@ class Innsending private constructor(
     }
 
     private fun trengerMinsteinntektVurdering(hendelse: Hendelse) {
-        val person = requireNotNull(person) { "Person må eksistere på innsending ved behov ${Behovtype.MinsteinntektVurdering.name}" }
+        val person =
+            requireNotNull(person) { "Person må eksistere på innsending ved behov ${Behovtype.MinsteinntektVurdering.name}" }
         hendelse.behov(
             Behovtype.MinsteinntektVurdering, "Trenger vurdering av minste arbeidsinntekt",
             mapOf(
@@ -450,7 +452,12 @@ class Innsending private constructor(
     }
 
     private fun trengerEksisterendeSaker(hendelse: Hendelse) {
-        hendelse.behov(Behovtype.EksisterendeSaker, "Trenger opplysninger om eksisterende saker")
+        val person =
+            requireNotNull(person) { "Person må eksistere på innsending ved behov ${Behovtype.EksisterendeSaker.name}" }
+        hendelse.behov(
+            Behovtype.EksisterendeSaker, "Trenger opplysninger om eksisterende saker",
+            mapOf("fnr" to person.fødselsnummer)
+        )
     }
 
     private fun oppretteArenaStartVedtakOppgave(hendelse: Hendelse) {
@@ -466,7 +473,11 @@ class Innsending private constructor(
             "registrertDato" to oppgavebenk.datoRegistrert,
             "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon
         )
-        hendelse.behov(Behovtype.OpprettStartVedtakOppgave, "Oppretter oppgave og sak for journalpost $journalpostId", parametre)
+        hendelse.behov(
+            Behovtype.OpprettStartVedtakOppgave,
+            "Oppretter oppgave og sak for journalpost $journalpostId",
+            parametre
+        )
     }
 
     private fun oppretteArenaVurderHenvendelseOppgave(
