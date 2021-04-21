@@ -28,7 +28,7 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
 
     private val proxyArenaClient = HttpClient() {
         install(DefaultRequest) {
-            this.url("${config.dpProxyUrl()}/arena/sak/aktiv")
+            this.url("${config.dpProxyUrl()}/proxy/v1/arena/sak/aktiv")
             method = HttpMethod.Get
         }
     }
