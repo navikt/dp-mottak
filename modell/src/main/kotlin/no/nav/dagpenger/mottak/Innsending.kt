@@ -119,6 +119,7 @@ class Innsending private constructor(
         hendelse.info(melding)
     }
 
+    // Gang of four State pattern
     interface Tilstand : Aktivitetskontekst {
 
         val type: InnsendingTilstandType
@@ -271,9 +272,8 @@ class Innsending private constructor(
         override fun håndter(innsending: Innsending, søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
             val kategorisertJournalpost =
                 requireNotNull(
-                    innsending.journalpost,
-                    { " Journalpost må være kategorisert på dette tidspunktet " }
-                ).kategorisertJournalpost()
+                    innsending.journalpost
+                ) { " Journalpost må være kategorisert på dette tidspunktet " }.kategorisertJournalpost()
             søknadsdata.info("Fikk Søknadsdata for ${kategorisertJournalpost.javaClass.simpleName}")
             innsending.søknad = søknadsdata.søknad()
             when (kategorisertJournalpost) {
@@ -518,7 +518,7 @@ class Innsending private constructor(
         val person = person?.let {
             mapOf(
                 "fødselsnummer" to it.fødselsnummer,
-                "aktørId" to it.aktørId,
+                "aktørId" to it.aktørId
             )
         } ?: emptyMap()
 
