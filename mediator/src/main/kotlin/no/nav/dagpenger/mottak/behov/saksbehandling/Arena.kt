@@ -46,7 +46,7 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Accept, "application/json")
-            body = AktivSakRequest(fnr, virkningstidspunkt.minusMonths(32), virkningstidspunkt)
+            body = AktivSakRequest(fnr, virkningstidspunkt.minusMonths(36), virkningstidspunkt)
         }.harAktivSak
     }
 }
