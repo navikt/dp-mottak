@@ -1,10 +1,12 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.features.DefaultRequest
+import io.ktor.client.features.json.JacksonSerializer
+import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.header
-import io.ktor.client.request.parameter
 import io.ktor.client.request.request
 import io.ktor.client.request.url
 import io.ktor.http.HttpHeaders
@@ -29,19 +31,25 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
     private val proxyArenaClient = HttpClient() {
         install(DefaultRequest) {
             this.url("${config.dpProxyUrl()}/proxy/v1/arena/sak/aktiv")
-            method = HttpMethod.Get
+            method = HttpMethod.Post
+        }
+        install(JsonFeature) {
+            serializer = JacksonSerializer {
+                registerModule(JavaTimeModule())
+            }
         }
     }
 
     override suspend fun harEksisterendeSaker(fnr: String, virkningstidspunkt: LocalDate): Boolean {
         sikkerlogg.info { "Forsøker å hente eksisterende saker fra arena for fnr $fnr" }
-        proxyArenaClient.request<String> {
+        return proxyArenaClient.request<AktivSakResponse> {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
-            parameter("fnr", fnr)
-            parameter("fom", virkningstidspunkt.minusMonths(36).toString())
-            parameter("tom", virkningstidspunkt.toString())
-        }.let {
-            return it.toBoolean()
-        }
+            header(HttpHeaders.ContentType, "application/json")
+            header(HttpHeaders.Accept, "application/json")
+            body = AktivSakRequest(fnr, virkningstidspunkt.minusMonths(36), virkningstidspunkt)
+        }.harAktivSak
     }
 }
+
+private data class AktivSakRequest(val fnr: String, val fom: LocalDate, val tom: LocalDate)
+private data class AktivSakResponse(val harAktivSak: Boolean)
