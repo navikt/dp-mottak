@@ -5,14 +5,21 @@ import com.natpryce.konfig.ConfigurationMap
 import com.natpryce.konfig.ConfigurationProperties
 import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
+import com.natpryce.konfig.intType
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
+import com.zaxxer.hikari.HikariDataSource
 import no.nav.dagpenger.aad.api.ClientCredentialsClient
 
 internal object Config {
 
     private val defaultProperties = ConfigurationMap(
         mapOf(
+            "DB_USERNAME" to "username",
+            "DB_PASSWORD" to "password",
+            "DB_DATABASE" to "dp-mottak",
+            "DB_HOST" to "localhost",
+            "DB_PORT" to "5432",
             "DP_PROXY_SCOPE" to "api://dev-fss.teamdagpenger.dp-proxy/.default",
             "DP_PROXY_URL" to "https://dp-proxy.dev-fss-pub.nais.io",
             "HTTP_PORT" to "8080",
@@ -42,6 +49,22 @@ internal object Config {
             scope {
                 add(properties.dpProxyScope())
             }
+        }
+    }
+
+    val dataSource by lazy {
+        HikariDataSource().apply {
+            dataSourceClassName = "org.postgresql.ds.PGSimpleDataSource"
+            addDataSourceProperty("serverName", properties[Key("DB_HOST", stringType)])
+            addDataSourceProperty("portNumber", properties[Key("DB_PORT", intType)])
+            addDataSourceProperty("databaseName", properties[Key("DB_DATABASE", stringType)])
+            addDataSourceProperty("user", properties[Key("DB_USERNAME", stringType)])
+            addDataSourceProperty("password", properties[Key("DB_USERNAMEk", stringType)])
+            maximumPoolSize = 10
+            minimumIdle = 1
+            idleTimeout = 10001
+            connectionTimeout = 1000
+            maxLifetime = 30001
         }
     }
 
