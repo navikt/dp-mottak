@@ -1,15 +1,19 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling.gosys
 
 import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDate
-import java.time.LocalDate
 
 internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag, rapidsConnection: RapidsConnection) :
     River.PacketListener {
+
+    private companion object {
+        val logger = KotlinLogging.logger { }
+    }
 
     init {
         River(rapidsConnection).apply {
@@ -17,7 +21,8 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
                 it.demandValue("@event_name", "behov")
                 it.demandAllOrAny("@behov", listOf("OpprettGosysoppgave"))
                 it.rejectKey("@løsning")
-                it.requireKey("@id", "journalpostId")
+                it.requireKey("@id", "journalpostId", "behandlendeEnhetId", "registrertDato")
+                it.interestedIn("aktørId", "tilleggsinformasjon", "oppgavebeskrivelse")
             }
         }.register(this)
     }
@@ -28,19 +33,27 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
                 gosysOppslag.opprettOppgave(
                     packet.gosysOppgave()
                 )
+            }.also {
+
+                packet["@løsning"] = mapOf(
+                    "OpprettGosysoppgave" to mapOf(
+                        "journalpostId" to packet["journalpostId"],
+                        "oppgaveId" to it
+                    )
+                )
+                context.publish(packet.toJson())
             }
-
         } catch (e: Exception) {
-
+            logger.info { "Kunne ikke opprette gosys oppgave for journalpost med id ${packet["journalpostId"]}" }
+            throw e
         }
     }
 }
 
-private fun JsonMessage.gosysOppgave(): GosysOppgave = GosysOppgave(
+private fun JsonMessage.gosysOppgave(): GosysOppgaveParametre = GosysOppgaveParametre(
     journalpostId = this["journalpostId"].asText(),
-    aktørId = this["aktørid"].asText(),
-    tildeltEnhetsnr = this["tildeltEnhetsnr"].asText(),
-    beskrivelse = this["beskrivelse"].asText(),
-    aktivDato = this["aktivDato"].asLocalDate(), //TODO: whats this?
-    fristFerdigstillelse = LocalDate.now().plusWeeks(3) //TODO: er fristen 3 uker?
+    aktørId = this["aktørId"].asText(),
+    tildeltEnhetsnr = this["behandlendeEnhetId"].asText(),
+    aktivDato = this["registrertDato"].asLocalDate(),
+    beskrivelse = this["oppgavebeskrivelse"].asText()
 )
