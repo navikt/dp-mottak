@@ -14,10 +14,9 @@ import io.ktor.http.HttpMethod
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.Config.tokenProvider
-import java.time.LocalDate
 
 interface ArenaOppslag {
-    suspend fun harEksisterendeSaker(fnr: String, virkningstidspunkt: LocalDate = LocalDate.now()): Boolean
+    suspend fun harEksisterendeSaker(fnr: String): Boolean
 }
 
 class ArenaApiClient(config: Configuration) : ArenaOppslag {
@@ -40,16 +39,16 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
         }
     }
 
-    override suspend fun harEksisterendeSaker(fnr: String, virkningstidspunkt: LocalDate): Boolean {
+    override suspend fun harEksisterendeSaker(fnr: String): Boolean {
         sikkerlogg.info { "Forsøker å hente eksisterende saker fra arena for fnr $fnr" }
         return proxyArenaClient.request<AktivSakResponse> {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Accept, "application/json")
-            body = AktivSakRequest(fnr, virkningstidspunkt.minusMonths(36), virkningstidspunkt)
+            body = AktivSakRequest(fnr)
         }.harAktivSak
     }
 }
 
-private data class AktivSakRequest(val fnr: String, val fom: LocalDate, val tom: LocalDate)
+private data class AktivSakRequest(val fnr: String)
 private data class AktivSakResponse(val harAktivSak: Boolean)

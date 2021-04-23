@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -18,7 +17,7 @@ internal class EksisterendeSakerLøserTest {
     init {
         EksisterendeSakerLøser(
             arenaOppslag = object : ArenaOppslag {
-                override suspend fun harEksisterendeSaker(fnr: String, virkningstidspunkt: LocalDate): Boolean = true
+                override suspend fun harEksisterendeSaker(fnr: String): Boolean = true
             },
             rapidsConnection = testRapid
         )
