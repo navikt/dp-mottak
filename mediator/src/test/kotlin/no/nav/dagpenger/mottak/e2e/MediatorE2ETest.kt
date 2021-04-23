@@ -61,7 +61,7 @@ internal class MediatorE2ETest {
         assertBehov("Persondata", 1)
         håndterHendelse(persondataMottattHendelse())
         assertBehov("OpprettGosysoppgave", 2)
-
+        håndterHendelse(gosysOppgaveOpprettetHendelse())
         // todo: OpprettGosysoppgave behovløser
 
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
@@ -263,6 +263,24 @@ internal class MediatorE2ETest {
           "@løsning": {
             "FerdigstillJournalpost": {
               "journalpostId": "$JOURNALPOST_ID"
+            }
+          }
+        }
+        """.trimIndent()
+    //language=JSON
+    private fun gosysOppgaveOpprettetHendelse(): String =
+        """{
+          "@event_name": "behov",
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "OpprettGosysoppgave"
+          ],
+          "@opprettet" : "${now()}",
+          "journalpostId": "$JOURNALPOST_ID",
+          "@løsning": {
+            "OpprettGosysoppgave": {
+              "journalpostId": "$JOURNALPOST_ID",
+              "oppgaveId": "123456"
             }
           }
         }
