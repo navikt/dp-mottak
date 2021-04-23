@@ -142,7 +142,8 @@ abstract class AbstractEndeTilEndeTest {
 
     private fun gosysOppgaveOpprettet(): GosysOppgaveOpprettet = GosysOppgaveOpprettet(
         aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID
+        journalpostId = JOURNALPOST_ID,
+        oppgaveId = "1234567"
     )
 
     private fun eksisterendesakData(): Eksisterendesaker = Eksisterendesaker(

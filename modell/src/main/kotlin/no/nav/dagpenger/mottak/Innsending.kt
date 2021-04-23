@@ -536,7 +536,9 @@ class Innsending private constructor(
         // TODO — finn ut av parametre til gosys
         val parametre = mapOf(
             "behandlendeEnhetId" to oppgavebenk.id,
-            "registrertDato" to oppgavebenk.datoRegistrert
+            "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
+            "registrertDato" to oppgavebenk.datoRegistrert,
+            "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon
         ) + person
 
         hendelse.behov(
