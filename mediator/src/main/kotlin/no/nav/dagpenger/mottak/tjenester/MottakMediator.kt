@@ -14,5 +14,6 @@ internal class MottakMediator(mediator: InnsendingMediator, rapidsConnection: Ra
         MinsteinntektVurderingMottak(mediator, rapidsConnection)
         OpprettStartVedtakOppgaveMottak(mediator, rapidsConnection)
         SøknadsdataMottak(mediator, rapidsConnection)
+        GosysOppgaveOpprettetMottak(mediator, rapidsConnection)
     }
 }

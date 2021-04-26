@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.db.InnsendingRepository
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
+import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
@@ -14,7 +15,6 @@ import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import no.nav.helse.rapids_rivers.RapidsConnection
 
-private val logg = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 internal class InnsendingMediator(
@@ -61,6 +61,12 @@ internal class InnsendingMediator(
     fun håndter(eksisterendeSaker: Eksisterendesaker) {
         håndter(eksisterendeSaker) { innsending ->
             innsending.håndter(eksisterendeSaker)
+        }
+    }
+
+    fun håndter(oppgaveOpprettet: GosysOppgaveOpprettet) {
+        håndter(oppgaveOpprettet) { innsending ->
+            innsending.håndter(oppgaveOpprettet)
         }
     }
 

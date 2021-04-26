@@ -33,7 +33,6 @@ internal class EksisterendeSakerLøserTest {
         }
     }
 
-    // TODO: legge til fnr i eksisterendeSaker melding
     //language=JSON
     private fun eksisterendeSakerBehov(): String =
         """{
