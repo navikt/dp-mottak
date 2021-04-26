@@ -22,7 +22,7 @@ data class InnsendingData(
     val søknadsData: JsonNode?,
     val aktivitetslogg: AktivitetsloggData
 ) {
-    fun InnsendingData.createInnsending(): Innsending {
+    fun createInnsending(): Innsending {
         return Innsending::class.primaryConstructor!!
             .apply { isAccessible = true }
             .call(
