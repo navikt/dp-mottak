@@ -20,4 +20,5 @@ dependencies {
     implementation(Ktor.library("client-jackson"))
 
     testImplementation(Mockk.mockk)
+    testImplementation(TestContainers.postgresql)
 }
