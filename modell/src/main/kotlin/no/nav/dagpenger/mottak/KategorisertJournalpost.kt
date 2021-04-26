@@ -14,7 +14,7 @@ sealed class KategorisertJournalpost(
 ) {
     protected abstract fun henvendelseNavn(): String
     protected open fun finnOppgaveBenk(
-        søknad: Søknad?,
+        søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ): OppgaveBenk =
@@ -32,10 +32,10 @@ sealed class KategorisertJournalpost(
 
     internal fun oppgaveBenk(
         person: Person?,
-        søknad: Søknad? = null,
+        søknadFakta: SøknadFakta? = null,
         oppfyllerMinsteArbeidsinntekt: Boolean? = null
     ): OppgaveBenk {
-        val oppgaveBenk = finnOppgaveBenk(søknad, oppfyllerMinsteArbeidsinntekt, person)
+        val oppgaveBenk = finnOppgaveBenk(søknadFakta, oppfyllerMinsteArbeidsinntekt, person)
 
         return when (person?.diskresjonskode) {
             true -> oppgaveBenk.copy(
@@ -106,19 +106,19 @@ data class NySøknad(
         "Start Vedtaksbehandling - automatisk journalført.\n"
 
     override fun finnOppgaveBenk(
-        søknad: Søknad?,
+        søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ): OppgaveBenk {
         // val koronaRegelverkMinsteinntektBrukt =
         //     packet.getNullableBoolean(PacketKeys.KORONAREGELVERK_MINSTEINNTEKT_BRUKT) == true
-        val konkurs = søknad?.harAvsluttetArbeidsforholdFraKonkurs() == true
+        val konkurs = søknadFakta?.harAvsluttetArbeidsforholdFraKonkurs() == true
         val kanAvslåsPåMinsteinntekt = oppfyllerMinsteArbeidsinntekt == false
-        val grenseArbeider = søknad?.erGrenseArbeider() == true
-        val eøsArbeidsforhold = søknad?.harEøsArbeidsforhold() == true
-        val inntektFraFangstFisk = søknad?.harInntektFraFangstOgFiske() == true
-        val harAvtjentVerneplikt = søknad?.harAvtjentVerneplikt() == true
-        val erPermittertFraFiskeforedling = søknad?.erPermittertFraFiskeForedling() == true
+        val grenseArbeider = søknadFakta?.erGrenseArbeider() == true
+        val eøsArbeidsforhold = søknadFakta?.harEøsArbeidsforhold() == true
+        val inntektFraFangstFisk = søknadFakta?.harInntektFraFangstOgFiske() == true
+        val harAvtjentVerneplikt = søknadFakta?.harAvtjentVerneplikt() == true
+        val erPermittertFraFiskeforedling = søknadFakta?.erPermittertFraFiskeForedling() == true
         val datoRegistrert = journalpost.datoRegistrert()
         val originalOppgavebenk = when {
             eøsArbeidsforhold -> {
@@ -169,7 +169,7 @@ data class NySøknad(
                 tilleggsinformasjon()
             )
         }
-        return fornyetRettEllerOrginal(søknad, originalOppgavebenk)
+        return fornyetRettEllerOrginal(søknadFakta, originalOppgavebenk)
     }
 
     private fun finnEnhetForHurtigAvslag(person: Person?) = when (behandlendeEnhet(person)) {
@@ -185,10 +185,10 @@ data class Gjenopptak(
     override fun henvendelseNavn(): String = "Gjenopptak\n"
 
     override fun finnOppgaveBenk(
-        søknad: Søknad?,
+        søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
-    ) = fornyetRettEllerOrginal(søknad, super.finnOppgaveBenk(søknad, oppfyllerMinsteArbeidsinntekt, person))
+    ) = fornyetRettEllerOrginal(søknadFakta, super.finnOppgaveBenk(søknadFakta, oppfyllerMinsteArbeidsinntekt, person))
 }
 
 data class Utdanning(
@@ -214,7 +214,7 @@ data class KlageOgAnkeLønnskompensasjon(
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage og anke — Lønnskompensasjon\n"
     override fun finnOppgaveBenk(
-        søknad: Søknad?,
+        søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ) = OppgaveBenk(
@@ -244,10 +244,10 @@ data class UtenBruker(
 }
 
 private fun fornyetRettEllerOrginal(
-    søknad: Søknad?,
+    søknadFakta: SøknadFakta?,
     originalOppgavebenk: KategorisertJournalpost.OppgaveBenk
 ): KategorisertJournalpost.OppgaveBenk {
-    return if (søknad?.erFornyetRettighet() == true)
+    return if (søknadFakta?.erFornyetRettighet() == true)
         KategorisertJournalpost.OppgaveBenk(
             "4451",
             "Anmodningsvedtak 538",

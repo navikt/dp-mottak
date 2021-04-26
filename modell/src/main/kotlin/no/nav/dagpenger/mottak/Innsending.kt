@@ -452,7 +452,7 @@ class Innsending private constructor(
         val journalpost = requireNotNull(journalpost).kategorisertJournalpost()
         val søknad = requireNotNull(søknad)
         val person = requireNotNull(person)
-        val oppgavebenk = journalpost.oppgaveBenk(person, Søknad.fromJson(søknad.data), oppfyllerMinsteArbeidsinntekt)
+        val oppgavebenk = journalpost.oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt)
         val parametre = mapOf(
             "fødselsnummer" to person.fødselsnummer,
             "aktørId" to person.aktørId,
@@ -576,6 +576,10 @@ class Innsending private constructor(
     internal fun accept(visitor: InnsendingVisitor) {
         visitor.preVisitInnsending(this, journalpostId)
         visitor.visitTilstand(tilstand)
+        journalpost?.accept(visitor)
+        arenaSak?.accept(visitor)
+        person?.accept(visitor)
+        søknad?.accept(visitor)
         visitor.visitInnsendingAktivitetslogg(aktivitetslogg)
         aktivitetslogg.accept(visitor)
         visitor.postVisitInnsending(this, journalpostId)

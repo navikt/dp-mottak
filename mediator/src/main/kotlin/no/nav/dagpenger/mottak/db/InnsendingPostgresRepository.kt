@@ -25,13 +25,15 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
     override fun lagre(innsending: Innsending): Boolean =
         using(sessionOf(datasource)) { session ->
             session.run(
-                queryOf(//language=PostgreSQL
+                queryOf( //language=PostgreSQL
                     "INSERT INTO  innsending_v1(journalpostId, tilstand) VALUES (:journalpostId,:tilstand)",
                     dummyInnsendingVerider(innsending)
                 ).asUpdate
-            ).let { it==1 }
+            ).let { it == 1 }
         }
 }
 
-private fun dummyInnsendingVerider(innsending: Innsending) = mapOf("journalpostId" to innsending.journalpostId().toLong(),
-    "tilstand" to InnsendingTilstandType.MottattType.name)
+private fun dummyInnsendingVerider(innsending: Innsending) = mapOf(
+    "journalpostId" to innsending.journalpostId().toLong(),
+    "tilstand" to InnsendingTilstandType.MottattType.name
+)

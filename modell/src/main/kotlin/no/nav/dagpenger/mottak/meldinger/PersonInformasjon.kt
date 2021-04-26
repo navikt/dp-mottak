@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak.meldinger
 
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Hendelse
+import no.nav.dagpenger.mottak.PersonVisitor
 
 class PersonInformasjon(
     aktivitetslogg: Aktivitetslogg,
@@ -26,7 +27,11 @@ class PersonInformasjon(
         val fødselsnummer: String,
         val norskTilknytning: Boolean,
         val diskresjonskode: Boolean
-    )
+    ) {
+        fun accept(visitor: PersonVisitor) {
+            visitor.visitPerson(aktørId, fødselsnummer, norskTilknytning, diskresjonskode)
+        }
+    }
 }
 
 class PersonInformasjonIkkeFunnet(aktivitetslogg: Aktivitetslogg, private val journalpostId: String) :

@@ -5,6 +5,7 @@ import no.nav.dagpenger.mottak.Etablering
 import no.nav.dagpenger.mottak.Ettersending
 import no.nav.dagpenger.mottak.Gjenopptak
 import no.nav.dagpenger.mottak.Hendelse
+import no.nav.dagpenger.mottak.JournalpostVisitor
 import no.nav.dagpenger.mottak.KategorisertJournalpost
 import no.nav.dagpenger.mottak.KlageOgAnke
 import no.nav.dagpenger.mottak.KlageOgAnkeLønnskompensasjon
@@ -141,4 +142,8 @@ class Journalpost constructor(
             "journalpostId" to journalpostId()
         )
     )
+
+    fun accept(visitor: JournalpostVisitor) {
+        visitor.visitJournalpost(journalpostId, journalpostStatus, bruker, behandlingstema, registrertDato)
+    }
 }

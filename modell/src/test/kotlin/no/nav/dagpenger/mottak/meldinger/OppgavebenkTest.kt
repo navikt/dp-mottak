@@ -4,7 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
-import no.nav.dagpenger.mottak.Søknad
+import no.nav.dagpenger.mottak.SøknadFakta
 import no.nav.dagpenger.mottak.erFornyetRettighet
 import no.nav.dagpenger.mottak.erGrenseArbeider
 import no.nav.dagpenger.mottak.erPermittertFraFiskeForedling
@@ -32,7 +32,7 @@ class OppgavebenkTest {
             erGrenseArbeider = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
-            val oppgaveBenk = jp.oppgaveBenk(person = null, søknad = it)
+            val oppgaveBenk = jp.oppgaveBenk(person = null, søknadFakta = it)
             assertEquals("4470", oppgaveBenk.id)
             assertEquals("MULIG SAMMENLEGGING - EØS\n", oppgaveBenk.beskrivelse)
         }
@@ -46,7 +46,7 @@ class OppgavebenkTest {
             erGrenseArbeider = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
-            val oppgaveBenk = jp.oppgaveBenk(person = person.copy(diskresjonskode = true), søknad = it)
+            val oppgaveBenk = jp.oppgaveBenk(person = person.copy(diskresjonskode = true), søknadFakta = it)
             assertEquals("2103", oppgaveBenk.id)
             assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
         }
@@ -60,7 +60,7 @@ class OppgavebenkTest {
             erGrenseArbeider = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
-            val oppgaveBenk = jp.oppgaveBenk(person = person, søknad = it)
+            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
             assertEquals("4450", oppgaveBenk.id)
             assertEquals("VERNEPLIKT\n", oppgaveBenk.beskrivelse)
         }
@@ -73,7 +73,7 @@ class OppgavebenkTest {
             erGrenseArbeider = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
-            val oppgaveBenk = jp.oppgaveBenk(person = person, søknad = it)
+            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
             assertEquals("FANGST OG FISKE\n", oppgaveBenk.beskrivelse)
             assertEquals("4450", oppgaveBenk.id)
         }
@@ -85,7 +85,7 @@ class OppgavebenkTest {
             erGrenseArbeider = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
-            val oppgaveBenk = jp.oppgaveBenk(person = person, søknad = it)
+            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
             assertEquals("EØS\n", oppgaveBenk.beskrivelse)
             assertEquals("4465", oppgaveBenk.id)
         }
@@ -99,7 +99,7 @@ class OppgavebenkTest {
             erGrenseArbeider = false,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
-            val oppgaveBenk = jp.oppgaveBenk(person = person, søknad = it)
+            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
             assertEquals("Konkurs\n", oppgaveBenk.beskrivelse)
             assertEquals("4401", oppgaveBenk.id)
         }
@@ -110,7 +110,7 @@ class OppgavebenkTest {
         withSøknad(
             erPermittertFraFiskeforedling = true
         ) {
-            val oppgaveBenk = jp.oppgaveBenk(person = person, søknad = it)
+            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
             assertEquals("FISK\n", oppgaveBenk.beskrivelse)
             assertEquals("4454", oppgaveBenk.id)
         }
@@ -119,7 +119,7 @@ class OppgavebenkTest {
     @Test
     fun `Finn riktig oppgave beskrivelse og benk ved når en IKKE oppfyller minsteinntekt ved ordninær`() {
         withSøknad {
-            val oppgaveBenk = jp.oppgaveBenk(person = person, søknad = it, oppfyllerMinsteArbeidsinntekt = false)
+            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it, oppfyllerMinsteArbeidsinntekt = false)
             assertEquals("Minsteinntekt - mulig avslag\n", oppgaveBenk.beskrivelse)
             assertEquals("4451", oppgaveBenk.id)
         }
@@ -129,7 +129,7 @@ class OppgavebenkTest {
     fun `Finn riktig oppgave beskrivelse og benk ved oppfyller minsteinntekt ved permittering   `() {
         withSøknad {
             val oppgaveBenk = lagjournalpostData("NAV 04-01.04").kategorisertJournalpost()
-                .oppgaveBenk(person = person, søknad = it, oppfyllerMinsteArbeidsinntekt = false)
+                .oppgaveBenk(person = person, søknadFakta = it, oppfyllerMinsteArbeidsinntekt = false)
             assertEquals("Minsteinntekt - mulig avslag\n", oppgaveBenk.beskrivelse)
             assertEquals("4456", oppgaveBenk.id)
         }
@@ -139,7 +139,7 @@ class OppgavebenkTest {
     fun `Finn riktig oppgave beskrivelse og person ikke har norsk tilknytning ved permittering`() {
         withSøknad {
             val oppgaveBenk = lagjournalpostData("NAV 04-01.04").kategorisertJournalpost()
-                .oppgaveBenk(person = person.copy(norskTilknytning = false), søknad = it)
+                .oppgaveBenk(person = person.copy(norskTilknytning = false), søknadFakta = it)
             assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
             assertEquals("4465", oppgaveBenk.id)
         }
@@ -148,7 +148,7 @@ class OppgavebenkTest {
     @ValueSource(strings = ["NAV 04-01.03", "NAV 04-01.04", "NAV 04-16.03", "NAV 04-16.04"])
     fun `finner riktig benk for  fornyet rettighet`(brevkode: String) {
         withSøknad(erFornyetRettighet = true) {
-            val oppgavebenk = lagjournalpostData(brevkode).kategorisertJournalpost().oppgaveBenk(person = person, søknad = it)
+            val oppgavebenk = lagjournalpostData(brevkode).kategorisertJournalpost().oppgaveBenk(person = person, søknadFakta = it)
             assertEquals("4451", oppgavebenk.id)
             assertEquals("Anmodningsvedtak 538", oppgavebenk.beskrivelse)
             assertDoesNotThrow { jacksonObjectMapper().readTree(oppgavebenk.tilleggsinformasjon) }
@@ -158,7 +158,7 @@ class OppgavebenkTest {
     @Test
     fun `Finner riktig benk for klage og anke når behandligstema er lønnskompensasjon`() {
         val jp = lagjournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0438").kategorisertJournalpost()
-        jp.oppgaveBenk(person = person, søknad = null, oppfyllerMinsteArbeidsinntekt = null).also {
+        jp.oppgaveBenk(person = person, søknadFakta = null, oppfyllerMinsteArbeidsinntekt = null).also {
             assertEquals("Klage og anke — Lønnskompensasjon\n", it.beskrivelse)
             assertEquals("4486", it.id)
         }
@@ -168,7 +168,7 @@ class OppgavebenkTest {
     @Disabled("TODO: Få inne koronaregler")
     fun `Finn riktig oppgave beskrivelse og benk ved oppfyller minsteinntekt ved korona regler`() {
         withSøknad {
-            val oppgaveBenk = jp.oppgaveBenk(person = person, søknad = it, oppfyllerMinsteArbeidsinntekt = false)
+            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it, oppfyllerMinsteArbeidsinntekt = false)
             assertEquals("Minsteinntekt - mulig avslag - korona\n", oppgaveBenk.beskrivelse)
             assertEquals("4451", oppgaveBenk.id)
         }
@@ -182,13 +182,13 @@ class OppgavebenkTest {
         harAvsluttetArbeidsforholdFraKonkurs: Boolean = false,
         erPermittertFraFiskeforedling: Boolean = false,
         erFornyetRettighet: Boolean = false,
-        test: (søknad: Søknad) -> Unit
+        test: (søknadFakta: SøknadFakta) -> Unit
     ) {
 
         mockkStatic(
-            "no.nav.dagpenger.mottak.SøknadKt"
+            "no.nav.dagpenger.mottak.SøknadFaktaKt"
         ) {
-            val søknad = mockk<Søknad>(relaxed = false).also {
+            val søknad = mockk<SøknadFakta>(relaxed = false).also {
                 every { it.harEøsArbeidsforhold() } returns harEøsArbeidsforhold
                 every { it.harAvtjentVerneplikt() } returns harAvtjentVerneplikt
                 every { it.harInntektFraFangstOgFiske() } returns harInntektFraFangstOgFiske

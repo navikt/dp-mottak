@@ -2,42 +2,16 @@ package no.nav.dagpenger.mottak
 
 import com.fasterxml.jackson.databind.JsonNode
 
-interface Søknad {
+interface SøknadFakta {
     fun getFakta(faktaNavn: String): List<JsonNode>
     fun getBooleanFaktum(faktaNavn: String): Boolean
     fun getBooleanFaktum(faktaNavn: String, defaultValue: Boolean): Boolean
     fun getChildFakta(faktumId: Int): List<JsonNode>
-
-    companion object {
-        fun fromJson(søknadAsJson: JsonNode): Søknad {
-            return object : Søknad {
-                override fun getFakta(faktaNavn: String): List<JsonNode> =
-                    søknadAsJson.get("fakta")?.filter { it["key"].asText() == faktaNavn } ?: emptyList()
-
-                override fun getBooleanFaktum(faktaNavn: String) = getFaktumValue(
-                    getFakta(faktaNavn)
-                ).asBoolean()
-
-                override fun getBooleanFaktum(faktaNavn: String, defaultValue: Boolean) = kotlin.runCatching {
-                    getFaktumValue(
-                        getFakta(faktaNavn)
-                    ).asBoolean()
-                }.getOrDefault(defaultValue)
-
-                override fun getChildFakta(faktumId: Int): List<JsonNode> =
-                    søknadAsJson.get("fakta").filter { it["parrentFaktum"].asInt() == faktumId }
-
-                private fun getFaktumValue(fakta: List<JsonNode>): JsonNode = fakta
-                    .first()
-                    .get("value")
-            }
-        }
-    }
 }
 
 internal typealias AvsluttedeArbeidsforhold = List<AvsluttetArbeidsforhold>
 
-fun Søknad.avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
+fun SøknadFakta.avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
     return this.getFakta("arbeidsforhold").map {
         AvsluttetArbeidsforhold(
             sluttårsak = asÅrsak(it["properties"]["type"].asText()),
@@ -47,16 +21,16 @@ fun Søknad.avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
     }
 }
 
-fun Søknad.erGrenseArbeider(): Boolean =
+fun SøknadFakta.erGrenseArbeider(): Boolean =
     this.avsluttetArbeidsforhold().any { it.grensearbeider }
 
-fun Søknad.harAvsluttetArbeidsforholdFraKonkurs(): Boolean =
+fun SøknadFakta.harAvsluttetArbeidsforholdFraKonkurs(): Boolean =
     this.avsluttetArbeidsforhold().any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS }
 
-fun Søknad.erPermittertFraFiskeForedling(): Boolean =
+fun SøknadFakta.erPermittertFraFiskeForedling(): Boolean =
     this.avsluttetArbeidsforhold().any { it.fiskeforedling }
 
-fun Søknad.erFornyetRettighet(): Boolean = this.getBooleanFaktum("fornyetrett.onskerutvidelse", true).not()
+fun SøknadFakta.erFornyetRettighet(): Boolean = this.getBooleanFaktum("fornyetrett.onskerutvidelse", true).not()
 
 data class AvsluttetArbeidsforhold(
     val sluttårsak: Sluttårsak,
@@ -85,11 +59,11 @@ private fun asÅrsak(type: String): AvsluttetArbeidsforhold.Sluttårsak = when (
     else -> throw Exception("Missing permitteringstype")
 }
 
-internal fun Søknad.harInntektFraFangstOgFiske(): Boolean =
+internal fun SøknadFakta.harInntektFraFangstOgFiske(): Boolean =
     this.getBooleanFaktum("egennaering.fangstogfiske", false).not()
 
-internal fun Søknad.harEøsArbeidsforhold(): Boolean =
+internal fun SøknadFakta.harEøsArbeidsforhold(): Boolean =
     this.getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
 
-internal fun Søknad.harAvtjentVerneplikt(): Boolean =
+internal fun SøknadFakta.harAvtjentVerneplikt(): Boolean =
     this.getFakta("ikkeavtjentverneplikt").getOrNull(0)?.get("value")?.asBoolean()?.not() ?: false

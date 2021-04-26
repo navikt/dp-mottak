@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.meldinger
 
 import no.nav.dagpenger.mottak.Aktivitetslogg
+import no.nav.dagpenger.mottak.ArenaSakVisitor
 import no.nav.dagpenger.mottak.Hendelse
 
 class ArenaOppgaveOpprettet(
@@ -12,8 +13,12 @@ class ArenaOppgaveOpprettet(
     override fun journalpostId(): String = journalpostId
     fun arenaSak(): ArenaSak = ArenaSak(oppgaveId, fagsakId)
 
-    data class ArenaSak(
+    class ArenaSak(
         val oppgaveId: String,
         val fagsakId: String
-    )
+    ) {
+        fun accept(visitor: ArenaSakVisitor) {
+            visitor.visitArenaSak(oppgaveId, fagsakId)
+        }
+    }
 }
