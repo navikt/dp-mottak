@@ -59,7 +59,7 @@ internal object Config {
             addDataSourceProperty("portNumber", properties[Key("DB_PORT", intType)])
             addDataSourceProperty("databaseName", properties[Key("DB_DATABASE", stringType)])
             addDataSourceProperty("user", properties[Key("DB_USERNAME", stringType)])
-            addDataSourceProperty("password", properties[Key("DB_USERNAMEk", stringType)])
+            addDataSourceProperty("password", properties[Key("DB_PASSWORD", stringType)])
             maximumPoolSize = 10
             minimumIdle = 1
             idleTimeout = 10001
