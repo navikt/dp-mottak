@@ -23,7 +23,7 @@ class Journalpost(
     private val journalpostStatus: String,
     private val bruker: Bruker?,
     private val behandlingstema: String?,
-    private val relevanteDatoer: List<RelevantDato>,
+    private val relevanteDatoer: List<RelevantDato>, // todo: registrert dato i stedet
     private val dokumenter: List<DokumentInfo>
 ) : Hendelse(aktivitetslogg) {
 

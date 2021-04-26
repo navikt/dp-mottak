@@ -22,8 +22,6 @@ class Innsending private constructor(
     private var eksisterendeSaker: Boolean?,
     private var person: Person?,
     private var arenaSak: ArenaSak?,
-    private var oppdatertJournalpost: Boolean?,
-    private var ferdigstilt: Boolean?,
     internal val aktivitetslogg: Aktivitetslogg
 ) : Aktivitetskontekst {
 
@@ -40,8 +38,6 @@ class Innsending private constructor(
         eksisterendeSaker = null,
         person = null,
         arenaSak = null,
-        oppdatertJournalpost = null,
-        ferdigstilt = null,
         aktivitetslogg = Aktivitetslogg()
     )
 
@@ -377,7 +373,6 @@ class Innsending private constructor(
         }
 
         override fun håndter(innsending: Innsending, oppdatertJournalpost: JournalpostOppdatert) {
-            innsending.oppdatertJournalpost = true
             innsending.tilstand(oppdatertJournalpost, FerdigstillJournalpost)
         }
     }
@@ -396,7 +391,6 @@ class Innsending private constructor(
             innsending: Innsending,
             journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
         ) {
-            innsending.ferdigstilt = true
             journalpostferdigstilt.info("Ferdigstilte journalpost ${innsending.journalpostId}")
             innsending.tilstand(journalpostferdigstilt, JournalpostFerdigstilt)
         }
@@ -407,12 +401,6 @@ class Innsending private constructor(
             get() = InnsendingTilstandType.InnsendingFerdigstiltType
         override val timeout: Duration
             get() = Duration.ofDays(1)
-
-        override fun entering(innsending: Innsending, hendelse: Hendelse) {
-            if (innsending.oppdatertJournalpost == false && innsending.ferdigstilt == false) {
-                hendelse.severe("Forventet at journalpost var oppdatert og ferdigstilt på i tilstand $type")
-            }
-        }
     }
 
     private fun trengerSøknadsdata(hendelse: Hendelse) {
