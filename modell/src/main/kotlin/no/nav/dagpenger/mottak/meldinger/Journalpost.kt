@@ -13,17 +13,16 @@ import no.nav.dagpenger.mottak.SpesifikkKontekst
 import no.nav.dagpenger.mottak.UkjentSkjemaKode
 import no.nav.dagpenger.mottak.Utdanning
 import no.nav.dagpenger.mottak.UtenBruker
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-class Journalpost(
-    aktivitetslogg: Aktivitetslogg,
+class Journalpost constructor(
+    aktivitetslogg: Aktivitetslogg = Aktivitetslogg(),
     private val journalpostId: String,
     private val journalpostStatus: String,
     private val bruker: Bruker?,
     private val behandlingstema: String?,
-    private val relevanteDatoer: List<RelevantDato>, // todo: registrert dato i stedet
+    private val registrertDato: ZonedDateTime, // todo: registrert dato i stedet
     private val dokumenter: List<DokumentInfo>
 ) : Hendelse(aktivitetslogg) {
 
@@ -84,11 +83,7 @@ class Journalpost(
     fun bruker() = bruker
 
     fun dokumenter(): List<DokumentInfo> = dokumenter
-    fun datoRegistrert(): ZonedDateTime =
-        relevanteDatoer.find { dato -> dato.datotype == Datotype.DATO_REGISTRERT }?.let {
-            LocalDateTime.parse(it.dato).atZone(oslo)
-        } ?: LocalDateTime.now().atZone(oslo)
-
+    fun datoRegistrert(): ZonedDateTime = registrertDato
     class DokumentInfo(tittelHvisTilgjengelig: String?, dokumentInfoId: String, brevkode: String) {
         val tittel = tittelHvisTilgjengelig ?: allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
         val dokumentInfoId = dokumentInfoId

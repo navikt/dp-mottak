@@ -165,7 +165,7 @@ class Innsending private constructor(
             innsending: Innsending,
             journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
         ) {
-            journalpostferdigstilt.warn("Forventet ikke JournalpostFerdigstilt i %s", type.name)
+            journalpostferdigstilt.warn("Forventet ikke FerdigStilt i %s", type.name)
         }
 
         fun leaving(hendelse: Hendelse) {}
@@ -358,7 +358,7 @@ class Innsending private constructor(
         }
 
         override fun håndter(innsending: Innsending, gosysOppgave: GosysOppgaveOpprettet) {
-            innsending.tilstand(gosysOppgave, JournalpostFerdigstilt)
+            innsending.tilstand(gosysOppgave, FerdigStilt)
         }
     }
 
@@ -373,11 +373,11 @@ class Innsending private constructor(
         }
 
         override fun håndter(innsending: Innsending, oppdatertJournalpost: JournalpostOppdatert) {
-            innsending.tilstand(oppdatertJournalpost, FerdigstillJournalpost)
+            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
         }
     }
 
-    internal object FerdigstillJournalpost : Tilstand {
+    internal object AventerFerdigstill : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AvventerFerdigstillJournalpostType
         override val timeout: Duration
@@ -392,11 +392,11 @@ class Innsending private constructor(
             journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
         ) {
             journalpostferdigstilt.info("Ferdigstilte journalpost ${innsending.journalpostId}")
-            innsending.tilstand(journalpostferdigstilt, JournalpostFerdigstilt)
+            innsending.tilstand(journalpostferdigstilt, FerdigStilt)
         }
     }
 
-    internal object JournalpostFerdigstilt : Tilstand {
+    internal object FerdigStilt : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.InnsendingFerdigstiltType
         override val timeout: Duration

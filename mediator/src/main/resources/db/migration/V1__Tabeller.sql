@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS soknad_v1
 
 CREATE TABLE IF NOT EXISTS person_v1
 (
-    id            BIGSERIAL PRIMARY KEY ,
+    id            BIGSERIAL PRIMARY KEY,
     fødselsnummer VARCHAR(11) NOT NULL,
     aktørId       VARCHAR(32) NOT NULL
 );

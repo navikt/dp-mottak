@@ -10,15 +10,19 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
+import java.time.LocalDateTime
+import java.time.ZoneId
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype as Behov
 
 private val logg = KotlinLogging.logger {}
+
 internal class JournalpostMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
 
     private val løsning = "@løsning.${Behov.Journalpost.name}"
+
     init {
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
@@ -32,6 +36,7 @@ internal class JournalpostMottak(
 
         logg.info { "Fått løsning for $løsning, journalpostId: ${packet["journalpostId"]}" }
         val journalpostData = packet[løsning].let {
+            val oslo = ZoneId.of("Europe/Oslo")
             Journalpost(
                 aktivitetslogg = Aktivitetslogg(),
                 journalpostId = packet["journalpostId"].asText(),
@@ -46,17 +51,14 @@ internal class JournalpostMottak(
                     Journalpost.DokumentInfo(
                         tittelHvisTilgjengelig = jsonDokument["tittel"].textValue(),
                         dokumentInfoId = jsonDokument["dokumentInfoId"].asText(),
-                        brevkode = jsonDokument["brevkode"].asText(),
+                        brevkode = jsonDokument["brevkode"].asText()
                     )
                 },
-                relevanteDatoer = it["relevanteDatoer"].map { jsonDato ->
-                    Journalpost.RelevantDato(
-                        dato = jsonDato["dato"].asText(),
-                        datotype = Journalpost.Datotype.valueOf(jsonDato["datotype"].asText())
-                    )
-                },
+                registrertDato = it["relevanteDatoer"].firstOrNull {
+                    it["datotype"].asText() == "DATO_REGISTRERT"
+                }?.get("dato")?.asText().let { LocalDateTime.parse(it).atZone(oslo) } ?: LocalDateTime.now()
+                    .atZone(oslo),
                 behandlingstema = it["behandlingstema"].textValue()
-
             )
         }
 
