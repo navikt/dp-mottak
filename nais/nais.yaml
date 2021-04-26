@@ -36,4 +36,18 @@ spec:
     outbound:
       external:
         - host: {{ DP_PROXY_HOST }}
+  gcp:
+    sqlInstances:
+      - name: dp-mottak
+        type: POSTGRES_12
+        tier:  {{ db_tier }}
+        diskType: SSD
+        highAvailability: false
+        diskSize: {{ db_size }}
+        diskAutoresize: true
+        autoBackupTime: "03:00"
+        databases:
+          - name: mottak
+            envVarPrefix: DB
+        cascadingDelete: false
 
