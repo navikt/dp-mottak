@@ -4,29 +4,31 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
 import no.nav.dagpenger.mottak.helpers.assertDeepEquals
 import no.nav.dagpenger.mottak.serder.InnsendingData
+import no.nav.dagpenger.mottak.serder.InnsendingData.JournalpostData.DokumentInfoData
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.time.Duration
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 internal class InnsendingPostgresRepositoryTest {
 
     private val journalpostId = "187689"
     private val journalpostStatus = "aktiv"
     private val fnr = "12345678910"
-    private val registrertdato = ZonedDateTime.now()
-    private val dokumenter = listOf(
-        InnsendingData.JournalpostData.DokumentInfoData(
-            tittel = "Fin tittel",
-            brevkode = "NAV 04-01.03",
-            dokumentInfoId = "12345678"
-        ),
-        InnsendingData.JournalpostData.DokumentInfoData(
-            tittel = "Annen Fin tittel",
-            brevkode = "NAV 04-01.03",
-            dokumentInfoId = "123456567"
-        )
-    )
+    private val registrertdato = LocalDateTime.now()
+    private val dokumenter = listOf<DokumentInfoData>()
+
+    //    private val dokumenter = listOf(
+//        InnsendingData.JournalpostData.DokumentInfoData(
+//            tittel = "Fin tittel",
+//            brevkode = "NAV 04-01.03",
+//            dokumentInfoId = "12345678"
+//        ),
+//        InnsendingData.JournalpostData.DokumentInfoData(
+//            tittel = "Annen Fin tittel",
+//            brevkode = "NAV 04-01.03",
+//            dokumentInfoId = "123456567"
+//        )
+//    )
     //language=JSON
     private val søknadsjson = jacksonObjectMapper().readTree(
         """
@@ -40,7 +42,6 @@ internal class InnsendingPostgresRepositoryTest {
         journalpostId = journalpostId,
         tilstand = InnsendingData.TilstandData(
             InnsendingData.TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType,
-            Duration.ofDays(1)
         ),
         journalpostData = InnsendingData.JournalpostData(
             journalpostId = journalpostId,

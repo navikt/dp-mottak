@@ -4,6 +4,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
+import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -89,7 +90,7 @@ sealed class KategorisertJournalpost(
     data class OppgaveBenk(
         val id: String,
         val beskrivelse: String,
-        val datoRegistrert: ZonedDateTime,
+        val datoRegistrert: LocalDateTime,
         val tilleggsinformasjon: String
     ) {
         private companion object {

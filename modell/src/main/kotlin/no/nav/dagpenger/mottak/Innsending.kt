@@ -576,6 +576,7 @@ class Innsending private constructor(
     fun accept(visitor: InnsendingVisitor) {
         visitor.preVisitInnsending(this, journalpostId)
         visitor.visitTilstand(tilstand)
+        visitor.visitInnsending(oppfyllerMinsteArbeidsinntekt, eksisterendeSaker)
         journalpost?.accept(visitor)
         arenaSak?.accept(visitor)
         person?.accept(visitor)

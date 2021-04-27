@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak
 
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
+import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 interface JournalpostVisitor {
@@ -10,7 +11,7 @@ interface JournalpostVisitor {
         journalpostStatus: String,
         bruker: Journalpost.Bruker?,
         behandlingstema: String?,
-        registrertDato: ZonedDateTime,
+        registrertDato: LocalDateTime,
         dokumenter: List<Journalpost.DokumentInfo>
     ) {
     }

@@ -14,8 +14,8 @@ import no.nav.dagpenger.mottak.SpesifikkKontekst
 import no.nav.dagpenger.mottak.UkjentSkjemaKode
 import no.nav.dagpenger.mottak.Utdanning
 import no.nav.dagpenger.mottak.UtenBruker
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 class Journalpost constructor(
     aktivitetslogg: Aktivitetslogg = Aktivitetslogg(),
@@ -23,13 +23,13 @@ class Journalpost constructor(
     private val journalpostStatus: String,
     private val bruker: Bruker?,
     private val behandlingstema: String?,
-    private val registrertDato: ZonedDateTime, // todo: registrert dato i stedet
+    registrertDato: LocalDateTime,
     private val dokumenter: List<DokumentInfo>
 ) : Hendelse(aktivitetslogg) {
 
-    internal companion object {
-        val oslo: ZoneId = ZoneId.of("Europe/Oslo")
+    private val registrertDato: LocalDateTime = registrertDato.truncatedTo(ChronoUnit.MINUTES)
 
+    internal companion object {
         // @todo: not sure if this belong here
         val allKnownTypes = mapOf(
             "NAV 04-02.03" to "Bekreftelse på ansettelsesforhold",
@@ -84,7 +84,7 @@ class Journalpost constructor(
     fun bruker() = bruker
 
     fun dokumenter(): List<DokumentInfo> = dokumenter
-    fun datoRegistrert(): ZonedDateTime = registrertDato
+    fun datoRegistrert(): LocalDateTime = registrertDato
     class DokumentInfo(tittelHvisTilgjengelig: String?, dokumentInfoId: String, brevkode: String) {
         val tittel = tittelHvisTilgjengelig ?: allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
         val dokumentInfoId = dokumentInfoId

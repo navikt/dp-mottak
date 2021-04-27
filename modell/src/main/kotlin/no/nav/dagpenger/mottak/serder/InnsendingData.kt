@@ -7,6 +7,7 @@ import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import java.time.Duration
+import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
@@ -14,7 +15,7 @@ import kotlin.reflect.jvm.isAccessible
 data class InnsendingData(
     val journalpostId: String,
     val tilstand: TilstandData,
-    val journalpostData: JournalpostData,
+    val journalpostData: JournalpostData?,
     val oppfyllerMinsteArbeidsinntekt: Boolean?,
     val eksisterendeSaker: Boolean?,
     val personData: PersonData?,
@@ -28,20 +29,22 @@ data class InnsendingData(
             .call(
                 journalpostId,
                 tilstand.createTilstand(),
-                Journalpost(
-                    journalpostId = journalpostId,
-                    bruker = journalpostData.bruker?.createBruker(),
-                    journalpostStatus = journalpostData.journalpostStatus,
-                    behandlingstema = journalpostData.behandlingstema,
-                    registrertDato = journalpostData.registertDato,
-                    dokumenter = journalpostData.dokumenter.map {
-                        Journalpost.DokumentInfo(
-                            it.tittel,
-                            it.dokumentInfoId,
-                            it.brevkode
-                        )
-                    }
-                ),
+                journalpostData?.let {
+                    Journalpost(
+                        journalpostId = journalpostId,
+                        bruker = journalpostData.bruker?.createBruker(),
+                        journalpostStatus = journalpostData.journalpostStatus,
+                        behandlingstema = journalpostData.behandlingstema,
+                        registrertDato = journalpostData.registertDato,
+                        dokumenter = journalpostData.dokumenter.map {
+                            Journalpost.DokumentInfo(
+                                it.tittel,
+                                it.dokumentInfoId,
+                                it.brevkode
+                            )
+                        }
+                    )
+                },
                 søknadsData?.let { Søknadsdata.Søknad(it) },
                 oppfyllerMinsteArbeidsinntekt,
                 eksisterendeSaker,
@@ -59,8 +62,7 @@ data class InnsendingData(
     }
 
     data class TilstandData(
-        val type: InnsendingTilstandTypeData,
-        val timeout: Duration
+        val type: InnsendingTilstandTypeData
     ) {
         fun createTilstand(): Innsending.Tilstand = when (type) {
             InnsendingTilstandTypeData.MottattType -> Innsending.Mottatt
@@ -139,7 +141,7 @@ data class InnsendingData(
         val journalpostStatus: String,
         val bruker: BrukerData?,
         val behandlingstema: String?,
-        val registertDato: ZonedDateTime,
+        val registertDato: LocalDateTime,
         val dokumenter: List<DokumentInfoData>
     ) {
         fun createJournalPost() {

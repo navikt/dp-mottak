@@ -56,8 +56,7 @@ internal class JournalpostMottak(
                 },
                 registrertDato = it["relevanteDatoer"].firstOrNull {
                     it["datotype"].asText() == "DATO_REGISTRERT"
-                }?.get("dato")?.asText().let { LocalDateTime.parse(it).atZone(oslo) } ?: LocalDateTime.now()
-                    .atZone(oslo),
+                }?.get("dato")?.asText().let { LocalDateTime.parse(it) } ?: LocalDateTime.now(),
                 behandlingstema = it["behandlingstema"].textValue()
             )
         }
