@@ -1,4 +1,4 @@
-package no.nav.dagpenger.mottak.behov.saksbehandling
+package no.nav.dagpenger.mottak.behov.saksbehandling.arena
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.natpryce.konfig.Configuration
