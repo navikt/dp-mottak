@@ -88,7 +88,8 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                         behandlendeEnhet = packet["behandlendeEnhetId"].asText(),
                         beskrivelse = packet["oppgavebeskrivelse"].asText(),
                         tilleggsinformasjon = packet["tilleggsinformasjon"].asText(),
-                        registrertDato = packet["registrertDato"].asLocalDateTime()
+                        registrertDato = packet["registrertDato"].asLocalDateTime(),
+                        journalpostId = packet["journalpostId"].asText()
                     ).also {
                         packet["@løsning"] = mapOf("OpprettStartVedtakOppgave" to it)
                         context.publish(packet.toJson())

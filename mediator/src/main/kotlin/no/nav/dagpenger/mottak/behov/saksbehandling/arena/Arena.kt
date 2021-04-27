@@ -14,6 +14,7 @@ import io.ktor.http.HttpMethod
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.Config.tokenProvider
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 interface ArenaOppslag {
@@ -24,7 +25,8 @@ interface ArenaOppslag {
         behandlendeEnhet: String,
         beskrivelse: String,
         tilleggsinformasjon: String,
-        registrertDato: LocalDateTime
+        registrertDato: LocalDateTime,
+        journalpostId:String
     ): Map<String, String>
 }
 
@@ -64,11 +66,43 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
         behandlendeEnhet: String,
         beskrivelse: String,
         tilleggsinformasjon: String,
-        registrertDato: LocalDateTime
+        registrertDato: LocalDateTime,
+        journalpostId: String
     ): Map<String, String> {
-        TODO("Not yet implemented")
+        sikkerlogg.info { "Forsøker å opprette start vedtak oppgave i Arena" }
+        return proxyArenaClient.request<OpprettVedtakOppgaveResponse> {
+            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
+            header(HttpHeaders.ContentType, "application/json")
+            header(HttpHeaders.Accept, "application/json")
+            body = OpprettVedtakOppgaveRequest(
+                naturligIdent = fødselsnummer,
+                behandlendeEnhetId = behandlendeEnhet,
+                tilleggsinformasjon = tilleggsinformasjon,
+                registrertDato = registrertDato.toLocalDate(),
+                oppgavebeskrivelse = beskrivelse
+            )
+        }.map(journalpostId)
     }
 }
 
 private data class AktivSakRequest(val fnr: String)
 private data class AktivSakResponse(val harAktivSak: Boolean)
+
+private data class OpprettVedtakOppgaveRequest(
+    val naturligIdent: String,
+    val behandlendeEnhetId: String,
+    val tilleggsinformasjon: String,
+    val registrertDato: LocalDate,
+    val oppgavebeskrivelse: String
+)
+
+private data class OpprettVedtakOppgaveResponse(
+    val fagsakId: String,
+    val oppgaveId:String
+){
+    fun map(journalpostId: String)= mapOf(
+        "fagsakId" to fagsakId,
+        "oppgaveId" to oppgaveId,
+        "journalpostId" to journalpostId
+    )
+}

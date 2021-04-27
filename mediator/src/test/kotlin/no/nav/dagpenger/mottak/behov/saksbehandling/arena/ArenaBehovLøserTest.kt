@@ -25,10 +25,11 @@ internal class ArenaBehovLøserTest {
                     behandlendeEnhet: String,
                     beskrivelse: String,
                     tilleggsinformasjon: String,
-                    registrertDato: LocalDateTime
+                    registrertDato: LocalDateTime,
+                    journalpostId:String
                 ): Map<String, String> {
                     return mapOf(
-                        "journalpostId" to JOURNALPOST_ID,
+                        "journalpostId" to journalpostId,
                         "fagsakId" to "123",
                         "oppgaveId" to "123"
                     )
