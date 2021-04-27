@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling.arena
 
-import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -20,6 +19,21 @@ internal class ArenaBehovLøserTest {
         ArenaBehovLøser(
             arenaOppslag = object : ArenaOppslag {
                 override suspend fun harEksisterendeSaker(fnr: String): Boolean = true
+                override suspend fun opprettStartVedtakOppgave(
+                    fødselsnummer: String,
+                    aktørId: String,
+                    behandlendeEnhet: String,
+                    beskrivelse: String,
+                    tilleggsinformasjon: String,
+                    registrertDato: LocalDateTime
+                ): Map<String, String> {
+                    return mapOf(
+                        "journalpostId" to JOURNALPOST_ID,
+                        "fagsakId" to "123",
+                        "oppgaveId" to "123"
+                    )
+
+                }
             },
             rapidsConnection = testRapid
         )
@@ -46,8 +60,8 @@ internal class ArenaBehovLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
-            assertEquals("123", field(0, "@løsning")["fagsakId"].asText())
-            assertEquals("123", field(0, "@løsning")["fagsakId"].asText())
+            assertEquals("123", field(0, "@løsning")["OpprettStartVedtakOppgave"]["fagsakId"].asText())
+            assertEquals("123", field(0, "@løsning")["OpprettStartVedtakOppgave"]["oppgaveId"].asText())
             assertEquals(JOURNALPOST_ID, field(0, "@løsning")["OpprettStartVedtakOppgave"]["journalpostId"].asText())
         }
 
@@ -74,11 +88,12 @@ internal class ArenaBehovLøserTest {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behov": [
-            "EksisterendeSaker"
+            "OpprettStartVedtakOppgave"
           ],
           "@opprettet" : "${LocalDateTime.now()}",
           "journalpostId": "$JOURNALPOST_ID",
           "fødselsnummer": "12345678910",
+          "aktørId": "23456789",
           "behandlendeEnhetId": "1235",
           "oppgavebeskrivelse": "beskrivende beskrivelse",
           "registrertDato": "${LocalDateTime.now()}",

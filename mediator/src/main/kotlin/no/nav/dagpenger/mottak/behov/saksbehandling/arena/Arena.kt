@@ -14,9 +14,18 @@ import io.ktor.http.HttpMethod
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.Config.tokenProvider
+import java.time.LocalDateTime
 
 interface ArenaOppslag {
     suspend fun harEksisterendeSaker(fnr: String): Boolean
+    suspend fun opprettStartVedtakOppgave(
+        fødselsnummer: String,
+        aktørId: String,
+        behandlendeEnhet: String,
+        beskrivelse: String,
+        tilleggsinformasjon: String,
+        registrertDato: LocalDateTime
+    ): Map<String, String>
 }
 
 class ArenaApiClient(config: Configuration) : ArenaOppslag {
@@ -47,6 +56,17 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
             header(HttpHeaders.Accept, "application/json")
             body = AktivSakRequest(fnr)
         }.harAktivSak
+    }
+
+    override suspend fun opprettStartVedtakOppgave(
+        fødselsnummer: String,
+        aktørId: String,
+        behandlendeEnhet: String,
+        beskrivelse: String,
+        tilleggsinformasjon: String,
+        registrertDato: LocalDateTime
+    ): Map<String, String> {
+        TODO("Not yet implemented")
     }
 }
 
