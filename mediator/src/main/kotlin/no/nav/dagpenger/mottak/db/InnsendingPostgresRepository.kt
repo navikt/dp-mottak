@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.db
 
+import kotliquery.Query
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
@@ -24,36 +25,32 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         } ?: throw IllegalArgumentException("Kunne ikke finnne innsending med id $journalpostId")
 
     override fun lagre(innsending: Innsending): Boolean {
-
-
-
+        val visitor = PersistenceVisitor(innsending)
         return using(sessionOf(datasource)) { session ->
-            session.run(
-                queryOf( //language=PostgreSQL
-                    "INSERT INTO  innsending_v1(journalpostId, tilstand) VALUES (:journalpostId,:tilstand)",
-                    dummyInnsendingVerider(innsending)
-                ).asUpdate
-            ).let { it == 1 }
+            val updates = visitor.lagreQueries.map { query ->
+                session.transaction { tx ->
+                    tx.run(query.asUpdate)
+                }
+            }
+            updates.all { it==1 }
         }
     }
 
-}
+    private class PersistenceVisitor(val innsending: Innsending) : InnsendingVisitor {
 
-private fun dummyInnsendingVerider(innsending: Innsending) = mapOf(
-    "journalpostId" to innsending.journalpostId().toLong(),
-    "tilstand" to InnsendingTilstandType.MottattType.name
-)
+        val lagreQueries: MutableList<Query> = mutableListOf()
 
-class PersistenceVisitor(innsending: Innsending) : InnsendingVisitor {
+        init {
+            innsending.accept(this)
+        }
 
-
-    init {
-        innsending.accept(this)
+        override fun visitTilstand(tilstandType: Innsending.Tilstand) {
+            lagreQueries.add(queryOf(//language=PostgreSQL
+                "INSERT INTO innsending_v1(journalpostId,tilstand) VALUES(:jpId, :tilstand)", mapOf(
+                    "jpId" to innsending.journalpostId().toLong(),
+                    "tilstand" to tilstandType.type.name
+                )
+            ))
+        }
     }
-
-    override fun visitTilstand(tilstandType: Innsending.Tilstand) {
-
-    }
-
-
 }
