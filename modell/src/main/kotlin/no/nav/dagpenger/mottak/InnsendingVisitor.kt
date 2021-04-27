@@ -27,7 +27,7 @@ interface ArenaSakVisitor {
     fun visitArenaSak(oppgaveId: String, fagsakId: String) {}
 }
 
-internal interface InnsendingVisitor :
+interface InnsendingVisitor :
     JournalpostVisitor,
     SøknadVisitor,
     PersonVisitor,

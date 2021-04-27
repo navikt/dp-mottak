@@ -127,7 +127,7 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
         internal abstract fun accept(visitor: AktivitetsloggVisitor)
 
         operator fun contains(kontekst: Aktivitetskontekst) = kontekst.toSpesifikkKontekst() in kontekster
-        internal class Info(
+        class Info(
             kontekster: List<SpesifikkKontekst>,
             private val melding: String,
             private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat)
@@ -143,7 +143,7 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
             }
         }
 
-        internal class Warn(
+        class Warn(
             kontekster: List<SpesifikkKontekst>,
             private val melding: String,
             private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat)
@@ -192,7 +192,7 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
             }
         }
 
-        internal class Error(
+        class Error(
             kontekster: List<SpesifikkKontekst>,
             private val melding: String,
             private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat)
@@ -208,7 +208,7 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
             }
         }
 
-        internal class Severe(
+        class Severe(
             kontekster: List<SpesifikkKontekst>,
             private val melding: String,
             private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat)
@@ -245,7 +245,7 @@ interface IAktivitetslogg {
     fun kontekster(): List<IAktivitetslogg>
 }
 
-internal interface AktivitetsloggVisitor {
+interface AktivitetsloggVisitor {
     fun preVisitAktivitetslogg(aktivitetslogg: Aktivitetslogg) {}
     fun visitInfo(
         kontekster: List<SpesifikkKontekst>,

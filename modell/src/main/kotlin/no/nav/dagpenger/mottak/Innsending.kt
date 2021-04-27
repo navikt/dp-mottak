@@ -573,7 +573,7 @@ class Innsending private constructor(
         }
     }
 
-    internal fun accept(visitor: InnsendingVisitor) {
+    fun accept(visitor: InnsendingVisitor) {
         visitor.preVisitInnsending(this, journalpostId)
         visitor.visitTilstand(tilstand)
         journalpost?.accept(visitor)

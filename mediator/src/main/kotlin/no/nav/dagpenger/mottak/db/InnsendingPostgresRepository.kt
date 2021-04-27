@@ -6,6 +6,7 @@ import kotliquery.using
 import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingTilstandType
+import no.nav.dagpenger.mottak.InnsendingVisitor
 import javax.sql.DataSource
 
 internal class InnsendingPostgresRepository(private val datasource: DataSource = Config.dataSource) :
@@ -22,8 +23,11 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             }
         } ?: throw IllegalArgumentException("Kunne ikke finnne innsending med id $journalpostId")
 
-    override fun lagre(innsending: Innsending): Boolean =
-        using(sessionOf(datasource)) { session ->
+    override fun lagre(innsending: Innsending): Boolean {
+
+
+
+        return using(sessionOf(datasource)) { session ->
             session.run(
                 queryOf( //language=PostgreSQL
                     "INSERT INTO  innsending_v1(journalpostId, tilstand) VALUES (:journalpostId,:tilstand)",
@@ -31,9 +35,25 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                 ).asUpdate
             ).let { it == 1 }
         }
+    }
+
 }
 
 private fun dummyInnsendingVerider(innsending: Innsending) = mapOf(
     "journalpostId" to innsending.journalpostId().toLong(),
     "tilstand" to InnsendingTilstandType.MottattType.name
 )
+
+class PersistenceVisitor(innsending: Innsending) : InnsendingVisitor {
+
+
+    init {
+        innsending.accept(this)
+    }
+
+    override fun visitTilstand(tilstandType: Innsending.Tilstand) {
+
+    }
+
+
+}
