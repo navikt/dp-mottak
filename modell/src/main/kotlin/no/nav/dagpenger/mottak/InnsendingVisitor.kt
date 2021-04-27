@@ -3,7 +3,6 @@ package no.nav.dagpenger.mottak
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import java.time.LocalDateTime
-import java.time.ZonedDateTime
 
 interface JournalpostVisitor {
     fun visitJournalpost(

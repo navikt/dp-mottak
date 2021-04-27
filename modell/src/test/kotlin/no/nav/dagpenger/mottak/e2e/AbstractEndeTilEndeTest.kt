@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDateTime
-import java.time.ZoneId
 
 abstract class AbstractEndeTilEndeTest {
 
@@ -187,7 +186,7 @@ abstract class AbstractEndeTilEndeTest {
         journalpostStatus = "MOTTATT",
         bruker = bruker,
         behandlingstema = behandlingstema,
-        registrertDato = LocalDateTime.now().atZone(ZoneId.of("Europe/Oslo")),
+        registrertDato = LocalDateTime.now(),
         dokumenter = listOf(
             Journalpost.DokumentInfo(
                 tittelHvisTilgjengelig = null,

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import java.time.LocalDateTime
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 private const val maksTegn = 1999

@@ -52,7 +52,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
               left join person_innsending_v1 person_innsending on innsending.journalpostid = person_innsending.journalpostid
               left join person_v1 person on person_innsending.personid = person.id
      where innsending.journalpostid = :jpId;
- """.trimIndent()
+    """.trimIndent()
 
     fun Row.booleanOrNull(columnLabel: String) = this.stringOrNull(columnLabel)?.let { it == "t" }
 
@@ -88,7 +88,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                                 diskresjonskode = row.boolean("diskresjonskode")
                             )
                         },
-                        aktivitetslogg = InnsendingData.AktivitetsloggData(listOf()), //todo
+                        aktivitetslogg = InnsendingData.AktivitetsloggData(listOf()), // todo
                         arenaSakData = row.stringOrNull("fagsakId")?.let {
                             InnsendingData.ArenaSakData(
                                 oppgaveId = row.string("oppgaveId"),
@@ -243,5 +243,4 @@ VALUES (:fagsakId, :oppgaveId, :journalpostId)
             )
         }
     }
-
 }

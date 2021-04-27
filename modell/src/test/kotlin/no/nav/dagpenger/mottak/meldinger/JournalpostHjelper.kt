@@ -2,7 +2,6 @@ package no.nav.dagpenger.mottak.meldinger
 
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import java.time.LocalDateTime
-import java.time.ZoneId
 
 internal fun lagjournalpostData(
     brevkode: String,
@@ -15,7 +14,7 @@ internal fun lagjournalpostData(
         journalpostId = "1234",
         journalpostStatus = "MOTTATT",
         bruker = Journalpost.Bruker(id = "1234", type = Journalpost.BrukerType.AKTOERID),
-        registrertDato = dato.atZone(ZoneId.of("Europe/Oslo")),
+        registrertDato = dato,
         dokumenter = listOf(
             Journalpost.DokumentInfo(
                 tittelHvisTilgjengelig = null,

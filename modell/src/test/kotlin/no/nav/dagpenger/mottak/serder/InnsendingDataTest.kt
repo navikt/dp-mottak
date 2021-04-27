@@ -11,14 +11,13 @@ import no.nav.dagpenger.mottak.serder.InnsendingData.PersonData
 import no.nav.dagpenger.mottak.serder.InnsendingData.TilstandData
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import java.time.Duration
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 internal class InnsendingDataTest {
     private val journalpostId = "ertyu"
     private val journalpostStatus = "aktiv"
     private val fnr = "12345678910"
-    private val registrertdato = ZonedDateTime.now()
+    private val registrertdato = LocalDateTime.now()
     private val dokumenter = listOf<DokumentInfoData>(
         DokumentInfoData(
             tittel = "Fin tittel",
@@ -32,8 +31,7 @@ internal class InnsendingDataTest {
         val innsendingData = InnsendingData(
             journalpostId = journalpostId,
             tilstand = TilstandData(
-                TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType,
-                Duration.ofDays(1)
+                TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType
             ),
             journalpostData = JournalpostData(
                 journalpostId = journalpostId,
