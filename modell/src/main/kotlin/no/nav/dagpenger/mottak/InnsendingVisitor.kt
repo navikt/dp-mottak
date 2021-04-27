@@ -10,7 +10,8 @@ interface JournalpostVisitor {
         journalpostStatus: String,
         bruker: Journalpost.Bruker?,
         behandlingstema: String?,
-        registrertDato: ZonedDateTime
+        registrertDato: ZonedDateTime,
+        dokumenter: List<Journalpost.DokumentInfo>
     ) {
     }
 }
