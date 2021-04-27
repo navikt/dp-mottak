@@ -19,7 +19,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         using(sessionOf(datasource)) { session ->
             session.run(
                 queryOf( //language=PostgreSQL
-                    "SELECT * FROM innsending_v1 WHERE journalpostId = :id",
+                    "SELECT * FROM innsending_v1  WHERE journalpostId = :id",
                     mapOf("id" to journalpostId.toLong())
                 ).map { Innsending(it.long("journalpostId").toString()) }.asSingle
             )?.let {
@@ -45,8 +45,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
 
         override fun visitTilstand(tilstandType: Innsending.Tilstand) {
             lagreQueries.add(
-                queryOf(//language=PostgreSQL
-                    "INSERT INTO innsending_v1(journalpostId,tilstand) VALUES(:jpId, :tilstand)", mapOf(
+                queryOf( //language=PostgreSQL
+                    "INSERT INTO innsending_v1(journalpostId,tilstand) VALUES(:jpId, :tilstand)",
+                    mapOf(
                         "jpId" to jpId,
                         "tilstand" to tilstandType.type.name
                     )
@@ -56,7 +57,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
 
         override fun visitInnsending(oppfyllerMinsteArbeidsinntekt: Boolean?, eksisterendeSaker: Boolean?) {
             lagreQueries.add(
-                queryOf(//language=PostgreSQL
+                queryOf( //language=PostgreSQL
                     "INSERT INTO innsending_oppfyller_minsteinntekt_v1(journalpostId,verdi) VALUES (:jpId, :verdi)",
                     mapOf(
                         "jpId" to jpId,
@@ -65,7 +66,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                 )
             )
             lagreQueries.add(
-                queryOf(//language=PostgreSQL
+                queryOf( //language=PostgreSQL
                     "INSERT INTO innsending_eksisterende_arena_saker_v1(journalpostId,verdi) VALUES (:jpId, :verdi)",
                     mapOf(
                         "jpId" to jpId,
@@ -84,7 +85,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             dokumenter: List<Journalpost.DokumentInfo>
         ) {
             lagreQueries.add(
-                queryOf(//language=PostgreSQL
+                queryOf( //language=PostgreSQL
                     "INSERT INTO journalpost_v1(journalpostId,brukerId,brukerType,behandlingstema,registrertDato) VALUES(:jpId, :brukerId, :brukerType, :behandlingstema,:registrertDato)",
                     mapOf(
                         "jpId" to jpId,
@@ -96,9 +97,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                 )
             )
             val dokumentliste =
-                dokumenter.joinToString { """('${jpId}','${it.tittel}','${it.dokumentInfoId}','${it.brevkode}')""" }
+                dokumenter.joinToString { """('$jpId','${it.tittel}','${it.dokumentInfoId}','${it.brevkode}')""" }
             lagreQueries.add(
-                queryOf(//language=PostgreSQL
+                queryOf( //language=PostgreSQL
                     "INSERT INTO journalpost_dokumenter_v1(journalpostId,tittel,dokumentInfoId,brevkode) VALUES $dokumentliste"
                 )
             )
@@ -107,7 +108,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         override fun visitSøknad(søknad: Søknadsdata.Søknad?) {
             søknad?.let {
                 lagreQueries.add(
-                    queryOf(//language=PostgreSQL
+                    queryOf( //language=PostgreSQL
                         "INSERT INTO soknad_v1(journalpostId,data) VALUES(:jpId,:data)",
                         mapOf(
                             "jpId" to jpId,
@@ -129,7 +130,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         ) {
 
             lagreQueries.add(
-                queryOf(//language=PostgreSQL
+                queryOf( //language=PostgreSQL
                     """WITH inserted_id as 
                         (INSERT INTO person_v1(fødselsnummer,aktørId) VALUES(:fnr,:aktoerId) RETURNING id)
                         INSERT INTO person_innsending_v1(journalpostId,personId,norsktilknytning,diskresjonskode) 
@@ -141,8 +142,24 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         "norskTilknytning" to norskTilknytning,
                         "diskresjonskode" to diskresjonskode
                     )
-                ).also { println(it.cleanStatement) }
+                )
+            )
+        }
+
+        override fun visitArenaSak(oppgaveId: String, fagsakId: String) {
+            lagreQueries.add(
+                queryOf( //language=PostgreSQL
+                    """
+                        INSERT INTO arenasak_v1(fagsakId, oppgaveId, journalpostId) VALUES(:fagsakId,:opgaveId,:journalpostId) 
+                        """,
+                    mapOf(
+                        "journalpostId" to jpId,
+                        "fagsakId" to fagsakId,
+                        "oppgaveId" to oppgaveId
+                    )
+                )
             )
         }
     }
+
 }

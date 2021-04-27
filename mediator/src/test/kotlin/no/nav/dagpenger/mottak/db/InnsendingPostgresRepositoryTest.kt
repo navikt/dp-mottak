@@ -74,7 +74,7 @@ internal class InnsendingPostgresRepositoryTest {
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
                 lagre(innsending).also {
-                    assertTrue(it > 0,"lagring av innsending feilet")
+                    assertTrue(it > 0, "lagring av innsending feilet")
                 }
 
                 hent(journalpostId).also {
@@ -83,5 +83,4 @@ internal class InnsendingPostgresRepositoryTest {
             }
         }
     }
-
 }

@@ -6,6 +6,13 @@ CREATE TABLE IF NOT EXISTS innsending_v1
     opprettet     TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'utc')
 );
 
+CREATE TABLE IF NOT EXISTS arenasak_v1
+(
+    fagsakId      VARCHAR(64) primary key,
+    oppgaveId     VARCHAR(64),
+    journalpostId BIGINT REFERENCES innsending_v1
+);
+
 CREATE TABLE IF NOT EXISTS innsending_oppfyller_minsteinntekt_v1
 (
     journalpostId BIGINT REFERENCES innsending_v1,

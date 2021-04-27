@@ -144,6 +144,6 @@ class Journalpost constructor(
     )
 
     fun accept(visitor: JournalpostVisitor) {
-        visitor.visitJournalpost(journalpostId, journalpostStatus, bruker, behandlingstema, registrertDato,dokumenter)
+        visitor.visitJournalpost(journalpostId, journalpostStatus, bruker, behandlingstema, registrertDato, dokumenter)
     }
 }
