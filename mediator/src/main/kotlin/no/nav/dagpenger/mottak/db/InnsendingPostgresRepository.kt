@@ -5,6 +5,7 @@ import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
+import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingVisitor
@@ -15,6 +16,7 @@ import no.nav.dagpenger.mottak.serder.InnsendingData
 import no.nav.dagpenger.mottak.serder.InnsendingData.JournalpostData.BrukerData
 import no.nav.dagpenger.mottak.serder.InnsendingData.JournalpostData.BrukerTypeData
 import no.nav.dagpenger.mottak.serder.InnsendingData.TilstandData
+import no.nav.dagpenger.mottak.toMap
 import org.postgresql.util.PGobject
 import java.time.LocalDateTime
 import javax.sql.DataSource
@@ -42,7 +44,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             aktivitetslogg.data                       as "aktivitetslogg"
      from innsending_v1 as innsending
               left join journalpost_v1 journalpost on innsending.journalpostid = journalpost.journalpostid
-              left join aktivitetslogg aktivitetslogg on innsending.journalpostid = aktivitetslogg.journalpostid
+              left join aktivitetslogg_v1 aktivitetslogg on innsending.journalpostid = aktivitetslogg.journalpostid
               left join arenasak_v1 arenasak on innsending.journalpostid = arenasak.journalpostid
               left join innsending_eksisterende_arena_saker_v1 innsending_eksisterende_arena_saker
                         on innsending.journalpostid = innsending_eksisterende_arena_saker.journalpostid
@@ -88,7 +90,10 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                                 diskresjonskode = row.boolean("diskresjonskode")
                             )
                         },
-                        aktivitetslogg = InnsendingData.AktivitetsloggData(listOf()), // todo
+                        aktivitetslogg = JsonMapper.jacksonJsonAdapter.readValue(
+                            row.binaryStream("aktivitetslogg"),
+                            InnsendingData.AktivitetsloggData::class.java
+                        ),
                         arenaSakData = row.stringOrNull("fagsakId")?.let {
                             InnsendingData.ArenaSakData(
                                 oppgaveId = row.string("oppgaveId"),
@@ -238,6 +243,24 @@ VALUES (:fagsakId, :oppgaveId, :journalpostId)
                         "journalpostId" to jpId,
                         "fagsakId" to fagsakId,
                         "oppgaveId" to oppgaveId
+                    )
+                )
+            )
+        }
+
+        override fun preVisitAktivitetslogg(aktivitetslogg: Aktivitetslogg) {
+            lagreQueries.add(
+                queryOf( //language=PostgreSQL
+                    """
+                            INSERT INTO aktivitetslogg_v1(journalpostId, data) 
+                            VALUES (:journalpostId, :data)
+                    """.trimIndent(),
+                    mapOf(
+                        "journalpostId" to jpId,
+                        "data" to PGobject().apply {
+                            type = "jsonb"
+                            value = JsonMapper.jacksonJsonAdapter.writeValueAsString(aktivitetslogg.toMap())
+                        }
                     )
                 )
             )

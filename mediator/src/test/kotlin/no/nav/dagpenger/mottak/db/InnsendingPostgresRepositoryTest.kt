@@ -29,6 +29,26 @@ internal class InnsendingPostgresRepositoryTest {
 //            dokumentInfoId = "123456567"
 //        )
 //    )
+
+    private val aktivitetsloggData = InnsendingData.AktivitetsloggData(
+        listOf(
+            InnsendingData.AktivitetsloggData.AktivitetData(
+                alvorlighetsgrad = InnsendingData.AktivitetsloggData.Alvorlighetsgrad.INFO,
+                label = 'N',
+                melding = "TEST",
+                tidsstempel = LocalDateTime.now().toString(),
+                detaljer = mapOf("detaljVariabel" to "tt"),
+                kontekster = listOf(
+                    InnsendingData.AktivitetsloggData.SpesifikkKontekstData(
+                        kontekstType = "TEST",
+                        kontekstMap = mapOf("kontekstVariabel" to "foo")
+                    )
+                ),
+                behovtype = null
+            )
+        )
+
+    )
     //language=JSON
     private val søknadsjson = jacksonObjectMapper().readTree(
         """
@@ -58,7 +78,7 @@ internal class InnsendingPostgresRepositoryTest {
             fagsakId = "129678"
         ),
         søknadsData = søknadsjson,
-        aktivitetslogg = InnsendingData.AktivitetsloggData(emptyList()),
+        aktivitetslogg = aktivitetsloggData,
         personData = InnsendingData.PersonData(
             fødselsnummer = fnr,
             aktørId = "345678",
