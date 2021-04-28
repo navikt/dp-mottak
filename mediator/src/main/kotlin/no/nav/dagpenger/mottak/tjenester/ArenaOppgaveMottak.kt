@@ -18,19 +18,20 @@ internal class OpprettStartVedtakOppgaveMottak(
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
 
-    private val løsning = "@løsning.${Behovtype.OpprettStartVedtakOppgave.name}"
     init {
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-            validate { it.requireKey(løsning) }
+            validate { it.demandAllOrAny("@behov", listOf(Behovtype.OpprettStartVedtakOppgave.name, Behovtype.OpprettVurderhenvendelseOppgave.name)) }
+            validate { it.requireKey("@løsning") }
             validate { it.requireKey("journalpostId") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        logg.info { "Fått løsning for $løsning, journalpostId: ${packet["journalpostId"]}" }
-        val arenaOppgaveOpprettetData = packet[løsning].let {
+        val arenaLøsning = packet["@løsning"].first()
+        logg.info { "Fått løsning for ${arenaLøsning.first()}, journalpostId: ${packet["journalpostId"]}" }
+        val oppgaveOpprettet = arenaLøsning.let {
             ArenaOppgaveOpprettet(
                 aktivitetslogg = Aktivitetslogg(),
                 journalpostId = packet["journalpostId"].asText(),
@@ -39,6 +40,6 @@ internal class OpprettStartVedtakOppgaveMottak(
             )
         }
 
-        innsendingMediator.håndter(arenaOppgaveOpprettetData)
+        innsendingMediator.håndter(oppgaveOpprettet)
     }
 }

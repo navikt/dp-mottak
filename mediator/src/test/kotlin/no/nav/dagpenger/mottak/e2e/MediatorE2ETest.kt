@@ -63,6 +63,25 @@ internal class MediatorE2ETest {
     }
 
     @Test
+    fun `Skal motta hendelser om gjennopptak og sende ut behov`() {
+        håndterHendelse(joarkMelding())
+        assertBehov("Journalpost", 0)
+        håndterHendelse(journalpostMottattHendelse(brevkode = "NAV 04-16.03"))
+        assertBehov("Persondata", 1)
+        håndterHendelse(persondataMottattHendelse())
+        assertBehov("Søknadsdata", 2)
+        håndterHendelse(søknadsdataMottakHendelse())
+        assertBehov("OpprettVurderhenvendelseOppgave", 3)
+        håndterHendelse(opprettOpprettVurderhenvendelseHendelse())
+        assertBehov("OppdaterJournalpost", 4)
+        håndterHendelse(oppdatertJournalpostMotattHendelse())
+        assertBehov("FerdigstillJournalpost", 5)
+        håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+        assertTrue(testRapid.inspektør.size == 6, "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}")
+        assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+    }
+
+    @Test
     fun `Skal motta hendelser som fører til manuell behandling og sende ut behov`() {
         håndterHendelse(joarkMelding())
         assertBehov("Journalpost", 0)
@@ -71,7 +90,6 @@ internal class MediatorE2ETest {
         håndterHendelse(persondataMottattHendelse())
         assertBehov("OpprettGosysoppgave", 2)
         håndterHendelse(gosysOppgaveOpprettetHendelse())
-        // todo: OpprettGosysoppgave behovløser
 
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
     }
@@ -234,6 +252,25 @@ internal class MediatorE2ETest {
           "journalpostId": "$journalpostId",
           "@løsning": {
             "OpprettStartVedtakOppgave": {
+              "fagsakId": "12345",
+              "oppgaveId": "12345678"
+            }
+          }
+        }
+        """.trimIndent()
+
+    //language=JSON
+    private fun opprettOpprettVurderhenvendelseHendelse(): String =
+        """{
+          "@event_name": "behov",
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "OpprettVurderhenvendelseOppgave"
+          ],
+          "@opprettet" : "${now()}",
+          "journalpostId": "$journalpostId",
+          "@løsning": {
+            "OpprettVurderhenvendelseOppgave": {
               "fagsakId": "12345",
               "oppgaveId": "12345678"
             }

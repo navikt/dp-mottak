@@ -10,6 +10,7 @@ import no.nav.helse.rapids_rivers.asLocalDateTime
 
 internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: RapidsConnection) {
 
+    // todo: OpprettVurderhenvendelseOppgave
     init {
         EksisterendeSakerLøser(arenaOppslag, rapidsConnection)
         OpprettStartVedtakOppgaveLøser(arenaOppslag, rapidsConnection)
