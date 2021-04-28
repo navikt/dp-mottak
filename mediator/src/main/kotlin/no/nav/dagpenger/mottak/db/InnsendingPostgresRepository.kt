@@ -353,7 +353,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                 queryOf( //language=PostgreSQL
                     """
                             INSERT INTO aktivitetslogg_v1(id, data) 
-                            VALUES (:id, :data)
+                            VALUES (:id, :data) ON CONFLICT(id) DO UPDATE SET data=:data 
                     """.trimIndent(),
                     mapOf(
                         "id" to internId,

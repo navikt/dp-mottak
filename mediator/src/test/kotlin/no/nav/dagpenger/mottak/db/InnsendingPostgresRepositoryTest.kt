@@ -113,22 +113,29 @@ internal class InnsendingPostgresRepositoryTest {
     fun `håndterer ny lagring av aktivitetslogg`() {
         val innsending = innsendingData.createInnsending()
         val nyLogg = innsendingData.aktivitetslogg.aktiviteter.toMutableList().also {
-            it.add(            InnsendingData.AktivitetsloggData.AktivitetData(
-                alvorlighetsgrad = InnsendingData.AktivitetsloggData.Alvorlighetsgrad.INFO,
-                label = 'N',
-                melding = "NY TEST",
-                tidsstempel = LocalDateTime.now().toString(),
-                detaljer = mapOf("detaljVariabel" to "tt"),
-                kontekster = listOf(
-                    InnsendingData.AktivitetsloggData.SpesifikkKontekstData(
-                        kontekstType = "TEST",
-                        kontekstMap = mapOf("kontekstVariabel" to "foo")
-                    )
-                ),
-                behovtype = null
-            ))
+            it.add(
+                InnsendingData.AktivitetsloggData.AktivitetData(
+                    alvorlighetsgrad = InnsendingData.AktivitetsloggData.Alvorlighetsgrad.INFO,
+                    label = 'N',
+                    melding = "NY TEST",
+                    tidsstempel = LocalDateTime.now().toString(),
+                    detaljer = mapOf("detaljVariabel" to "tt"),
+                    kontekster = listOf(
+                        InnsendingData.AktivitetsloggData.SpesifikkKontekstData(
+                            kontekstType = "TEST",
+                            kontekstMap = mapOf("kontekstVariabel" to "foo")
+                        )
+                    ),
+                    behovtype = null
+                )
+            )
         }
-        val innsending2 = innsendingData.copy(aktivitetslogg= InnsendingData.AktivitetsloggData(nyLogg.toList())).createInnsending()
+        val innsending2 = innsendingData.copy(
+            aktivitetslogg = InnsendingData.AktivitetsloggData(nyLogg.toList()),
+            tilstand = InnsendingData.TilstandData(
+                InnsendingData.TilstandData.InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType,
+            )
+        ).createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
                 lagre(innsending).also {
@@ -140,30 +147,29 @@ internal class InnsendingPostgresRepositoryTest {
                 }
 
                 hent(innsending.journalpostId()).also {
-                    assertDeepEquals(it,innsending2)
+                    assertDeepEquals(it, innsending2)
                 }
             }
         }
     }
 
-
     @Test
-    fun `Skriver ikke over immutable verdier`() {
+    fun `Dobbelagrer ikke verider som skal være unike`() {
         val innsending = innsendingData.createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
                 lagre(innsending)
                 lagre(innsending).also {
-                    assertAntallRader("soknad_v1",1)
-                    assertAntallRader("innsending_oppfyller_minsteinntekt_v1",1)
+                    assertAntallRader("soknad_v1", 1)
+                    assertAntallRader("innsending_oppfyller_minsteinntekt_v1", 1)
                     assertAntallRader("innsending_eksisterende_arena_saker_v1", 1)
-                    assertAntallRader("person_innsending_v1",1)
-                    assertAntallRader("aktivitetslogg_v1",1)
-                    assertAntallRader("arenasak_v1",1)
-                    assertAntallRader("journalpost_v1",1)
-                    assertAntallRader("journalpost_dokumenter_v1",2)
-                    assertAntallRader("person_v1",1)
-                    assertAntallRader("person_innsending_v1",1)
+                    assertAntallRader("person_innsending_v1", 1)
+                    assertAntallRader("aktivitetslogg_v1", 1)
+                    assertAntallRader("arenasak_v1", 1)
+                    assertAntallRader("journalpost_v1", 1)
+                    assertAntallRader("journalpost_dokumenter_v1", 2)
+                    assertAntallRader("person_v1", 1)
+                    assertAntallRader("person_innsending_v1", 1)
                 }
             }
 
@@ -187,7 +193,7 @@ internal class InnsendingPostgresRepositoryTest {
                 assertAntallRader("person_v1", 1)
                 assertAntallRader("person_innsending_v1", 2)
                 assertAntallRader("innsending_v1", 2)
-                assertAntallRader("soknad_v1",2)
+                assertAntallRader("soknad_v1", 2)
             }
         }
     }
@@ -202,6 +208,4 @@ internal class InnsendingPostgresRepositoryTest {
         }
         assertEquals(anntallRader, faktiskeRader, "Feil anntal rader for tabell: $tabell")
     }
-
-
 }

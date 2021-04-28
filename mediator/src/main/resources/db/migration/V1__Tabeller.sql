@@ -69,6 +69,6 @@ CREATE TABLE IF NOT EXISTS person_innsending_v1
 
 CREATE TABLE IF NOT EXISTS aktivitetslogg_v1
 (
-    id   BIGINT REFERENCES innsending_v1,
+    id   BIGINT PRIMARY KEY REFERENCES innsending_v1,
     data JSONB NOT NULL
 );
