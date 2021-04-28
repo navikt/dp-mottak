@@ -26,7 +26,6 @@ data class InnsendingData(
         return Innsending::class.primaryConstructor!!
             .apply { isAccessible = true }
             .call(
-                id,
                 journalpostId,
                 tilstand.createTilstand(),
                 journalpostData?.let {

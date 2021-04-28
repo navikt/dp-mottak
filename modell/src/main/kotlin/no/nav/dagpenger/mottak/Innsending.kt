@@ -6,15 +6,16 @@ import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
 import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
+import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
+import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import java.time.Duration
 
 class Innsending private constructor(
-    private val id: Long,
     private val journalpostId: String,
     private var tilstand: Tilstand,
     private var journalpost: no.nav.dagpenger.mottak.meldinger.Journalpost?,
@@ -29,10 +30,8 @@ class Innsending private constructor(
     private val observers = mutableSetOf<InnsendingObserver>()
 
     constructor(
-        id: Long = 0,
         journalpostId: String
     ) : this(
-        id = id,
         journalpostId = journalpostId,
         tilstand = Mottatt,
         journalpost = null,

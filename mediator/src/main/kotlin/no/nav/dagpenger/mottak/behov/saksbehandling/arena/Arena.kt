@@ -26,7 +26,7 @@ interface ArenaOppslag {
         beskrivelse: String,
         tilleggsinformasjon: String,
         registrertDato: LocalDateTime,
-        journalpostId:String
+        journalpostId: String
     ): Map<String, String>
 }
 
@@ -98,9 +98,9 @@ private data class OpprettVedtakOppgaveRequest(
 
 private data class OpprettVedtakOppgaveResponse(
     val fagsakId: String,
-    val oppgaveId:String
-){
-    fun map(journalpostId: String)= mapOf(
+    val oppgaveId: String
+) {
+    fun map(journalpostId: String) = mapOf(
         "fagsakId" to fagsakId,
         "oppgaveId" to oppgaveId,
         "journalpostId" to journalpostId

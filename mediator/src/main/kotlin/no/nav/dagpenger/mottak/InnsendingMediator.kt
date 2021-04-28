@@ -15,6 +15,7 @@ import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import no.nav.helse.rapids_rivers.RapidsConnection
 
+private val log = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 
 internal class InnsendingMediator(
@@ -95,10 +96,26 @@ internal class InnsendingMediator(
     }
 
     private fun håndter(hendelse: Hendelse, handler: (Innsending) -> Unit) {
-        innsendingRepository.hent(hendelse.journalpostId()).also { innsending ->
+        innsending(hendelse).also { innsending ->
             observatører.forEach { innsending.addObserver(it) }
             handler(innsending)
             finalize(innsending, hendelse)
+        }
+    }
+
+    private fun innsending(hendelse: Hendelse): Innsending {
+        val innsending = innsendingRepository.hent(hendelse.journalpostId())
+        return when (innsending) {
+            is Innsending -> {
+                log.info { "Fant Innsending" }
+                sikkerlogg.info { "Fant Innsending for ${hendelse.journalpostId()}" }
+                innsending
+            }
+            else -> {
+                val innsending = Innsending(hendelse.journalpostId())
+                innsendingRepository.lagre(innsending)
+                return innsending
+            }
         }
     }
 

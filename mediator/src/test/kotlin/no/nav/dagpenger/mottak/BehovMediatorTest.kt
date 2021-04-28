@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.time.LocalDateTime
 import java.util.UUID
-import kotlin.random.Random.Default.nextLong
 
 internal class BehovMediatorTest {
     private companion object {
@@ -26,7 +25,7 @@ internal class BehovMediatorTest {
 
     @BeforeEach
     fun setup() {
-        innsending = Innsending(nextLong(), journalpostId = journalpostId)
+        innsending = Innsending(journalpostId = journalpostId)
         aktivitetslogg = Aktivitetslogg()
         behovMediator = BehovMediator(
             rapidsConnection = testRapid,

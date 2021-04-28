@@ -16,17 +16,17 @@ internal class InnsendingPostgresRepositoryTest {
     private val fnr = "12345678910"
     private val registrertdato = LocalDateTime.now()
     private val dokumenter = listOf(
-       DokumentInfoData(
-           tittel = "Fin tittel",
-           brevkode = "NAV 04-01.03",
-           dokumentInfoId = "12345678"
-       ),
-       DokumentInfoData(
-           tittel = "Annen Fin tittel",
-           brevkode = "NAV 04-01.03",
-           dokumentInfoId = "123456567"
-       )
-   )
+        DokumentInfoData(
+            tittel = "Fin tittel",
+            brevkode = "NAV 04-01.03",
+            dokumentInfoId = "12345678"
+        ),
+        DokumentInfoData(
+            tittel = "Annen Fin tittel",
+            brevkode = "NAV 04-01.03",
+            dokumentInfoId = "123456567"
+        )
+    )
 
     private val aktivitetsloggData = InnsendingData.AktivitetsloggData(
         listOf(

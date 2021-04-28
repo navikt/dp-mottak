@@ -2,23 +2,27 @@ package no.nav.dagpenger.mottak.e2e
 
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.InnsendingTilstandType
-import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
+import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
+import no.nav.dagpenger.mottak.db.PostgresTestHelper
+import no.nav.dagpenger.mottak.db.runMigration
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime.now
 import java.util.UUID
+import kotlin.random.Random
 
 internal class MediatorE2ETest {
 
-    private companion object {
-        val JOURNALPOST_ID = 124567
-    }
+    var journalpostId: Long = 0L
 
     private val testRapid = TestRapid()
-    private val innsendingRepository = InMemoryInnsendingRepository()
+    private val innsendingRepository = InnsendingPostgresRepository(datasource = PostgresTestHelper.dataSource).also {
+        runMigration(PostgresTestHelper.dataSource)
+    }
     private val testObservatør = TestObservatør()
     private val innsendingMediator = InnsendingMediator(
         innsendingRepository = innsendingRepository,
@@ -28,6 +32,11 @@ internal class MediatorE2ETest {
 
     init {
         MottakMediator(innsendingMediator, testRapid)
+    }
+
+    @BeforeEach
+    fun setup() {
+        journalpostId = Random.nextLong()
     }
 
     @Test
@@ -71,7 +80,7 @@ internal class MediatorE2ETest {
         assertTrue(testRapid.inspektør.size == indexPåMelding + 1, "Ingen melding på index $indexPåMelding")
         testRapid.inspektør.message(indexPåMelding).also { jsonNode ->
             assertEquals(expectedBehov, jsonNode["@behov"].map { it.asText() }.first())
-            assertEquals(JOURNALPOST_ID.toString(), jsonNode["journalpostId"].asText())
+            assertEquals(journalpostId.toString(), jsonNode["journalpostId"].asText())
         }
     }
 
@@ -88,10 +97,10 @@ internal class MediatorE2ETest {
             "Journalpost"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$JOURNALPOST_ID",
+          "journalpostId": "$journalpostId",
           "@løsning": {
             "Journalpost": {
-                "id" : "$JOURNALPOST_ID",
+                "id" : "$journalpostId",
                 "bruker" : {
                   "id": "12345678901",
                   "type": "FNR"
@@ -129,7 +138,7 @@ internal class MediatorE2ETest {
             "Persondata"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$JOURNALPOST_ID",
+          "journalpostId": "$journalpostId",
           "@løsning": {
             "Persondata": {
               "aktørId": "tadda",
@@ -147,7 +156,7 @@ internal class MediatorE2ETest {
           "hendelsesId": "",
           "versjon": "",
           "hendelsesType": "",
-          "journalpostId": "$JOURNALPOST_ID",
+          "journalpostId": "$journalpostId",
           "journalpostStatus": "Mottatt",
           "temaGammelt": "DAG",
           "temaNytt": "DAG",
@@ -165,7 +174,7 @@ internal class MediatorE2ETest {
             "Søknadsdata"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$JOURNALPOST_ID",
+          "journalpostId": "$journalpostId",
           "@løsning": {
             "Søknadsdata": {
                  "brukerBehandlingId": "blabla",
@@ -186,7 +195,7 @@ internal class MediatorE2ETest {
             "MinsteinntektVurdering"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$JOURNALPOST_ID",
+          "journalpostId": "$journalpostId",
           "@løsning": {
             "MinsteinntektVurdering": {
               "oppfyllerMinsteArbeidsinntekt": null
@@ -204,7 +213,7 @@ internal class MediatorE2ETest {
             "MinsteinntektVurdering"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$JOURNALPOST_ID",
+          "journalpostId": "$journalpostId",
           "@løsning": {
             "EksisterendeSaker": {
               "harEksisterendeSak": false
@@ -222,7 +231,7 @@ internal class MediatorE2ETest {
             "OpprettStartVedtakOppgave"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$JOURNALPOST_ID",
+          "journalpostId": "$journalpostId",
           "@løsning": {
             "OpprettStartVedtakOppgave": {
               "fagsakId": "12345",
@@ -241,10 +250,10 @@ internal class MediatorE2ETest {
             "OppdaterJournalpost"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$JOURNALPOST_ID",
+          "journalpostId": "$journalpostId",
           "@løsning": {
             "OppdaterJournalpost": {
-              "journalpostId": "$JOURNALPOST_ID"
+              "journalpostId": "$journalpostId"
             }
           }
         }
@@ -259,10 +268,10 @@ internal class MediatorE2ETest {
             "FerdigstillJournalpost"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$JOURNALPOST_ID",
+          "journalpostId": "$journalpostId",
           "@løsning": {
             "FerdigstillJournalpost": {
-              "journalpostId": "$JOURNALPOST_ID"
+              "journalpostId": "$journalpostId"
             }
           }
         }
@@ -276,10 +285,10 @@ internal class MediatorE2ETest {
             "OpprettGosysoppgave"
           ],
           "@opprettet" : "${now()}",
-          "journalpostId": "$JOURNALPOST_ID",
+          "journalpostId": "$journalpostId",
           "@løsning": {
             "OpprettGosysoppgave": {
-              "journalpostId": "$JOURNALPOST_ID",
+              "journalpostId": "$journalpostId",
               "oppgaveId": "123456"
             }
           }

@@ -29,7 +29,7 @@ internal class InnsendingDataTest {
     @Test
     fun `Skal lage innsending`() {
         val innsendingData = InnsendingData(
-            ,
+            id = 111L,
             journalpostId = journalpostId,
             tilstand = TilstandData(
                 TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType

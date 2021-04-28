@@ -8,9 +8,9 @@ CREATE TABLE IF NOT EXISTS innsending_v1
 
 CREATE TABLE IF NOT EXISTS arenasak_v1
 (
-    fagsakId  VARCHAR(64) primary key,
-    oppgaveId VARCHAR(64) NOT NULL,
-    id        BIGINT REFERENCES innsending_v1
+    id        BIGINT PRIMARY KEY REFERENCES innsending_v1,
+    fagsakId  VARCHAR(64),
+    oppgaveId VARCHAR(64) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS innsending_oppfyller_minsteinntekt_v1

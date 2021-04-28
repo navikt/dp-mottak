@@ -10,7 +10,7 @@ import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaApiClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
 import no.nav.dagpenger.mottak.behov.vilkårtester.MinsteinntektVurderingLøser
 import no.nav.dagpenger.mottak.behov.vilkårtester.RegelApiProxy
-import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
+import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.clean
 import no.nav.dagpenger.mottak.db.runMigration
 import no.nav.dagpenger.mottak.proxy.proxyPing
@@ -22,7 +22,7 @@ private val logg = KotlinLogging.logger {}
 
 internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.StatusListener {
 
-    private val innsendingRepository = InMemoryInnsendingRepository()
+    private val innsendingRepository = InnsendingPostgresRepository(Config.dataSource)
     private val safClient = SafClient(Config.properties)
     private val regelApiClient = RegelApiProxy(Config.properties)
     private val arenaApiClient = ArenaApiClient(Config.properties)

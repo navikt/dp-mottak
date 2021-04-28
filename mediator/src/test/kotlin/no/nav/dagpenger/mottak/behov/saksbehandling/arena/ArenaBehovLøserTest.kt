@@ -26,14 +26,13 @@ internal class ArenaBehovLøserTest {
                     beskrivelse: String,
                     tilleggsinformasjon: String,
                     registrertDato: LocalDateTime,
-                    journalpostId:String
+                    journalpostId: String
                 ): Map<String, String> {
                     return mapOf(
                         "journalpostId" to journalpostId,
                         "fagsakId" to "123",
                         "oppgaveId" to "123"
                     )
-
                 }
             },
             rapidsConnection = testRapid
@@ -41,7 +40,7 @@ internal class ArenaBehovLøserTest {
     }
 
     @BeforeEach
-    fun `clear rapid`(){
+    fun `clear rapid`() {
         testRapid.reset()
     }
 
@@ -56,7 +55,7 @@ internal class ArenaBehovLøserTest {
     }
 
     @Test
-    fun `Løser OpprettStartVedtakOppgave behov`(){
+    fun `Løser OpprettStartVedtakOppgave behov`() {
         testRapid.sendTestMessage(opprettStartVedtakBehov())
         with(testRapid.inspektør) {
             assertEquals(1, size)
@@ -65,9 +64,7 @@ internal class ArenaBehovLøserTest {
             assertEquals("123", field(0, "@løsning")["OpprettStartVedtakOppgave"]["oppgaveId"].asText())
             assertEquals(JOURNALPOST_ID, field(0, "@løsning")["OpprettStartVedtakOppgave"]["journalpostId"].asText())
         }
-
     }
-
 
     //language=JSON
     private fun eksisterendeSakerBehov(): String =
@@ -101,5 +98,4 @@ internal class ArenaBehovLøserTest {
           "tilleggsinformasjon": "I tillegg til informasjonen kommer det noen ganger tileggsinformasjon"
         }
         """.trimIndent()
-
 }

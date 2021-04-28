@@ -22,7 +22,7 @@ import java.time.LocalDateTime
 import javax.sql.DataSource
 
 internal class InnsendingPostgresRepository(private val datasource: DataSource = Config.dataSource) :
-    InnsendingRepository { 
+    InnsendingRepository {
     //language=PostgresSQL
     val hentDataSql = """
      select innsending.id                             as "internId",
@@ -60,7 +60,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
 
     fun Row.booleanOrNull(columnLabel: String) = this.stringOrNull(columnLabel)?.let { it == "t" }
 
-    override fun hent(journalpostId: String): Innsending =
+    override fun hent(journalpostId: String): Innsending? =
         using(sessionOf(datasource)) { session ->
             session.run(
                 queryOf(
@@ -69,11 +69,11 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                 ).map { row ->
                     InnsendingData(
                         id = row.long("internId"),
-                        journalpostId = row.int("journalpostId").toString(),
+                        journalpostId = row.long("journalpostId").toString(),
                         tilstand = TilstandData(TilstandData.InnsendingTilstandTypeData.valueOf(row.string("tilstand"))),
                         journalpostData = row.localDateTimeOrNull("registrertDato")?.let {
                             InnsendingData.JournalpostData(
-                                journalpostId = row.int("journalpostId").toString(),
+                                journalpostId = row.long("journalpostId").toString(),
                                 bruker = row.stringOrNull("brukerType")?.let { type ->
                                     BrukerData(BrukerTypeData.valueOf(type), row.string("brukerId"))
                                 },
@@ -112,14 +112,15 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                 }.asSingle
             )?.let {
                 val dokumenter = session.run(
-                    queryOf(//language=PostgreSQL
+                    queryOf( //language=PostgreSQL
                         """
                             SELECT 
                             brevkode,
                             tittel,
                             dokumentinfoid
                             FROM journalpost_dokumenter_v1 WHERE id = :internId
-                        """.trimIndent(), mapOf(
+                        """.trimIndent(),
+                        mapOf(
                             "internId" to it.id
                         )
 
@@ -134,16 +135,17 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
 
                 it.copy(journalpostData = it.journalpostData?.copy(dokumenter = dokumenter)).createInnsending()
             }
-        } ?: throw IllegalArgumentException("Kunne ikke finnne innsending med id $journalpostId")
+        }
 
     override fun lagre(innsending: Innsending): Int {
 
         val internId: Long = using(sessionOf(datasource)) { session ->
             session.run(
-                queryOf(//language=PostgreSQL
+                queryOf( //language=PostgreSQL
                     """ 
                         SELECT id from innsending_v1 where journalpostid = :journalpostId
-                    """.trimIndent(), mapOf("journalpostId" to innsending.journalpostId().toLong())
+                    """.trimIndent(),
+                    mapOf("journalpostId" to innsending.journalpostId().toLong())
                 ).map {
                     it.longOrNull("id")
                 }.asSingle
@@ -167,7 +169,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             internId = using(sessionOf(datasource)) { session ->
                 session.transaction {
                     it.run(
-                        queryOf(//language=Postgresql
+                        queryOf( //language=Postgresql
                             "INSERT INTO innsending_v1(journalpostId,tilstand) VALUES(:jpId, :tilstand) RETURNING id",
                             mapOf(
                                 "jpId" to innsending.journalpostId().toLong(),
@@ -206,24 +208,28 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         }
 
         override fun visitInnsending(oppfyllerMinsteArbeidsinntekt: Boolean?, eksisterendeSaker: Boolean?) {
-            lagreQueries.add(
-                queryOf( //language=PostgreSQL
-                    "INSERT INTO innsending_oppfyller_minsteinntekt_v1(id,verdi) VALUES (:id, :verdi)",
-                    mapOf(
-                        "id" to internId,
-                        "verdi" to oppfyllerMinsteArbeidsinntekt
+            oppfyllerMinsteArbeidsinntekt?.let {
+                lagreQueries.add(
+                    queryOf( //language=PostgreSQL
+                        "INSERT INTO innsending_oppfyller_minsteinntekt_v1(id,verdi) VALUES (:id, :verdi)",
+                        mapOf(
+                            "id" to internId,
+                            "verdi" to it
+                        )
                     )
                 )
-            )
-            lagreQueries.add(
-                queryOf( //language=PostgreSQL
-                    "INSERT INTO innsending_eksisterende_arena_saker_v1(id,verdi) VALUES (:id, :verdi)",
-                    mapOf(
-                        "id" to internId,
-                        "verdi" to eksisterendeSaker
+            }
+            eksisterendeSaker?.let {
+                lagreQueries.add(
+                    queryOf( //language=PostgreSQL
+                        "INSERT INTO innsending_eksisterende_arena_saker_v1(id,verdi) VALUES (:id, :verdi)",
+                        mapOf(
+                            "id" to internId,
+                            "verdi" to it
+                        )
                     )
                 )
-            )
+            }
         }
 
         override fun visitJournalpost(
@@ -236,7 +242,11 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         ) {
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
-                    "INSERT INTO journalpost_v1(id,status, brukerId,brukerType,behandlingstema,registrertDato) VALUES(:id, :status,:brukerId, :brukerType, :behandlingstema,:registrertDato)",
+                    """
+                        INSERT INTO journalpost_v1(id,status, brukerId,brukerType,behandlingstema,registrertDato) 
+                        VALUES(:id, :status,:brukerId, :brukerType, :behandlingstema,:registrertDato)
+                        ON CONFLICT(id) DO NOTHING 
+                    """.trimIndent(),
                     mapOf(
                         "id" to internId,
                         "status" to journalpostStatus,
@@ -253,7 +263,11 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             if (dokumentliste.isNotEmpty()) {
                 lagreQueries.add(
                     queryOf( //language=PostgreSQL
-                        "INSERT INTO journalpost_dokumenter_v1(id,tittel,dokumentInfoId,brevkode) VALUES $dokumentliste"
+                        """
+                            INSERT INTO journalpost_dokumenter_v1(id,tittel,dokumentInfoId,brevkode) 
+                            VALUES $dokumentliste
+                             
+                        """.trimIndent()
                     )
                 )
             }
@@ -303,8 +317,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         override fun visitArenaSak(oppgaveId: String, fagsakId: String) {
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
-                    """INSERT INTO arenasak_v1(fagsakId, oppgaveId, id)
-VALUES (:fagsakId, :oppgaveId, :id) 
+                    """
+                        INSERT INTO arenasak_v1(fagsakId, oppgaveId, id) VALUES (:fagsakId, :oppgaveId, :id) 
+                        ON CONFLICT(id) DO NOTHING 
                         """,
                     mapOf(
                         "id" to internId,
