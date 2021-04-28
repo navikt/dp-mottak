@@ -110,7 +110,44 @@ internal class InnsendingPostgresRepositoryTest {
     }
 
     @Test
-    fun `håndtere flere innsendinger for samme person`() {
+    fun `håndterer ny lagring av aktivitetslogg`() {
+        val innsending = innsendingData.createInnsending()
+        val nyLogg = innsendingData.aktivitetslogg.aktiviteter.toMutableList().also {
+            it.add(            InnsendingData.AktivitetsloggData.AktivitetData(
+                alvorlighetsgrad = InnsendingData.AktivitetsloggData.Alvorlighetsgrad.INFO,
+                label = 'N',
+                melding = "NY TEST",
+                tidsstempel = LocalDateTime.now().toString(),
+                detaljer = mapOf("detaljVariabel" to "tt"),
+                kontekster = listOf(
+                    InnsendingData.AktivitetsloggData.SpesifikkKontekstData(
+                        kontekstType = "TEST",
+                        kontekstMap = mapOf("kontekstVariabel" to "foo")
+                    )
+                ),
+                behovtype = null
+            ))
+        }
+        val innsending2 = innsendingData.copy(aktivitetslogg= InnsendingData.AktivitetsloggData(nyLogg.toList())).createInnsending()
+        withMigratedDb {
+            with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
+                lagre(innsending).also {
+                    assertTrue(it > 0, "lagring av innsending feilet")
+                }
+
+                lagre(innsending2).also {
+                    assertTrue(it > 0, "lagring av innsending feilet")
+                }
+
+                hent(innsending.journalpostId()).also {
+                    assertDeepEquals(it,innsending2)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `håndterer flere innsendinger for samme person`() {
         val innsending = innsendingData.createInnsending()
         val innsending2 = innsendingData.copy(journalpostId = "287689").createInnsending()
         withMigratedDb {
@@ -140,4 +177,6 @@ internal class InnsendingPostgresRepositoryTest {
         }
         assertEquals(anntallRader, faktiskeRader, "Feil anntal rader for tabell: $tabell")
     }
+
+
 }

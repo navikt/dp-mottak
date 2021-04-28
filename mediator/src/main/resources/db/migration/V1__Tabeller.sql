@@ -42,7 +42,8 @@ CREATE TABLE IF NOT EXISTS journalpost_dokumenter_v1
     id             BIGINT REFERENCES journalpost_v1,
     tittel         VARCHAR(50) NOT NULL,
     dokumentInfoId BIGINT      NOT NULL,
-    brevkode       VARCHAR(20) NOT NULL
+    brevkode       VARCHAR(20) NOT NULL,
+    PRIMARY KEY(dokumentInfoId,id,brevkode)
 );
 
 CREATE TABLE IF NOT EXISTS soknad_v1

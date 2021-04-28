@@ -266,7 +266,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                     queryOf( //language=PostgreSQL
                         """
                             INSERT INTO journalpost_dokumenter_v1(id,tittel,dokumentInfoId,brevkode) 
-                            VALUES $dokumentliste
+                            VALUES $dokumentliste ON CONFLICT DO NOTHING
                              
                         """.trimIndent()
                     )
