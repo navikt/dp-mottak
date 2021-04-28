@@ -1,10 +1,14 @@
 package no.nav.dagpenger.mottak.db
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import kotliquery.queryOf
+import kotliquery.sessionOf
+import kotliquery.using
 import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
 import no.nav.dagpenger.mottak.helpers.assertDeepEquals
 import no.nav.dagpenger.mottak.serder.InnsendingData
 import no.nav.dagpenger.mottak.serder.InnsendingData.JournalpostData.DokumentInfoData
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -47,6 +51,7 @@ internal class InnsendingPostgresRepositoryTest {
         )
 
     )
+
     //language=JSON
     private val søknadsjson = jacksonObjectMapper().readTree(
         """
@@ -102,5 +107,37 @@ internal class InnsendingPostgresRepositoryTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun `håndtere flere innsendinger for samme person`() {
+        val innsending = innsendingData.createInnsending()
+        val innsending2 = innsendingData.copy(journalpostId = "287689").createInnsending()
+        withMigratedDb {
+            with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
+                lagre(innsending).also {
+                    assertTrue(it > 0, "lagring av innsending feilet")
+                }
+
+                lagre(innsending2).also {
+                    assertTrue(it > 0, "lagring av innsending feilet")
+                }
+
+                assertAnntallRader("person_v1", 1)
+                assertAnntallRader("person_innsending_v1", 2)
+                assertAnntallRader("innsending_v1", 2)
+            }
+        }
+    }
+
+    private fun assertAnntallRader(tabell: String, anntallRader: Int) {
+        val faktiskeRader = using(sessionOf(PostgresTestHelper.dataSource)) { session ->
+            session.run(
+                queryOf("select count(1) from $tabell").map { row ->
+                    row.int(1)
+                }.asSingle
+            )
+        }
+        assertEquals(anntallRader, faktiskeRader, "Feil anntal rader for tabell: $tabell")
     }
 }

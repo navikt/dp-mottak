@@ -17,13 +17,14 @@ import no.nav.dagpenger.mottak.serder.InnsendingData.JournalpostData.BrukerData
 import no.nav.dagpenger.mottak.serder.InnsendingData.JournalpostData.BrukerTypeData
 import no.nav.dagpenger.mottak.serder.InnsendingData.TilstandData
 import no.nav.dagpenger.mottak.toMap
+import org.intellij.lang.annotations.Language
 import org.postgresql.util.PGobject
 import java.time.LocalDateTime
 import javax.sql.DataSource
 
 internal class InnsendingPostgresRepository(private val datasource: DataSource = Config.dataSource) :
     InnsendingRepository {
-    //language=PostgresSQL
+    @Language("PostgreSQL")
     val hentDataSql = """
      select innsending.id                             as "internId",
             innsending.journalpostid                  as "journalpostId",
@@ -299,10 +300,27 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
 
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
-                    """WITH inserted_id as 
-                        (INSERT INTO person_v1(fødselsnummer,aktørId) VALUES(:fnr,:aktoerId) RETURNING id)
+                    """
+                       INSERT INTO person_v1(fødselsnummer,aktørId)
+                        VALUES(:fnr,:aktoerId) 
+                        ON CONFLICT DO NOTHING
+                        """.trimMargin(),
+                    mapOf(
+                        "id" to internId,
+                        "fnr" to fødselsnummer,
+                        "aktoerId" to aktørId,
+                    )
+                )
+            )
+
+            lagreQueries.add(
+                queryOf( //language=PostgreSQL
+                    """
                         INSERT INTO person_innsending_v1(id,personId,norsktilknytning,diskresjonskode) 
-                        SELECT :id, id, :norskTilknytning, :diskresjonskode  from inserted_id""".trimMargin(),
+                        SELECT :id, id, :norskTilknytning, :diskresjonskode
+                        FROM public.person_v1 WHERE fødselsnummer = :fnr 
+                        AND aktørid = :aktoerId ON CONFLICT DO NOTHING 
+                        """.trimMargin(),
                     mapOf(
                         "id" to internId,
                         "fnr" to fødselsnummer,

@@ -54,13 +54,13 @@ CREATE TABLE IF NOT EXISTS soknad_v1
 CREATE TABLE IF NOT EXISTS person_v1
 (
     id            BIGSERIAL PRIMARY KEY,
-    fødselsnummer VARCHAR(11) NOT NULL,
-    aktørId       VARCHAR(32) NOT NULL
+    fødselsnummer VARCHAR(11) UNIQUE NOT NULL,
+    aktørId       VARCHAR(32) UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS person_innsending_v1
 (
-    id               BIGINT REFERENCES innsending_v1,
+    id               BIGINT PRIMARY KEY REFERENCES innsending_v1,
     personId         BIGSERIAL REFERENCES person_v1 (id),
     norsktilknytning BOOLEAN NOT NULL,
     diskresjonskode  BOOLEAN NOT NULL
