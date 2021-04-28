@@ -172,7 +172,6 @@ internal class InnsendingPostgresRepositoryTest {
                     assertAntallRader("person_innsending_v1", 1)
                 }
             }
-
         }
     }
 

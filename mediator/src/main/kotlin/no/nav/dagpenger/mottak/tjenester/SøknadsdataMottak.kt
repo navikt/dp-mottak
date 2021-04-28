@@ -21,7 +21,6 @@ internal class SøknadsdataMottak(
     private val løsning = "@løsning.${Behovtype.Søknadsdata.name}"
 
     init {
-
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }

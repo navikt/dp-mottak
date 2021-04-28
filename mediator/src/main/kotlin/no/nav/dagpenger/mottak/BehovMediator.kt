@@ -45,9 +45,9 @@ class BehovMediator(
                     }
                 }
                 .let { JsonMessage.newMessage(it) }
-                .also {
-                    sikkerLogg.info { "Sender $id som ${it.toJson()}" }
-                    rapidsConnection.publish(hendelse.journalpostId(), it.toJson())
+                .also { message ->
+                    sikkerLogg.info { "Sender $id som ${message.toJson()}" }
+                    rapidsConnection.publish(hendelse.journalpostId(), message.toJson())
                     logg.info { "Sender behov ${behovsliste.joinToString { it }}" }
                 }
         }
