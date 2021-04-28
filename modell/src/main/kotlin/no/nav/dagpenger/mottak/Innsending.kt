@@ -14,6 +14,7 @@ import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import java.time.Duration
 
 class Innsending private constructor(
+    private val id: Long,
     private val journalpostId: String,
     private var tilstand: Tilstand,
     private var journalpost: no.nav.dagpenger.mottak.meldinger.Journalpost?,
@@ -28,8 +29,10 @@ class Innsending private constructor(
     private val observers = mutableSetOf<InnsendingObserver>()
 
     constructor(
+        id: Long = 0,
         journalpostId: String
     ) : this(
+        id = id,
         journalpostId = journalpostId,
         tilstand = Mottatt,
         journalpost = null,

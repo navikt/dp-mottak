@@ -29,6 +29,7 @@ internal class InnsendingDataTest {
     @Test
     fun `Skal lage innsending`() {
         val innsendingData = InnsendingData(
+            ,
             journalpostId = journalpostId,
             tilstand = TilstandData(
                 TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType
@@ -43,19 +44,19 @@ internal class InnsendingDataTest {
             ),
             oppfyllerMinsteArbeidsinntekt = true,
             eksisterendeSaker = false,
-            arenaSakData = ArenaSakData(
-                oppgaveId = "123487",
-                fagsakId = "129678"
-            ),
-            søknadsData = søknadsjson,
-            aktivitetslogg = AktivitetsloggData(emptyList()),
             personData = PersonData(
                 fødselsnummer = fnr,
                 aktørId = "345678",
                 norskTilknytning = true,
                 // TODO: wattudu med diskresjonskoder(egen ansatt, 6 og 7)
                 diskresjonskode = false
-            )
+            ),
+            arenaSakData = ArenaSakData(
+                oppgaveId = "123487",
+                fagsakId = "129678"
+            ),
+            søknadsData = søknadsjson,
+            aktivitetslogg = AktivitetsloggData(emptyList())
         )
 
         innsendingData.createInnsending().also {

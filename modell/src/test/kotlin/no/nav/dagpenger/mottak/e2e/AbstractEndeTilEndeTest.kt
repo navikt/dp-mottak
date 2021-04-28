@@ -40,7 +40,7 @@ abstract class AbstractEndeTilEndeTest {
 
     @BeforeEach
     internal fun setup() {
-        innsending = Innsending(JOURNALPOST_ID)
+        innsending = Innsending(, JOURNALPOST_ID)
         observatør = TestObservatør().also {
             innsending.addObserver(it)
         }

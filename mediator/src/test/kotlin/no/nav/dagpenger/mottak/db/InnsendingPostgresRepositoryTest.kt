@@ -57,6 +57,7 @@ internal class InnsendingPostgresRepositoryTest {
     )
 
     val innsendingData = InnsendingData(
+        id = 1,
         journalpostId = journalpostId,
         tilstand = InnsendingData.TilstandData(
             InnsendingData.TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType,
@@ -71,19 +72,19 @@ internal class InnsendingPostgresRepositoryTest {
         ),
         oppfyllerMinsteArbeidsinntekt = true,
         eksisterendeSaker = false,
-        arenaSakData = InnsendingData.ArenaSakData(
-            oppgaveId = "123487",
-            fagsakId = "129678"
-        ),
-        søknadsData = søknadsjson,
-        aktivitetslogg = aktivitetsloggData,
         personData = InnsendingData.PersonData(
             fødselsnummer = fnr,
             aktørId = "345678",
             norskTilknytning = true,
             // TODO: wattudu med diskresjonskoder(egen ansatt, 6 og 7)
             diskresjonskode = false
-        )
+        ),
+        arenaSakData = InnsendingData.ArenaSakData(
+            oppgaveId = "123487",
+            fagsakId = "129678"
+        ),
+        søknadsData = søknadsjson,
+        aktivitetslogg = aktivitetsloggData
     )
 
     @Test

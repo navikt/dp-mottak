@@ -11,6 +11,7 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 
 data class InnsendingData(
+    val id: Long,
     val journalpostId: String,
     val tilstand: TilstandData,
     val journalpostData: JournalpostData?,
@@ -25,6 +26,7 @@ data class InnsendingData(
         return Innsending::class.primaryConstructor!!
             .apply { isAccessible = true }
             .call(
+                id,
                 journalpostId,
                 tilstand.createTilstand(),
                 journalpostData?.let {

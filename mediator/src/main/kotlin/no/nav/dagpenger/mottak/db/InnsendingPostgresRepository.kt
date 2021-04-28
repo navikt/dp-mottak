@@ -22,9 +22,11 @@ import java.time.LocalDateTime
 import javax.sql.DataSource
 
 internal class InnsendingPostgresRepository(private val datasource: DataSource = Config.dataSource) :
-    InnsendingRepository {
+    InnsendingRepository { 
+    //language=PostgresSQL
     val hentDataSql = """
-     select innsending.journalpostid                  as "journalpostId",
+     select innsending.id                             as "internId",
+            innsending.journalpostid                  as "journalpostId",
             innsending.tilstand                       as "tilstand",
             innsending.opprettet                      as "opprettet",
             journalpost.status                        as "status",
@@ -43,17 +45,17 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             person.aktørid                            as "aktørid",
             aktivitetslogg.data                       as "aktivitetslogg"
      from innsending_v1 as innsending
-              left join journalpost_v1 journalpost on innsending.journalpostid = journalpost.journalpostid
-              left join aktivitetslogg_v1 aktivitetslogg on innsending.journalpostid = aktivitetslogg.journalpostid
-              left join arenasak_v1 arenasak on innsending.journalpostid = arenasak.journalpostid
+              left join journalpost_v1 journalpost on innsending.id = journalpost.id
+              left join aktivitetslogg_v1 aktivitetslogg on innsending.id = aktivitetslogg.id
+              left join arenasak_v1 arenasak on innsending.id = arenasak.id
               left join innsending_eksisterende_arena_saker_v1 innsending_eksisterende_arena_saker
-                        on innsending.journalpostid = innsending_eksisterende_arena_saker.journalpostid
+                        on innsending.id = innsending_eksisterende_arena_saker.id
               left join innsending_oppfyller_minsteinntekt_v1 innsending_oppfyller_minsteinntekt
-                        on innsending.journalpostid = innsending_oppfyller_minsteinntekt.journalpostid
-              left join soknad_v1 soknad on innsending.journalpostid = soknad.journalpostid
-              left join person_innsending_v1 person_innsending on innsending.journalpostid = person_innsending.journalpostid
+                        on innsending.id = innsending_oppfyller_minsteinntekt.id
+              left join soknad_v1 soknad on innsending.id = soknad.id
+              left join person_innsending_v1 person_innsending on innsending.id = person_innsending.id
               left join person_v1 person on person_innsending.personid = person.id
-     where innsending.journalpostid = :jpId;
+     where innsending.journalpostId = :jpId;
     """.trimIndent()
 
     fun Row.booleanOrNull(columnLabel: String) = this.stringOrNull(columnLabel)?.let { it == "t" }
@@ -66,6 +68,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                     mapOf("jpId" to journalpostId.toLong())
                 ).map { row ->
                     InnsendingData(
+                        id = row.long("internId"),
                         journalpostId = row.int("journalpostId").toString(),
                         tilstand = TilstandData(TilstandData.InnsendingTilstandTypeData.valueOf(row.string("tilstand"))),
                         journalpostData = row.localDateTimeOrNull("registrertDato")?.let {
@@ -90,12 +93,6 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                                 diskresjonskode = row.boolean("diskresjonskode")
                             )
                         },
-                        aktivitetslogg = row.binaryStream("aktivitetslogg").use {
-                            JsonMapper.jacksonJsonAdapter.readValue(
-                                it,
-                                InnsendingData.AktivitetsloggData::class.java
-                            )
-                        },
                         arenaSakData = row.stringOrNull("fagsakId")?.let {
                             InnsendingData.ArenaSakData(
                                 oppgaveId = row.string("oppgaveId"),
@@ -104,6 +101,12 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         },
                         søknadsData = row.binaryStreamOrNull("søknadsData")?.use {
                             JsonMapper.jacksonJsonAdapter.readTree(it)
+                        },
+                        aktivitetslogg = row.binaryStream("aktivitetslogg").use {
+                            JsonMapper.jacksonJsonAdapter.readValue(
+                                it,
+                                InnsendingData.AktivitetsloggData::class.java
+                            )
                         }
                     )
                 }.asSingle
@@ -115,9 +118,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                             brevkode,
                             tittel,
                             dokumentinfoid
-                            FROM journalpost_dokumenter_v1 WHERE journalpostid = :journalpostId
+                            FROM journalpost_dokumenter_v1 WHERE id = :internId
                         """.trimIndent(), mapOf(
-                            "journalpostId" to journalpostId.toLong()
+                            "internId" to it.id
                         )
 
                     ).map { row ->
@@ -134,16 +137,54 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         } ?: throw IllegalArgumentException("Kunne ikke finnne innsending med id $journalpostId")
 
     override fun lagre(innsending: Innsending): Int {
-        val visitor = PersistenceVisitor(innsending)
+
+        val internId: Long = using(sessionOf(datasource)) { session ->
+            session.run(
+                queryOf(//language=PostgreSQL
+                    """ 
+                        SELECT id from innsending_v1 where journalpostid = :journalpostId
+                    """.trimIndent(), mapOf("journalpostId" to innsending.journalpostId().toLong())
+                ).map {
+                    it.longOrNull("id")
+                }.asSingle
+            ) ?: NyInnsendingQueryVisiotor(innsending, datasource).internId
+        }
+        val visitor = InnsendingQueryVisitor(innsending, internId)
         return using(sessionOf(datasource)) { session ->
             session.transaction { tx -> visitor.lagreQueries.map { tx.run(it.asUpdate) }.sum() }
         }
     }
 
-    private class PersistenceVisitor(val innsending: Innsending) : InnsendingVisitor {
+    class NyInnsendingQueryVisiotor(private val innsending: Innsending, private val datasource: DataSource) :
+        InnsendingVisitor {
+        var internId: Long = 0
+
+        init {
+            innsending.accept(this)
+        }
+
+        override fun visitTilstand(tilstandType: Innsending.Tilstand) {
+            internId = using(sessionOf(datasource)) { session ->
+                session.transaction {
+                    it.run(
+                        queryOf(//language=Postgresql
+                            "INSERT INTO innsending_v1(journalpostId,tilstand) VALUES(:jpId, :tilstand) RETURNING id",
+                            mapOf(
+                                "jpId" to innsending.journalpostId().toLong(),
+                                "tilstand" to tilstandType.type.name
+                            )
+                        ).map { row ->
+                            row.long("id")
+                        }.asSingle
+                    )
+                }
+            } ?: throw IllegalArgumentException("Feil ved opprettelse av Innsending! Noe er galt")
+        }
+    }
+
+    class InnsendingQueryVisitor(innsending: Innsending, private val internId: Long) : InnsendingVisitor {
 
         val lagreQueries: MutableList<Query> = mutableListOf()
-        private val jpId = innsending.journalpostId().toLong()
 
         init {
             innsending.accept(this)
@@ -152,9 +193,12 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         override fun visitTilstand(tilstandType: Innsending.Tilstand) {
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
-                    "INSERT INTO innsending_v1(journalpostId,tilstand) VALUES(:jpId, :tilstand)",
+                    """
+                        INSERT INTO innsending_v1(id,tilstand) VALUES(:id, :tilstand) 
+                        ON CONFLICT(id) DO UPDATE  set tilstand = :tilstand
+                    """.trimIndent(),
                     mapOf(
-                        "jpId" to jpId,
+                        "id" to internId,
                         "tilstand" to tilstandType.type.name
                     )
                 )
@@ -164,18 +208,18 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         override fun visitInnsending(oppfyllerMinsteArbeidsinntekt: Boolean?, eksisterendeSaker: Boolean?) {
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
-                    "INSERT INTO innsending_oppfyller_minsteinntekt_v1(journalpostId,verdi) VALUES (:jpId, :verdi)",
+                    "INSERT INTO innsending_oppfyller_minsteinntekt_v1(id,verdi) VALUES (:id, :verdi)",
                     mapOf(
-                        "jpId" to jpId,
+                        "id" to internId,
                         "verdi" to oppfyllerMinsteArbeidsinntekt
                     )
                 )
             )
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
-                    "INSERT INTO innsending_eksisterende_arena_saker_v1(journalpostId,verdi) VALUES (:jpId, :verdi)",
+                    "INSERT INTO innsending_eksisterende_arena_saker_v1(id,verdi) VALUES (:id, :verdi)",
                     mapOf(
-                        "jpId" to jpId,
+                        "id" to internId,
                         "verdi" to eksisterendeSaker
                     )
                 )
@@ -192,9 +236,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         ) {
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
-                    "INSERT INTO journalpost_v1(journalpostId,status, brukerId,brukerType,behandlingstema,registrertDato) VALUES(:jpId, :status,:brukerId, :brukerType, :behandlingstema,:registrertDato)",
+                    "INSERT INTO journalpost_v1(id,status, brukerId,brukerType,behandlingstema,registrertDato) VALUES(:id, :status,:brukerId, :brukerType, :behandlingstema,:registrertDato)",
                     mapOf(
-                        "jpId" to jpId,
+                        "id" to internId,
                         "status" to journalpostStatus,
                         "brukerId" to bruker?.id,
                         "brukerType" to bruker?.type?.name,
@@ -204,12 +248,12 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                 )
             )
             val dokumentliste =
-                dokumenter.joinToString { """('$jpId','${it.tittel}','${it.dokumentInfoId}','${it.brevkode}')""" }
+                dokumenter.joinToString { """('$internId','${it.tittel}','${it.dokumentInfoId}','${it.brevkode}')""" }
 
             if (dokumentliste.isNotEmpty()) {
                 lagreQueries.add(
                     queryOf( //language=PostgreSQL
-                        "INSERT INTO journalpost_dokumenter_v1(journalpostId,tittel,dokumentInfoId,brevkode) VALUES $dokumentliste"
+                        "INSERT INTO journalpost_dokumenter_v1(id,tittel,dokumentInfoId,brevkode) VALUES $dokumentliste"
                     )
                 )
             }
@@ -219,9 +263,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             søknad?.let {
                 lagreQueries.add(
                     queryOf( //language=PostgreSQL
-                        "INSERT INTO soknad_v1(journalpostId,data) VALUES(:jpId,:data)",
+                        "INSERT INTO soknad_v1(id,data) VALUES(:id,:data)",
                         mapOf(
-                            "jpId" to jpId,
+                            "id" to internId,
                             "data" to PGobject().apply {
                                 type = "jsonb"
                                 value = it.data.toString()
@@ -243,10 +287,10 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                 queryOf( //language=PostgreSQL
                     """WITH inserted_id as 
                         (INSERT INTO person_v1(fødselsnummer,aktørId) VALUES(:fnr,:aktoerId) RETURNING id)
-                        INSERT INTO person_innsending_v1(journalpostId,personId,norsktilknytning,diskresjonskode) 
-                        SELECT :jpId, id, :norskTilknytning, :diskresjonskode  from inserted_id""".trimMargin(),
+                        INSERT INTO person_innsending_v1(id,personId,norsktilknytning,diskresjonskode) 
+                        SELECT :id, id, :norskTilknytning, :diskresjonskode  from inserted_id""".trimMargin(),
                     mapOf(
-                        "jpId" to jpId,
+                        "id" to internId,
                         "fnr" to fødselsnummer,
                         "aktoerId" to aktørId,
                         "norskTilknytning" to norskTilknytning,
@@ -259,11 +303,11 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         override fun visitArenaSak(oppgaveId: String, fagsakId: String) {
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
-                    """INSERT INTO arenasak_v1(fagsakId, oppgaveId, journalpostId)
-VALUES (:fagsakId, :oppgaveId, :journalpostId) 
+                    """INSERT INTO arenasak_v1(fagsakId, oppgaveId, id)
+VALUES (:fagsakId, :oppgaveId, :id) 
                         """,
                     mapOf(
-                        "journalpostId" to jpId,
+                        "id" to internId,
                         "fagsakId" to fagsakId,
                         "oppgaveId" to oppgaveId
                     )
@@ -275,11 +319,11 @@ VALUES (:fagsakId, :oppgaveId, :journalpostId)
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
                     """
-                            INSERT INTO aktivitetslogg_v1(journalpostId, data) 
-                            VALUES (:journalpostId, :data)
+                            INSERT INTO aktivitetslogg_v1(id, data) 
+                            VALUES (:id, :data)
                     """.trimIndent(),
                     mapOf(
-                        "journalpostId" to jpId,
+                        "id" to internId,
                         "data" to PGobject().apply {
                             type = "jsonb"
                             value = JsonMapper.jacksonJsonAdapter.writeValueAsString(aktivitetslogg.toMap())
