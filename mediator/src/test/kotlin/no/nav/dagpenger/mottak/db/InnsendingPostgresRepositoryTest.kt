@@ -146,6 +146,30 @@ internal class InnsendingPostgresRepositoryTest {
         }
     }
 
+
+    @Test
+    fun `Skriver ikke over immutable verdier`() {
+        val innsending = innsendingData.createInnsending()
+        withMigratedDb {
+            with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
+                lagre(innsending)
+                lagre(innsending).also {
+                    assertAntallRader("soknad_v1",1)
+                    assertAntallRader("innsending_oppfyller_minsteinntekt_v1",1)
+                    assertAntallRader("innsending_eksisterende_arena_saker_v1", 1)
+                    assertAntallRader("person_innsending_v1",1)
+                    assertAntallRader("aktivitetslogg_v1",1)
+                    assertAntallRader("arenasak_v1",1)
+                    assertAntallRader("journalpost_v1",1)
+                    assertAntallRader("journalpost_dokumenter_v1",2)
+                    assertAntallRader("person_v1",1)
+                    assertAntallRader("person_innsending_v1",1)
+                }
+            }
+
+        }
+    }
+
     @Test
     fun `håndterer flere innsendinger for samme person`() {
         val innsending = innsendingData.createInnsending()
@@ -160,14 +184,15 @@ internal class InnsendingPostgresRepositoryTest {
                     assertTrue(it > 0, "lagring av innsending feilet")
                 }
 
-                assertAnntallRader("person_v1", 1)
-                assertAnntallRader("person_innsending_v1", 2)
-                assertAnntallRader("innsending_v1", 2)
+                assertAntallRader("person_v1", 1)
+                assertAntallRader("person_innsending_v1", 2)
+                assertAntallRader("innsending_v1", 2)
+                assertAntallRader("soknad_v1",2)
             }
         }
     }
 
-    private fun assertAnntallRader(tabell: String, anntallRader: Int) {
+    private fun assertAntallRader(tabell: String, anntallRader: Int) {
         val faktiskeRader = using(sessionOf(PostgresTestHelper.dataSource)) { session ->
             session.run(
                 queryOf("select count(1) from $tabell").map { row ->

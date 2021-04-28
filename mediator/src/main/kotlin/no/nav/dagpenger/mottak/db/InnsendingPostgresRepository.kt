@@ -212,7 +212,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             oppfyllerMinsteArbeidsinntekt?.let {
                 lagreQueries.add(
                     queryOf( //language=PostgreSQL
-                        "INSERT INTO innsending_oppfyller_minsteinntekt_v1(id,verdi) VALUES (:id, :verdi)",
+                        "INSERT INTO innsending_oppfyller_minsteinntekt_v1(id,verdi) VALUES (:id, :verdi) ON CONFLICT DO NOTHING ",
                         mapOf(
                             "id" to internId,
                             "verdi" to it
@@ -223,7 +223,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             eksisterendeSaker?.let {
                 lagreQueries.add(
                     queryOf( //language=PostgreSQL
-                        "INSERT INTO innsending_eksisterende_arena_saker_v1(id,verdi) VALUES (:id, :verdi)",
+                        "INSERT INTO innsending_eksisterende_arena_saker_v1(id,verdi) VALUES (:id, :verdi) ON CONFLICT DO NOTHING ",
                         mapOf(
                             "id" to internId,
                             "verdi" to it
@@ -278,7 +278,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             søknad?.let {
                 lagreQueries.add(
                     queryOf( //language=PostgreSQL
-                        "INSERT INTO soknad_v1(id,data) VALUES(:id,:data)",
+                        "INSERT INTO soknad_v1(id,data) VALUES(:id,:data) ON CONFLICT DO NOTHING",
                         mapOf(
                             "id" to internId,
                             "data" to PGobject().apply {

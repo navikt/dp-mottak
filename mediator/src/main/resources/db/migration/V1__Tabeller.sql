@@ -15,14 +15,14 @@ CREATE TABLE IF NOT EXISTS arenasak_v1
 
 CREATE TABLE IF NOT EXISTS innsending_oppfyller_minsteinntekt_v1
 (
-    id    BIGINT REFERENCES innsending_v1,
+    id    BIGINT PRIMARY KEY REFERENCES innsending_v1,
     verdi BOOLEAN NOT NULL
 );
 
 
 CREATE TABLE IF NOT EXISTS innsending_eksisterende_arena_saker_v1
 (
-    id    BIGINT REFERENCES innsending_v1,
+    id    BIGINT PRIMARY KEY REFERENCES innsending_v1,
     verdi BOOLEAN NOT NULL
 );
 
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS journalpost_dokumenter_v1
 
 CREATE TABLE IF NOT EXISTS soknad_v1
 (
-    id   BIGINT REFERENCES innsending_v1,
+    id   BIGINT PRIMARY KEY REFERENCES innsending_v1,
     data JSONB NOT NULL
 );
 
