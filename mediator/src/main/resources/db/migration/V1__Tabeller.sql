@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS person_innsending_v1
     diskresjonskode  BOOLEAN NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS aktivitetslogg
+CREATE TABLE IF NOT EXISTS aktivitetslogg_v1
 (
     journalpostId BIGINT REFERENCES innsending_v1,
     data          JSONB NOT NULL

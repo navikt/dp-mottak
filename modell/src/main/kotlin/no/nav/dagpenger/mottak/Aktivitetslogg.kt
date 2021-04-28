@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak
 
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov
+import no.nav.dagpenger.mottak.serder.AktivitetsloggReflect
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -225,6 +226,8 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
         }
     }
 }
+
+fun Aktivitetslogg.toMap() = AktivitetsloggReflect(this).toMap()
 
 interface IAktivitetslogg {
     fun info(melding: String, vararg params: Any?)
