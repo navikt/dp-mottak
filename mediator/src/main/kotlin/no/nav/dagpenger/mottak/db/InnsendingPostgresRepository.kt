@@ -71,8 +71,8 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         journalpostData = row.localDateTimeOrNull("registrertDato")?.let {
                             InnsendingData.JournalpostData(
                                 journalpostId = row.int("journalpostId").toString(),
-                                bruker = row.stringOrNull("brukerType")?.let {
-                                    BrukerData(BrukerTypeData.valueOf(it), row.string("brukerId"))
+                                bruker = row.stringOrNull("brukerType")?.let { type ->
+                                    BrukerData(BrukerTypeData.valueOf(type), row.string("brukerId"))
                                 },
                                 journalpostStatus = row.string("status"),
                                 behandlingstema = row.stringOrNull("behandlingstema"),
@@ -90,23 +90,46 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                                 diskresjonskode = row.boolean("diskresjonskode")
                             )
                         },
-                        aktivitetslogg = JsonMapper.jacksonJsonAdapter.readValue(
-                            row.binaryStream("aktivitetslogg"),
-                            InnsendingData.AktivitetsloggData::class.java
-                        ),
+                        aktivitetslogg = row.binaryStream("aktivitetslogg").use {
+                            JsonMapper.jacksonJsonAdapter.readValue(
+                                it,
+                                InnsendingData.AktivitetsloggData::class.java
+                            )
+                        },
                         arenaSakData = row.stringOrNull("fagsakId")?.let {
                             InnsendingData.ArenaSakData(
                                 oppgaveId = row.string("oppgaveId"),
                                 fagsakId = it
                             )
                         },
-                        søknadsData = row.stringOrNull("søknadsData")?.let {
+                        søknadsData = row.binaryStreamOrNull("søknadsData")?.use {
                             JsonMapper.jacksonJsonAdapter.readTree(it)
                         }
-                    ).createInnsending()
+                    )
                 }.asSingle
             )?.let {
-                it
+                val dokumenter = session.run(
+                    queryOf(//language=PostgreSQL
+                        """
+                            SELECT 
+                            brevkode,
+                            tittel,
+                            dokumentinfoid
+                            FROM journalpost_dokumenter_v1 WHERE journalpostid = :journalpostId
+                        """.trimIndent(), mapOf(
+                            "journalpostId" to journalpostId.toLong()
+                        )
+
+                    ).map { row ->
+                        InnsendingData.JournalpostData.DokumentInfoData(
+                            brevkode = row.string("brevkode"),
+                            tittel = row.string("tittel"),
+                            dokumentInfoId = row.string("dokumentInfoId")
+                        )
+                    }.asList
+                )
+
+                it.copy(journalpostData = it.journalpostData?.copy(dokumenter = dokumenter)).createInnsending()
             }
         } ?: throw IllegalArgumentException("Kunne ikke finnne innsending med id $journalpostId")
 
