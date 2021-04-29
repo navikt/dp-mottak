@@ -29,7 +29,7 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
 
     private val tokenProvider = config.tokenProvider
 
-    private val baseUrl = "${config.dpProxyUrl()}/proxy/v1/arena/sak/"
+    private val baseUrl = "${config.dpProxyUrl()}/proxy/v1/arena/sak"
     private val proxyArenaClient = HttpClient() {
         install(DefaultRequest) {
             method = HttpMethod.Post
