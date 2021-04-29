@@ -1,7 +1,9 @@
 package no.nav.dagpenger.mottak
 
 import mu.KotlinLogging
+import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApiClient
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
+import no.nav.dagpenger.mottak.behov.journalpost.OppdaterJournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.SafClient
 import no.nav.dagpenger.mottak.behov.journalpost.SøknadsdataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.PdlPersondataOppslag
@@ -26,6 +28,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val safClient = SafClient(Config.properties)
     private val regelApiClient = RegelApiProxy(Config.properties)
     private val arenaApiClient = ArenaApiClient(Config.properties)
+    private val journalpostApiClient = JournalpostApiClient(Config.properties)
 
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
@@ -38,6 +41,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
 
             // Behovløsere
             JournalpostBehovLøser(safClient, this)
+            OppdaterJournalpostBehovLøser(journalpostApiClient, this)
             PersondataBehovLøser(PdlPersondataOppslag(Config.properties), this)
             SøknadsdataBehovLøser(safClient, this)
             MinsteinntektVurderingLøser(regelApiClient, this)

@@ -53,4 +53,3 @@ private fun JsonMessage.bruker(): JournalpostApi.Bruker =
     JournalpostApi.Bruker(
         id = this["fødselsnummer"].asText()
     )
-

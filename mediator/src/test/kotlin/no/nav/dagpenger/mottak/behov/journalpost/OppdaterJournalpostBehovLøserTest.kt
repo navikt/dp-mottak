@@ -36,8 +36,8 @@ internal class OppdaterJournalpostBehovLøserTest {
             assertEquals(1, size)
             assertNotNull(field(0, "@løsning")["OppdaterJournalpost"])
             requireNotNull(mappedRequest).also {
-                assertEquals(fagsakId,it.sak.fagsakId)
-                assertEquals(JournalpostApi.SaksType.FAGSAK,it.sak.saksType)
+                assertEquals(fagsakId, it.sak.fagsakId)
+                assertEquals(JournalpostApi.SaksType.FAGSAK, it.sak.saksType)
                 assertEquals(fødselsnummer, it.bruker.id)
                 assertEquals(2, it.dokumenter.size)
             }
@@ -51,7 +51,7 @@ internal class OppdaterJournalpostBehovLøserTest {
             assertEquals(1, size)
             assertNotNull(field(0, "@løsning")["OppdaterJournalpost"])
             requireNotNull(mappedRequest).also {
-                assertEquals(JournalpostApi.SaksType.GENERELL_SAK,it.sak.saksType)
+                assertEquals(JournalpostApi.SaksType.GENERELL_SAK, it.sak.saksType)
                 assertEquals(fødselsnummer, it.bruker.id)
                 assertEquals(2, it.dokumenter.size)
             }

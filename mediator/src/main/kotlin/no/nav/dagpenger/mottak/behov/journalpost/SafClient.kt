@@ -20,10 +20,6 @@ internal interface JournalpostArkiv {
     suspend fun hentJournalpost(journalpostId: String): SafGraphQL.Journalpost
 }
 
-internal interface JournalpostOppdatering{
-    suspend fun oppdaterJournalpost(journalpostId: String,journalpost: JournalpostApi.OppdaterJournalpostRequest)
-}
-
 internal interface SøknadsArkiv {
     suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): SafGraphQL.SøknadsData
 }

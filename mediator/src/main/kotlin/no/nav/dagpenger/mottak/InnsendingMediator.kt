@@ -111,10 +111,10 @@ internal class InnsendingMediator(
                 innsending
             }
             else -> {
-                val innsending = Innsending(hendelse.journalpostId())
-                innsendingRepository.lagre(innsending)
+                val nyInnsending = Innsending(hendelse.journalpostId())
+                innsendingRepository.lagre(nyInnsending)
                 log.info { "Opprettet Innsending for ${hendelse.journalpostId()}" }
-                innsending
+                nyInnsending
             }
         }
     }
