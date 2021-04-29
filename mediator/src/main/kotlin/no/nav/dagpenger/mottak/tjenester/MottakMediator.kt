@@ -12,7 +12,7 @@ internal class MottakMediator(mediator: InnsendingMediator, rapidsConnection: Ra
         JournalpostOppdatertMottak(mediator, rapidsConnection)
         JournalpostFerdigstiltMottak(mediator, rapidsConnection)
         MinsteinntektVurderingMottak(mediator, rapidsConnection)
-        OpprettStartVedtakOppgaveMottak(mediator, rapidsConnection)
+        OpprettArenaOppgaveMottak(mediator, rapidsConnection)
         SøknadsdataMottak(mediator, rapidsConnection)
         GosysOppgaveOpprettetMottak(mediator, rapidsConnection)
     }

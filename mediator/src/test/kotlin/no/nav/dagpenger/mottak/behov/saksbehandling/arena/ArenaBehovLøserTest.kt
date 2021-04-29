@@ -33,9 +33,11 @@ internal class ArenaBehovLøserTest {
                 override suspend fun opprettVurderHenvendelsOppgave(
                     journalpostId: String,
                     parametere: OpprettArenaOppgaveParametere
-                ): Map<String, String> {
-                    TODO("not implemented")
-                }
+                ): Map<String, String> = mapOf(
+                    "journalpostId" to journalpostId,
+                    "fagsakId" to "123",
+                    "oppgaveId" to "123"
+                )
             },
             rapidsConnection = testRapid
         )
@@ -68,6 +70,18 @@ internal class ArenaBehovLøserTest {
         }
     }
 
+    @Test
+    fun `Løser 0pprettVurderhenvendelseOppgave behov`() {
+        testRapid.sendTestMessage(opprettVurderhenvendelseOppgaveBehov())
+        with(testRapid.inspektør) {
+            assertEquals(1, size)
+            assertDoesNotThrow { field(0, "@løsning") }
+            assertEquals("123", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["fagsakId"].asText())
+            assertEquals("123", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["oppgaveId"].asText())
+            assertEquals(JOURNALPOST_ID, field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["journalpostId"].asText())
+        }
+    }
+
     //language=JSON
     private fun eksisterendeSakerBehov(): String =
         """{
@@ -93,7 +107,24 @@ internal class ArenaBehovLøserTest {
           "@opprettet" : "${LocalDateTime.now()}",
           "journalpostId": "$JOURNALPOST_ID",
           "fødselsnummer": "12345678910",
-          "aktørId": "23456789",
+          "behandlendeEnhetId": "1235",
+          "oppgavebeskrivelse": "beskrivende beskrivelse",
+          "registrertDato": "${LocalDateTime.now()}",
+          "tilleggsinformasjon": "I tillegg til informasjonen kommer det noen ganger tileggsinformasjon"
+        }
+        """.trimIndent()
+
+    //language=JSON
+    private fun opprettVurderhenvendelseOppgaveBehov(): String =
+        """{
+          "@event_name": "behov",
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "OpprettVurderhenvendelseOppgave"
+          ],
+          "@opprettet" : "${LocalDateTime.now()}",
+          "journalpostId": "$JOURNALPOST_ID",
+          "fødselsnummer": "12345678910",
           "behandlendeEnhetId": "1235",
           "oppgavebeskrivelse": "beskrivende beskrivelse",
           "registrertDato": "${LocalDateTime.now()}",

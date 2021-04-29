@@ -4,9 +4,9 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
+import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.helse.rapids_rivers.asLocalDateTime
 
 internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: RapidsConnection) {
@@ -63,7 +63,12 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
         init {
             River(rapidsConnection).apply {
                 validate { it.demandValue("@event_name", "behov") }
-                validate { it.demandAllOrAny("@behov", listOf("OpprettStartVedtakOppgave")) }
+                validate {
+                    it.demandAllOrAny(
+                        "@behov",
+                        listOf("OpprettStartVedtakOppgave", "OpprettVurderhenvendelseOppgave")
+                    )
+                }
                 validate { it.rejectKey("@løsning") }
                 validate { it.requireKey("@id", "journalpostId") }
                 validate {
@@ -72,34 +77,51 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                         "behandlendeEnhetId",
                         "oppgavebeskrivelse",
                         "registrertDato",
-                        "tilleggsinformasjon",
-                        "aktørId"
+                        "tilleggsinformasjon"
                     )
                 }
             }.register(this)
         }
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
+            val journalpostId = packet["journalpostId"].asText()
             try {
                 runBlocking {
-                    arenaOppslag.opprettStartVedtakOppgave(
-                        journalpostId = packet["journalpostId"].asText(),
-                        parametere = OpprettArenaOppgaveParametere(
-                            naturligIdent = packet["fødselsnummer"].asText(),
-                            behandlendeEnhetId = packet["behandlendeEnhetId"].asText(),
-                            tilleggsinformasjon = packet["tilleggsinformasjon"].asText(),
-                            registrertDato = packet["registrertDato"].asLocalDateTime().toLocalDate(),
-                            oppgavebeskrivelse = packet["oppgavebeskrivelse"].asText(),
+                    val behovNavn = packet["@behov"].first().asText()
+                    val response = when (behovNavn) {
+                        "OpprettVurderhenvendelseOppgave" -> arenaOppslag.opprettVurderHenvendelsOppgave(
+                            journalpostId,
+                            packet.arenaOppgaveParametre()
                         )
-                    ).also {
-                        packet["@løsning"] = mapOf("OpprettStartVedtakOppgave" to it)
-                        context.publish(packet.toJson())
+                        "OpprettStartVedtakOppgave" -> arenaOppslag.opprettStartVedtakOppgave(
+                            journalpostId,
+                            packet.arenaOppgaveParametre()
+                        )
+                        else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
                     }
+                    packet["@løsning"] = mapOf(behovNavn to response)
+                    context.publish(packet.toJson())
                 }
             } catch (e: Exception) {
                 logger.error(e) { "Kunne opprette arena sak med journalpostId ${packet["journalpostId"]}" }
                 throw e
             }
         }
+
+        override fun onError(problems: MessageProblems, context: MessageContext) {
+            println(problems)
+        }
+
+        override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
+            error.printStackTrace()
+        }
     }
 }
+
+private fun JsonMessage.arenaOppgaveParametre(): OpprettArenaOppgaveParametere = OpprettArenaOppgaveParametere(
+    naturligIdent = this["fødselsnummer"].asText(),
+    behandlendeEnhetId = this["behandlendeEnhetId"].asText(),
+    tilleggsinformasjon = this["tilleggsinformasjon"].asText(),
+    registrertDato = this["registrertDato"].asLocalDateTime().toLocalDate(),
+    oppgavebeskrivelse = this["oppgavebeskrivelse"].asText(),
+)

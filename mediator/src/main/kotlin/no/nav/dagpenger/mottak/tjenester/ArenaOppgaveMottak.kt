@@ -13,7 +13,7 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
 
 private val logg = KotlinLogging.logger {}
-internal class OpprettStartVedtakOppgaveMottak(
+internal class OpprettArenaOppgaveMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
