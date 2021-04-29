@@ -107,14 +107,14 @@ internal class InnsendingMediator(
         val innsending = innsendingRepository.hent(hendelse.journalpostId())
         return when (innsending) {
             is Innsending -> {
-                log.info { "Fant Innsending" }
-                sikkerlogg.info { "Fant Innsending for ${hendelse.journalpostId()}" }
+                log.info { "Fant Innsending for ${hendelse.journalpostId()}" }
                 innsending
             }
             else -> {
                 val innsending = Innsending(hendelse.journalpostId())
                 innsendingRepository.lagre(innsending)
-                return innsending
+                log.info { "Opprettet Innsending for ${hendelse.journalpostId()}" }
+                innsending
             }
         }
     }
