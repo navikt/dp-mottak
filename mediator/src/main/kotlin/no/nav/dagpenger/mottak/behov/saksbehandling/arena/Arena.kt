@@ -29,7 +29,7 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
 
     private val tokenProvider = config.tokenProvider
 
-    private val baseUrl = "${config.dpProxyUrl()}/proxy/v1/arena/sak"
+    private val baseUrl = "${config.dpProxyUrl()}/proxy/v1/arena"
     private val proxyArenaClient = HttpClient() {
         install(DefaultRequest) {
             method = HttpMethod.Post
@@ -43,7 +43,7 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
 
     override suspend fun harEksisterendeSaker(fnr: String): Boolean {
         sikkerlogg.info { "Forsøker å hente eksisterende saker fra arena for fnr $fnr" }
-        return proxyArenaClient.request<AktivSakResponse>("$baseUrl/aktiv") {
+        return proxyArenaClient.request<AktivSakResponse>("$baseUrl/sak/aktiv") {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Accept, "application/json")
@@ -67,7 +67,7 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
     override suspend fun opprettVurderHenvendelsOppgave(
         journalpostId: String,
         parametere: OpprettArenaOppgaveParametere
-    ): Map<String, String> = opprettArenaOppgave("$baseUrl/henvendelse", parametere).map(journalpostId)
+    ): Map<String, String> = opprettArenaOppgave("$baseUrl/sak/henvendelse", parametere).map(journalpostId)
 }
 
 private data class AktivSakRequest(val fnr: String)
