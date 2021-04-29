@@ -20,19 +20,21 @@ internal class ArenaBehovLøserTest {
             arenaOppslag = object : ArenaOppslag {
                 override suspend fun harEksisterendeSaker(fnr: String): Boolean = true
                 override suspend fun opprettStartVedtakOppgave(
-                    fødselsnummer: String,
-                    aktørId: String,
-                    behandlendeEnhet: String,
-                    beskrivelse: String,
-                    tilleggsinformasjon: String,
-                    registrertDato: LocalDateTime,
-                    journalpostId: String
+                    journalpostId: String,
+                    parametere: OpprettArenaOppgaveParametere
                 ): Map<String, String> {
                     return mapOf(
                         "journalpostId" to journalpostId,
                         "fagsakId" to "123",
                         "oppgaveId" to "123"
                     )
+                }
+
+                override suspend fun opprettVurderHenvendelsOppgave(
+                    journalpostId: String,
+                    parametere: OpprettArenaOppgaveParametere
+                ): Map<String, String> {
+                    TODO("not implemented")
                 }
             },
             rapidsConnection = testRapid

@@ -14,22 +14,14 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.Config.tokenProvider
 import java.time.LocalDate
-import java.time.LocalDateTime
 
-interface ArenaOppslag {
+internal interface ArenaOppslag {
     suspend fun harEksisterendeSaker(fnr: String): Boolean
-    suspend fun opprettStartVedtakOppgave(
-        fødselsnummer: String,
-        aktørId: String,
-        behandlendeEnhet: String,
-        beskrivelse: String,
-        tilleggsinformasjon: String,
-        registrertDato: LocalDateTime,
-        journalpostId: String
-    ): Map<String, String>
+    suspend fun opprettStartVedtakOppgave(journalpostId: String, parametere: OpprettArenaOppgaveParametere): Map<String, String>
+    suspend fun opprettVurderHenvendelsOppgave(journalpostId: String, parametere: OpprettArenaOppgaveParametere): Map<String, String>
 }
 
-class ArenaApiClient(config: Configuration) : ArenaOppslag {
+internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
 
     companion object {
         private val sikkerlogg = KotlinLogging.logger("tjenestekall")
@@ -37,7 +29,7 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
 
     private val tokenProvider = config.tokenProvider
 
-    val baseUrl = "${config.dpProxyUrl()}/proxy/v1/arena/sak/"
+    private val baseUrl = "${config.dpProxyUrl()}/proxy/v1/arena/sak/"
     private val proxyArenaClient = HttpClient() {
         install(DefaultRequest) {
             method = HttpMethod.Post
@@ -60,34 +52,28 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
     }
 
     override suspend fun opprettStartVedtakOppgave(
-        fødselsnummer: String,
-        aktørId: String,
-        behandlendeEnhet: String,
-        beskrivelse: String,
-        tilleggsinformasjon: String,
-        registrertDato: LocalDateTime,
-        journalpostId: String
-    ): Map<String, String> {
-        sikkerlogg.info { "Forsøker å opprette start vedtak oppgave i Arena" }
-        return proxyArenaClient.request<OpprettVedtakOppgaveResponse>("$baseUrl/vedtak") {
+        journalpostId: String,
+        parametere: OpprettArenaOppgaveParametere
+    ): Map<String, String> = opprettArenaOppgave("$baseUrl/vedtak", parametere).map(journalpostId)
+
+    private suspend fun opprettArenaOppgave(url: String, parametereBody: OpprettArenaOppgaveParametere): OpprettVedtakOppgaveResponse =
+        proxyArenaClient.request(url) {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Accept, "application/json")
-            body = OpprettVedtakOppgaveRequest(
-                naturligIdent = fødselsnummer,
-                behandlendeEnhetId = behandlendeEnhet,
-                tilleggsinformasjon = tilleggsinformasjon,
-                registrertDato = registrertDato.toLocalDate(),
-                oppgavebeskrivelse = beskrivelse
-            )
-        }.map(journalpostId)
-    }
+            body = parametereBody
+        }
+
+    override suspend fun opprettVurderHenvendelsOppgave(
+        journalpostId: String,
+        parametere: OpprettArenaOppgaveParametere
+    ): Map<String, String> = opprettArenaOppgave("$baseUrl/henvendelse", parametere).map(journalpostId)
 }
 
 private data class AktivSakRequest(val fnr: String)
 private data class AktivSakResponse(val harAktivSak: Boolean)
 
-private data class OpprettVedtakOppgaveRequest(
+internal data class OpprettArenaOppgaveParametere(
     val naturligIdent: String,
     val behandlendeEnhetId: String,
     val tilleggsinformasjon: String,

@@ -6,6 +6,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.helse.rapids_rivers.asLocalDateTime
 
 internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: RapidsConnection) {
@@ -82,20 +83,21 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
             try {
                 runBlocking {
                     arenaOppslag.opprettStartVedtakOppgave(
-                        fødselsnummer = packet["fødselsnummer"].asText(),
-                        aktørId = packet["aktørId"].asText(),
-                        behandlendeEnhet = packet["behandlendeEnhetId"].asText(),
-                        beskrivelse = packet["oppgavebeskrivelse"].asText(),
-                        tilleggsinformasjon = packet["tilleggsinformasjon"].asText(),
-                        registrertDato = packet["registrertDato"].asLocalDateTime(),
-                        journalpostId = packet["journalpostId"].asText()
+                        journalpostId = packet["journalpostId"].asText(),
+                        parametere = OpprettArenaOppgaveParametere(
+                            naturligIdent = packet["fødselsnummer"].asText(),
+                            behandlendeEnhetId = packet["behandlendeEnhetId"].asText(),
+                            tilleggsinformasjon = packet["tilleggsinformasjon"].asText(),
+                            registrertDato = packet["registrertDato"].asLocalDateTime().toLocalDate(),
+                            oppgavebeskrivelse = packet["oppgavebeskrivelse"].asText(),
+                        )
                     ).also {
                         packet["@løsning"] = mapOf("OpprettStartVedtakOppgave" to it)
                         context.publish(packet.toJson())
                     }
                 }
             } catch (e: Exception) {
-                logger.info { "Kunne ikke hente eksisterende saker for søknad med journalpostId ${packet["journalpostId"]}" }
+                logger.error(e) { "Kunne opprette arena sak med journalpostId ${packet["journalpostId"]}" }
                 throw e
             }
         }
