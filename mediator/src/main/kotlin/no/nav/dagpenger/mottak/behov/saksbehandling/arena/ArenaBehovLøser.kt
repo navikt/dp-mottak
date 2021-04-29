@@ -27,13 +27,11 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
 
         init {
             River(rapidsConnection).apply {
-                validate {
-                    it.demandValue("@event_name", "behov")
-                    it.demandAllOrAny("@behov", listOf("EksisterendeSaker"))
-                    it.rejectKey("@løsning")
-                    it.requireKey("@id", "journalpostId")
-                    it.requireKey("fnr")
-                }
+                validate { it.demandValue("@event_name", "behov") }
+                validate { it.demandAllOrAny("@behov", listOf("EksisterendeSaker")) }
+                validate { it.rejectKey("@løsning") }
+                validate { it.requireKey("@id", "journalpostId") }
+                validate { it.requireKey("fnr") }
             }.register(this)
         }
 
@@ -63,11 +61,11 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
 
         init {
             River(rapidsConnection).apply {
+                validate { it.demandValue("@event_name", "behov") }
+                validate { it.demandAllOrAny("@behov", listOf("OpprettStartVedtakOppgave")) }
+                validate { it.rejectKey("@løsning") }
+                validate { it.requireKey("@id", "journalpostId") }
                 validate {
-                    it.demandValue("@event_name", "behov")
-                    it.demandAllOrAny("@behov", listOf("OpprettStartVedtakOppgave"))
-                    it.rejectKey("@løsning")
-                    it.requireKey("@id", "journalpostId")
                     it.requireKey(
                         "fødselsnummer",
                         "behandlendeEnhetId",

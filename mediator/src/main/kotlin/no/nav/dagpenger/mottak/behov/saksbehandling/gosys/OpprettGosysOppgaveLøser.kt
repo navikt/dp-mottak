@@ -17,13 +17,11 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
 
     init {
         River(rapidsConnection).apply {
-            validate {
-                it.demandValue("@event_name", "behov")
-                it.demandAllOrAny("@behov", listOf("OpprettGosysoppgave"))
-                it.rejectKey("@løsning")
-                it.requireKey("@id", "journalpostId", "behandlendeEnhetId", "registrertDato")
-                it.interestedIn("aktørId", "tilleggsinformasjon", "oppgavebeskrivelse")
-            }
+            validate { it.demandValue("@event_name", "behov") }
+            validate { it.demandAllOrAny("@behov", listOf("OpprettGosysoppgave")) }
+            validate { it.rejectKey("@løsning") }
+            validate { it.requireKey("@id", "journalpostId", "behandlendeEnhetId", "registrertDato") }
+            validate { it.interestedIn("aktørId", "tilleggsinformasjon", "oppgavebeskrivelse") }
         }.register(this)
     }
 

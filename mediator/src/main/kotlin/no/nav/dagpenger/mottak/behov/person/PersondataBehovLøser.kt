@@ -18,13 +18,11 @@ internal class PersondataBehovLøser(
 
     init {
         River(rapidsConnection).apply {
-            validate {
-                it.demandValue("@event_name", "behov")
-                it.demandAllOrAny("@behov", listOf("Persondata"))
-                it.rejectKey("@løsning")
-                it.requireKey("@id", "journalpostId")
-                it.requireKey("brukerId")
-            }
+            validate { it.demandValue("@event_name", "behov") }
+            validate { it.demandAllOrAny("@behov", listOf("Persondata")) }
+            validate { it.rejectKey("@løsning") }
+            validate { it.requireKey("@id", "journalpostId") }
+            validate { it.requireKey("brukerId") }
         }.register(this)
     }
 

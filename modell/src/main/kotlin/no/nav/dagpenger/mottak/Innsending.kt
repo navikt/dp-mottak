@@ -18,8 +18,8 @@ import java.time.Duration
 class Innsending private constructor(
     private val journalpostId: String,
     private var tilstand: Tilstand,
-    private var journalpost: no.nav.dagpenger.mottak.meldinger.Journalpost?,
-    private var søknad: no.nav.dagpenger.mottak.meldinger.Søknadsdata.Søknad?,
+    private var journalpost: Journalpost?,
+    private var søknad: Søknadsdata.Søknad?,
     private var oppfyllerMinsteArbeidsinntekt: Boolean?,
     private var eksisterendeSaker: Boolean?,
     private var person: Person?,
@@ -51,7 +51,7 @@ class Innsending private constructor(
         tilstand.håndter(this, joarkHendelse)
     }
 
-    fun håndter(journalpost: no.nav.dagpenger.mottak.meldinger.Journalpost) {
+    fun håndter(journalpost: Journalpost) {
         if (journalpostId != journalpost.journalpostId()) return
         kontekst(journalpost, "Mottatt informasjon om journalpost")
         tilstand.håndter(this, journalpost)
@@ -69,7 +69,7 @@ class Innsending private constructor(
         tilstand.håndter(this, personInformasjonIkkeFunnet)
     }
 
-    fun håndter(søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
+    fun håndter(søknadsdata: Søknadsdata) {
         if (journalpostId != søknadsdata.journalpostId()) return
         kontekst(søknadsdata, "Mottatt søknadsdata")
         tilstand.håndter(this, søknadsdata)
@@ -127,7 +127,7 @@ class Innsending private constructor(
             joarkHendelse.warn("Forventet ikke JoarkHendelse i %s", type.name)
         }
 
-        fun håndter(innsending: Innsending, journalpost: no.nav.dagpenger.mottak.meldinger.Journalpost) {
+        fun håndter(innsending: Innsending, journalpost: Journalpost) {
             journalpost.warn("Forventet ikke JournalpostData i %s", type.name)
         }
 
@@ -139,7 +139,7 @@ class Innsending private constructor(
             personInformasjonIkkeFunnet.warn("Forventet ikke PersonInformasjonIkkeFunnet i %s", type.name)
         }
 
-        fun håndter(innsending: Innsending, søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
+        fun håndter(innsending: Innsending, søknadsdata: Søknadsdata) {
             søknadsdata.warn("Forventet ikke Søknadsdata i %s", type.name)
         }
 
@@ -201,7 +201,7 @@ class Innsending private constructor(
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
-        override fun håndter(innsending: Innsending, journalpost: no.nav.dagpenger.mottak.meldinger.Journalpost) {
+        override fun håndter(innsending: Innsending, journalpost: Journalpost) {
             innsending.journalpost = journalpost
             when (requireNotNull(innsending.journalpost).kategorisertJournalpost()) {
                 is UtenBruker -> {
@@ -267,7 +267,7 @@ class Innsending private constructor(
             innsending.trengerSøknadsdata(hendelse)
         }
 
-        override fun håndter(innsending: Innsending, søknadsdata: no.nav.dagpenger.mottak.meldinger.Søknadsdata) {
+        override fun håndter(innsending: Innsending, søknadsdata: Søknadsdata) {
             val kategorisertJournalpost =
                 requireNotNull(
                     innsending.journalpost

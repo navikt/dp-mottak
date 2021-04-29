@@ -20,12 +20,10 @@ internal class JournalpostBehovLøser(
 
     init {
         River(rapidsConnection).apply {
-            validate {
-                it.demandValue("@event_name", "behov")
-                it.demandAllOrAny("@behov", listOf("Journalpost"))
-                it.rejectKey("@løsning")
-                it.requireKey("@id", "journalpostId")
-            }
+            validate { it.demandValue("@event_name", "behov") }
+            validate { it.demandAllOrAny("@behov", listOf("Journalpost")) }
+            validate { it.rejectKey("@løsning") }
+            validate { it.requireKey("@id", "journalpostId") }
         }.register(this)
     }
 

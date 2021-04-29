@@ -22,17 +22,18 @@ internal class MinsteinntektVurderingLøser(
         val pendingPackets = mutableMapOf<String, JsonMessage>()
     }
 
-    private class StartBehovPacketListener(private val regelApiClient: RegelApiClient, rapidsConnection: RapidsConnection) :
+    private class StartBehovPacketListener(
+        private val regelApiClient: RegelApiClient,
+        rapidsConnection: RapidsConnection
+    ) :
         River.PacketListener {
         init {
             River(rapidsConnection).apply {
-                validate {
-                    it.demandValue("@event_name", "behov")
-                    it.demandAllOrAny("@behov", listOf("MinsteinntektVurdering"))
-                    it.rejectKey("@løsning")
-                    it.requireKey("@id", "journalpostId")
-                    it.requireKey("aktørId")
-                }
+                validate { it.demandValue("@event_name", "behov") }
+                validate { it.demandAllOrAny("@behov", listOf("MinsteinntektVurdering")) }
+                validate { it.rejectKey("@løsning") }
+                validate { it.requireKey("@id", "journalpostId") }
+                validate { it.requireKey("aktørId") }
             }.register(this)
         }
 
