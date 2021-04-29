@@ -8,7 +8,6 @@ import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.header
 import io.ktor.client.request.request
-import io.ktor.client.request.url
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import mu.KotlinLogging
@@ -38,9 +37,9 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
 
     private val tokenProvider = config.tokenProvider
 
+    val baseUrl = "${config.dpProxyUrl()}/proxy/v1/arena/sak/"
     private val proxyArenaClient = HttpClient() {
         install(DefaultRequest) {
-            this.url("${config.dpProxyUrl()}/proxy/v1/arena/sak/aktiv")
             method = HttpMethod.Post
         }
         install(JsonFeature) {
@@ -52,7 +51,7 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
 
     override suspend fun harEksisterendeSaker(fnr: String): Boolean {
         sikkerlogg.info { "Forsøker å hente eksisterende saker fra arena for fnr $fnr" }
-        return proxyArenaClient.request<AktivSakResponse> {
+        return proxyArenaClient.request<AktivSakResponse>("$baseUrl/aktiv") {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Accept, "application/json")
@@ -70,7 +69,7 @@ class ArenaApiClient(config: Configuration) : ArenaOppslag {
         journalpostId: String
     ): Map<String, String> {
         sikkerlogg.info { "Forsøker å opprette start vedtak oppgave i Arena" }
-        return proxyArenaClient.request<OpprettVedtakOppgaveResponse> {
+        return proxyArenaClient.request<OpprettVedtakOppgaveResponse>("$baseUrl/vedtak") {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
             header(HttpHeaders.ContentType, "application/json")
             header(HttpHeaders.Accept, "application/json")
