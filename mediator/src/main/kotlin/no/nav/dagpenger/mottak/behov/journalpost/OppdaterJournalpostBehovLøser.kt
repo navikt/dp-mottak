@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
 import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApi.OppdaterJournalpostRequest
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -8,9 +9,14 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
 internal class OppdaterJournalpostBehovLøser(
-    private val journalpostOppdatering: JournalpostOppdatering,
+    private val journalpostDokarkiv: JournalpostDokarkiv,
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
+
+    private companion object {
+        val logger = KotlinLogging.logger { }
+    }
+
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
@@ -24,9 +30,10 @@ internal class OppdaterJournalpostBehovLøser(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val journalpostId = packet["journalpostId"].asText()
         runBlocking {
-            journalpostOppdatering.oppdaterJournalpost(journalpostId, packet.tilJournalføringOppdaterRequest())
+            journalpostDokarkiv.oppdaterJournalpost(journalpostId, packet.tilJournalføringOppdaterRequest())
         }
         packet["@løsning"] = mapOf("OppdaterJournalpost" to mapOf("journalpostId" to journalpostId))
+        logger.info("løser behov OppdaterJournalpost for journalpost med id $journalpostId")
         context.publish(packet.toJson())
     }
 }

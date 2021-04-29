@@ -16,13 +16,17 @@ internal class OppdaterJournalpostBehovLøserTest {
 
     init {
         OppdaterJournalpostBehovLøser(
-            journalpostOppdatering = object : JournalpostOppdatering {
+            journalpostDokarkiv = object : JournalpostDokarkiv {
 
                 override suspend fun oppdaterJournalpost(
                     journalpostId: String,
                     journalpost: JournalpostApi.OppdaterJournalpostRequest
                 ) {
                     mappedRequest = journalpost
+                }
+
+                override suspend fun ferdigstill(journalpostId: String) {
+                    throw IllegalArgumentException("Skal ikke kalles her")
                 }
             },
             rapidsConnection = testRapid

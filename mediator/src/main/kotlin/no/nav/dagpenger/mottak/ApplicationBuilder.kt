@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak
 
 import mu.KotlinLogging
+import no.nav.dagpenger.mottak.behov.journalpost.FerdigstillJournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApiClient
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.OppdaterJournalpostBehovLøser
@@ -42,6 +43,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             // Behovløsere
             JournalpostBehovLøser(safClient, this)
             OppdaterJournalpostBehovLøser(journalpostApiClient, this)
+            FerdigstillJournalpostBehovLøser(journalpostApiClient, this)
             PersondataBehovLøser(PdlPersondataOppslag(Config.properties), this)
             SøknadsdataBehovLøser(safClient, this)
             MinsteinntektVurderingLøser(regelApiClient, this)
