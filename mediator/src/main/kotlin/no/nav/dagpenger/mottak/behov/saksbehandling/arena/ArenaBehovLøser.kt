@@ -108,12 +108,8 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
             }
         }
 
-        override fun onError(problems: MessageProblems, context: MessageContext) {
-            println(problems)
-        }
-
         override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
-            error.printStackTrace()
+            logger.error(error) { error.problems }
         }
     }
 }
