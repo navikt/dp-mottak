@@ -16,8 +16,8 @@ internal class SøknadsdataBehovLøserTest {
         SøknadsdataBehovLøser(
             rapidsConnection = testRapid,
             søknadsArkiv = object : SøknadsArkiv {
-                override suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): Saf.SøknadsData {
-                    return Saf.SøknadsData(
+                override suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): SafGraphQL.SøknadsData {
+                    return SafGraphQL.SøknadsData(
                         jacksonJsonAdapter.createObjectNode().apply {
                             put("something", "something")
                             put("something else", "something else")

@@ -53,8 +53,8 @@ internal class JournalpostBehovLøserTest {
         JournalpostBehovLøser(
             rapidsConnection = testRapid,
             journalpostArkiv = object : JournalpostArkiv {
-                override suspend fun hentJournalpost(journalpostId: String): Saf.Journalpost =
-                    Saf.Journalpost.fromGraphQlJson(journalpostJson)
+                override suspend fun hentJournalpost(journalpostId: String): SafGraphQL.Journalpost =
+                    SafGraphQL.Journalpost.fromGraphQlJson(journalpostJson)
             }
         )
     }
@@ -74,7 +74,7 @@ internal class JournalpostBehovLøserTest {
     @Test
     fun `Kaster excpetion om error liste ikke er tom`() {
         assertThrows<Throwable> {
-            Saf.Journalpost.fromGraphQlJson("""{"errors": ["Her er en error"],"data":null}""".trimIndent())
+            SafGraphQL.Journalpost.fromGraphQlJson("""{"errors": ["Her er en error"],"data":null}""".trimIndent())
         }
     }
 

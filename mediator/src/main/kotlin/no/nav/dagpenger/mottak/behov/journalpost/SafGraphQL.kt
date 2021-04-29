@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 
-internal class Saf {
+internal class SafGraphQL {
     data class Bruker(
         val type: BrukerType,
         val id: String
@@ -33,7 +33,6 @@ internal class Saf {
             return "DokumentInfo(tittel=$tittel, dokumentInfoId=$dokumentInfoId, brevkode=$brevkode)"
         }
     }
-
     internal data class Journalpost(
         val journalstatus: Journalstatus?,
         val journalpostId: String,

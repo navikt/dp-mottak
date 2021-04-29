@@ -17,11 +17,15 @@ import no.nav.dagpenger.mottak.Config.tokenProvider
 import no.nav.dagpenger.mottak.behov.GraphqlQuery
 
 internal interface JournalpostArkiv {
-    suspend fun hentJournalpost(journalpostId: String): Saf.Journalpost
+    suspend fun hentJournalpost(journalpostId: String): SafGraphQL.Journalpost
+}
+
+internal interface JournalpostOppdatering{
+    suspend fun oppdaterJournalpost(journalpostId: String,journalpost: JournalpostApi.OppdaterJournalpostRequest)
 }
 
 internal interface SøknadsArkiv {
-    suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): Saf.SøknadsData
+    suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): SafGraphQL.SøknadsData
 }
 
 internal data class JournalPostQuery(@JsonIgnore val journalpostId: String) : GraphqlQuery(
@@ -77,26 +81,26 @@ internal class SafClient(private val config: Configuration) : JournalpostArkiv, 
         }
     }
 
-    override suspend fun hentJournalpost(journalpostId: String): Saf.Journalpost =
+    override suspend fun hentJournalpost(journalpostId: String): SafGraphQL.Journalpost =
         proxyJoarkClient.request<String> {
             header("Content-Type", "application/json")
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
             body = JournalPostQuery(journalpostId).toJson()
         }.let {
-            Saf.Journalpost.fromGraphQlJson(it)
+            SafGraphQL.Journalpost.fromGraphQlJson(it)
         }
 
-    override suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): Saf.SøknadsData =
+    override suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): SafGraphQL.SøknadsData =
         try {
             proxySøknadsDataClient.request<String>("${config.dpProxyUrl()}/proxy/v1/saf/rest/hentdokument/$journalpostId/$dokumentInfoId/ORIGINAL") {
                 header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
             }.let {
-                Saf.SøknadsData.fromJson(it)
+                SafGraphQL.SøknadsData.fromJson(it)
             }
         } catch (exception: ClientRequestException) {
             if (exception.response.status == HttpStatusCode.NotFound) {
                 logger.warn(exception) { "Fant ikke dokumentInfo for journalpostId $journalpostId med dokumentinfoId $dokumentInfoId" }
-                Saf.SøknadsData.fromJson("{}")
+                SafGraphQL.SøknadsData.fromJson("{}")
             } else {
                 throw exception
             }
