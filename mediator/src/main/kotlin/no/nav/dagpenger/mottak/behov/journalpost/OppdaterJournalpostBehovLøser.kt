@@ -52,6 +52,7 @@ internal class OppdaterJournalpostBehovLøser(
         when (journalpostException.statusCode) {
             400 -> {
                 val json = JsonMapper.jacksonJsonAdapter.readTree(journalpostException.content)
+                logger.info { "CONTENT -> $json" }
                 val feilmelding = json["message"].asText()
                 if (feilmelding in whitelistFeilmeldinger) {
                     return
