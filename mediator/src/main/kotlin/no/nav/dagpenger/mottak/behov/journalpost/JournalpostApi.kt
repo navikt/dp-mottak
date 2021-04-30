@@ -32,7 +32,7 @@ internal interface JournalpostFeil {
 
     fun ignorerKjenteTilstander(journalpostException: JournalpostException) {
         when (journalpostException.statusCode) {
-            400, 403 -> {
+            400 -> {
                 logger.info { "CONTENT -> ${journalpostException.content}" }
                 val json = JsonMapper.jacksonJsonAdapter.readTree(journalpostException.content)
 
@@ -41,6 +41,7 @@ internal interface JournalpostFeil {
                     return
                 } else throw journalpostException
             }
+            403 -> return
         }
     }
 }
