@@ -13,6 +13,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.utils.io.jvm.javaio.toInputStream
+import io.ktor.utils.io.readUTF8Line
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.Config.tokenProvider
@@ -89,7 +90,7 @@ internal class JournalpostApiClient(private val config: Configuration) : Journal
         } catch (e: ClientRequestException) {
             throw JournalpostException(
                 e.response.status.value,
-                e.message
+                e.response.content.readUTF8Line()
             )
         }
     }

@@ -51,8 +51,9 @@ internal class OppdaterJournalpostBehovLøser(
     private fun ignorerKjenteTilstander(journalpostException: JournalpostException) {
         when (journalpostException.statusCode) {
             400 -> {
+                logger.info { "CONTENT -> ${journalpostException.content}" }
                 val json = JsonMapper.jacksonJsonAdapter.readTree(journalpostException.content)
-                logger.info { "CONTENT -> $json" }
+
                 val feilmelding = json["message"].asText()
                 if (feilmelding in whitelistFeilmeldinger) {
                     return
