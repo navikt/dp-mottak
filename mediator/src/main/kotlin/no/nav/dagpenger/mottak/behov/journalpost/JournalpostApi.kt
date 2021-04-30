@@ -13,9 +13,12 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.utils.io.jvm.javaio.toInputStream
+import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.Config.tokenProvider
 import java.lang.RuntimeException
+
+private val logger = KotlinLogging.logger { }
 
 internal interface JournalpostDokarkiv {
     suspend fun oppdaterJournalpost(journalpostId: String, journalpost: JournalpostApi.OppdaterJournalpostRequest)
@@ -84,6 +87,9 @@ internal class JournalpostApiClient(private val config: Configuration) : Journal
                 body = journalpost
             }
         } catch (e: ClientRequestException) {
+
+            logger.error(e) { e.message }
+
             throw JournalpostException(
                 e.response.status.value,
                 e.response.content.toInputStream().use {
