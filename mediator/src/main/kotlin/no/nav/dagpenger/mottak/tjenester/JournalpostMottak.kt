@@ -11,7 +11,6 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
 import java.time.LocalDateTime
-import java.time.ZoneId
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype as Behov
 
 private val logg = KotlinLogging.logger {}
@@ -36,11 +35,11 @@ internal class JournalpostMottak(
 
         logg.info { "Fått løsning for $løsning, journalpostId: ${packet["journalpostId"]}" }
         val journalpostData = packet[løsning].let {
-            val oslo = ZoneId.of("Europe/Oslo")
+
             Journalpost(
                 aktivitetslogg = Aktivitetslogg(),
                 journalpostId = packet["journalpostId"].asText(),
-                journalpostStatus = "TODO",
+                journalpostStatus = it["journalstatus"].asText(),
                 bruker = it["bruker"]?.let { jsonBruker ->
                     Journalpost.Bruker(
                         id = jsonBruker["id"].asText(),

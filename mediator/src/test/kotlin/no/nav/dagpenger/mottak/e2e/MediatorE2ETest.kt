@@ -119,6 +119,7 @@ internal class MediatorE2ETest {
           "@løsning": {
             "Journalpost": {
                 "id" : "$journalpostId",
+                "journalstatus" : "MOTTATT",
                 "bruker" : {
                   "id": "12345678901",
                   "type": "FNR"
