@@ -10,6 +10,7 @@ import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.header
 import io.ktor.client.request.request
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.readText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.utils.io.jvm.javaio.toInputStream
@@ -90,7 +91,7 @@ internal class JournalpostApiClient(private val config: Configuration) : Journal
         } catch (e: ClientRequestException) {
             throw JournalpostException(
                 e.response.status.value,
-                e.response.content.readUTF8Line()
+                e.response.readText()
             )
         }
     }
