@@ -84,7 +84,11 @@ internal class JournalpostApi {
     }
 }
 
-internal class JournalpostApiClient(private val config: Configuration) : JournalpostDokarkiv {
+internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv {
+
+    private companion object {
+        val logger = KotlinLogging.logger { }
+    }
 
     private val journalføringBaseUrl = "${config.dpProxyUrl()}/proxy/v1/dokarkiv/rest/journalpostapi/v1/journalpost"
     private val tokenProvider = config.tokenProvider
@@ -128,6 +132,7 @@ internal class JournalpostApiClient(private val config: Configuration) : Journal
                 body = FerdigstillJournalpostRequest()
             }
         } catch (e: ClientRequestException) {
+            logger.error(e) { "Kunne ikke ferdigstille journalpost" }
             throw JournalpostFeil.JournalpostException(
                 e.response.status.value,
                 e.response.readText()
