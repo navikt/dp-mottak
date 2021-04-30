@@ -18,7 +18,6 @@ import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -47,7 +46,7 @@ abstract class AbstractEndeTilEndeTest {
     }
 
     protected fun assertTilstander(vararg tilstander: InnsendingTilstandType) {
-        Assertions.assertEquals(tilstander.asList(), observatør.tilstander[JOURNALPOST_ID])
+        assertEquals(tilstander.asList(), observatør.tilstander[JOURNALPOST_ID])
     }
 
     protected fun assertNoErrors(inspektør: TestInnsendingInspektør) {

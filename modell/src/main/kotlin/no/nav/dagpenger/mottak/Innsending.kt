@@ -229,7 +229,7 @@ class Innsending private constructor(
         }
 
         override fun håndter(innsending: Innsending, personInformasjonIkkeFunnet: PersonInformasjonIkkeFunnet) {
-            innsending.tilstand(personInformasjonIkkeFunnet, AvventerGosysOppgave)
+            innsending.tilstand(personInformasjonIkkeFunnet, UkjentBruker)
         }
     }
 
@@ -252,7 +252,7 @@ class Innsending private constructor(
                 is KlageOgAnkeLønnskompensasjon -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is Ettersending -> innsending.tilstand(hendelse, AventerArenaOppgave)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
-                is UtenBruker -> innsending.tilstand(hendelse, AvventerGosysOppgave)
+                is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
             }
         }
     }
@@ -328,7 +328,11 @@ class Innsending private constructor(
 
         override fun håndter(innsending: Innsending, arenaOppgave: ArenaOppgaveOpprettet) {
             innsending.arenaSak = arenaOppgave.arenaSak()
-            innsending.tilstand(arenaOppgave, OppdaterJournalpost)
+            innsending.oppdatereJournalpost(hendelse = arenaOppgave)
+        }
+
+        override fun håndter(innsending: Innsending, oppdatertJournalpost: JournalpostOppdatert) {
+            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
         }
     }
 
@@ -345,7 +349,11 @@ class Innsending private constructor(
 
         override fun håndter(innsending: Innsending, arenaOppgave: ArenaOppgaveOpprettet) {
             innsending.arenaSak = arenaOppgave.arenaSak()
-            innsending.tilstand(arenaOppgave, OppdaterJournalpost)
+            innsending.oppdatereJournalpost(arenaOppgave)
+        }
+
+        override fun håndter(innsending: Innsending, oppdatertJournalpost: JournalpostOppdatert) {
+            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
         }
     }
 
@@ -354,28 +362,31 @@ class Innsending private constructor(
             get() = InnsendingTilstandType.AvventerGosysType
         override val timeout: Duration
             get() = Duration.ofDays(1)
+        override fun entering(innsending: Innsending, hendelse: Hendelse) {
+            innsending.opprettGosysOppgave(hendelse)
+        }
+
+        override fun håndter(innsending: Innsending, gosysOppgave: GosysOppgaveOpprettet) {
+            innsending.oppdatereJournalpost(gosysOppgave)
+        }
+
+        override fun håndter(innsending: Innsending, oppdatertJournalpost: JournalpostOppdatert) {
+            innsending.tilstand(oppdatertJournalpost, InnsendingFerdigStilt)
+        }
+    }
+
+    internal object UkjentBruker : Tilstand {
+        override val type: InnsendingTilstandType
+            get() = InnsendingTilstandType.UkjentBrukerType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
 
         override fun entering(innsending: Innsending, hendelse: Hendelse) {
             innsending.opprettGosysOppgave(hendelse)
         }
 
         override fun håndter(innsending: Innsending, gosysOppgave: GosysOppgaveOpprettet) {
-            innsending.tilstand(gosysOppgave, FerdigStilt) // hvis person er satt, oppdater journalpost
-        }
-    }
-
-    internal object OppdaterJournalpost : Tilstand {
-        override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.OppdaterJournalpostType
-        override val timeout: Duration
-            get() = Duration.ofDays(1)
-
-        override fun entering(innsending: Innsending, hendelse: Hendelse) {
-            innsending.oppdatereJournalpost(hendelse)
-        }
-
-        override fun håndter(innsending: Innsending, oppdatertJournalpost: JournalpostOppdatert) {
-            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
+            innsending.tilstand(gosysOppgave, InnsendingFerdigStilt)
         }
     }
 
@@ -394,11 +405,11 @@ class Innsending private constructor(
             journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
         ) {
             journalpostferdigstilt.info("Ferdigstilte journalpost ${innsending.journalpostId}")
-            innsending.tilstand(journalpostferdigstilt, FerdigStilt)
+            innsending.tilstand(journalpostferdigstilt, InnsendingFerdigStilt)
         }
     }
 
-    internal object FerdigStilt : Tilstand {
+    internal object InnsendingFerdigStilt : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.InnsendingFerdigstiltType
         override val timeout: Duration
@@ -494,12 +505,13 @@ class Innsending private constructor(
 
     private fun oppdatereJournalpost(hendelse: Hendelse) {
         val person = requireNotNull(person)
-        val arenaSak = requireNotNull(arenaSak)
+
+        val arenaSakId = arenaSak?.let { mapOf("fagsakId" to it.fagsakId) } ?: emptyMap()
         val parametre = mapOf(
-            "fagsakId" to arenaSak.fagsakId,
             "aktørId" to person.aktørId,
             "fødselsnummer" to person.fødselsnummer
-        )
+        ) + arenaSakId
+
         hendelse.behov(
             Behovtype.OppdaterJournalpost,
             "Oppdatere journalpost for $journalpostId",
@@ -523,7 +535,6 @@ class Innsending private constructor(
             )
         } ?: emptyMap()
 
-        // TODO — finn ut av parametre til gosys
         val parametre = mapOf(
             "behandlendeEnhetId" to oppgavebenk.id,
             "oppgavebeskrivelse" to oppgavebenk.beskrivelse,

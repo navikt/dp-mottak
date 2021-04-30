@@ -90,6 +90,8 @@ internal class MediatorE2ETest {
         håndterHendelse(persondataMottattHendelse())
         assertBehov("OpprettGosysoppgave", 2)
         håndterHendelse(gosysOppgaveOpprettetHendelse())
+        assertBehov("OppdaterJournalpost", 3)
+        håndterHendelse(oppdatertJournalpostMotattHendelse())
 
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
     }

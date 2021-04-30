@@ -72,9 +72,8 @@ data class InnsendingData(
             InnsendingTilstandTypeData.AvventerMinsteinntektVurderingType -> Innsending.AventerMinsteinntektVurdering
             InnsendingTilstandTypeData.AvventerSvarOmEksisterendeSakerType -> Innsending.AvventerSvarOmEksisterendeSaker
             InnsendingTilstandTypeData.AventerArenaStartVedtakType -> Innsending.AventerArenaStartVedtak
-            InnsendingTilstandTypeData.OppdaterJournalpostType -> Innsending.OppdaterJournalpost
             InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType -> Innsending.AventerFerdigstill
-            InnsendingTilstandTypeData.InnsendingFerdigstiltType -> Innsending.FerdigStilt
+            InnsendingTilstandTypeData.InnsendingFerdigstiltType -> Innsending.InnsendingFerdigStilt
             InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerArenaOppgave
             InnsendingTilstandTypeData.AvventerGosysType -> Innsending.AvventerGosysOppgave
         }
@@ -88,7 +87,6 @@ data class InnsendingData(
             AvventerMinsteinntektVurderingType,
             AvventerSvarOmEksisterendeSakerType,
             AventerArenaStartVedtakType,
-            OppdaterJournalpostType,
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType,
             AventerArenaOppgaveType,

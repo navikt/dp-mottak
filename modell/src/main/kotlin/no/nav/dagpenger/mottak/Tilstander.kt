@@ -9,9 +9,9 @@ enum class InnsendingTilstandType {
     AvventerMinsteinntektVurderingType,
     AvventerSvarOmEksisterendeSakerType,
     AventerArenaStartVedtakType,
-    OppdaterJournalpostType,
     AvventerFerdigstillJournalpostType,
     InnsendingFerdigstiltType,
     AventerArenaOppgaveType,
-    AvventerGosysType
+    AvventerGosysType,
+    UkjentBrukerType
 }
