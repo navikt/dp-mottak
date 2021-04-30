@@ -9,7 +9,6 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-
 internal class JournalføringMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection

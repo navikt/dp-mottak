@@ -11,13 +11,12 @@ import no.nav.helse.rapids_rivers.asLocalDateTime
 
 internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: RapidsConnection) {
 
-    // todo: OpprettVurderhenvendelseOppgave
     init {
-        EksisterendeSakerLøser(arenaOppslag, rapidsConnection)
-        OpprettStartVedtakOppgaveLøser(arenaOppslag, rapidsConnection)
+        EksisterendeSakerBehovLøser(arenaOppslag, rapidsConnection)
+        OpprettArenaOppgaveBehovLøser(arenaOppslag, rapidsConnection)
     }
 
-    private class EksisterendeSakerLøser(
+    private class EksisterendeSakerBehovLøser(
         private val arenaOppslag: ArenaOppslag,
         rapidsConnection: RapidsConnection
     ) : River.PacketListener {
@@ -51,7 +50,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
         }
     }
 
-    private class OpprettStartVedtakOppgaveLøser(
+    private class OpprettArenaOppgaveBehovLøser(
         private val arenaOppslag: ArenaOppslag,
         rapidsConnection: RapidsConnection
     ) : River.PacketListener {
@@ -106,10 +105,6 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                 logger.error(e) { "Kunne opprette arena sak med journalpostId ${packet["journalpostId"]}" }
                 throw e
             }
-        }
-
-        override fun onSevere(error: MessageProblems.MessageException, context: MessageContext) {
-            logger.error(error) { error.problems }
         }
     }
 }
