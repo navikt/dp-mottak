@@ -62,7 +62,7 @@ internal class OppdaterJournalpostBehovLøserTest {
 
     @Test
     fun `test kjente feil tilstander`() {
-        coEvery { mockedJournalpostDokarkiv.oppdaterJournalpost(journalpostId = "12345", journalpost = any()) } throws JournalpostException(
+        coEvery { mockedJournalpostDokarkiv.oppdaterJournalpost(journalpostId = "12345", journalpost = any()) } throws JournalpostFeil.JournalpostException(
             statusCode = 400,
             //language=JSON
             content = """{

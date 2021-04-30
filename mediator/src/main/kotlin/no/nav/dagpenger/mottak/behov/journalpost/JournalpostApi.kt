@@ -9,18 +9,41 @@ import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.header
 import io.ktor.client.request.request
-import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import io.ktor.utils.io.jvm.javaio.toInputStream
-import io.ktor.utils.io.readUTF8Line
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.Config.tokenProvider
+import no.nav.dagpenger.mottak.behov.JsonMapper
 import java.lang.RuntimeException
 
-private val logger = KotlinLogging.logger { }
+internal interface JournalpostFeil {
+
+    private companion object {
+        val logger = KotlinLogging.logger { }
+        private val whitelistFeilmeldinger = setOf(
+            "Bruker kan ikke oppdateres for journalpost med journalpostStatus=J og journalpostType=I.",
+            "er ikke midlertidig journalført",
+            "er ikke midlertidig journalf&oslash;rt"
+        )
+    }
+    class JournalpostException(val statusCode: Int, val content: String?) : RuntimeException()
+
+    fun ignorerKjenteTilstander(journalpostException: JournalpostException) {
+        when (journalpostException.statusCode) {
+            400, 403 -> {
+                logger.info { "CONTENT -> ${journalpostException.content}" }
+                val json = JsonMapper.jacksonJsonAdapter.readTree(journalpostException.content)
+
+                val feilmelding = json["message"].asText()
+                if (feilmelding in whitelistFeilmeldinger) {
+                    return
+                } else throw journalpostException
+            }
+        }
+    }
+}
 
 internal interface JournalpostDokarkiv {
     suspend fun oppdaterJournalpost(journalpostId: String, journalpost: JournalpostApi.OppdaterJournalpostRequest)
@@ -89,7 +112,7 @@ internal class JournalpostApiClient(private val config: Configuration) : Journal
                 body = journalpost
             }
         } catch (e: ClientRequestException) {
-            throw JournalpostException(
+            throw JournalpostFeil.JournalpostException(
                 e.response.status.value,
                 e.response.readText()
             )
@@ -97,16 +120,21 @@ internal class JournalpostApiClient(private val config: Configuration) : Journal
     }
 
     override suspend fun ferdigstill(journalpostId: String) {
-        proxyJournalpostApiClient.request<HttpResponse>("$journalføringBaseUrl/$journalpostId/ferdigstill") {
-            method = HttpMethod.Patch
-            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
-            header(HttpHeaders.ContentType, "application/json")
-            body = FerdigstillJournalpostRequest()
+        try {
+            proxyJournalpostApiClient.request<String>("$journalføringBaseUrl/$journalpostId/ferdigstill") {
+                method = HttpMethod.Patch
+                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
+                header(HttpHeaders.ContentType, "application/json")
+                body = FerdigstillJournalpostRequest()
+            }
+        } catch (e: ClientRequestException) {
+            throw JournalpostFeil.JournalpostException(
+                e.response.status.value,
+                e.response.readText()
+            )
         }
     }
 
     private data class FerdigstillJournalpostRequest(val journalfoerendeEnhet: String = "9999")
     private data class OppdaterJournalpostResponse(val journalpostId: String)
 }
-
-class JournalpostException(val statusCode: Int, val content: String?) : RuntimeException()

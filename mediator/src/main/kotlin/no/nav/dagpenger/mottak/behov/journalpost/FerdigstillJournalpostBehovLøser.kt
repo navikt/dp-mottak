@@ -10,7 +10,7 @@ import no.nav.helse.rapids_rivers.River
 internal class FerdigstillJournalpostBehovLøser(
     private val journalpostDokarkiv: JournalpostDokarkiv,
     rapidsConnection: RapidsConnection,
-) : River.PacketListener {
+) : River.PacketListener, JournalpostFeil {
 
     private companion object {
         val logger = KotlinLogging.logger { }
@@ -28,8 +28,12 @@ internal class FerdigstillJournalpostBehovLøser(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val journalpostId = packet["journalpostId"].asText()
 
-        runBlocking {
-            journalpostDokarkiv.ferdigstill(journalpostId)
+        try {
+            runBlocking {
+                journalpostDokarkiv.ferdigstill(journalpostId)
+            }
+        } catch (e: JournalpostFeil.JournalpostException) {
+            ignorerKjenteTilstander(e)
         }
 
         packet["@løsning"] = mapOf(
