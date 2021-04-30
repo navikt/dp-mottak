@@ -87,14 +87,9 @@ internal class JournalpostApiClient(private val config: Configuration) : Journal
                 body = journalpost
             }
         } catch (e: ClientRequestException) {
-
-            logger.error(e) { e.message }
-
             throw JournalpostException(
                 e.response.status.value,
-                e.response.content.toInputStream().use {
-                    it.bufferedReader().readText()
-                }
+                e.message
             )
         }
     }
@@ -112,4 +107,4 @@ internal class JournalpostApiClient(private val config: Configuration) : Journal
     private data class OppdaterJournalpostResponse(val journalpostId: String)
 }
 
-class JournalpostException(val statusCode: Int, val content: String) : RuntimeException()
+class JournalpostException(val statusCode: Int, val content: String?) : RuntimeException()
