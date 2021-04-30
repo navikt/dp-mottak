@@ -3,6 +3,7 @@ package no.nav.dagpenger.mottak.behov.journalpost
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
+import io.ktor.client.features.ClientRequestException
 import io.ktor.client.features.DefaultRequest
 import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
@@ -11,8 +12,10 @@ import io.ktor.client.request.request
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.utils.io.jvm.javaio.toInputStream
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.Config.tokenProvider
+import java.lang.RuntimeException
 
 internal interface JournalpostDokarkiv {
     suspend fun oppdaterJournalpost(journalpostId: String, journalpost: JournalpostApi.OppdaterJournalpostRequest)
@@ -72,12 +75,21 @@ internal class JournalpostApiClient(private val config: Configuration) : Journal
         journalpostId: String,
         journalpost: JournalpostApi.OppdaterJournalpostRequest
     ) {
-        proxyJournalpostApiClient.request<OppdaterJournalpostResponse>("$journalføringBaseUrl/$journalpostId") {
-            method = HttpMethod.Put
-            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
-            header(HttpHeaders.ContentType, "application/json")
-            header(HttpHeaders.Accept, "application/json")
-            body = journalpost
+        try {
+            proxyJournalpostApiClient.request<OppdaterJournalpostResponse>("$journalføringBaseUrl/$journalpostId") {
+                method = HttpMethod.Put
+                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
+                header(HttpHeaders.ContentType, "application/json")
+                header(HttpHeaders.Accept, "application/json")
+                body = journalpost
+            }
+        } catch (e: ClientRequestException) {
+            throw JournalpostException(
+                e.response.status.value,
+                e.response.content.toInputStream().use {
+                    it.bufferedReader().readText()
+                }
+            )
         }
     }
 
@@ -93,3 +105,5 @@ internal class JournalpostApiClient(private val config: Configuration) : Journal
     private data class FerdigstillJournalpostRequest(val journalfoerendeEnhet: String = "9999")
     private data class OppdaterJournalpostResponse(val journalpostId: String)
 }
+
+class JournalpostException(val statusCode: Int, val content: String) : RuntimeException()

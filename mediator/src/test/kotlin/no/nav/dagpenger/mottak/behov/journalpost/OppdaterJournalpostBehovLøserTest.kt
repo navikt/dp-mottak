@@ -1,8 +1,12 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
+import io.mockk.coEvery
+import io.mockk.mockk
+import io.mockk.slot
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.UUID
@@ -10,36 +14,29 @@ import java.util.UUID
 internal class OppdaterJournalpostBehovLøserTest {
 
     private val testRapid = TestRapid()
-    private var mappedRequest: JournalpostApi.OppdaterJournalpostRequest? = null
     private val fagsakId = "23456"
     private val fødselsnummer = "12345678910"
 
+    private val slot = slot<JournalpostApi.OppdaterJournalpostRequest>()
+    private val mockedJournalpostDokarkiv: JournalpostDokarkiv = mockk<JournalpostDokarkiv>().also {
+        coEvery { it.oppdaterJournalpost(journalpostId = any(), journalpost = capture(slot)) } returns Unit
+    }
+
     init {
         OppdaterJournalpostBehovLøser(
-            journalpostDokarkiv = object : JournalpostDokarkiv {
-
-                override suspend fun oppdaterJournalpost(
-                    journalpostId: String,
-                    journalpost: JournalpostApi.OppdaterJournalpostRequest
-                ) {
-                    mappedRequest = journalpost
-                }
-
-                override suspend fun ferdigstill(journalpostId: String) {
-                    throw IllegalArgumentException("Skal ikke kalles her")
-                }
-            },
+            journalpostDokarkiv = mockedJournalpostDokarkiv,
             rapidsConnection = testRapid
         )
     }
 
     @Test
     fun `Løser oppdater journalpost behov`() {
-        testRapid.sendTestMessage(journalpostBehov())
+        testRapid.sendTestMessage(journalpostBehov("12345"))
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertNotNull(field(0, "@løsning")["OppdaterJournalpost"])
-            requireNotNull(mappedRequest).also {
+            assertTrue(slot.isCaptured)
+            requireNotNull(slot.captured).also {
                 assertEquals(fagsakId, it.sak.fagsakId)
                 assertEquals(JournalpostApi.SaksType.FAGSAK, it.sak.saksType)
                 assertEquals(fødselsnummer, it.bruker.id)
@@ -54,7 +51,8 @@ internal class OppdaterJournalpostBehovLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertNotNull(field(0, "@løsning")["OppdaterJournalpost"])
-            requireNotNull(mappedRequest).also {
+            assertTrue(slot.isCaptured)
+            requireNotNull(slot.captured).also {
                 assertEquals(JournalpostApi.SaksType.GENERELL_SAK, it.sak.saksType)
                 assertEquals(fødselsnummer, it.bruker.id)
                 assertEquals(2, it.dokumenter.size)
@@ -62,8 +60,29 @@ internal class OppdaterJournalpostBehovLøserTest {
         }
     }
 
+    @Test
+    fun `test kjente feil tilstander`() {
+        coEvery { mockedJournalpostDokarkiv.oppdaterJournalpost(journalpostId = "12345", journalpost = any()) } throws JournalpostException(
+            statusCode = 400,
+            //language=JSON
+            content = """{
+  "timestamp": "2021-04-30T07:54:09.362+00:00",
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Bruker kan ikke oppdateres for journalpost med journalpostStatus=J og journalpostType=I.",
+  "path": "/rest/journalpostapi/v1/journalpost/493358469"
+}"""
+
+        )
+        testRapid.sendTestMessage(journalpostBehov("12345"))
+        with(testRapid.inspektør) {
+            assertEquals(1, size)
+            assertNotNull(field(0, "@løsning")["OppdaterJournalpost"])
+        }
+    }
+
     //language=JSON
-    private fun journalpostBehov(): String =
+    private fun journalpostBehov(journalpostId: String = "23456789"): String =
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
@@ -71,7 +90,7 @@ internal class OppdaterJournalpostBehovLøserTest {
             "OppdaterJournalpost"
           ],
           "@opprettet" : "${LocalDateTime.now()}",
-          "journalpostId": "23456789",
+          "journalpostId": "$journalpostId",
           "fagsakId": "$fagsakId",
           "fødselsnummer": "$fødselsnummer",
           "aktørId": "123474",

@@ -360,7 +360,7 @@ class Innsending private constructor(
         }
 
         override fun håndter(innsending: Innsending, gosysOppgave: GosysOppgaveOpprettet) {
-            innsending.tilstand(gosysOppgave, FerdigStilt)
+            innsending.tilstand(gosysOppgave, FerdigStilt) //hvis person er satt, oppdater journalpost
         }
     }
 
