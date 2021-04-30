@@ -22,7 +22,7 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerSøknadsdataType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.InnsendingFerdigstiltType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.MottattType
-import no.nav.dagpenger.mottak.InnsendingTilstandType.OppdaterJournalpostType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.UkjentBrukerType
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -84,7 +84,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerMinsteinntektVurderingType,
             AvventerSvarOmEksisterendeSakerType,
             AventerArenaStartVedtakType,
-            OppdaterJournalpostType,
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType
         )
@@ -143,7 +142,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             KategoriseringType,
             AvventerSøknadsdataType,
             AventerArenaOppgaveType,
-            OppdaterJournalpostType,
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType
         )
@@ -190,7 +188,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerPersondataType,
             KategoriseringType,
             AventerArenaOppgaveType,
-            OppdaterJournalpostType,
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType
         )
@@ -208,6 +205,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJournalpostData("Fritekstkode")
         håndterPersonInformasjon()
         håndterGosysOppgaveOpprettet()
+        håndterJournalpostOppdatert()
 
         assertTilstander(
             MottattType,
@@ -231,6 +229,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0438")
         håndterPersonInformasjon()
         håndterGosysOppgaveOpprettet()
+        håndterJournalpostOppdatert()
         assertBehovDetaljer(
             OpprettGosysoppgave,
             setOf(
@@ -304,7 +303,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             MottattType,
             AvventerJournalpostType,
             KategoriseringType,
-            AvventerGosysType,
+            UkjentBrukerType,
             InnsendingFerdigstiltType
         )
 
@@ -327,7 +326,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             MottattType,
             AvventerJournalpostType,
             AvventerPersondataType,
-            AvventerGosysType,
+            UkjentBrukerType,
             InnsendingFerdigstiltType
         )
 
