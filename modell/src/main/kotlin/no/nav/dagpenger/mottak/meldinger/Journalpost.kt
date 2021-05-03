@@ -81,6 +81,7 @@ class Journalpost constructor(
 
     override fun journalpostId(): String = journalpostId
     fun hovedskjema() = dokumenter.first().brevkode
+    fun tittel() = dokumenter.first().tittel
     fun bruker() = bruker
 
     fun dokumenter(): List<DokumentInfo> = dokumenter

@@ -28,7 +28,7 @@ internal class FerdigstillJournalpostBehovLøser(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val journalpostId = packet["journalpostId"].asText()
 
-        if (journalpostId != "493358652") {
+        if (journalpostId != "493358652" || journalpostId != "493358710") {
 
             try {
                 runBlocking {

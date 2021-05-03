@@ -69,7 +69,9 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "aktørId",
                 "fødselsnummer",
                 "navn",
-                "fagsakId"
+                "fagsakId",
+                "tittel",
+                "dokumenter"
             )
         )
 
@@ -130,7 +132,9 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "aktørId",
                 "fødselsnummer",
                 "navn",
-                "fagsakId"
+                "fagsakId",
+                "tittel",
+                "dokumenter"
             )
         )
 
@@ -180,7 +184,9 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "aktørId",
                 "fødselsnummer",
                 "fagsakId",
-                "navn"
+                "navn",
+                "tittel",
+                "dokumenter"
             )
         )
         håndterJournalpostFerdigstilt()
