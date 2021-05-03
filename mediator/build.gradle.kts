@@ -19,6 +19,11 @@ dependencies {
     implementation(Ktor.library("client-cio-jvm"))
     implementation(Ktor.library("client-jackson"))
 
+    // unleash
+    implementation("no.finn.unleash:unleash-client-java:4.2.1") {
+        exclude("org.apache.logging.log4j")
+    }
+
     testImplementation(Mockk.mockk)
     testImplementation(TestContainers.postgresql)
 }

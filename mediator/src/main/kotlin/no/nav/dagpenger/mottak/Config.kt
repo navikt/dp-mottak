@@ -9,7 +9,12 @@ import com.natpryce.konfig.intType
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
 import com.zaxxer.hikari.HikariDataSource
+import io.netty.util.NetUtil.getHostname
+import no.finn.unleash.DefaultUnleash
+import no.finn.unleash.util.UnleashConfig
 import no.nav.dagpenger.aad.api.ClientCredentialsClient
+import java.net.InetAddress
+import java.net.UnknownHostException
 
 internal object Config {
 
@@ -26,7 +31,9 @@ internal object Config {
             "KAFKA_CONSUMER_GROUP_ID" to "dp-mottak-v1",
             "KAFKA_EXTRA_TOPIC" to "teamdagpenger.mottak.v1,teamdagpenger.regel.v1",
             "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
-            "KAFKA_RESET_POLICY" to "latest"
+            "KAFKA_RESET_POLICY" to "latest",
+            "UNLEASH_URL" to "https://unleash.nais.io/api/"
+
         )
     )
     private val prodProperties = ConfigurationMap(
@@ -70,8 +77,23 @@ internal object Config {
 
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_URL", stringType)]
     fun Configuration.dpProxyScope() = this[Key("DP_PROXY_SCOPE", stringType)]
-
+    fun Configuration.unleash() = DefaultUnleash(unleashConfig(), ByClusterStrategy(ByClusterStrategy.Cluster.current))
+    private fun Configuration.unleashConfig(): UnleashConfig =
+        UnleashConfig.builder()
+            .appName("dp-mottak")
+            .instanceId(getHostname())
+            .unleashAPI(this[Key("unleash.url", stringType)])
+            .build()
     fun asMap(): Map<String, String> = properties.list().reversed().fold(emptyMap()) { map, pair ->
         map + pair.second
+    }
+}
+
+private fun getHostname(): String {
+    return try {
+        val addr: InetAddress = InetAddress.getLocalHost()
+        addr.hostName
+    } catch (e: UnknownHostException) {
+        "unknown"
     }
 }

@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.tjenester
 
+import no.finn.unleash.FakeUnleash
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.db.InMemoryInnsendingRepository
 import no.nav.dagpenger.mottak.e2e.TestObservatør
@@ -15,6 +16,9 @@ class PersondataMottakTest {
     private val innsendingMediator = InnsendingMediator(
         innsendingRepository = innsendingRepository,
         rapidsConnection = testRapid,
+        unleash = FakeUnleash().also {
+            it.enableAll()
+        },
         observatører = listOf(observatør)
     )
     init {
