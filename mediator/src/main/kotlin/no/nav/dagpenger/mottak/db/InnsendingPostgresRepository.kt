@@ -292,6 +292,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         }
 
         override fun visitPerson(
+            navn: String,
             aktørId: String,
             fødselsnummer: String,
             norskTilknytning: Boolean,
@@ -316,14 +317,15 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
                     """
-                        INSERT INTO person_innsending_v1(id,personId,norsktilknytning,diskresjonskode) 
-                        SELECT :id, id, :norskTilknytning, :diskresjonskode
+                        INSERT INTO person_innsending_v1(id,navn,personId,norsktilknytning,diskresjonskode) 
+                        SELECT :id, :navn, id, :norskTilknytning, :diskresjonskode
                         FROM public.person_v1 WHERE fødselsnummer = :fnr 
                         AND aktørid = :aktoerId ON CONFLICT DO NOTHING 
                         """.trimMargin(),
                     mapOf(
                         "id" to internId,
                         "fnr" to fødselsnummer,
+                        "navn" to navn,
                         "aktoerId" to aktørId,
                         "norskTilknytning" to norskTilknytning,
                         "diskresjonskode" to diskresjonskode

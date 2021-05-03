@@ -27,6 +27,7 @@ import java.time.LocalDateTime
 abstract class AbstractEndeTilEndeTest {
 
     protected companion object {
+        private const val NAVN = "TEST TESTEN"
         private const val UNG_PERSON_FNR_2018 = "12020052345"
         private const val AKTØRID = "42"
         private const val JOURNALPOST_ID = "12345"
@@ -168,7 +169,8 @@ abstract class AbstractEndeTilEndeTest {
         journalpostId = JOURNALPOST_ID,
         aktørId = AKTØRID,
         fødselsnummer = UNG_PERSON_FNR_2018,
-        norskTilknytning = true
+        norskTilknytning = true,
+        navn = NAVN
     )
     private fun personInformasjonIkkeFunnet(): PersonInformasjonIkkeFunnet = PersonInformasjonIkkeFunnet(
         aktivitetslogg = Aktivitetslogg(),

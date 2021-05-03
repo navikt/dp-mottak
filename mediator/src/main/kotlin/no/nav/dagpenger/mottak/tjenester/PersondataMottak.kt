@@ -41,8 +41,9 @@ internal class PersondataMottak(
                 journalpostId = packet["journalpostId"].asText(),
                 aktørId = persondata["aktørId"].asText(),
                 fødselsnummer = persondata["fødselsnummer"].asText(),
-                norskTilknytning = persondata["norskTilknytning"].asBoolean(),
-                diskresjonskode = persondata["diskresjonskode"].textValue()
+                diskresjonskode = persondata["diskresjonskode"].textValue(),
+                navn = persondata["navn"].asText(),
+                norskTilknytning = persondata["norskTilknytning"].asBoolean()
             ).also { innsendingMediator.håndter(it) }
         }
     }

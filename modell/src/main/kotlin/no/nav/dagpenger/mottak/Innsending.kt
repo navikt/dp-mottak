@@ -509,7 +509,8 @@ class Innsending private constructor(
         val arenaSakId = arenaSak?.let { mapOf("fagsakId" to it.fagsakId) } ?: emptyMap()
         val parametre = mapOf(
             "aktørId" to person.aktørId,
-            "fødselsnummer" to person.fødselsnummer
+            "fødselsnummer" to person.fødselsnummer,
+            "navn" to person.navn
         ) + arenaSakId
 
         hendelse.behov(

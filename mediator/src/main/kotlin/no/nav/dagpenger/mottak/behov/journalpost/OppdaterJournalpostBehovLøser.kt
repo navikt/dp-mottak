@@ -23,7 +23,7 @@ internal class OppdaterJournalpostBehovLøser(
             validate { it.demandAllOrAny("@behov", listOf("OppdaterJournalpost")) }
             validate { it.rejectKey("@løsning") }
             validate { it.requireKey("@id", "journalpostId") }
-            validate { it.interestedIn("fødselsnummer", "tittel", "dokumenter", "fagsakId") }
+            validate { it.interestedIn("navn", "fødselsnummer", "tittel", "dokumenter", "fagsakId") }
         }.register(this)
     }
 
@@ -48,7 +48,11 @@ private fun JsonMessage.tilJournalføringOppdaterRequest(): OppdaterJournalpostR
         tittel = this["tittel"].asText(),
         sak = this.sak(),
         dokumenter = this.dokumenter(),
+        avsenderMottaker = this.avsender()
     )
+
+private fun JsonMessage.avsender(): JournalpostApi.Avsender =
+    JournalpostApi.Avsender(this["navn"].asText())
 
 private fun JsonMessage.dokumenter(): List<JournalpostApi.Dokument> =
     this["dokumenter"].map {

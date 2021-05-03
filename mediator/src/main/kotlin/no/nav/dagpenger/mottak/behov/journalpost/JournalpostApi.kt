@@ -41,7 +41,6 @@ internal interface JournalpostFeil {
                     return
                 } else throw journalpostException
             }
-            403 -> return
         }
     }
 }
@@ -53,6 +52,7 @@ internal interface JournalpostDokarkiv {
 
 internal class JournalpostApi {
     internal data class OppdaterJournalpostRequest(
+        val avsenderMottaker: Avsender,
         val bruker: Bruker,
         val tittel: String,
         val sak: Sak,
@@ -76,6 +76,7 @@ internal class JournalpostApi {
             }
         }
     }
+    internal data class Avsender(val navn: String)
 
     internal data class Bruker(val id: String, val idType: String = "FNR")
     internal data class Dokument(val dokumentInfoId: String, val tittel: String)

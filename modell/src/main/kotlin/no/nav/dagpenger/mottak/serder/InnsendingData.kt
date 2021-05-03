@@ -49,6 +49,7 @@ data class InnsendingData(
                 eksisterendeSaker,
                 personData?.let {
                     PersonInformasjon.Person(
+                        "Test Navn",
                         it.aktørId,
                         it.fødselsnummer,
                         it.norskTilknytning,

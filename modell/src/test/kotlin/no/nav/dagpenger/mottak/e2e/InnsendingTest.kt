@@ -68,6 +68,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             setOf(
                 "aktørId",
                 "fødselsnummer",
+                "navn",
                 "fagsakId"
             )
         )
@@ -128,6 +129,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             setOf(
                 "aktørId",
                 "fødselsnummer",
+                "navn",
                 "fagsakId"
             )
         )
@@ -177,7 +179,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             setOf(
                 "aktørId",
                 "fødselsnummer",
-                "fagsakId"
+                "fagsakId",
+                "navn"
             )
         )
         håndterJournalpostFerdigstilt()

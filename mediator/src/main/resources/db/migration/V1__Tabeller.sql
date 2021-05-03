@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS person_v1
 CREATE TABLE IF NOT EXISTS person_innsending_v1
 (
     id               BIGINT PRIMARY KEY REFERENCES innsending_v1,
+    navn             TEXT NOT NULL,
     personId         BIGSERIAL REFERENCES person_v1 (id),
     norsktilknytning BOOLEAN NOT NULL,
     diskresjonskode  BOOLEAN NOT NULL

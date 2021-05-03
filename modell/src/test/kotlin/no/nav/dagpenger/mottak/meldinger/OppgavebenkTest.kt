@@ -21,7 +21,13 @@ import org.junit.jupiter.params.provider.ValueSource
 
 class OppgavebenkTest {
     private val jp = lagjournalpostData("NAV 04-01.03").kategorisertJournalpost()
-    private val person = PersonInformasjon.Person("12344", "12345678901", norskTilknytning = true, diskresjonskode = false)
+    private val person = PersonInformasjon.Person(
+        "Test Navn",
+        "12344",
+        "12345678901",
+        norskTilknytning = true,
+        diskresjonskode = false
+    )
 
     @Test
     fun `Finn riktig oppgave beskrivelse og benk når søker har eøs arbeidsforhold de siste 3 årene `() {

@@ -14,11 +14,13 @@ internal class PersonInformasjonTest {
     fun `skal mappe diskresjonskoder`(kode: String) {
         val person = PersonInformasjon(
             Aktivitetslogg(),
-            "12345",
-            "12345678",
-            "12345678901",
-            true,
-            kode
+            journalpostId = "12345",
+            aktørId = "12345678",
+            fødselsnummer = "12345678901",
+            norskTilknytning = true,
+            navn = "Test Testen",
+            diskresjonskode = kode
+
         )
         assertTrue(person.person().diskresjonskode, "Kode $kode")
     }
@@ -27,11 +29,12 @@ internal class PersonInformasjonTest {
     fun `skal ikke ha diskresjonkode hvis ikke informasjon om det  `() {
         val person = PersonInformasjon(
             Aktivitetslogg(),
-            "12345",
-            "12345678",
-            "12345678901",
-            true,
-            null
+            journalpostId = "12345",
+            aktørId = "12345678",
+            fødselsnummer = "12345678901",
+            norskTilknytning = true,
+            navn = "Test Testen",
+            diskresjonskode = null
         )
         assertFalse(person.person().diskresjonskode)
     }
