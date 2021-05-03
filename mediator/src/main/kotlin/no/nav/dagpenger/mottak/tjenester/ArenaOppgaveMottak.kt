@@ -35,7 +35,7 @@ internal class OpprettArenaOppgaveMottak(
             ArenaOppgaveOpprettet(
                 aktivitetslogg = Aktivitetslogg(),
                 journalpostId = packet["journalpostId"].asText(),
-                oppgaveId = it["oppgaveId"].asText(),
+                oppgaveId = it["oppgaveId"]?.asText(),
                 fagsakId = it["fagsakId"].asText()
             )
         }

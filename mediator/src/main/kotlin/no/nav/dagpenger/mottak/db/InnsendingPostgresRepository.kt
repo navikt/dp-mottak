@@ -332,7 +332,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             )
         }
 
-        override fun visitArenaSak(oppgaveId: String, fagsakId: String) {
+        override fun visitArenaSak(oppgaveId: String?, fagsakId: String) {
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
                     """

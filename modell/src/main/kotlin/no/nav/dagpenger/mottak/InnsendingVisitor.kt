@@ -25,7 +25,7 @@ interface PersonVisitor {
 }
 
 interface ArenaSakVisitor {
-    fun visitArenaSak(oppgaveId: String, fagsakId: String) {}
+    fun visitArenaSak(oppgaveId: String?, fagsakId: String) {}
 }
 
 interface InnsendingVisitor :

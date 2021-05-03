@@ -86,7 +86,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
             try {
                 runBlocking {
                     val behovNavn = packet["@behov"].first().asText()
-                    val response = when (behovNavn) {
+                    val oppgaveResponse = when (behovNavn) {
                         "OpprettVurderhenvendelseOppgave" -> arenaOppslag.opprettVurderHenvendelsOppgave(
                             journalpostId,
                             packet.arenaOppgaveParametre()
@@ -97,7 +97,14 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                         )
                         else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
                     }
-                    packet["@løsning"] = mapOf(behovNavn to response)
+
+                    packet["@løsning"] = mapOf(
+                        behovNavn to mapOf(
+                            "journalpostId" to journalpostId,
+                            "fagsakId" to oppgaveResponse.fagsakId,
+                            "oppgaveId" to oppgaveResponse.oppgaveId
+                        )
+                    )
                     context.publish(packet.toJson())
                 }
             } catch (e: Exception) {

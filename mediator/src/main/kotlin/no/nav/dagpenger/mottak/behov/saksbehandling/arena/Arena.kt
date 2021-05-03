@@ -17,8 +17,8 @@ import java.time.LocalDate
 
 internal interface ArenaOppslag {
     suspend fun harEksisterendeSaker(fnr: String): Boolean
-    suspend fun opprettStartVedtakOppgave(journalpostId: String, parametere: OpprettArenaOppgaveParametere): Map<String, String>
-    suspend fun opprettVurderHenvendelsOppgave(journalpostId: String, parametere: OpprettArenaOppgaveParametere): Map<String, String>
+    suspend fun opprettStartVedtakOppgave(journalpostId: String, parametere: OpprettArenaOppgaveParametere): OpprettVedtakOppgaveResponse
+    suspend fun opprettVurderHenvendelsOppgave(journalpostId: String, parametere: OpprettArenaOppgaveParametere): OpprettVedtakOppgaveResponse
 }
 
 internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
@@ -54,7 +54,7 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
     override suspend fun opprettStartVedtakOppgave(
         journalpostId: String,
         parametere: OpprettArenaOppgaveParametere
-    ): Map<String, String> = opprettArenaOppgave("$baseUrl/vedtak", parametere).map(journalpostId)
+    ): OpprettVedtakOppgaveResponse = opprettArenaOppgave("$baseUrl/vedtak", parametere)
 
     private suspend fun opprettArenaOppgave(url: String, parametereBody: OpprettArenaOppgaveParametere): OpprettVedtakOppgaveResponse =
         proxyArenaClient.request(url) {
@@ -67,7 +67,7 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
     override suspend fun opprettVurderHenvendelsOppgave(
         journalpostId: String,
         parametere: OpprettArenaOppgaveParametere
-    ): Map<String, String> = opprettArenaOppgave("$baseUrl/sak/henvendelse", parametere).map(journalpostId)
+    ): OpprettVedtakOppgaveResponse = opprettArenaOppgave("$baseUrl/sak/henvendelse", parametere)
 }
 
 private data class AktivSakRequest(val fnr: String)
@@ -81,13 +81,7 @@ internal data class OpprettArenaOppgaveParametere(
     val oppgavebeskrivelse: String
 )
 
-private data class OpprettVedtakOppgaveResponse(
+internal data class OpprettVedtakOppgaveResponse(
     val fagsakId: String,
-    val oppgaveId: String
-) {
-    fun map(journalpostId: String) = mapOf(
-        "fagsakId" to fagsakId,
-        "oppgaveId" to oppgaveId,
-        "journalpostId" to journalpostId
-    )
-}
+    val oppgaveId: String?
+)

@@ -14,6 +14,7 @@ import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
 import no.nav.dagpenger.mottak.behov.vilkårtester.MinsteinntektVurderingLøser
 import no.nav.dagpenger.mottak.behov.vilkårtester.RegelApiProxy
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
+import no.nav.dagpenger.mottak.db.clean
 import no.nav.dagpenger.mottak.db.runMigration
 import no.nav.dagpenger.mottak.proxy.proxyPing
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
@@ -56,6 +57,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     fun start() = rapidsConnection.start()
 
     override fun onStartup(rapidsConnection: RapidsConnection) {
+        clean(Config.dataSource)
         runMigration(Config.dataSource)
         logg.info { "Starter dp-mottak" }
     }

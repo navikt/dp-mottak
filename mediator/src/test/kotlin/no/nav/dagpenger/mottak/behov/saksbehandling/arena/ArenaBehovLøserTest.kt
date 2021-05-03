@@ -22,21 +22,16 @@ internal class ArenaBehovLøserTest {
                 override suspend fun opprettStartVedtakOppgave(
                     journalpostId: String,
                     parametere: OpprettArenaOppgaveParametere
-                ): Map<String, String> {
-                    return mapOf(
-                        "journalpostId" to journalpostId,
-                        "fagsakId" to "123",
-                        "oppgaveId" to "123"
-                    )
-                }
-
+                ) = OpprettVedtakOppgaveResponse(
+                    fagsakId = "123",
+                    oppgaveId = "123"
+                )
                 override suspend fun opprettVurderHenvendelsOppgave(
                     journalpostId: String,
                     parametere: OpprettArenaOppgaveParametere
-                ): Map<String, String> = mapOf(
-                    "journalpostId" to journalpostId,
-                    "fagsakId" to "123",
-                    "oppgaveId" to "123"
+                ) = OpprettVedtakOppgaveResponse(
+                    fagsakId = "123",
+                    oppgaveId = null
                 )
             },
             rapidsConnection = testRapid
@@ -77,7 +72,7 @@ internal class ArenaBehovLøserTest {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
             assertEquals("123", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["fagsakId"].asText())
-            assertEquals("123", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["oppgaveId"].asText())
+            assertEquals(null, field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["oppgaveId"].textValue())
             assertEquals(JOURNALPOST_ID, field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["journalpostId"].asText())
         }
     }
