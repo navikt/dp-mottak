@@ -11,6 +11,8 @@ import no.nav.dagpenger.mottak.behov.person.PdlPersondataOppslag
 import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaApiClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
+import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysProxyClient
+import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.OpprettGosysOppgaveLøser
 import no.nav.dagpenger.mottak.behov.vilkårtester.MinsteinntektVurderingLøser
 import no.nav.dagpenger.mottak.behov.vilkårtester.RegelApiProxy
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
@@ -30,6 +32,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val regelApiClient = RegelApiProxy(Config.properties)
     private val arenaApiClient = ArenaApiClient(Config.properties)
     private val journalpostApiClient = JournalpostApiClient(Config.properties)
+    private val gosysProxyClient = GosysProxyClient(Config.properties)
 
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
@@ -52,6 +55,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             SøknadsdataBehovLøser(safClient, this)
             MinsteinntektVurderingLøser(regelApiClient, this)
             ArenaBehovLøser(arenaApiClient, this)
+            OpprettGosysOppgaveLøser(gosysProxyClient, this)
         }
 
     init {
