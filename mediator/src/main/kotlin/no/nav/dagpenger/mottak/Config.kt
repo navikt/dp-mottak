@@ -82,7 +82,7 @@ internal object Config {
         UnleashConfig.builder()
             .appName("dp-mottak")
             .instanceId(getHostname())
-            .unleashAPI(this[Key("unleash.url", stringType)])
+            .unleashAPI(this[Key("UNLEASH_URL", stringType)])
             .build()
     fun asMap(): Map<String, String> = properties.list().reversed().fold(emptyMap()) { map, pair ->
         map + pair.second
