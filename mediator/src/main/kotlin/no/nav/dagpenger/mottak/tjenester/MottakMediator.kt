@@ -5,7 +5,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 
 internal class MottakMediator(mediator: InnsendingMediator, rapidsConnection: RapidsConnection) {
     init {
-        JournalføringMottak(mediator, rapidsConnection)
+        JoarkMottak(mediator, rapidsConnection)
         JournalpostMottak(mediator, rapidsConnection)
         EksisterendeSakerMottak(mediator, rapidsConnection)
         PersondataMottak(mediator, rapidsConnection)

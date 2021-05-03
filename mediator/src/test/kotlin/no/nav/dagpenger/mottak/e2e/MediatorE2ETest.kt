@@ -176,7 +176,7 @@ internal class MediatorE2ETest {
         {
           "hendelsesId": "",
           "versjon": "",
-          "hendelsesType": "",
+          "hendelsesType": "MidlertidigJournalført",
           "journalpostId": "$journalpostId",
           "journalpostStatus": "Mottatt",
           "temaGammelt": "DAG",

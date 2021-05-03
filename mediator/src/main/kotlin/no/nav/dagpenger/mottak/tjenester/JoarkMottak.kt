@@ -9,7 +9,7 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-internal class JournalføringMottak(
+internal class JoarkMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
@@ -22,6 +22,13 @@ internal class JournalføringMottak(
         River(rapidsConnection).apply {
             validate { it.requireKey("journalpostId") }
             validate { it.requireKey("journalpostStatus") }
+            validate { it.requireValue("temaNytt", "DAG") }
+            validate { it.requireValue("hendelsesType", "MidlertidigJournalført") }
+            validate {
+                it.require("mottaksKanal") { json ->
+                    if (json.asText() == "EESSI") throw IllegalArgumentException("Kan ikke håndtere 'EESSI' mottakskanal")
+                }
+            }
             validate { it.interestedIn("temaNytt", "hendelsesType", "mottaksKanal", "behandlingstema") }
         }.register(this)
     }
