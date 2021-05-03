@@ -51,7 +51,7 @@ internal class OpprettGosysOppgaveLøserTest {
           "@opprettet" : "${LocalDateTime.now()}",
           "journalpostId" : "$journalpostId",
           "aktørId": "34567890",
-          "registrertDato": "2021-04-21",
+          "registrertDato": "2021-05-03T14:29:00",
           "behandlendeEnhetId":"3458",
           "oppgavebeskrivelse":"ahfjkafhk"
         }
@@ -67,7 +67,7 @@ internal class OpprettGosysOppgaveLøserTest {
           ],
           "@opprettet" : "${LocalDateTime.now()}",
           "journalpostId" : "$journalpostId",
-          "registrertDato": "2021-04-21",
+          "registrertDato": "2021-05-03T14:29:00",
           "behandlendeEnhetId":"4568"
         }
         """.trimIndent()

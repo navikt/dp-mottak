@@ -7,6 +7,7 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDate
+import no.nav.helse.rapids_rivers.asLocalDateTime
 
 internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag, rapidsConnection: RapidsConnection) :
     River.PacketListener {
@@ -52,6 +53,6 @@ private fun JsonMessage.gosysOppgave(): GosysOppgaveRequest = GosysOppgaveReques
     journalpostId = this["journalpostId"].asText(),
     aktørId = this["aktørId"].asText(),
     tildeltEnhetsnr = this["behandlendeEnhetId"].asText(),
-    aktivDato = this["registrertDato"].asLocalDate(),
+    aktivDato = this["registrertDato"].asLocalDateTime().toLocalDate(),
     beskrivelse = this["oppgavebeskrivelse"].asText()
 )
