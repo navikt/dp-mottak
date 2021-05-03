@@ -77,12 +77,12 @@ internal object Config {
 
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_URL", stringType)]
     fun Configuration.dpProxyScope() = this[Key("DP_PROXY_SCOPE", stringType)]
-    fun Configuration.unleash() = DefaultUnleash(unleashConfig(), ByClusterStrategy(ByClusterStrategy.Cluster.current))
-    private fun Configuration.unleashConfig(): UnleashConfig =
+    fun unleash() = DefaultUnleash(unleashConfig(), ByClusterStrategy(ByClusterStrategy.Cluster.current))
+    fun unleashConfig(): UnleashConfig =
         UnleashConfig.builder()
             .appName("dp-mottak")
             .instanceId(getHostname())
-            .unleashAPI(this[Key("UNLEASH_URL", stringType)])
+            .unleashAPI(properties[Key("UNLEASH_URL", stringType)])
             .build()
     fun asMap(): Map<String, String> = properties.list().reversed().fold(emptyMap()) { map, pair ->
         map + pair.second

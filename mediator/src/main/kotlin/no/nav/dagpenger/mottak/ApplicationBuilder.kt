@@ -1,7 +1,6 @@
 package no.nav.dagpenger.mottak
 
 import mu.KotlinLogging
-import no.nav.dagpenger.mottak.Config.unleash
 import no.nav.dagpenger.mottak.behov.journalpost.FerdigstillJournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApiClient
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
@@ -40,7 +39,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             val mediator = InnsendingMediator(
                 innsendingRepository = innsendingRepository,
                 rapidsConnection = this,
-                unleash = Config.properties.unleash()
+                unleash = Config.unleash()
             )
             // Behovmottakere
             MottakMediator(mediator, this)
