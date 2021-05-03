@@ -45,7 +45,7 @@ internal class GosysProxyClient(config: Configuration) : GosysOppslag {
 
     private val proxyGosysClient = HttpClient() {
         install(DefaultRequest) {
-            this.url("${config.dpProxyUrl()}/proxy/v1/oppgaver")
+            this.url("${config.dpProxyUrl()}/proxy/v1/gosys/oppgaver")
             method = HttpMethod.Post
         }
         install(JsonFeature) {
