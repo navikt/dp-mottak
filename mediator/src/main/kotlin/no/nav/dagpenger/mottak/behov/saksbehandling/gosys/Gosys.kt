@@ -59,6 +59,7 @@ internal class GosysProxyClient(config: Configuration) : GosysOppslag {
         try {
             logger.info { "Forsøker å opprette oppgave i gosys for sak med journalpostId ${oppgaveRequest.journalpostId}" }
             return proxyGosysClient.request<GosysOppgaveReponse> {
+                header("X-Correlation-ID", oppgaveRequest.journalpostId)
                 header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
                 header(HttpHeaders.ContentType, "application/json")
                 header(HttpHeaders.Accept, "application/json")
