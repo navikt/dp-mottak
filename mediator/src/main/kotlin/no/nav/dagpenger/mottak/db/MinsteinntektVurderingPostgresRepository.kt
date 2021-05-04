@@ -44,4 +44,18 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
             JsonMessage(it, MessageProblems(it))
         }
     }
+
+    override fun slettUtgåtteVurderinger(): List<JsonMessage> {
+        return using(sessionOf(dataSource)) { session ->
+            //language=PostgreSQL
+            session.run(
+                queryOf(
+                    "DELETE FROM minsteinntekt_vurdering_v1 WHERE opprettet < (now() - (make_interval(hours := 2))) RETURNING *"
+                ).map { res ->
+                    val packet = res.string("packet")
+                    JsonMessage(packet, MessageProblems(packet))
+                }.asList
+            )
+        }
+    }
 }

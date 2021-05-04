@@ -6,20 +6,29 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import kotlin.concurrent.fixedRateTimer
 
 internal class MinsteinntektVurderingLøser(
     regelApiClient: RegelApiClient,
     private val repository: MinsteinntektVurderingRepository,
-    rapidsConnection: RapidsConnection
+    private val rapidsConnection: RapidsConnection
 ) {
+    private companion object {
+        private const val FEM_MINUTTER = 3000.toLong()
+        val logger = KotlinLogging.logger { }
+    }
+
+    private val minsteInntektVurderingVaktmester = MinsteInntektVurderingVaktmester()
 
     init {
         StartBehovPacketListener(regelApiClient, rapidsConnection)
         LøsningPacketListener(rapidsConnection)
-    }
-
-    private companion object {
-        val logger = KotlinLogging.logger { }
+        fixedRateTimer(
+            name = "MinsteinntektVurderingVaktmester",
+            daemon = true,
+            initialDelay = FEM_MINUTTER,
+            period = FEM_MINUTTER
+        ) { minsteInntektVurderingVaktmester.rydd() }
     }
 
     private inner class StartBehovPacketListener(
@@ -57,6 +66,15 @@ internal class MinsteinntektVurderingLøser(
         }
     }
 
+    private inner class MinsteInntektVurderingVaktmester {
+        fun rydd() {
+//            repository.slettUtgåtteVurderinger().forEach {
+//                rapidsConnection.publish("hubba")
+//            }
+            logger.info { "Rydder opp stuff" }
+        }
+    }
+
     private inner class LøsningPacketListener(
         rapidsConnection: RapidsConnection
     ) :
@@ -88,4 +106,5 @@ internal class MinsteinntektVurderingLøser(
 interface MinsteinntektVurderingRepository {
     fun lagre(journalpostId: String, packet: JsonMessage): Int
     fun fjern(journalpostId: String): JsonMessage?
+    fun slettUtgåtteVurderinger(): List<JsonMessage>
 }
