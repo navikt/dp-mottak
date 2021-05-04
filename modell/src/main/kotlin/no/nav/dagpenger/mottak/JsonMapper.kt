@@ -9,9 +9,7 @@ internal object JsonMapper {
     internal val jacksonJsonAdapter =
         jacksonMapperBuilder()
             .addModule(JavaTimeModule())
+            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .build()
-            .also {
-                it.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                it.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            }
 }
