@@ -17,7 +17,6 @@ import no.nav.dagpenger.mottak.behov.vilkårtester.MinsteinntektVurderingLøser
 import no.nav.dagpenger.mottak.behov.vilkårtester.RegelApiProxy
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.MinsteinntektVurderingPostgresRepository
-import no.nav.dagpenger.mottak.db.clean
 import no.nav.dagpenger.mottak.db.runMigration
 import no.nav.dagpenger.mottak.proxy.proxyPing
 import no.nav.dagpenger.mottak.tjenester.MottakMediator

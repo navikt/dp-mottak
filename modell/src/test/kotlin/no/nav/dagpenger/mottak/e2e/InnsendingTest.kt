@@ -23,6 +23,9 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType.InnsendingFerdigstiltType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.MottattType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.UkjentBrukerType
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -96,6 +99,15 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertMessages(it)
             println(it.innsendingLogg.toString())
         }
+        assertFerdigstilt {
+            assertEquals("NySøknad", it.type.name)
+            assertNotNull(it.søknadsData)
+            assertNotNull(it.fagsakId)
+            assertNotNull(it.aktørId)
+            assertNotNull(it.fødselsnummer)
+            assertNotNull(it.behandlendeEnhet)
+            assertNotNull(it.datoRegistrert)
+        }
     }
 
     @ParameterizedTest
@@ -157,6 +169,16 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertMessages(it)
             println(it.innsendingLogg.toString())
         }
+
+        assertFerdigstilt {
+            assertEquals("Gjenopptak", it.type.name)
+            assertNotNull(it.søknadsData)
+            assertNotNull(it.fagsakId)
+            assertNotNull(it.aktørId)
+            assertNotNull(it.fødselsnummer)
+            assertNotNull(it.behandlendeEnhet)
+            assertNotNull(it.datoRegistrert)
+        }
     }
 
     @ParameterizedTest
@@ -206,6 +228,16 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertMessages(it)
             println(it.innsendingLogg.toString())
         }
+
+        assertFerdigstilt {
+            val expected = setOf("Etablering", "Ettersending", "KlageOgAnke", "Utdanning")
+            assertTrue(it.type.name in expected, "Forventet at ${it.type.name} var en av $expected")
+            assertNotNull(it.fagsakId)
+            assertNotNull(it.aktørId)
+            assertNotNull(it.fødselsnummer)
+            assertNotNull(it.behandlendeEnhet)
+            assertNotNull(it.datoRegistrert)
+        }
     }
 
     @Test
@@ -229,6 +261,14 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNoErrors(it)
             assertMessages(it)
             println(it.innsendingLogg.toString())
+        }
+
+        assertFerdigstilt {
+            assertEquals("UkjentSkjemaKode", it.type.name)
+            assertNotNull(it.aktørId)
+            assertNotNull(it.fødselsnummer)
+            assertNotNull(it.behandlendeEnhet)
+            assertNotNull(it.datoRegistrert)
         }
     }
 
@@ -273,6 +313,14 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNoErrors(it)
             assertMessages(it)
             println(it.innsendingLogg.toString())
+        }
+
+        assertFerdigstilt {
+            assertEquals("KlageOgAnkeLønnskompensasjon", it.type.name)
+            assertNotNull(it.aktørId)
+            assertNotNull(it.fødselsnummer)
+            assertNotNull(it.behandlendeEnhet)
+            assertNotNull(it.datoRegistrert)
         }
     }
 
@@ -321,6 +369,11 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertMessages(it)
             println(it.innsendingLogg.toString())
         }
+
+        assertFerdigstilt {
+            assertNotNull(it.behandlendeEnhet)
+            assertNotNull(it.datoRegistrert)
+        }
     }
 
     @Test
@@ -343,6 +396,11 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNoErrors(it)
             assertMessages(it)
             println(it.innsendingLogg.toString())
+        }
+
+        assertFerdigstilt {
+            assertNotNull(it.behandlendeEnhet)
+            assertNotNull(it.datoRegistrert)
         }
     }
 }
