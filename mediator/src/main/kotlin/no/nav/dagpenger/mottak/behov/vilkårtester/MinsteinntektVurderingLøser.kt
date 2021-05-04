@@ -51,7 +51,7 @@ internal class MinsteinntektVurderingLøser(
                 } catch (e: Exception) {
                     logger.warn(e) { "Feil ved start av minsteinntekts vurdering for journalpost med id ${packet["journalpostId"]}" }
                     packet["@løsning"] = mapOf("MinsteinntektVurdering" to null)
-                    context.publish(packet.toJson())
+                    context.publish(journalpostId, packet.toJson())
                 }
             }
         }
@@ -72,12 +72,12 @@ internal class MinsteinntektVurderingLøser(
         }
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
-            val key = repository.fjern(packet["kontekstId"].asText())
-            key?.let {
+            val journalpostId = packet["kontekstId"].asText()
+            repository.fjern(journalpostId)?.let {
                 it["@løsning"] =
                     mapOf("MinsteinntektVurdering" to MinsteinntektVurdering(packet["minsteinntektResultat"]["oppfyllerMinsteinntekt"].asBoolean()))
-                context.publish(it.toJson())
-                logger.info { "Løste behov for minsteinntekt ${packet["kontekstId"].asText()}" }
+                context.publish(journalpostId, it.toJson())
+                logger.info { "Løste behov for minsteinntekt $journalpostId" }
             }
         }
     }

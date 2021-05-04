@@ -44,6 +44,7 @@ internal class MinsteinntektVurderingLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertTrue(field(0, "@løsning")["MinsteinntektVurdering"]["oppfyllerMinsteArbeidsinntekt"].asBoolean())
+            assertEquals(journalpostId, key(0))
         }
     }
 
@@ -57,6 +58,7 @@ internal class MinsteinntektVurderingLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertTrue(field(0, "@løsning")["MinsteinntektVurdering"].isNull)
+            assertEquals(journalpostId, key(0))
         }
     }
 
