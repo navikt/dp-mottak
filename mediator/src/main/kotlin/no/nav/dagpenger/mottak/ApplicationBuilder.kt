@@ -33,7 +33,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val arenaApiClient = ArenaApiClient(Config.properties)
     private val journalpostApiClient = JournalpostApiClient(Config.properties)
     private val gosysProxyClient = GosysProxyClient(Config.properties)
-    private val minsteinntektVurderingRepository= MinsteinntektVurderingPostgresRepository(Config.dataSource)
+    private val minsteinntektVurderingRepository = MinsteinntektVurderingPostgresRepository(Config.dataSource)
 
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
@@ -54,7 +54,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             FerdigstillJournalpostBehovLøser(journalpostApiClient, this)
             PersondataBehovLøser(PdlPersondataOppslag(Config.properties), this)
             SøknadsdataBehovLøser(safClient, this)
-            MinsteinntektVurderingLøser(regelApiClient, minsteinntektVurderingRepository,this)
+            MinsteinntektVurderingLøser(regelApiClient, minsteinntektVurderingRepository, this)
             ArenaBehovLøser(arenaApiClient, this)
             OpprettGosysOppgaveLøser(gosysProxyClient, this)
         }

@@ -15,13 +15,14 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
         return using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf(
-                    "INSERT INTO  minsteinntekt_vurdering_v1(journalpostId,packet) VALUES(:journaplostId,:packet) ON CONFLICT DO NOTHING",
+                    "INSERT INTO  minsteinntekt_vurdering_v1(journalpostId,packet) VALUES(:journalpostId,:packet) ON CONFLICT DO NOTHING",
                     mapOf(
                         "journalpostId" to journalpostId.toLong(),
                         "packet" to PGobject().apply {
                             type = "jsonb"
                             value = packet.toJson()
-                        })
+                        }
+                    )
                 ).asUpdate
             )
         }
@@ -31,7 +32,7 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
         return using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf(
-                    "DELETE FROM minsteinntekt_vurdering_v1 WHERE journalpostId=:journalpostId RETURNING packet",
+                    "DELETE FROM minsteinntekt_vurdering_v1 WHERE journalpostId=:journalpostId RETURNING *",
                     mapOf(
                         "journalpostId" to journalpostId.toLong()
                     )

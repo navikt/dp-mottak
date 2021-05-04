@@ -86,6 +86,6 @@ internal class MinsteinntektVurderingLøser(
 }
 
 interface MinsteinntektVurderingRepository {
-    fun lagre(journalpostId: String, packet: JsonMessage):Int
+    fun lagre(journalpostId: String, packet: JsonMessage): Int
     fun fjern(journalpostId: String): JsonMessage?
 }
