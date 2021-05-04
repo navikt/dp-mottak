@@ -9,7 +9,7 @@ interface InnsendingObserver {
         val gjeldendeTilstand: InnsendingTilstandType,
         val forrigeTilstand: InnsendingTilstandType,
         val aktivitetslogg: Aktivitetslogg,
-        val timeout: Duration,
+        val timeout: Duration
     )
 
     fun tilstandEndret(event: InnsendingEndretTilstandEvent) {}

@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.features.ClientRequestException
@@ -99,9 +98,7 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
         install(DefaultRequest) {
         }
         install(JsonFeature) {
-            serializer = JacksonSerializer {
-                registerModule(JavaTimeModule())
-            }
+            serializer = JacksonSerializer(jackson = JsonMapper.jacksonJsonAdapter)
         }
     }
 

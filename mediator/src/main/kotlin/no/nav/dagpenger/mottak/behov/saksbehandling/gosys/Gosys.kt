@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling.gosys
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.features.DefaultRequest
@@ -14,6 +13,7 @@ import io.ktor.http.HttpMethod
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.Config.tokenProvider
+import no.nav.dagpenger.mottak.behov.JsonMapper
 import java.time.LocalDate
 
 internal interface GosysOppslag {
@@ -34,7 +34,7 @@ internal data class GosysOppgaveRequest(
     val tema: String = "DAG"
 }
 
-private data class GosysOppgaveReponse(val id: String)
+internal data class GosysOppgaveResponse(val id: String)
 
 internal class GosysProxyClient(config: Configuration) : GosysOppslag {
     companion object {
@@ -49,16 +49,14 @@ internal class GosysProxyClient(config: Configuration) : GosysOppslag {
             method = HttpMethod.Post
         }
         install(JsonFeature) {
-            serializer = JacksonSerializer {
-                registerModule(JavaTimeModule())
-            }
+            serializer = JacksonSerializer(jackson = JsonMapper.jacksonJsonAdapter)
         }
     }
 
     override suspend fun opprettOppgave(oppgaveRequest: GosysOppgaveRequest): String {
         return try {
             logger.info { "Forsøker å opprette oppgave i gosys for sak med journalpostId ${oppgaveRequest.journalpostId}" }
-            proxyGosysClient.request<GosysOppgaveReponse> {
+            proxyGosysClient.request<GosysOppgaveResponse> {
                 header("X-Correlation-ID", oppgaveRequest.journalpostId)
                 header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
                 header(HttpHeaders.ContentType, "application/json")

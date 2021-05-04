@@ -1,7 +1,5 @@
 package no.nav.dagpenger.mottak
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import java.time.LocalDateTime
@@ -92,10 +90,8 @@ sealed class KategorisertJournalpost(
         val datoRegistrert: LocalDateTime,
         val tilleggsinformasjon: String
     ) {
-        private companion object {
-            val objectMapper = jacksonMapperBuilder().addModule(JavaTimeModule()).build()
-        }
-        fun toJson() = objectMapper.writeValueAsString(this)
+
+        fun toJson() = JsonMapper.jacksonJsonAdapter.writeValueAsString(this)
     }
 }
 

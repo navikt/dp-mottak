@@ -1,11 +1,11 @@
-package no.nav.dagpenger.mottak.behov
+package no.nav.dagpenger.mottak
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
 
-object JsonMapper {
+internal object JsonMapper {
     internal val jacksonJsonAdapter =
         jacksonMapperBuilder()
             .addModule(JavaTimeModule())

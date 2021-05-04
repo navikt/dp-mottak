@@ -1,8 +1,5 @@
 package no.nav.dagpenger.mottak
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -10,34 +7,31 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 internal class SøknadFaktaTest {
-    private val objectMapper = jacksonObjectMapper()
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        .registerModule(JavaTimeModule())
 
     @Test
     fun `Skal kunne hente årsak til avsluttet arbeidsforhold`() {
-        val data = objectMapper.readTree(søknadWithArbeidsforhold())
+        val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
         val søknad = Søknadsdata.Søknad(data)
         assertTrue(søknad.harAvsluttetArbeidsforholdFraKonkurs())
     }
 
     @Test
     fun `Skal kunne hente om søker er grensearbeider`() {
-        val data = objectMapper.readTree(søknadWithArbeidsforhold())
+        val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
         val søknad = Søknadsdata.Søknad(data)
         assertTrue(søknad.erGrenseArbeider())
     }
 
     @Test
     fun `Skal kunne hente om søker er permittert fra fiskeforedling`() {
-        val data = objectMapper.readTree(søknadWithArbeidsforhold())
+        val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
         val søknad = Søknadsdata.Søknad(data)
         assertTrue(søknad.erPermittertFraFiskeForedling())
     }
 
     @Test
     fun `empty søknadsdata`() {
-        val data = objectMapper.readTree("{}")
+        val data = JsonMapper.jacksonJsonAdapter.readTree("{}")
         val søknad = Søknadsdata.Søknad(data)
         assertFalse(søknad.harAvsluttetArbeidsforholdFraKonkurs())
     }
