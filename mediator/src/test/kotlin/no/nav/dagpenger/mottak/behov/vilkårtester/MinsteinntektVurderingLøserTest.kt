@@ -3,11 +3,14 @@ package no.nav.dagpenger.mottak.behov.vilkårtester
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import no.nav.dagpenger.mottak.db.MinsteinntektVurderingPostgresRepository
+import no.nav.dagpenger.mottak.db.PostgresTestHelper
+import no.nav.dagpenger.mottak.db.runMigration
+import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.lang.RuntimeException
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -17,8 +20,18 @@ internal class MinsteinntektVurderingLøserTest {
     private val aktørId = "456"
     val testRapid = TestRapid()
     val regelApiClientMock = mockk<RegelApiClient>(relaxed = true)
+    private val packetRepository = mutableMapOf<String, JsonMessage>()
+    private val minsteinntektVurderingRepository =
+        MinsteinntektVurderingPostgresRepository(dataSource = PostgresTestHelper.dataSource).also {
+            runMigration(PostgresTestHelper.dataSource)
+        }
+
     init {
-        MinsteinntektVurderingLøser(regelApiClientMock, testRapid)
+        MinsteinntektVurderingLøser(
+            regelApiClient = regelApiClientMock,
+            repository = minsteinntektVurderingRepository,
+            rapidsConnection = testRapid
+        )
     }
 
     @Test

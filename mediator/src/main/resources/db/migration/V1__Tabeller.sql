@@ -73,3 +73,10 @@ CREATE TABLE IF NOT EXISTS aktivitetslogg_v1
     id   BIGINT PRIMARY KEY REFERENCES innsending_v1,
     data JSONB NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS minsteinntekt_vurdering_v1
+(
+    journalpostId BIGINT UNIQUE,
+    packet JSONB NOT NULL,
+    opprettet     TIMESTAMP WITH TIME ZONE NOT NULL default (now() at time zone 'utc')
+)

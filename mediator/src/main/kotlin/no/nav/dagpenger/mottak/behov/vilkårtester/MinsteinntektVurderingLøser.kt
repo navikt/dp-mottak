@@ -8,7 +8,8 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
 internal class MinsteinntektVurderingLøser(
-    private val regelApiClient: RegelApiClient,
+    regelApiClient: RegelApiClient,
+    private val repository: MinsteinntektVurderingRepository,
     rapidsConnection: RapidsConnection
 ) {
 
@@ -19,10 +20,9 @@ internal class MinsteinntektVurderingLøser(
 
     private companion object {
         val logger = KotlinLogging.logger { }
-        val pendingPackets = mutableMapOf<String, JsonMessage>()
     }
 
-    private class StartBehovPacketListener(
+    private inner class StartBehovPacketListener(
         private val regelApiClient: RegelApiClient,
         rapidsConnection: RapidsConnection
     ) :
@@ -47,7 +47,7 @@ internal class MinsteinntektVurderingLøser(
                         aktørId = packet["aktørId"].asText(),
                         journalpostId = journalpostId
                     )
-                    pendingPackets.putIfAbsent(journalpostId, packet)
+                    repository.lagre(journalpostId, packet)
                 } catch (e: Exception) {
                     logger.warn(e) { "Feil ved start av minsteinntekts vurdering for journalpost med id ${packet["journalpostId"]}" }
                     packet["@løsning"] = mapOf("MinsteinntektVurdering" to null)
@@ -57,7 +57,9 @@ internal class MinsteinntektVurderingLøser(
         }
     }
 
-    private class LøsningPacketListener(rapidsConnection: RapidsConnection) :
+    private inner class LøsningPacketListener(
+        rapidsConnection: RapidsConnection
+    ) :
         River.PacketListener {
         init {
             River(rapidsConnection).apply {
@@ -70,13 +72,20 @@ internal class MinsteinntektVurderingLøser(
         }
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
-            pendingPackets.remove(packet["kontekstId"].asText())?.let {
-                it["@løsning"] = mapOf("MinsteinntektVurdering" to MinsteinntektVurdering(packet["minsteinntektResultat"]["oppfyllerMinsteinntekt"].asBoolean()))
+            val key = repository.fjern(packet["kontekstId"].asText())
+            key?.let {
+                it["@løsning"] =
+                    mapOf("MinsteinntektVurdering" to MinsteinntektVurdering(packet["minsteinntektResultat"]["oppfyllerMinsteinntekt"].asBoolean()))
                 context.publish(it.toJson())
-                logger.info { "Løste behove for minsteinntekt ${packet["kontekstId"].asText()}" }
+                logger.info { "Løste behov for minsteinntekt ${packet["kontekstId"].asText()}" }
             }
         }
-
-        private data class MinsteinntektVurdering(val oppfyllerMinsteArbeidsinntekt: Boolean)
     }
+
+    private data class MinsteinntektVurdering(val oppfyllerMinsteArbeidsinntekt: Boolean)
+}
+
+interface MinsteinntektVurderingRepository {
+    fun lagre(journalpostId: String, packet: JsonMessage):Int
+    fun fjern(journalpostId: String): JsonMessage?
 }
