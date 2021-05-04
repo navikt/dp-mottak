@@ -9,12 +9,13 @@ import no.nav.helse.rapids_rivers.River
 import kotlin.concurrent.fixedRateTimer
 
 internal class MinsteinntektVurderingLøser(
+    oppryddningPeriode: Long = FEM_MINUTTER,
     regelApiClient: RegelApiClient,
     private val repository: MinsteinntektVurderingRepository,
     private val rapidsConnection: RapidsConnection
 ) {
     private companion object {
-        private const val FEM_MINUTTER = 3000.toLong()
+        private const val FEM_MINUTTER = 30000.toLong()
         val logger = KotlinLogging.logger { }
     }
 
@@ -26,8 +27,8 @@ internal class MinsteinntektVurderingLøser(
         fixedRateTimer(
             name = "MinsteinntektVurderingVaktmester",
             daemon = true,
-            initialDelay = FEM_MINUTTER,
-            period = FEM_MINUTTER
+            initialDelay = oppryddningPeriode,
+            period = oppryddningPeriode
         ) { minsteInntektVurderingVaktmester.rydd() }
     }
 
@@ -68,10 +69,14 @@ internal class MinsteinntektVurderingLøser(
 
     private inner class MinsteInntektVurderingVaktmester {
         fun rydd() {
-//            repository.slettUtgåtteVurderinger().forEach {
-//                rapidsConnection.publish("hubba")
-//            }
-            logger.info { "Rydder opp stuff" }
+            logger.info { "Starter MinsteInntektVurderingVaktmester jobb" }
+            repository.slettUtgåtteVurderinger().forEach { (jpId, packet) ->
+                packet["@løsning"] =
+                    mapOf("MinsteinntektVurdering" to null)
+                rapidsConnection.publish(jpId, packet.toJson()).also {
+                    logger.info { "Ryddet opp utgått innsending for journalpostId $jpId" }
+                }
+            }
         }
     }
 
@@ -106,5 +111,5 @@ internal class MinsteinntektVurderingLøser(
 interface MinsteinntektVurderingRepository {
     fun lagre(journalpostId: String, packet: JsonMessage): Int
     fun fjern(journalpostId: String): JsonMessage?
-    fun slettUtgåtteVurderinger(): List<JsonMessage>
+    fun slettUtgåtteVurderinger(): List<Pair<String, JsonMessage>>
 }

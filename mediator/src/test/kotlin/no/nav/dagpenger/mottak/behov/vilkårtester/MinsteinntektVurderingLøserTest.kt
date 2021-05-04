@@ -2,11 +2,15 @@ package no.nav.dagpenger.mottak.behov.vilkårtester
 
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.mottak.db.MinsteinntektVurderingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresTestHelper
 import no.nav.dagpenger.mottak.db.runMigration
 import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -20,7 +24,6 @@ internal class MinsteinntektVurderingLøserTest {
     private val aktørId = "456"
     val testRapid = TestRapid()
     val regelApiClientMock = mockk<RegelApiClient>(relaxed = true)
-    private val packetRepository = mutableMapOf<String, JsonMessage>()
     private val minsteinntektVurderingRepository =
         MinsteinntektVurderingPostgresRepository(dataSource = PostgresTestHelper.dataSource).also {
             runMigration(PostgresTestHelper.dataSource)
@@ -57,6 +60,31 @@ internal class MinsteinntektVurderingLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertTrue(field(0, "@løsning")["MinsteinntektVurdering"].isNull)
+        }
+    }
+
+    @Test
+    fun `Vaktermester skal rydde`() {
+        runBlocking {
+            val repository = mockk<MinsteinntektVurderingRepository>().also {
+                every { it.slettUtgåtteVurderinger() } returns listOf(
+                    Pair("0", JsonMessage("""{}""", MessageProblems(""))),
+                    Pair("1", JsonMessage("""{}""", MessageProblems("")))
+                ) andThen emptyList()
+            }
+            MinsteinntektVurderingLøser(
+                oppryddningPeriode = 100.toLong(),
+                regelApiClient = mockk(),
+                repository = repository,
+                testRapid
+            )
+            delay(500)
+
+            assertEquals(2, testRapid.inspektør.size)
+            assertTrue(testRapid.inspektør.message(0)["@løsning"]["MinsteinntektVurdering"].isNull)
+            assertTrue(testRapid.inspektør.message(1)["@løsning"]["MinsteinntektVurdering"].isNull)
+            assertEquals("0", testRapid.inspektør.key(0))
+            assertEquals("1", testRapid.inspektør.key(1))
         }
     }
 

@@ -54,7 +54,11 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             FerdigstillJournalpostBehovLøser(journalpostApiClient, this)
             PersondataBehovLøser(PdlPersondataOppslag(Config.properties), this)
             SøknadsdataBehovLøser(safClient, this)
-            MinsteinntektVurderingLøser(regelApiClient, minsteinntektVurderingRepository, this)
+            MinsteinntektVurderingLøser(
+                regelApiClient = regelApiClient,
+                repository = minsteinntektVurderingRepository,
+                rapidsConnection = this
+            )
             ArenaBehovLøser(arenaApiClient, this)
             OpprettGosysOppgaveLøser(gosysProxyClient, this)
         }
