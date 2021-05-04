@@ -22,7 +22,7 @@ internal interface GosysOppslag {
 
 internal data class GosysOppgaveRequest(
     val journalpostId: String,
-    val aktørId: String?,
+    val aktoerId: String?,
     val tildeltEnhetsnr: String,
     val aktivDato: LocalDate,
     val fristFerdigstillelse: LocalDate = aktivDato,
@@ -56,9 +56,9 @@ internal class GosysProxyClient(config: Configuration) : GosysOppslag {
     }
 
     override suspend fun opprettOppgave(oppgaveRequest: GosysOppgaveRequest): String {
-        try {
+        return try {
             logger.info { "Forsøker å opprette oppgave i gosys for sak med journalpostId ${oppgaveRequest.journalpostId}" }
-            return proxyGosysClient.request<GosysOppgaveReponse> {
+            proxyGosysClient.request<GosysOppgaveReponse> {
                 header("X-Correlation-ID", oppgaveRequest.journalpostId)
                 header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
                 header(HttpHeaders.ContentType, "application/json")

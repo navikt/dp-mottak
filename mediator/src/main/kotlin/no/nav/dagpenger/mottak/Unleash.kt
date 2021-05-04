@@ -9,7 +9,7 @@ internal class ByClusterStrategy(private val currentCluster: Cluster) : Strategy
     }
     override fun getName(): String = "byCluster"
     override fun isEnabled(parameters: Map<String, String>): Boolean {
-        val clustersParameter = parameters?.get("cluster") ?: return false
+        val clustersParameter = parameters["cluster"] ?: return false
         val alleClustere = clustersParameter.split(",").map { it.trim() }.map { it.toLowerCase() }.toList()
         return alleClustere.contains(currentCluster.asString())
     }
