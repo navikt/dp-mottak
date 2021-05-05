@@ -68,6 +68,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                     )
                 }
                 validate { it.rejectKey("@løsning") }
+                validate { it.rejectKey("@feil") }
                 validate { it.requireKey("@id", "journalpostId") }
                 validate {
                     it.requireKey(
