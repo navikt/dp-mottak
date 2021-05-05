@@ -5,7 +5,6 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 interface InnsendingObserver {
-
     data class InnsendingEndretTilstandEvent(
         val journalpostId: String,
         val gjeldendeTilstand: InnsendingTilstandType,
@@ -13,6 +12,7 @@ interface InnsendingObserver {
         val aktivitetslogg: Aktivitetslogg,
         val timeout: Duration
     )
+
     enum class Type {
         NySøknad,
         Gjenopptak,

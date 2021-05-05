@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.observers
 
 import no.nav.dagpenger.mottak.InnsendingObserver
+import no.nav.dagpenger.mottak.InnsendingObserver.Type.NySøknad
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import org.apache.kafka.clients.producer.MockProducer
 import org.apache.kafka.common.serialization.StringSerializer
@@ -63,7 +64,7 @@ internal class FerdigstiltInnsendingObserverTest {
         fødselsnummer = null,
         aktørId = null,
         søknadsData = null,
-        fagsakId = null
+        fagsakId = null,
     )
 
     private fun ferdigstiltEvent(): InnsendingObserver.InnsendingFerdigstiltEvent =
@@ -71,7 +72,7 @@ internal class FerdigstiltInnsendingObserverTest {
             journalpostId = journalpostId,
             fødselsnummer = "12345678901",
             aktørId = "1234455",
-            type = InnsendingObserver.Type.NySøknad,
+            type = NySøknad,
             fagsakId = "1234",
             datoRegistrert = LocalDateTime.now(),
             søknadsData = JsonMapper.jacksonJsonAdapter.createObjectNode().also {

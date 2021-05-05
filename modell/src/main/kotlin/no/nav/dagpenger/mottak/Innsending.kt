@@ -605,15 +605,14 @@ class Innsending private constructor(
 
     private fun emitFerdigstilt() {
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
-        val type = type(jp)
         InnsendingFerdigstiltEvent(
-            type = type,
+            type = mapToHendelseType(jp),
             journalpostId = journalpostId,
             aktørId = person?.aktørId,
             fødselsnummer = person?.fødselsnummer,
             fagsakId = arenaSak?.fagsakId,
             datoRegistrert = jp.datoRegistrert(),
-            søknadsData = søknad?.data
+            søknadsData = søknad?.data,
         ).also { ferdig ->
             observers.forEach { it.innsendingFerdigstilt(ferdig) }
         }
@@ -621,20 +620,19 @@ class Innsending private constructor(
 
     private fun emitMottatt() {
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
-        val type = type(jp)
         InnsendingObserver.InnsendingMottattEvent(
-            type = type,
+            type = mapToHendelseType(jp),
             journalpostId = journalpostId,
             aktørId = person?.aktørId,
             fødselsnummer = person?.fødselsnummer,
             datoRegistrert = jp.datoRegistrert(),
-            søknadsData = søknad?.data
+            søknadsData = søknad?.data,
         ).also { mottatt ->
             observers.forEach { it.innsendingMottatt(mottatt) }
         }
     }
 
-    fun type(jp: Journalpost) = when (jp.kategorisertJournalpost()) {
+    private fun mapToHendelseType(jp: Journalpost) = when (jp.kategorisertJournalpost()) {
         is Etablering -> InnsendingObserver.Type.Etablering
         is Ettersending -> InnsendingObserver.Type.Ettersending
         is Gjenopptak -> InnsendingObserver.Type.Gjenopptak
