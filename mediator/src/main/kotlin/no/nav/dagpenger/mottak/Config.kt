@@ -61,7 +61,15 @@ internal object Config {
     val Configuration.dpProxyTokenProvider by lazy {
         ClientCredentialsClient(properties) {
             scope {
-                add(properties.dpProxyScope())
+                add(properties[Key("DP_PROXY_SCOPE", stringType)])
+            }
+        }
+    }
+
+    val Configuration.pdlApiTokenProvider by lazy {
+        ClientCredentialsClient(properties) {
+            scope {
+                add(properties[Key("PDL_API_SCOPE", stringType)])
             }
         }
     }
@@ -97,8 +105,7 @@ internal object Config {
     }
 
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_URL", stringType)]
-    fun Configuration.dpProxyScope() = this[Key("DP_PROXY_SCOPE", stringType)]
-    fun Configuration.pdlApiScope() = this[Key("PDL_API_SCOPE", stringType)]
+    fun Configuration.pdlApiUrl() = this[Key("PDL_API_URL", stringType)]
     fun unleash() = DefaultUnleash(unleashConfig(), ByClusterStrategy(ByClusterStrategy.Cluster.current))
     fun unleashConfig(): UnleashConfig =
         UnleashConfig.builder()

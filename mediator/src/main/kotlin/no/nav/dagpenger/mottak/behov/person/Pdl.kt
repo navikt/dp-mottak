@@ -14,18 +14,18 @@ import io.ktor.client.request.url
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import mu.KotlinLogging
-import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
-import no.nav.dagpenger.mottak.Config.dpProxyUrl
+import no.nav.dagpenger.mottak.Config.pdlApiTokenProvider
+import no.nav.dagpenger.mottak.Config.pdlApiUrl
 import no.nav.dagpenger.mottak.behov.GraphqlQuery
 import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 
 private val sikkerLogg = KotlinLogging.logger("tjenestekall")
 
 internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
-    private val tokenProvider = config.dpProxyTokenProvider
+    private val tokenProvider = config.pdlApiTokenProvider
     private val proxyPdlClient = HttpClient() {
         install(DefaultRequest) {
-            this.url("${config.dpProxyUrl()}/proxy/v1/pdl/graphql")
+            this.url("${config.pdlApiUrl()}/graphql")
             method = HttpMethod.Post
         }
     }
