@@ -5,17 +5,59 @@ import no.nav.dagpenger.mottak.InnsendingObserver
 
 internal class MetrikkObserver : InnsendingObserver {
 
-    companion object {
-        private val tilstandCounter = Counter
-            .build("dp_innsending_endret", "Antall tilstandsendringer")
-            .labelNames("tilstand", "forrigeTilstand")
-            .register()
-    }
-
     override fun tilstandEndret(event: InnsendingObserver.InnsendingEndretTilstandEvent) {
-        tilstandCounter.labels(
+        Metrics.tilstandCounterInc(
             event.gjeldendeTilstand.name,
             event.forrigeTilstand.name
-        ).inc()
+        )
     }
+
+    override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingFerdigstiltEvent) {
+        Metrics.jpFerdigStillInc(event.type.name)
+        if (event.fagsakId != null) {
+            Metrics.automatiskJournalførtJaTellerInc(event.behandlendeEnhet)
+        } else {
+            Metrics.automatiskJournalførtNeiTellerInc(event.type.name, event.behandlendeEnhet)
+        }
+    }
+}
+
+internal object Metrics {
+    private const val DAGPENGER_NAMESPACE = "dagpenger"
+
+    private val jpFerdigstiltCounter = Counter
+        .build()
+        .namespace(DAGPENGER_NAMESPACE)
+        .name("journalpost_ferdigstilt")
+        .labelNames("kategorisering")
+        .help("Number of journal post processed succesfully")
+        .register()
+
+    fun jpFerdigStillInc(kategorisertSom: String) =
+        jpFerdigstiltCounter
+            .labels(kategorisertSom)
+            .inc()
+
+    private val automatiskJournalførtTeller = Counter
+        .build()
+        .name("automatisk_journalfort_arena")
+        .help("Antall søknader som er automatisk journalført i Arena")
+        .labelNames("opprettet", "grunn", "enhet")
+        .register()
+
+    fun automatiskJournalførtJaTellerInc(enhet: String) =
+        automatiskJournalførtTeller.labels("true", "arena_ok", enhet).inc()
+
+    fun automatiskJournalførtNeiTellerInc(reason: String, enhet: String) =
+        automatiskJournalførtTeller.labels("false", reason, enhet).inc()
+
+    private val tilstandCounter = Counter
+        .build("dp_innsending_endret", "Antall tilstandsendringer")
+        .labelNames("tilstand", "forrigeTilstand")
+        .register()
+
+    fun tilstandCounterInc(gjeldendeTilstand: String, forrigeTilstand: String) =
+        tilstandCounter
+            .labels(gjeldendeTilstand, forrigeTilstand)
+            .inc()
 }

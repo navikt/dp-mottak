@@ -22,6 +22,7 @@ interface InnsendingObserver {
         val fagsakId: String?,
         val datoRegistrert: LocalDateTime,
         val søknadsData: JsonNode?,
+        val behandlendeEnhet: String,
     ) {
 
         enum class Type {

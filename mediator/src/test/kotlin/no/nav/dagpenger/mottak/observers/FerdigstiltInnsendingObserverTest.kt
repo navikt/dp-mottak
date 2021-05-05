@@ -69,14 +69,15 @@ internal class FerdigstiltInnsendingObserverTest {
 
     private fun ferdigstiltEvent(): InnsendingObserver.InnsendingFerdigstiltEvent =
         InnsendingObserver.InnsendingFerdigstiltEvent(
-            journalpostId = journalpostId,
-            fødselsnummer = "12345678901",
-            aktørId = "1234455",
             type = NySøknad,
+            journalpostId = journalpostId,
+            aktørId = "1234455",
+            fødselsnummer = "12345678901",
             fagsakId = "1234",
             datoRegistrert = LocalDateTime.now(),
             søknadsData = JsonMapper.jacksonJsonAdapter.createObjectNode().also {
                 it.put("test", "test")
-            }
+            },
+            behandlendeEnhet = "Tadda"
         )
 }

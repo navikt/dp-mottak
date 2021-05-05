@@ -620,6 +620,7 @@ class Innsending private constructor(
             fagsakId = arenaSak?.fagsakId,
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = søknad?.data,
+            behandlendeEnhet = jp.kategorisertJournalpost().oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id
         ).also { ferdig ->
             observers.forEach { it.innsendingFerdigstilt(ferdig) }
         }
