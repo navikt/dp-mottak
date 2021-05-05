@@ -85,6 +85,29 @@ internal class MediatorE2ETest {
     }
 
     @Test
+    fun `Skal motta hendelser om ny søknad der en ikke kan opprette oppgave i Arena`() {
+        håndterHendelse(joarkMelding())
+        assertBehov("Journalpost", 0)
+        håndterHendelse(journalpostMottattHendelse(brevkode = "NAV 04-01.03"))
+        assertBehov("Persondata", 1)
+        håndterHendelse(persondataMottattHendelse())
+        assertBehov("Søknadsdata", 2)
+        håndterHendelse(søknadsdataMottakHendelse())
+        assertBehov("MinsteinntektVurdering", 3)
+        håndterHendelse(minsteinntektVurderingMotattHendelse())
+        assertBehov("EksisterendeSaker", 4)
+        håndterHendelse(eksisterendeSakerMotattHendelse())
+        assertBehov("OpprettStartVedtakOppgave", 5)
+        håndterHendelse(opprettArenaOppgaveFeilet())
+        assertBehov("OpprettGosysoppgave", 6)
+        håndterHendelse(gosysOppgaveOpprettetHendelse())
+        assertBehov("OppdaterJournalpost", 7)
+        håndterHendelse(oppdatertJournalpostMotattHendelse())
+        assertTrue(testRapid.inspektør.size == 8, "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}")
+        assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+    }
+
+    @Test
     fun `Skal motta hendelser som fører til manuell behandling og sende ut behov`() {
         håndterHendelse(joarkMelding())
         assertBehov("Journalpost", 0)
@@ -251,6 +274,20 @@ internal class MediatorE2ETest {
               "harEksisterendeSak": false
             }
           }
+        }
+        """.trimIndent()
+
+    //language=JSON
+    private fun opprettArenaOppgaveFeilet(): String =
+        """{
+          "@event_name": "behov",
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "OpprettStartVedtakOppgave"
+          ],
+          "@opprettet" : "${now()}",
+          "journalpostId": "$journalpostId",
+          "@feil": "OpprettStartVedtakOppgave"
         }
         """.trimIndent()
 

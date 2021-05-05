@@ -98,13 +98,18 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                         else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
                     }
 
-                    packet["@løsning"] = mapOf(
-                        behovNavn to mapOf(
-                            "journalpostId" to journalpostId,
-                            "fagsakId" to oppgaveResponse.fagsakId,
-                            "oppgaveId" to oppgaveResponse.oppgaveId
+                    if (oppgaveResponse != null) {
+                        packet["@løsning"] = mapOf(
+                            behovNavn to mapOf(
+                                "journalpostId" to journalpostId,
+                                "fagsakId" to oppgaveResponse.fagsakId,
+                                "oppgaveId" to oppgaveResponse.oppgaveId
+                            )
                         )
-                    )
+                    } else {
+                        packet["@feil"] = behovNavn
+                    }
+
                     context.publish(packet.toJson())
                 }
             } catch (e: Exception) {

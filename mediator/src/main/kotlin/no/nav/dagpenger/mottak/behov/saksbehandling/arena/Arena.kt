@@ -2,11 +2,13 @@ package no.nav.dagpenger.mottak.behov.saksbehandling.arena
 
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
+import io.ktor.client.features.ClientRequestException
 import io.ktor.client.features.DefaultRequest
 import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.header
 import io.ktor.client.request.request
+import io.ktor.client.statement.readText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import mu.KotlinLogging
@@ -17,13 +19,14 @@ import java.time.LocalDate
 
 internal interface ArenaOppslag {
     suspend fun harEksisterendeSaker(fnr: String): Boolean
-    suspend fun opprettStartVedtakOppgave(journalpostId: String, parametere: OpprettArenaOppgaveParametere): OpprettVedtakOppgaveResponse
-    suspend fun opprettVurderHenvendelsOppgave(journalpostId: String, parametere: OpprettArenaOppgaveParametere): OpprettVedtakOppgaveResponse
+    suspend fun opprettStartVedtakOppgave(journalpostId: String, parametere: OpprettArenaOppgaveParametere): OpprettVedtakOppgaveResponse?
+    suspend fun opprettVurderHenvendelsOppgave(journalpostId: String, parametere: OpprettArenaOppgaveParametere): OpprettVedtakOppgaveResponse?
 }
 
 internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
 
     companion object {
+        private val logger = KotlinLogging.logger {}
         private val sikkerlogg = KotlinLogging.logger("tjenestekall")
     }
 
@@ -52,20 +55,30 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
     override suspend fun opprettStartVedtakOppgave(
         journalpostId: String,
         parametere: OpprettArenaOppgaveParametere
-    ): OpprettVedtakOppgaveResponse = opprettArenaOppgave("$baseUrl/vedtak", parametere)
+    ): OpprettVedtakOppgaveResponse? = opprettArenaOppgave("$baseUrl/vedtak", parametere)
 
-    private suspend fun opprettArenaOppgave(url: String, parametereBody: OpprettArenaOppgaveParametere): OpprettVedtakOppgaveResponse =
-        proxyArenaClient.request(url) {
-            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
-            header(HttpHeaders.ContentType, "application/json")
-            header(HttpHeaders.Accept, "application/json")
-            body = parametereBody
+    private suspend fun opprettArenaOppgave(url: String, parametereBody: OpprettArenaOppgaveParametere): OpprettVedtakOppgaveResponse? =
+        try {
+            proxyArenaClient.request(url) {
+                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
+                header(HttpHeaders.ContentType, "application/json")
+                header(HttpHeaders.Accept, "application/json")
+                body = parametereBody
+            }
+        } catch (e: ClientRequestException) {
+            val message = e.response.readText()
+            if (e.response.status.value == 400) {
+                logger.warn { "Kunne ikke opprette Arena oppgave, feilmelding: $message" }
+                null
+            } else {
+                throw e
+            }
         }
 
     override suspend fun opprettVurderHenvendelsOppgave(
         journalpostId: String,
         parametere: OpprettArenaOppgaveParametere
-    ): OpprettVedtakOppgaveResponse = opprettArenaOppgave("$baseUrl/sak/henvendelse", parametere)
+    ): OpprettVedtakOppgaveResponse? = opprettArenaOppgave("$baseUrl/sak/henvendelse", parametere)
 }
 
 private data class AktivSakRequest(val fnr: String)

@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak
 
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingFerdigstiltEvent
+import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
 import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
@@ -94,6 +95,12 @@ class Innsending private constructor(
         tilstand.håndter(this, arenaOppgave)
     }
 
+    fun håndter(arenaOppgaveFeilet: ArenaOppgaveFeilet) {
+        if (journalpostId != arenaOppgaveFeilet.journalpostId()) return
+        kontekst(arenaOppgaveFeilet, "Mottatt informasjon om oppgaveopprettelse mot Arena feilet")
+        tilstand.håndter(this, arenaOppgaveFeilet)
+    }
+
     fun håndter(oppdatertJournalpost: JournalpostOppdatert) {
         if (journalpostId != oppdatertJournalpost.journalpostId()) return
         kontekst(oppdatertJournalpost, "Mottatt informasjon om oppdatert journalpost")
@@ -154,6 +161,10 @@ class Innsending private constructor(
 
         fun håndter(innsending: Innsending, arenaOppgave: ArenaOppgaveOpprettet) {
             arenaOppgave.warn("Forventet ikke ArenaOppgaveOpprettet i %s", type.name)
+        }
+
+        fun håndter(innsending: Innsending, arenaOppgaveFeilet: ArenaOppgaveFeilet) {
+            arenaOppgaveFeilet.warn("Forventet ikke ArenaOppgaveFeilet i %s", type.name)
         }
 
         fun håndter(innsending: Innsending, gosysOppgave: GosysOppgaveOpprettet) {
@@ -327,6 +338,10 @@ class Innsending private constructor(
             innsending.oppretteArenaStartVedtakOppgave(hendelse)
         }
 
+        override fun håndter(innsending: Innsending, arenaOppgaveFeilet: ArenaOppgaveFeilet) {
+            innsending.tilstand(arenaOppgaveFeilet, AvventerGosysOppgave)
+        }
+
         override fun håndter(innsending: Innsending, arenaOppgave: ArenaOppgaveOpprettet) {
             innsending.arenaSak = arenaOppgave.arenaSak()
             innsending.oppdatereJournalpost(hendelse = arenaOppgave)
@@ -346,6 +361,10 @@ class Innsending private constructor(
 
         override fun entering(innsending: Innsending, hendelse: Hendelse) {
             innsending.oppretteArenaVurderHenvendelseOppgave(hendelse)
+        }
+
+        override fun håndter(innsending: Innsending, arenaOppgaveFeilet: ArenaOppgaveFeilet) {
+            innsending.tilstand(arenaOppgaveFeilet, AvventerGosysOppgave)
         }
 
         override fun håndter(innsending: Innsending, arenaOppgave: ArenaOppgaveOpprettet) {

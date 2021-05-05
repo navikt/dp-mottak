@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import no.finn.unleash.Unleash
 import no.nav.dagpenger.mottak.ByClusterStrategy.Companion.SLÅ_PÅ_HÅNDTERING
 import no.nav.dagpenger.mottak.db.InnsendingRepository
+import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
@@ -99,6 +100,12 @@ internal class InnsendingMediator(
     fun håndter(personInformasjonIkkeFunnet: PersonInformasjonIkkeFunnet) {
         håndter(personInformasjonIkkeFunnet) { innsending ->
             innsending.håndter(personInformasjonIkkeFunnet)
+        }
+    }
+
+    fun håndter(arenaOppgaveFeilet: ArenaOppgaveFeilet) {
+        håndter(arenaOppgaveFeilet) { innsending ->
+            innsending.håndter(arenaOppgaveFeilet)
         }
     }
 
