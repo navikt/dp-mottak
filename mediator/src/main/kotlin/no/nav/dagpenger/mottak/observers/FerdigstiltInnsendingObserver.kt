@@ -24,6 +24,7 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
 
     private companion object {
         private val logger = KotlinLogging.logger {}
+        private val sikkerLogger = KotlinLogging.logger("tjenestekall")
         private fun createProducer(producerProperties: Properties): KafkaProducer<String, String> {
             producerProperties[ProducerConfig.ACKS_CONFIG] = "all"
             producerProperties[ProducerConfig.LINGER_MS_CONFIG] = "0"
@@ -45,6 +46,9 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
                 message.toJson()
             )
         ).get(500, TimeUnit.MILLISECONDS)
+
+        logger.info { "Send InnsendingFerdigstiltEvent til kafka for journalpostId ${event.journalpostId}" }
+        sikkerLogger.info { message.toJson() }
     }
 
     private fun shutdownHook() {
