@@ -25,7 +25,7 @@ interface InnsendingObserver {
         UtenBruker
     }
 
-    data class InnsendingFerdigstiltEvent(
+    data class InnsendingEvent(
         val type: Type,
         val journalpostId: String,
         val aktørId: String?,
@@ -35,16 +35,7 @@ interface InnsendingObserver {
         val søknadsData: JsonNode?
     )
 
-    data class InnsendingMottattEvent(
-        val type: Type,
-        val journalpostId: String,
-        val aktørId: String?,
-        val fødselsnummer: String?,
-        val datoRegistrert: LocalDateTime,
-        val søknadsData: JsonNode?
-    )
-
     fun tilstandEndret(event: InnsendingEndretTilstandEvent) {}
-    fun innsendingFerdigstilt(event: InnsendingFerdigstiltEvent) {}
-    fun innsendingMottatt(event: InnsendingMottattEvent) {}
+    fun innsendingFerdigstilt(event: InnsendingEvent) {}
+    fun innsendingMottatt(event: InnsendingEvent) {}
 }

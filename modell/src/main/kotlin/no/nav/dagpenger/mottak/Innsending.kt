@@ -1,7 +1,7 @@
 package no.nav.dagpenger.mottak
 
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
-import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingFerdigstiltEvent
+import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
 import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
@@ -27,7 +27,6 @@ class Innsending private constructor(
     private var arenaSak: ArenaSak?,
     internal val aktivitetslogg: Aktivitetslogg
 ) : Aktivitetskontekst {
-
     private val observers = mutableSetOf<InnsendingObserver>()
 
     constructor(
@@ -120,7 +119,6 @@ class Innsending private constructor(
 
     // Gang of four State pattern
     interface Tilstand : Aktivitetskontekst {
-
         val type: InnsendingTilstandType
         val timeout: Duration
 
@@ -342,7 +340,6 @@ class Innsending private constructor(
     }
 
     internal object AventerArenaOppgave : Tilstand {
-
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AventerArenaOppgaveType
         override val timeout: Duration
@@ -367,6 +364,7 @@ class Innsending private constructor(
             get() = InnsendingTilstandType.AvventerGosysType
         override val timeout: Duration
             get() = Duration.ofDays(1)
+
         override fun entering(innsending: Innsending, hendelse: Hendelse) {
             innsending.opprettGosysOppgave(hendelse)
         }
@@ -551,7 +549,6 @@ class Innsending private constructor(
                 "aktørId" to it.aktørId
             )
         } ?: emptyMap()
-
         val parametre = mapOf(
             "behandlendeEnhetId" to oppgavebenk.id,
             "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
@@ -588,7 +585,6 @@ class Innsending private constructor(
         forrigeTilstand: InnsendingTilstandType,
         timeout: Duration
     ) {
-
         observers.forEach {
             it.tilstandEndret(
                 InnsendingObserver.InnsendingEndretTilstandEvent(
@@ -597,7 +593,6 @@ class Innsending private constructor(
                     forrigeTilstand = forrigeTilstand,
                     aktivitetslogg = aktivitetslogg,
                     timeout = timeout
-
                 )
             )
         }
@@ -605,7 +600,7 @@ class Innsending private constructor(
 
     private fun emitFerdigstilt() {
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
-        InnsendingFerdigstiltEvent(
+        InnsendingEvent(
             type = mapToHendelseType(jp),
             journalpostId = journalpostId,
             aktørId = person?.aktørId,
@@ -620,13 +615,14 @@ class Innsending private constructor(
 
     private fun emitMottatt() {
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
-        InnsendingObserver.InnsendingMottattEvent(
+        InnsendingEvent(
             type = mapToHendelseType(jp),
             journalpostId = journalpostId,
             aktørId = person?.aktørId,
             fødselsnummer = person?.fødselsnummer,
+            fagsakId = null,
             datoRegistrert = jp.datoRegistrert(),
-            søknadsData = søknad?.data,
+            søknadsData = søknad?.data
         ).also { mottatt ->
             observers.forEach { it.innsendingMottatt(mottatt) }
         }

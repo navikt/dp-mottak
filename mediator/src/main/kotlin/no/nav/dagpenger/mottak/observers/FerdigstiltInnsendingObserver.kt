@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit
 
 internal class FerdigstiltInnsendingObserver internal constructor(private val producer: Producer<String, String>) :
     InnsendingObserver {
-
     constructor(producerProperties: Properties) : this(createProducer(producerProperties))
 
     init {
@@ -32,16 +31,40 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
         }
     }
 
-    override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingFerdigstiltEvent) {
+    override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
+        val payload = event.toPayload().also {
+            it["@event_name"] = "innsending_ferdigstilt"
+        }
 
-        val message = JsonMessage.newMessage(
-            event.toParameterMap()
+        publish(
+            event.journalpostId,
+            JsonMessage.newMessage(
+                payload
+            )
         )
+    }
 
+    override fun innsendingMottatt(event: InnsendingObserver.InnsendingEvent) {
+        val payload = event.toPayload().also {
+            it["@event_name"] = "innsending_mottatt"
+        }
+
+        publish(
+            event.journalpostId,
+            JsonMessage.newMessage(
+                payload
+            )
+        )
+    }
+
+    private fun publish(
+        key: String,
+        message: JsonMessage
+    ) {
         producer.send(
             ProducerRecord(
                 "teamdagpenger.journalforing.v1",
-                event.journalpostId,
+                key,
                 message.toJson()
             )
         ).get(500, TimeUnit.MILLISECONDS)
@@ -53,20 +76,16 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
     }
 }
 
-private fun InnsendingObserver.InnsendingFerdigstiltEvent.toParameterMap(): Map<String, Any> {
-
-    val parametere = mutableMapOf<String, Any>()
-
-    parametere["@event_name"] = "innsending_ferdigstilt"
-    parametere["@id"] = UUID.randomUUID().toString()
-    parametere["@opprettet"] = LocalDateTime.now()
-    parametere["journalpostId"] = journalpostId
-    parametere["datoRegistrert"] = datoRegistrert
-    parametere["type"] = type.name
-    fødselsnummer?.let { parametere["fødselsnummer"] = it }
-    aktørId?.let { parametere["aktørId"] = it }
-    fagsakId?.let { parametere["fagsakId"] = it }
-    søknadsData?.let { parametere["søknadsData"] = it }
-
-    return parametere.toMap()
-}
+private fun InnsendingObserver.InnsendingEvent.toPayload() =
+    mutableMapOf<String, Any>(
+        "@id" to UUID.randomUUID().toString(),
+        "@opprettet" to LocalDateTime.now(),
+        "journalpostId" to journalpostId,
+        "datoRegistrert" to datoRegistrert,
+        "type" to type.name
+    ).apply {
+        fødselsnummer?.let { set("fødselsnummer", it) }
+        aktørId?.let { set("aktørId", it) }
+        fagsakId?.let { set("fagsakId", it) }
+        søknadsData?.let { set("søknadsData", it) }
+    }

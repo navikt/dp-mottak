@@ -12,8 +12,8 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import java.time.LocalDateTime
 
 internal class FerdigstiltInnsendingObserverTest {
-
     private val journalpostId = "12455"
+
     @Test
     fun `skal sende til melding til journalforing v1 topic på ferdigstilte innsendinger `() {
         val mockProducer = MockProducer(true, StringSerializer(), StringSerializer())
@@ -46,7 +46,6 @@ internal class FerdigstiltInnsendingObserverTest {
         val record = mockProducer.history().first()
 
         assertEquals(journalpostId, record.key())
-
         val message = JsonMapper.jacksonJsonAdapter.readTree(record.value())
         assertEquals("innsending_ferdigstilt", message["@event_name"].asText())
         assertNotNull(message["@id"].asText())
@@ -60,19 +59,19 @@ internal class FerdigstiltInnsendingObserverTest {
         assertFalse(message.has("fagsakId"))
     }
 
-    private fun ukjentPersonEvent(): InnsendingObserver.InnsendingFerdigstiltEvent = ferdigstiltEvent().copy(
+    private fun ukjentPersonEvent(): InnsendingObserver.InnsendingEvent = ferdigstiltEvent().copy(
         fødselsnummer = null,
         aktørId = null,
         søknadsData = null,
         fagsakId = null,
     )
 
-    private fun ferdigstiltEvent(): InnsendingObserver.InnsendingFerdigstiltEvent =
-        InnsendingObserver.InnsendingFerdigstiltEvent(
-            journalpostId = journalpostId,
-            fødselsnummer = "12345678901",
-            aktørId = "1234455",
+    private fun ferdigstiltEvent(): InnsendingObserver.InnsendingEvent =
+        InnsendingObserver.InnsendingEvent(
             type = NySøknad,
+            journalpostId = journalpostId,
+            aktørId = "1234455",
+            fødselsnummer = "12345678901",
             fagsakId = "1234",
             datoRegistrert = LocalDateTime.now(),
             søknadsData = JsonMapper.jacksonJsonAdapter.createObjectNode().also {
