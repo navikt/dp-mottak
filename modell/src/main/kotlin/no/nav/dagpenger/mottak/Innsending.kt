@@ -171,7 +171,7 @@ class Innsending private constructor(
             journalpostferdigstilt.warn("Forventet ikke FerdigStilt i %s", type.name)
         }
 
-        fun leaving(hendelse: Hendelse) {}
+        fun leaving(innsending: Innsending, hendelse: Hendelse) {}
         fun entering(innsending: Innsending, hendelse: Hendelse) {}
 
         override fun toSpesifikkKontekst(): SpesifikkKontekst {
@@ -266,6 +266,10 @@ class Innsending private constructor(
 
         override fun entering(innsending: Innsending, hendelse: Hendelse) {
             innsending.trengerSøknadsdata(hendelse)
+        }
+
+        override fun leaving(innsending: Innsending, hendelse: Hendelse) {
+            innsending.emitMottatt()
         }
 
         override fun håndter(innsending: Innsending, søknadsdata: Søknadsdata) {
@@ -569,7 +573,7 @@ class Innsending private constructor(
         if (tilstand == nyTilstand) {
             return // Already in this state => ignore
         }
-        tilstand.leaving(event)
+        tilstand.leaving(this, event)
         val previousState = tilstand
         tilstand = nyTilstand
         block()
@@ -601,17 +605,7 @@ class Innsending private constructor(
 
     private fun emitFerdigstilt() {
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
-        val type = when (jp.kategorisertJournalpost()) {
-            is Etablering -> InnsendingFerdigstiltEvent.Type.Etablering
-            is Ettersending -> InnsendingFerdigstiltEvent.Type.Ettersending
-            is Gjenopptak -> InnsendingFerdigstiltEvent.Type.Gjenopptak
-            is KlageOgAnke -> InnsendingFerdigstiltEvent.Type.KlageOgAnke
-            is KlageOgAnkeLønnskompensasjon -> InnsendingFerdigstiltEvent.Type.KlageOgAnkeLønnskompensasjon
-            is NySøknad -> InnsendingFerdigstiltEvent.Type.NySøknad
-            is UkjentSkjemaKode -> InnsendingFerdigstiltEvent.Type.UkjentSkjemaKode
-            is Utdanning -> InnsendingFerdigstiltEvent.Type.Utdanning
-            is UtenBruker -> InnsendingFerdigstiltEvent.Type.UtenBruker
-        }
+        val type = type(jp)
         InnsendingFerdigstiltEvent(
             type = type,
             journalpostId = journalpostId,
@@ -619,10 +613,37 @@ class Innsending private constructor(
             fødselsnummer = person?.fødselsnummer,
             fagsakId = arenaSak?.fagsakId,
             datoRegistrert = jp.datoRegistrert(),
-            søknadsData = søknad?.data,
+            søknadsData = søknad?.data
         ).also { ferdig ->
             observers.forEach { it.innsendingFerdigstilt(ferdig) }
         }
+    }
+
+    private fun emitMottatt() {
+        val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
+        val type = type(jp)
+        InnsendingObserver.InnsendingMottattEvent(
+            type = type,
+            journalpostId = journalpostId,
+            aktørId = person?.aktørId,
+            fødselsnummer = person?.fødselsnummer,
+            datoRegistrert = jp.datoRegistrert(),
+            søknadsData = søknad?.data
+        ).also { mottatt ->
+            observers.forEach { it.innsendingMottatt(mottatt) }
+        }
+    }
+
+    fun type(jp: Journalpost) = when (jp.kategorisertJournalpost()) {
+        is Etablering -> InnsendingObserver.Type.Etablering
+        is Ettersending -> InnsendingObserver.Type.Ettersending
+        is Gjenopptak -> InnsendingObserver.Type.Gjenopptak
+        is KlageOgAnke -> InnsendingObserver.Type.KlageOgAnke
+        is KlageOgAnkeLønnskompensasjon -> InnsendingObserver.Type.KlageOgAnkeLønnskompensasjon
+        is NySøknad -> InnsendingObserver.Type.NySøknad
+        is UkjentSkjemaKode -> InnsendingObserver.Type.UkjentSkjemaKode
+        is Utdanning -> InnsendingObserver.Type.Utdanning
+        is UtenBruker -> InnsendingObserver.Type.UtenBruker
     }
 
     fun accept(visitor: InnsendingVisitor) {

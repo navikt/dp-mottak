@@ -13,6 +13,17 @@ interface InnsendingObserver {
         val aktivitetslogg: Aktivitetslogg,
         val timeout: Duration
     )
+    enum class Type {
+        NySøknad,
+        Gjenopptak,
+        Utdanning,
+        Etablering,
+        KlageOgAnke,
+        KlageOgAnkeLønnskompensasjon,
+        Ettersending,
+        UkjentSkjemaKode,
+        UtenBruker
+    }
 
     data class InnsendingFerdigstiltEvent(
         val type: Type,
@@ -21,22 +32,19 @@ interface InnsendingObserver {
         val fødselsnummer: String?,
         val fagsakId: String?,
         val datoRegistrert: LocalDateTime,
-        val søknadsData: JsonNode?,
-    ) {
+        val søknadsData: JsonNode?
+    )
 
-        enum class Type {
-            NySøknad,
-            Gjenopptak,
-            Utdanning,
-            Etablering,
-            KlageOgAnke,
-            KlageOgAnkeLønnskompensasjon,
-            Ettersending,
-            UkjentSkjemaKode,
-            UtenBruker
-        }
-    }
+    data class InnsendingMottattEvent(
+        val type: Type,
+        val journalpostId: String,
+        val aktørId: String?,
+        val fødselsnummer: String?,
+        val datoRegistrert: LocalDateTime,
+        val søknadsData: JsonNode?
+    )
 
     fun tilstandEndret(event: InnsendingEndretTilstandEvent) {}
     fun innsendingFerdigstilt(event: InnsendingFerdigstiltEvent) {}
+    fun innsendingMottatt(event: InnsendingMottattEvent) {}
 }

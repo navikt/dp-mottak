@@ -78,6 +78,12 @@ abstract class AbstractEndeTilEndeTest {
         test(observatør.ferdigstiltEvent!!)
     }
 
+    protected fun assertMottatt(test: (InnsendingObserver.InnsendingMottattEvent) -> Unit) {
+        assertNotNull(observatør.mottattEvent)
+        assertEquals(JOURNALPOST_ID, observatør.mottattEvent?.journalpostId)
+        test(observatør.mottattEvent!!)
+    }
+
     protected fun håndterJoarkHendelse() {
         innsending.håndter(joarkhendelse())
     }
