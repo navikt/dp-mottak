@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.Innsending
+import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
@@ -20,6 +21,7 @@ import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDateTime
@@ -68,6 +70,12 @@ abstract class AbstractEndeTilEndeTest {
             detaljer + setOf("tilstand", "journalpostId"),
             behov.detaljer().keys + behov.kontekster.flatMap { it.kontekstMap.keys }
         )
+    }
+
+    protected fun assertFerdigstilt(test: (InnsendingObserver.InnsendingFerdigstiltEvent) -> Unit) {
+        assertNotNull(observatør.ferdigstiltEvent)
+        assertEquals(JOURNALPOST_ID, observatør.ferdigstiltEvent?.journalpostId)
+        test(observatør.ferdigstiltEvent!!)
     }
 
     protected fun håndterJoarkHendelse() {

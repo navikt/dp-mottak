@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak
 
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
+import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingFerdigstiltEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
 import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
@@ -414,6 +415,10 @@ class Innsending private constructor(
             get() = InnsendingTilstandType.InnsendingFerdigstiltType
         override val timeout: Duration
             get() = Duration.ofDays(1)
+
+        override fun entering(innsending: Innsending, hendelse: Hendelse) {
+            innsending.emitFerdigstilt()
+        }
     }
 
     private fun trengerSøknadsdata(hendelse: Hendelse) {
@@ -591,6 +596,32 @@ class Innsending private constructor(
 
                 )
             )
+        }
+    }
+
+    private fun emitFerdigstilt() {
+        val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
+        val type = when (jp.kategorisertJournalpost()) {
+            is Etablering -> InnsendingFerdigstiltEvent.Type.Etablering
+            is Ettersending -> InnsendingFerdigstiltEvent.Type.Ettersending
+            is Gjenopptak -> InnsendingFerdigstiltEvent.Type.Gjenopptak
+            is KlageOgAnke -> InnsendingFerdigstiltEvent.Type.KlageOgAnke
+            is KlageOgAnkeLønnskompensasjon -> InnsendingFerdigstiltEvent.Type.KlageOgAnkeLønnskompensasjon
+            is NySøknad -> InnsendingFerdigstiltEvent.Type.NySøknad
+            is UkjentSkjemaKode -> InnsendingFerdigstiltEvent.Type.UkjentSkjemaKode
+            is Utdanning -> InnsendingFerdigstiltEvent.Type.Utdanning
+            is UtenBruker -> InnsendingFerdigstiltEvent.Type.UtenBruker
+        }
+        InnsendingFerdigstiltEvent(
+            type = type,
+            journalpostId = journalpostId,
+            aktørId = person?.aktørId,
+            fødselsnummer = person?.fødselsnummer,
+            fagsakId = arenaSak?.fagsakId,
+            datoRegistrert = jp.datoRegistrert(),
+            søknadsData = søknad?.data,
+        ).also { ferdig ->
+            observers.forEach { it.innsendingFerdigstilt(ferdig) }
         }
     }
 
