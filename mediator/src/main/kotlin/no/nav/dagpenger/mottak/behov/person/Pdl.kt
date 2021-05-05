@@ -8,34 +8,30 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.features.DefaultRequest
-import io.ktor.client.request.accept
 import io.ktor.client.request.header
 import io.ktor.client.request.request
 import io.ktor.client.request.url
-import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import mu.KotlinLogging
-import no.nav.dagpenger.mottak.Config.pdlApiTokenProvider
-import no.nav.dagpenger.mottak.Config.pdlApiUrl
+import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
+import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.behov.GraphqlQuery
 import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 
 private val sikkerLogg = KotlinLogging.logger("tjenestekall")
 
 internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
-    private val tokenProvider = config.pdlApiTokenProvider
-    private val pdlClient = HttpClient() {
+    private val tokenProvider = config.dpProxyTokenProvider
+    private val proxyPdlClient = HttpClient() {
         install(DefaultRequest) {
-            this.url("${config.pdlApiUrl()}/graphql")
+            this.url("${config.dpProxyUrl()}/proxy/v1/pdl/graphql")
             method = HttpMethod.Post
-            header("Content-Type", "application/json")
-            header("TEMA", "DAG")
-            accept(ContentType.Application.Json)
         }
     }
 
-    override suspend fun hentPerson(id: String): Pdl.Person? = pdlClient.request<String> {
+    override suspend fun hentPerson(id: String): Pdl.Person? = proxyPdlClient.request<String> {
+        header("Content-Type", "application/json")
         header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
         body = PersonQuery(id).toJson().also { sikkerLogg.info { "Forsøker å hente person med id $id fra PDL" } }
     }.let {
