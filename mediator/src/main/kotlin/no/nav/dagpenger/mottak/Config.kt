@@ -58,11 +58,10 @@ internal object Config {
         }
     }
 
-    val Configuration.tokenProvider by lazy {
+    val Configuration.dpProxyTokenProvider by lazy {
         ClientCredentialsClient(properties) {
             scope {
                 add(properties.dpProxyScope())
-                // add(properties.pdlApiScope())
             }
         }
     }

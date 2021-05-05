@@ -10,8 +10,8 @@ import io.ktor.client.request.request
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import mu.KotlinLogging
+import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
-import no.nav.dagpenger.mottak.Config.tokenProvider
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import java.time.LocalDate
 
@@ -27,7 +27,7 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
         private val sikkerlogg = KotlinLogging.logger("tjenestekall")
     }
 
-    private val tokenProvider = config.tokenProvider
+    private val tokenProvider = config.dpProxyTokenProvider
 
     private val baseUrl = "${config.dpProxyUrl()}/proxy/v1/arena"
     private val proxyArenaClient = HttpClient() {

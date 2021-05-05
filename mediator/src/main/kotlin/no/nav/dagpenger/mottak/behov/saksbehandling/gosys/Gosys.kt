@@ -11,8 +11,8 @@ import io.ktor.client.request.url
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import mu.KotlinLogging
+import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
-import no.nav.dagpenger.mottak.Config.tokenProvider
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import java.time.LocalDate
 
@@ -41,7 +41,7 @@ internal class GosysProxyClient(config: Configuration) : GosysOppslag {
         private val logger = KotlinLogging.logger {}
     }
 
-    private val tokenProvider = config.tokenProvider
+    private val tokenProvider = config.dpProxyTokenProvider
 
     private val proxyGosysClient = HttpClient() {
         install(DefaultRequest) {

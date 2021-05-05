@@ -12,8 +12,8 @@ import io.ktor.client.statement.readText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import mu.KotlinLogging
+import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
-import no.nav.dagpenger.mottak.Config.tokenProvider
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import java.lang.RuntimeException
 
@@ -92,7 +92,7 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
     }
 
     private val journalføringBaseUrl = "${config.dpProxyUrl()}/proxy/v1/dokarkiv/rest/journalpostapi/v1/journalpost"
-    private val tokenProvider = config.tokenProvider
+    private val tokenProvider = config.dpProxyTokenProvider
     private val proxyJournalpostApiClient = HttpClient() {
 
         install(DefaultRequest) {
