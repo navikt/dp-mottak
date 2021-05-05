@@ -13,8 +13,12 @@ import io.netty.util.NetUtil.getHostname
 import no.finn.unleash.DefaultUnleash
 import no.finn.unleash.util.UnleashConfig
 import no.nav.dagpenger.aad.api.ClientCredentialsClient
+import org.apache.kafka.clients.CommonClientConfigs
+import org.apache.kafka.common.config.SslConfigs
+import org.apache.kafka.common.security.auth.SecurityProtocol
 import java.net.InetAddress
 import java.net.UnknownHostException
+import java.util.Properties
 
 internal object Config {
 
@@ -72,6 +76,20 @@ internal object Config {
             idleTimeout = 10001
             connectionTimeout = 1000
             maxLifetime = 30001
+        }
+    }
+
+    val kafkaProducerProperties: Properties by lazy {
+        Properties().apply {
+            put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, properties[Key("KAFKA_BROKERS", stringType)])
+            put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SSL.name)
+            put(SslConfigs.SSL_ENDPOINT_IDENTIFICATION_ALGORITHM_CONFIG, "")
+            put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "jks")
+            put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PKCS12")
+            put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, properties[Key("KAFKA_TRUSTSTORE_PATH", stringType)])
+            put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, properties[Key("KAFKA_CREDSTORE_PASSWORD", stringType)])
+            put(SslConfigs.SSL_KEYSTORE_LOCATION_CONFIG, properties[Key("KAFKA_KEYSTORE_PATH", stringType)])
+            put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, properties[Key("KAFKA_CREDSTORE_PASSWORD", stringType)])
         }
     }
 

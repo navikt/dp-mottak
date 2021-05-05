@@ -18,6 +18,7 @@ import no.nav.dagpenger.mottak.behov.vilkårtester.RegelApiProxy
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.MinsteinntektVurderingPostgresRepository
 import no.nav.dagpenger.mottak.db.runMigration
+import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
 import no.nav.dagpenger.mottak.proxy.proxyPing
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import no.nav.helse.rapids_rivers.RapidApplication
@@ -34,6 +35,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val journalpostApiClient = JournalpostApiClient(Config.properties)
     private val gosysProxyClient = GosysProxyClient(Config.properties)
     private val minsteinntektVurderingRepository = MinsteinntektVurderingPostgresRepository(Config.dataSource)
+    private val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(Config.kafkaProducerProperties)
 
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
@@ -43,7 +45,10 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             val mediator = InnsendingMediator(
                 innsendingRepository = innsendingRepository,
                 rapidsConnection = this,
-                unleash = Config.unleash()
+                unleash = Config.unleash(),
+                observatører = listOf(
+                    ferdigstiltInnsendingObserver
+                )
             )
             // Behovmottakere
             MottakMediator(mediator, this)
