@@ -62,7 +62,7 @@ internal object Config {
         ClientCredentialsClient(properties) {
             scope {
                 add(properties.dpProxyScope())
-                add(properties.pdlApiScope())
+                // add(properties.pdlApiScope())
             }
         }
     }
