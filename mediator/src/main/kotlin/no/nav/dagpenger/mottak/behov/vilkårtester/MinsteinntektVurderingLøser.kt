@@ -15,7 +15,7 @@ internal class MinsteinntektVurderingLøser(
     private val rapidsConnection: RapidsConnection
 ) {
     private companion object {
-        private const val FEM_MINUTTER = 30000.toLong()
+        private const val FEM_MINUTTER = 300000.toLong()
         val logger = KotlinLogging.logger { }
     }
 
