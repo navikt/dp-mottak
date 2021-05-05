@@ -8,9 +8,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.features.DefaultRequest
+import io.ktor.client.request.accept
 import io.ktor.client.request.header
 import io.ktor.client.request.request
 import io.ktor.client.request.url
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import mu.KotlinLogging
@@ -23,15 +25,17 @@ private val sikkerLogg = KotlinLogging.logger("tjenestekall")
 
 internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
     private val tokenProvider = config.pdlApiTokenProvider
-    private val proxyPdlClient = HttpClient() {
+    private val pdlClient = HttpClient() {
         install(DefaultRequest) {
             this.url("${config.pdlApiUrl()}/graphql")
             method = HttpMethod.Post
+            header("Content-Type", "application/json")
+            header("TEMA", "DAG")
+            accept(ContentType.Application.Json)
         }
     }
 
-    override suspend fun hentPerson(id: String): Pdl.Person? = proxyPdlClient.request<String> {
-        header("Content-Type", "application/json")
+    override suspend fun hentPerson(id: String): Pdl.Person? = pdlClient.request<String> {
         header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
         body = PersonQuery(id).toJson().also { sikkerLogg.info { "Forsøker å hente person med id $id fra PDL" } }
     }.let {
