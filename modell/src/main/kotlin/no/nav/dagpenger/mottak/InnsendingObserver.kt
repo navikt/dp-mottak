@@ -19,7 +19,6 @@ interface InnsendingObserver {
         val journalpostId: String,
         val aktørId: String?,
         val fødselsnummer: String?,
-        val behandlendeEnhet: String,
         val fagsakId: String?,
         val datoRegistrert: LocalDateTime,
         val søknadsData: JsonNode?,

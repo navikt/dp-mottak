@@ -599,7 +599,6 @@ class Innsending private constructor(
         }
     }
 
-
     private fun emitFerdigstilt() {
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
         val type = when (jp.kategorisertJournalpost()) {
@@ -619,7 +618,6 @@ class Innsending private constructor(
             aktørId = person?.aktørId,
             fødselsnummer = person?.fødselsnummer,
             fagsakId = arenaSak?.fagsakId,
-            behandlendeEnhet = jp.kategorisertJournalpost().oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id,
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = søknad?.data,
         ).also { ferdig ->

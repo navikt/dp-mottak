@@ -105,7 +105,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.fagsakId)
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
-            assertNotNull(it.behandlendeEnhet)
             assertNotNull(it.datoRegistrert)
         }
     }
@@ -176,7 +175,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.fagsakId)
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
-            assertNotNull(it.behandlendeEnhet)
             assertNotNull(it.datoRegistrert)
         }
     }
@@ -235,7 +233,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.fagsakId)
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
-            assertNotNull(it.behandlendeEnhet)
             assertNotNull(it.datoRegistrert)
         }
     }
@@ -267,7 +264,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertEquals("UkjentSkjemaKode", it.type.name)
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
-            assertNotNull(it.behandlendeEnhet)
             assertNotNull(it.datoRegistrert)
         }
     }
@@ -319,7 +315,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertEquals("KlageOgAnkeLønnskompensasjon", it.type.name)
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
-            assertNotNull(it.behandlendeEnhet)
             assertNotNull(it.datoRegistrert)
         }
     }
@@ -371,7 +366,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         }
 
         assertFerdigstilt {
-            assertNotNull(it.behandlendeEnhet)
             assertNotNull(it.datoRegistrert)
         }
     }
@@ -399,7 +393,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         }
 
         assertFerdigstilt {
-            assertNotNull(it.behandlendeEnhet)
             assertNotNull(it.datoRegistrert)
         }
     }
