@@ -13,9 +13,9 @@ internal class MetrikkObserver : InnsendingObserver {
     }
 
     override fun tilstandEndret(event: InnsendingObserver.InnsendingEndretTilstandEvent) {
-            tilstandCounter.labels(
-                event.gjeldendeTilstand.name,
-                event.forrigeTilstand.name
-            ).inc()
+        tilstandCounter.labels(
+            event.gjeldendeTilstand.name,
+            event.forrigeTilstand.name
+        ).inc()
     }
 }
