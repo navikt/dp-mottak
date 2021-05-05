@@ -1,7 +1,7 @@
 package no.nav.dagpenger.mottak
 
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
-import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingFerdigstiltEvent
+import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
@@ -28,7 +28,6 @@ class Innsending private constructor(
     private var arenaSak: ArenaSak?,
     internal val aktivitetslogg: Aktivitetslogg
 ) : Aktivitetskontekst {
-
     private val observers = mutableSetOf<InnsendingObserver>()
 
     constructor(
@@ -131,7 +130,6 @@ class Innsending private constructor(
 
     // Gang of four State pattern
     interface Tilstand : Aktivitetskontekst {
-
         val type: InnsendingTilstandType
         val timeout: Duration
 
@@ -186,7 +184,7 @@ class Innsending private constructor(
             journalpostferdigstilt.warn("Forventet ikke FerdigStilt i %s", type.name)
         }
 
-        fun leaving(hendelse: Hendelse) {}
+        fun leaving(innsending: Innsending, hendelse: Hendelse) {}
         fun entering(innsending: Innsending, hendelse: Hendelse) {}
 
         override fun toSpesifikkKontekst(): SpesifikkKontekst {
@@ -283,6 +281,10 @@ class Innsending private constructor(
             innsending.trengerSøknadsdata(hendelse)
         }
 
+        override fun leaving(innsending: Innsending, hendelse: Hendelse) {
+            innsending.emitMottatt()
+        }
+
         override fun håndter(innsending: Innsending, søknadsdata: Søknadsdata) {
             val kategorisertJournalpost =
                 requireNotNull(
@@ -358,7 +360,6 @@ class Innsending private constructor(
     }
 
     internal object AventerVurderHenvendelseArenaOppgave : Tilstand {
-
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AventerArenaOppgaveType
         override val timeout: Duration
@@ -387,6 +388,7 @@ class Innsending private constructor(
             get() = InnsendingTilstandType.AvventerGosysType
         override val timeout: Duration
             get() = Duration.ofDays(1)
+
         override fun entering(innsending: Innsending, hendelse: Hendelse) {
             innsending.opprettGosysOppgave(hendelse)
         }
@@ -571,7 +573,6 @@ class Innsending private constructor(
                 "aktørId" to it.aktørId
             )
         } ?: emptyMap()
-
         val parametre = mapOf(
             "behandlendeEnhetId" to oppgavebenk.id,
             "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
@@ -593,7 +594,7 @@ class Innsending private constructor(
         if (tilstand == nyTilstand) {
             return // Already in this state => ignore
         }
-        tilstand.leaving(event)
+        tilstand.leaving(this, event)
         val previousState = tilstand
         tilstand = nyTilstand
         block()
@@ -608,7 +609,6 @@ class Innsending private constructor(
         forrigeTilstand: InnsendingTilstandType,
         timeout: Duration
     ) {
-
         observers.forEach {
             it.tilstandEndret(
                 InnsendingObserver.InnsendingEndretTilstandEvent(
@@ -617,7 +617,6 @@ class Innsending private constructor(
                     forrigeTilstand = forrigeTilstand,
                     aktivitetslogg = aktivitetslogg,
                     timeout = timeout
-
                 )
             )
         }
@@ -625,29 +624,48 @@ class Innsending private constructor(
 
     private fun emitFerdigstilt() {
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
-        val type = when (jp.kategorisertJournalpost()) {
-            is Etablering -> InnsendingFerdigstiltEvent.Type.Etablering
-            is Ettersending -> InnsendingFerdigstiltEvent.Type.Ettersending
-            is Gjenopptak -> InnsendingFerdigstiltEvent.Type.Gjenopptak
-            is KlageOgAnke -> InnsendingFerdigstiltEvent.Type.KlageOgAnke
-            is KlageOgAnkeLønnskompensasjon -> InnsendingFerdigstiltEvent.Type.KlageOgAnkeLønnskompensasjon
-            is NySøknad -> InnsendingFerdigstiltEvent.Type.NySøknad
-            is UkjentSkjemaKode -> InnsendingFerdigstiltEvent.Type.UkjentSkjemaKode
-            is Utdanning -> InnsendingFerdigstiltEvent.Type.Utdanning
-            is UtenBruker -> InnsendingFerdigstiltEvent.Type.UtenBruker
-        }
-        InnsendingFerdigstiltEvent(
-            type = type,
+        InnsendingEvent(
+            type = mapToHendelseType(jp),
             journalpostId = journalpostId,
             aktørId = person?.aktørId,
             fødselsnummer = person?.fødselsnummer,
             fagsakId = arenaSak?.fagsakId,
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = søknad?.data,
-            behandlendeEnhet = jp.kategorisertJournalpost().oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id
+            behandlendeEnhet = jp.kategorisertJournalpost()
+                .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id
         ).also { ferdig ->
             observers.forEach { it.innsendingFerdigstilt(ferdig) }
         }
+    }
+
+    private fun emitMottatt() {
+        val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
+        InnsendingEvent(
+            type = mapToHendelseType(jp),
+            journalpostId = journalpostId,
+            aktørId = person?.aktørId,
+            fødselsnummer = person?.fødselsnummer,
+            fagsakId = null,
+            datoRegistrert = jp.datoRegistrert(),
+            søknadsData = søknad?.data,
+            behandlendeEnhet = jp.kategorisertJournalpost()
+                .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id
+        ).also { mottatt ->
+            observers.forEach { it.innsendingMottatt(mottatt) }
+        }
+    }
+
+    private fun mapToHendelseType(jp: Journalpost) = when (jp.kategorisertJournalpost()) {
+        is Etablering -> InnsendingObserver.Type.Etablering
+        is Ettersending -> InnsendingObserver.Type.Ettersending
+        is Gjenopptak -> InnsendingObserver.Type.Gjenopptak
+        is KlageOgAnke -> InnsendingObserver.Type.KlageOgAnke
+        is KlageOgAnkeLønnskompensasjon -> InnsendingObserver.Type.KlageOgAnkeLønnskompensasjon
+        is NySøknad -> InnsendingObserver.Type.NySøknad
+        is UkjentSkjemaKode -> InnsendingObserver.Type.UkjentSkjemaKode
+        is Utdanning -> InnsendingObserver.Type.Utdanning
+        is UtenBruker -> InnsendingObserver.Type.UtenBruker
     }
 
     fun accept(visitor: InnsendingVisitor) {

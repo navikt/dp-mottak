@@ -99,6 +99,13 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertMessages(it)
             println(it.innsendingLogg.toString())
         }
+        assertMottatt {
+            assertEquals("NySøknad", it.type.name)
+            assertNotNull(it.søknadsData)
+            assertNotNull(it.aktørId)
+            assertNotNull(it.fødselsnummer)
+            assertNotNull(it.datoRegistrert)
+        }
         assertFerdigstilt {
             assertEquals("NySøknad", it.type.name)
             assertNotNull(it.søknadsData)

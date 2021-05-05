@@ -72,10 +72,16 @@ abstract class AbstractEndeTilEndeTest {
         )
     }
 
-    protected fun assertFerdigstilt(test: (InnsendingObserver.InnsendingFerdigstiltEvent) -> Unit) {
-        assertNotNull(observatør.ferdigstiltEvent)
-        assertEquals(JOURNALPOST_ID, observatør.ferdigstiltEvent?.journalpostId)
-        test(observatør.ferdigstiltEvent!!)
+    protected fun assertFerdigstilt(test: (InnsendingObserver.InnsendingEvent) -> Unit) {
+        assertNotNull(observatør.event)
+        assertEquals(JOURNALPOST_ID, observatør.event?.journalpostId)
+        test(observatør.event!!)
+    }
+
+    protected fun assertMottatt(test: (InnsendingObserver.InnsendingEvent) -> Unit) {
+        assertNotNull(observatør.mottattEvent)
+        assertEquals(JOURNALPOST_ID, observatør.mottattEvent?.journalpostId)
+        test(observatør.mottattEvent!!)
     }
 
     protected fun håndterJoarkHendelse() {
