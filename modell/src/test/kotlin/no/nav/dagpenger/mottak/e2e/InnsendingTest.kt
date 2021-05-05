@@ -396,4 +396,29 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.datoRegistrert)
         }
     }
+
+    @Test
+    fun `skal forhindre at ferdigstilte joarkhendelser skal behandles på nytt`() {
+        håndterJoarkHendelse()
+        håndterJournalpostData("ukjent")
+        håndterPersonInformasjon()
+        håndterGosysOppgaveOpprettet()
+        håndterJournalpostOppdatert()
+
+        // joark hendelse med samme journalpostId kommer
+        håndterJoarkHendelse()
+
+        inspektør.also {
+            assertTrue(it.innsendingLogg.hasErrors())
+        }
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            AvventerGosysType,
+            InnsendingFerdigstiltType
+        )
+    }
 }

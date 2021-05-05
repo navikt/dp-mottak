@@ -50,6 +50,10 @@ class Innsending private constructor(
     fun håndter(joarkHendelse: JoarkHendelse) {
         if (journalpostId != joarkHendelse.journalpostId()) return
         kontekst(joarkHendelse, "Registrert joark hendelse")
+        if (erFerdigBehandlet()) {
+            joarkHendelse.error("Journalpost med id ${joarkHendelse.journalpostId()} allerede ferdig behandlet")
+            return
+        }
         tilstand.håndter(this, joarkHendelse)
     }
 
@@ -661,6 +665,11 @@ class Innsending private constructor(
     fun addObserver(observer: InnsendingObserver) {
         observers.add(observer)
     }
+
+    private fun erFerdigBehandlet() =
+        this.tilstand.type in setOf(
+            InnsendingTilstandType.InnsendingFerdigstiltType
+        )
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(
         "Innsending",
