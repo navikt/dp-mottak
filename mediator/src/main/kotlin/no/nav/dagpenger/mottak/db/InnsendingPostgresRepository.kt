@@ -260,19 +260,24 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                     )
                 )
             )
-            val dokumentliste =
-                dokumenter.joinToString { """('$internId','${it.tittel}','${it.dokumentInfoId}','${it.brevkode}')""" }
 
-            if (dokumentliste.isNotEmpty()) {
-                lagreQueries.add(
-                    queryOf( //language=PostgreSQL
-                        """
-                            INSERT INTO journalpost_dokumenter_v1(id,tittel,dokumentInfoId,brevkode) 
-                            VALUES $dokumentliste ON CONFLICT DO NOTHING
-                             
-                        """.trimIndent()
+            val dokumentQueries = dokumenter.map {
+                queryOf( //language=PostgreSQL
+                    """
+                        INSERT INTO journalpost_dokumenter_v1(id,tittel,dokumentInfoId,brevkode) 
+                        VALUES(:internId, :tittel, :dokumentInfoId, :brevkode) ON CONFLICT DO NOTHING
+                    """.trimIndent(),
+                    mapOf(
+                        "internId" to internId,
+                        "tittel" to it.tittel,
+                        "dokumentInfoId" to it.dokumentInfoId.toLong(),
+                        "brevkode" to it.brevkode
                     )
                 )
+            }
+
+            if (dokumentQueries.isNotEmpty()) {
+                lagreQueries.addAll(dokumentQueries)
             }
         }
 

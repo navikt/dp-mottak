@@ -29,6 +29,12 @@ internal class InnsendingPostgresRepositoryTest {
             tittel = "Annen Fin tittel",
             brevkode = "NAV 04-01.03",
             dokumentInfoId = "123456567"
+        ),
+
+        DokumentInfoData(
+            tittel = "Permitteringsvarsel: Koko's AS",
+            brevkode = "NAV 04-01.03",
+            dokumentInfoId = "12366732"
         )
     )
 
@@ -78,7 +84,7 @@ internal class InnsendingPostgresRepositoryTest {
         oppfyllerMinsteArbeidsinntekt = true,
         eksisterendeSaker = false,
         personData = InnsendingData.PersonData(
-            navn = "Hubba Bubba",
+            navn = "Hubba Bubba's",
             fødselsnummer = fnr,
             aktørId = "345678",
             norskTilknytning = true,
@@ -154,7 +160,7 @@ internal class InnsendingPostgresRepositoryTest {
     }
 
     @Test
-    fun `Dobbelagrer ikke verider som skal være unike`() {
+    fun `Dobbelagrer ikke verdier som skal være unike`() {
         val innsending = innsendingData.createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
@@ -167,7 +173,7 @@ internal class InnsendingPostgresRepositoryTest {
                     assertAntallRader("aktivitetslogg_v1", 1)
                     assertAntallRader("arenasak_v1", 1)
                     assertAntallRader("journalpost_v1", 1)
-                    assertAntallRader("journalpost_dokumenter_v1", 2)
+                    assertAntallRader("journalpost_dokumenter_v1", 3)
                     assertAntallRader("person_v1", 1)
                     assertAntallRader("person_innsending_v1", 1)
                 }
