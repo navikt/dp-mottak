@@ -31,14 +31,15 @@ internal class PersondataMottak(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        logg.info { "Fått løsning for $løsning, journalpostId: ${packet["journalpostId"]}" }
+        val journalpostId = packet["journalpostId"].asText()
+        logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
         val persondata = packet[løsning]
         if (persondata.isNull) {
-            innsendingMediator.håndter(PersonInformasjonIkkeFunnet(Aktivitetslogg(), packet["journalpostId"].asText()))
+            innsendingMediator.håndter(PersonInformasjonIkkeFunnet(Aktivitetslogg(), journalpostId))
         } else {
             PersonInformasjon(
                 aktivitetslogg = Aktivitetslogg(),
-                journalpostId = packet["journalpostId"].asText(),
+                journalpostId = journalpostId,
                 aktørId = persondata["aktørId"].asText(),
                 fødselsnummer = persondata["fødselsnummer"].asText(),
                 diskresjonskode = persondata["diskresjonskode"].textValue(),

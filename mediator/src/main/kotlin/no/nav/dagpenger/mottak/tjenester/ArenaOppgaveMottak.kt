@@ -38,11 +38,12 @@ internal class OpprettArenaOppgaveMottak(
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
             val arenaLøsning = packet["@løsning"].first()
-            logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: ${packet["journalpostId"]}" }
+            val journalpostId = packet["journalpostId"].asText()
+            logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId" }
             val oppgaveOpprettet = arenaLøsning.let {
                 ArenaOppgaveOpprettet(
                     aktivitetslogg = Aktivitetslogg(),
-                    journalpostId = packet["journalpostId"].asText(),
+                    journalpostId = journalpostId,
                     oppgaveId = it["oppgaveId"]?.asText(),
                     fagsakId = it["fagsakId"].asText()
                 )

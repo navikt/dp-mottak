@@ -30,10 +30,11 @@ internal class MinsteinntektVurderingMottak(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        logg.info { "Fått løsning for $løsning, journalpostId: ${packet["journalpostId"]}" }
+        val journalpostId = packet["journalpostId"].asText()
+        logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
         val minsteinntektVurdering = MinsteinntektArbeidsinntektVurdert(
             aktivitetslogg = Aktivitetslogg(),
-            journalpostId = packet["journalpostId"].asText(),
+            journalpostId = journalpostId,
             oppfyllerMinsteArbeidsinntekt = packet[løsning]["oppfyllerMinsteArbeidsinntekt"]?.asBoolean()
         )
 

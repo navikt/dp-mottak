@@ -29,10 +29,11 @@ internal class JournalpostFerdigstiltMottak(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        logg.info { "Fått løsning for $løsning, journalpostId: ${packet["journalpostId"]}" }
+        val journalpostId = packet["journalpostId"].asText()
+        logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
         val journalpostFerdigstilt = JournalpostFerdigstilt(
             aktivitetslogg = Aktivitetslogg(),
-            journalpostId = packet[løsning]["journalpostId"].asText()
+            journalpostId = journalpostId
         )
 
         innsendingMediator.håndter(journalpostFerdigstilt)

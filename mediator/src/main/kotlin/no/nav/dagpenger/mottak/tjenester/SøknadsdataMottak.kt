@@ -30,11 +30,12 @@ internal class SøknadsdataMottak(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        logg.info { "Fått løsning for $løsning, journalpostId: ${packet["journalpostId"]}" }
+        val journalpostId = packet["journalpostId"].asText()
+        logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
         val søknadsdata = packet["@løsning.${Behovtype.Søknadsdata.name}"].let {
             Søknadsdata(
                 aktivitetslogg = Aktivitetslogg(),
-                journalpostId = packet["journalpostId"].asText(),
+                journalpostId = journalpostId,
                 data = it
             )
         }
