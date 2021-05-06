@@ -28,15 +28,12 @@ internal class FerdigstillJournalpostBehovLøser(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val journalpostId = packet["journalpostId"].asText()
 
-        if (journalpostId != "493358710") {
-
-            try {
-                runBlocking {
-                    journalpostDokarkiv.ferdigstill(journalpostId)
-                }
-            } catch (e: JournalpostFeil.JournalpostException) {
-                ignorerKjenteTilstander(e)
+        try {
+            runBlocking {
+                journalpostDokarkiv.ferdigstill(journalpostId)
             }
+        } catch (e: JournalpostFeil.JournalpostException) {
+            ignorerKjenteTilstander(e)
         }
 
         packet["@løsning"] = mapOf(

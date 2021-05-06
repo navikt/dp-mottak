@@ -240,7 +240,6 @@ internal class MediatorE2ETest {
         }
         """.trimIndent()
 
-    // todo: Koronaregelverk?
     //language=JSON
     private fun minsteinntektVurderingMotattHendelse(): String =
         """{

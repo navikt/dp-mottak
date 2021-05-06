@@ -30,7 +30,6 @@ class Journalpost constructor(
     private val registrertDato: LocalDateTime = registrertDato.truncatedTo(ChronoUnit.MINUTES)
 
     internal companion object {
-        // @todo: not sure if this belong here
         val allKnownTypes = mapOf(
             "NAV 04-02.03" to "Bekreftelse på ansettelsesforhold",
             "O2" to "Arbeidsavtale",

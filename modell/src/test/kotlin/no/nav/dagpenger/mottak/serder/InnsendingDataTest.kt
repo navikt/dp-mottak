@@ -49,7 +49,6 @@ internal class InnsendingDataTest {
                 fødselsnummer = fnr,
                 aktørId = "345678",
                 norskTilknytning = true,
-                // TODO: wattudu med diskresjonskoder(egen ansatt, 6 og 7)
                 diskresjonskode = false
             ),
             arenaSakData = ArenaSakData(
