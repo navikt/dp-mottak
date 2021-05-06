@@ -23,7 +23,7 @@ internal class OpprettGosysOppgaveLøserTest {
     init {
         OpprettGosysOppgaveLøser(
             gosysOppslag = object : GosysOppslag {
-                override suspend fun opprettOppgave(oppgave: GosysOppgaveRequest):  String {
+                override suspend fun opprettOppgave(oppgave: GosysOppgaveRequest): String {
                     expectedOppgave = oppgave
                     return "dfghjkl"
                 }

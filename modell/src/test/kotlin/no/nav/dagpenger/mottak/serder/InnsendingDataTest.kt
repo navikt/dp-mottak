@@ -18,7 +18,7 @@ internal class InnsendingDataTest {
     private val journalpostStatus = "aktiv"
     private val fnr = "12345678910"
     private val registrertdato = LocalDateTime.now()
-    private val dokumenter = listOf<DokumentInfoData>(
+    private val dokumenter = listOf(
         DokumentInfoData(
             tittel = "Fin tittel",
             brevkode = "NAV 04-01.03",
@@ -45,6 +45,7 @@ internal class InnsendingDataTest {
             oppfyllerMinsteArbeidsinntekt = true,
             eksisterendeSaker = false,
             personData = PersonData(
+                navn = "Hubba Bubba",
                 fødselsnummer = fnr,
                 aktørId = "345678",
                 norskTilknytning = true,

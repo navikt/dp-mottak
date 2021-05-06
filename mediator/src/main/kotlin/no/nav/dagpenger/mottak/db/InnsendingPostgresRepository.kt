@@ -40,6 +40,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             innsending_eksisterende_arena_saker.verdi as "harEksisterendeSaker",
             innsending_oppfyller_minsteinntekt.verdi  as "oppfyllerMinsteArbeidsinntekt",
             soknad.data                               as "søknadsData",
+            person_innsending.navn                    as "navn",
             person_innsending.diskresjonskode         as "diskresjonsKode",
             person_innsending.norsktilknytning        as "norsktilknytning",
             person.fødselsnummer                      as "fødselsnummer",
@@ -88,6 +89,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         eksisterendeSaker = row.booleanOrNull("harEksisterendeSaker"),
                         personData = row.stringOrNull("fødselsnummer")?.let {
                             InnsendingData.PersonData(
+                                navn = row.string("navn"),
                                 aktørId = row.string("aktørId"),
                                 fødselsnummer = row.string("fødselsnummer"),
                                 norskTilknytning = row.boolean("norsktilknytning"),

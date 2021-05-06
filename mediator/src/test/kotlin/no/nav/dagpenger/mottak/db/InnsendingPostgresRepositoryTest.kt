@@ -78,6 +78,7 @@ internal class InnsendingPostgresRepositoryTest {
         oppfyllerMinsteArbeidsinntekt = true,
         eksisterendeSaker = false,
         personData = InnsendingData.PersonData(
+            navn = "Hubba Bubba",
             fødselsnummer = fnr,
             aktørId = "345678",
             norskTilknytning = true,
