@@ -5,7 +5,6 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 interface InnsendingObserver {
-
     data class InnsendingEndretTilstandEvent(
         val journalpostId: String,
         val gjeldendeTilstand: InnsendingTilstandType,
@@ -14,7 +13,19 @@ interface InnsendingObserver {
         val timeout: Duration
     )
 
-    data class InnsendingFerdigstiltEvent(
+    enum class Type {
+        NySøknad,
+        Gjenopptak,
+        Utdanning,
+        Etablering,
+        KlageOgAnke,
+        KlageOgAnkeLønnskompensasjon,
+        Ettersending,
+        UkjentSkjemaKode,
+        UtenBruker
+    }
+
+    data class InnsendingEvent(
         val type: Type,
         val journalpostId: String,
         val aktørId: String?,
@@ -23,21 +34,9 @@ interface InnsendingObserver {
         val datoRegistrert: LocalDateTime,
         val søknadsData: JsonNode?,
         val behandlendeEnhet: String,
-    ) {
-
-        enum class Type {
-            NySøknad,
-            Gjenopptak,
-            Utdanning,
-            Etablering,
-            KlageOgAnke,
-            KlageOgAnkeLønnskompensasjon,
-            Ettersending,
-            UkjentSkjemaKode,
-            UtenBruker
-        }
-    }
+    )
 
     fun tilstandEndret(event: InnsendingEndretTilstandEvent) {}
-    fun innsendingFerdigstilt(event: InnsendingFerdigstiltEvent) {}
+    fun innsendingFerdigstilt(event: InnsendingEvent) {}
+    fun innsendingMottatt(event: InnsendingEvent) {}
 }

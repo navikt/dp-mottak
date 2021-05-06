@@ -12,7 +12,7 @@ internal class MetrikkObserver : InnsendingObserver {
         )
     }
 
-    override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingFerdigstiltEvent) {
+    override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
         Metrics.jpFerdigStillInc(event.type.name)
         if (event.fagsakId != null) {
             Metrics.automatiskJournalførtJaTellerInc(event.behandlendeEnhet)
