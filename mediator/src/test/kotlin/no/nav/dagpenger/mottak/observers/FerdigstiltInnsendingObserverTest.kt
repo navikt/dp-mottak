@@ -85,7 +85,7 @@ internal class FerdigstiltInnsendingObserverTest {
         fødselsnummer = null,
         aktørId = null,
         søknadsData = null,
-        fagsakId = null,
+        fagsakId = null
     )
 
     private fun ferdigstiltEvent(): InnsendingObserver.InnsendingEvent =

@@ -300,6 +300,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
+            assertNotNull(it.søknadsData)
         }
     }
 
