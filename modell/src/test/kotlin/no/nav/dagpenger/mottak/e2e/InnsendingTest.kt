@@ -296,8 +296,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         }
     }
 
-    // "NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04"
-
     @Test
     fun `skal håndtere ukjente brevkoder`() {
         håndterJoarkHendelse()
