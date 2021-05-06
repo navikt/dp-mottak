@@ -1,20 +1,16 @@
 @startuml
-
-title Innløpet
-[*] --> Mottak
-note right
-this is a note
-end note
-
-Mottak : Contents - void
-Mottak --> PersonMottat
-PersonMottat: Person
-PersonMottat --> JournalPostMottat
-JournalPostMottat -> Vilkårsprøvd
-Vilkårsprøvd --> Kategorisert
-Kategorisert -> ArenaOppgaveOpprettet
-Kategorisert -> GosysOppgaveOpprettet
-ArenaOppgaveOpprettet --> FerdigStilt
-GosysOppgaveOpprettet --> FerdigStilt
-FerdigStilt --> [*]
+title
+Innløpet – flyt for brevkode NAV 04-01.03
+end title
+[*]-->MottattType
+MottattType --> AvventerJournalpostType
+AvventerJournalpostType --> AvventerPersondataType
+AvventerPersondataType --> KategoriseringType
+KategoriseringType --> AvventerSøknadsdataType
+AvventerSøknadsdataType --> AvventerMinsteinntektVurderingType
+AvventerMinsteinntektVurderingType --> AvventerSvarOmEksisterendeSakerType
+AvventerSvarOmEksisterendeSakerType --> AventerArenaStartVedtakType
+AventerArenaStartVedtakType --> AvventerFerdigstillJournalpostType
+AvventerFerdigstillJournalpostType --> InnsendingFerdigstiltType
+InnsendingFerdigstiltType--> [*]
 @enduml

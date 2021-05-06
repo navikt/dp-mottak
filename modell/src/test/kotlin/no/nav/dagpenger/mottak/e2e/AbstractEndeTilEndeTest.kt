@@ -38,12 +38,16 @@ abstract class AbstractEndeTilEndeTest {
 
     protected lateinit var innsending: Innsending
     protected lateinit var observatør: TestObservatør
+    protected lateinit var plantUmlObservatør: PlantUmlObservatør
     protected val inspektør get() = TestInnsendingInspektør(innsending)
 
     @BeforeEach
     internal fun setup() {
         innsending = Innsending(JOURNALPOST_ID)
         observatør = TestObservatør().also {
+            innsending.addObserver(it)
+        }
+        plantUmlObservatør = PlantUmlObservatør().also {
             innsending.addObserver(it)
         }
     }

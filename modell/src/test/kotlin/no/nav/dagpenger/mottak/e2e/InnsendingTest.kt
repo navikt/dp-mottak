@@ -114,6 +114,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
         }
+
+   //     println(plantUmlObservatør.toPlantUml(brevkode))
     }
 
     @ParameterizedTest
