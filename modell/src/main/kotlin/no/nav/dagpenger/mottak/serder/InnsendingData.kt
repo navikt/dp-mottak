@@ -77,6 +77,7 @@ data class InnsendingData(
             InnsendingTilstandTypeData.InnsendingFerdigstiltType -> Innsending.InnsendingFerdigStilt
             InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerVurderHenvendelseArenaOppgave
             InnsendingTilstandTypeData.AvventerGosysType -> Innsending.AvventerGosysOppgave
+            InnsendingTilstandTypeData.UkjentBrukerType -> Innsending.UkjentBruker
         }
 
         enum class InnsendingTilstandTypeData {
@@ -91,7 +92,8 @@ data class InnsendingData(
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType,
             AventerArenaOppgaveType,
-            AvventerGosysType
+            AvventerGosysType,
+            UkjentBrukerType
         }
     }
 
