@@ -180,8 +180,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["NAV 04-06.08", "NAV 90-00.08", "NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04", "NAV 04-06.05"])
-    fun `skal håndtere joark hendelsene etablering, klage, ettersending og utdanning`(brevkode: String) {
+    @ValueSource(strings = ["NAV 04-06.08", "NAV 90-00.08", "NAV 04-06.05"])
+    fun `skal håndtere joark hendelsene etablering, klage&anke og utdanning`(brevkode: String) {
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
@@ -228,7 +228,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         }
 
         assertFerdigstilt {
-            val expected = setOf("Etablering", "Ettersending", "KlageOgAnke", "Utdanning")
+            val expected = setOf("Etablering", "KlageOgAnke", "Utdanning")
             assertTrue(it.type.name in expected, "Forventet at ${it.type.name} var en av $expected")
             assertNotNull(it.fagsakId)
             assertNotNull(it.aktørId)
@@ -236,6 +236,67 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.datoRegistrert)
         }
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04"])
+    fun `skal håndtere joark hendelsene ettersending`(brevkode: String) {
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode)
+        håndterPersonInformasjon()
+        håndterSøknadsdata()
+        håndterArenaOppgaveOpprettet()
+        assertBehovDetaljer(
+            OpprettVurderhenvendelseOppgave,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "behandlendeEnhetId",
+                "oppgavebeskrivelse",
+                "registrertDato",
+                "tilleggsinformasjon"
+            )
+        )
+        håndterJournalpostOppdatert()
+        assertBehovDetaljer(
+            OppdaterJournalpost,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "fagsakId",
+                "navn",
+                "tittel",
+                "dokumenter"
+            )
+        )
+        håndterJournalpostFerdigstilt()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            AvventerSøknadsdataType,
+            AventerArenaOppgaveType,
+            AvventerFerdigstillJournalpostType,
+            InnsendingFerdigstiltType
+        )
+
+        inspektør.also {
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+        }
+
+        assertFerdigstilt {
+            assertEquals("Ettersending", it.type.name)
+            assertNotNull(it.fagsakId)
+            assertNotNull(it.aktørId)
+            assertNotNull(it.fødselsnummer)
+            assertNotNull(it.datoRegistrert)
+        }
+    }
+
+    // "NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04"
 
     @Test
     fun `skal håndtere ukjente brevkoder`() {

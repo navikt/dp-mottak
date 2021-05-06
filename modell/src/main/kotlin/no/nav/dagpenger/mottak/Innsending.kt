@@ -262,11 +262,11 @@ class Innsending private constructor(
             when (hendelseType) {
                 is NySøknad -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Gjenopptak -> innsending.tilstand(hendelse, AvventerSøknadsdata)
-                is Utdanning -> innsending.tilstand(hendelse, AventerArenaOppgave)
-                is Etablering -> innsending.tilstand(hendelse, AventerArenaOppgave)
-                is KlageOgAnke -> innsending.tilstand(hendelse, AventerArenaOppgave)
+                is Utdanning -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
+                is Etablering -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
+                is KlageOgAnke -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is KlageOgAnkeLønnskompensasjon -> innsending.tilstand(hendelse, AvventerGosysOppgave)
-                is Ettersending -> innsending.tilstand(hendelse, AventerArenaOppgave)
+                is Ettersending -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
             }
@@ -292,7 +292,8 @@ class Innsending private constructor(
             innsending.søknad = søknadsdata.søknad()
             when (kategorisertJournalpost) {
                 is NySøknad -> innsending.tilstand(søknadsdata, AventerMinsteinntektVurdering)
-                is Gjenopptak -> innsending.tilstand(søknadsdata, AventerArenaOppgave)
+                is Gjenopptak -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
+                is Ettersending -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
                 else -> søknadsdata.severe("Forventet kun søknadsdata for NySøknad og Gjenopptak")
             }
         }
@@ -356,7 +357,7 @@ class Innsending private constructor(
         }
     }
 
-    internal object AventerArenaOppgave : Tilstand {
+    internal object AventerVurderHenvendelseArenaOppgave : Tilstand {
 
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AventerArenaOppgaveType

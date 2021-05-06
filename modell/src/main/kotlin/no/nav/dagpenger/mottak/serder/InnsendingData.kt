@@ -75,7 +75,7 @@ data class InnsendingData(
             InnsendingTilstandTypeData.AventerArenaStartVedtakType -> Innsending.AventerArenaStartVedtak
             InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType -> Innsending.AventerFerdigstill
             InnsendingTilstandTypeData.InnsendingFerdigstiltType -> Innsending.InnsendingFerdigStilt
-            InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerArenaOppgave
+            InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerVurderHenvendelseArenaOppgave
             InnsendingTilstandTypeData.AvventerGosysType -> Innsending.AvventerGosysOppgave
         }
 
