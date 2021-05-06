@@ -5,7 +5,7 @@ import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingFerdigstiltEvent.Typ
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import org.apache.kafka.clients.producer.MockProducer
 import org.apache.kafka.common.serialization.StringSerializer
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
