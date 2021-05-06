@@ -72,7 +72,11 @@ internal class MinsteinntektVurderingLøser(
             logger.info { "Starter MinsteInntektVurderingVaktmester jobb" }
             repository.slettUtgåtteVurderinger().forEach { (jpId, packet) ->
                 packet["@løsning"] =
-                    mapOf("MinsteinntektVurdering" to null)
+                    mapOf(
+                        "MinsteinntektVurdering" to mapOf(
+                            "oppfyllerMinsteArbeidsinntekt" to null
+                        )
+                    )
                 rapidsConnection.publish(jpId, packet.toJson()).also {
                     logger.info { "Ryddet opp utgått innsending for journalpostId $jpId" }
                 }

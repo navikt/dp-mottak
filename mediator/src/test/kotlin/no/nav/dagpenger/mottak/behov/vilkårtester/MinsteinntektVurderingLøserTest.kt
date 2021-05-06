@@ -81,8 +81,8 @@ internal class MinsteinntektVurderingLøserTest {
             delay(500)
 
             assertEquals(2, testRapid.inspektør.size)
-            assertTrue(testRapid.inspektør.message(0)["@løsning"]["MinsteinntektVurdering"].isNull)
-            assertTrue(testRapid.inspektør.message(1)["@løsning"]["MinsteinntektVurdering"].isNull)
+            assertTrue(testRapid.inspektør.message(0)["@løsning"]["MinsteinntektVurdering"]["oppfyllerMinsteArbeidsinntekt"].isNull)
+            assertTrue(testRapid.inspektør.message(1)["@løsning"]["MinsteinntektVurdering"]["oppfyllerMinsteArbeidsinntekt"].isNull)
             assertEquals("0", testRapid.inspektør.key(0))
             assertEquals("1", testRapid.inspektør.key(1))
         }
