@@ -2,6 +2,8 @@ package no.nav.dagpenger.mottak.behov.saksbehandling.gosys
 
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import java.time.LocalDateTime
@@ -11,10 +13,20 @@ internal class OpprettGosysOppgaveLøserTest {
     val journalpostId = "23456789"
     val testRapid = TestRapid()
 
+    private var expectedOppgave: GosysOppgaveRequest? = null
+
+    @BeforeEach
+    fun reset() {
+        expectedOppgave = null
+    }
+
     init {
         OpprettGosysOppgaveLøser(
             gosysOppslag = object : GosysOppslag {
-                override suspend fun opprettOppgave(oppgave: GosysOppgaveRequest): String = "dfghjkl"
+                override suspend fun opprettOppgave(oppgave: GosysOppgaveRequest):  String {
+                    expectedOppgave = oppgave
+                    return "dfghjkl"
+                }
             },
             rapidsConnection = testRapid
         )
@@ -37,6 +49,9 @@ internal class OpprettGosysOppgaveLøserTest {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
             assertEquals("dfghjkl", field(0, "@løsning")["OpprettGosysoppgave"]["oppgaveId"].asText())
+        }
+        requireNotNull(expectedOppgave).also {
+            assertNull(it.aktoerId)
         }
     }
 

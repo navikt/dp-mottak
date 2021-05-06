@@ -50,7 +50,7 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
 
 private fun JsonMessage.gosysOppgave(): GosysOppgaveRequest = GosysOppgaveRequest(
     journalpostId = this["journalpostId"].asText(),
-    aktoerId = this["aktørId"].asText(),
+    aktoerId = this["aktørId"].textValue(),
     tildeltEnhetsnr = this["behandlendeEnhetId"].asText(),
     aktivDato = this["registrertDato"].asLocalDateTime().toLocalDate(),
     beskrivelse = this["oppgavebeskrivelse"].asText()
