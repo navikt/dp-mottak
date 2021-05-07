@@ -124,7 +124,6 @@ internal class Pdl {
                     it
                 },
                 onFailure = {
-                    sikkerLogg.info(node.toString())
                     if (ukjentPersonIdent(node)) return null
                     else {
                         sikkerLogg.info(node.toString())
