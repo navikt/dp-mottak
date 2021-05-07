@@ -1,0 +1,13 @@
+@startuml
+title 
+Innløpet – flyt for brevkode NAV 04-06.08
+end title           
+[*]-->MottattType 
+MottattType --> AvventerJournalpostType
+AvventerJournalpostType --> AvventerPersondataType
+AvventerPersondataType --> KategoriseringType
+KategoriseringType --> AventerArenaOppgaveType
+AventerArenaOppgaveType --> AvventerFerdigstillJournalpostType
+AvventerFerdigstillJournalpostType --> InnsendingFerdigstiltType
+InnsendingFerdigstiltType--> [*]
+@enduml

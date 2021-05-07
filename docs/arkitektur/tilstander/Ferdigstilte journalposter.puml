@@ -1,0 +1,12 @@
+@startuml
+title 
+Innløpet – flyt for brevkode Ferdigstilte journalposter
+end title           
+[*]-->MottattType 
+MottattType --> AvventerJournalpostType
+AvventerJournalpostType --> AvventerPersondataType
+AvventerPersondataType --> KategoriseringType
+KategoriseringType --> AvventerGosysType
+AvventerGosysType --> InnsendingFerdigstiltType
+InnsendingFerdigstiltType--> [*]
+@enduml
