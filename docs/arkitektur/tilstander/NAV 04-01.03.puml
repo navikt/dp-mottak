@@ -1,8 +1,8 @@
 @startuml
-title
+title 
 Innløpet – flyt for brevkode NAV 04-01.03
-end title
-[*]-->MottattType
+end title           
+[*]-->MottattType 
 MottattType --> AvventerJournalpostType
 AvventerJournalpostType --> AvventerPersondataType
 AvventerPersondataType --> KategoriseringType

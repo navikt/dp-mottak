@@ -1,0 +1,14 @@
+@startuml
+title 
+Innløpet – flyt for brevkode NAVe 04-01.03
+end title           
+[*]-->MottattType 
+MottattType --> AvventerJournalpostType
+AvventerJournalpostType --> AvventerPersondataType
+AvventerPersondataType --> KategoriseringType
+KategoriseringType --> AvventerSøknadsdataType
+AvventerSøknadsdataType --> AventerArenaOppgaveType
+AventerArenaOppgaveType --> AvventerFerdigstillJournalpostType
+AvventerFerdigstillJournalpostType --> InnsendingFerdigstiltType
+InnsendingFerdigstiltType--> [*]
+@enduml
