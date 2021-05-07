@@ -32,8 +32,6 @@ import org.junit.jupiter.params.provider.ValueSource
 
 internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
-    private val writeDocs = false
-
     @ParameterizedTest
     @ValueSource(strings = ["NAV 04-01.03", "NAV 04-01.04"])
     fun `skal håndtere joark hendelse der journalpost er ny søknad`(brevkode: String) {
@@ -117,8 +115,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.datoRegistrert)
         }
 
-        if (writeDocs)
-            plantUmlObservatør.writePlantUml(brevkode)
+        plantUmlObservatør.writePlantUml(brevkode)
     }
 
     @ParameterizedTest
@@ -189,8 +186,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
         }
-        if (writeDocs)
-            plantUmlObservatør.writePlantUml(brevkode)
+
+        plantUmlObservatør.writePlantUml(brevkode)
     }
 
     @ParameterizedTest
@@ -249,8 +246,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
         }
-        if (writeDocs)
-            plantUmlObservatør.writePlantUml(brevkode)
+
+        plantUmlObservatør.writePlantUml(brevkode)
     }
 
     @ParameterizedTest
@@ -311,8 +308,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.datoRegistrert)
             assertNotNull(it.søknadsData)
         }
-        if (writeDocs)
-            plantUmlObservatør.writePlantUml(brevkode)
+
+        plantUmlObservatør.writePlantUml(brevkode)
     }
 
     @Test
@@ -344,8 +341,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
         }
-        if (writeDocs)
-            plantUmlObservatør.writePlantUml("Ukjente brevkoder")
+
+        plantUmlObservatør.writePlantUml("Ukjente brevkoder")
     }
 
     @Test
@@ -398,8 +395,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
         }
-        if (writeDocs)
-            plantUmlObservatør.writePlantUml(brevkode)
+
+        plantUmlObservatør.writePlantUml(brevkode)
     }
 
     @ParameterizedTest
@@ -478,8 +475,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         assertFerdigstilt {
             assertNotNull(it.datoRegistrert)
         }
-        if (writeDocs)
-            plantUmlObservatør.writePlantUml("Ukjent bruker")
+
+        plantUmlObservatør.writePlantUml("Ukjent bruker")
     }
 
     @Test
@@ -506,7 +503,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             InnsendingFerdigstiltType
         )
 
-        if (writeDocs)
-            plantUmlObservatør.writePlantUml("Ferdigstilte journalposter")
+        plantUmlObservatør.writePlantUml("Ferdigstilte journalposter")
     }
 }
