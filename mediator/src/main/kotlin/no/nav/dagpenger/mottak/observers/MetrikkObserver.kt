@@ -13,14 +13,9 @@ internal class MetrikkObserver : InnsendingObserver {
     }
 
     override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
-        Metrics.jpFerdigStillInc(event.type.name, event.skjemaKode)
+        Metrics.jpFerdigStillInc(event.type.name, event.skjemaKode, event.behandlendeEnhet)
         event.oppfyllerMinsteinntektArbeidsinntekt?.let {
             Metrics.oppfyllerMinsteinntektArbeidsinntekt(it)
-        }
-        if (event.fagsakId != null) {
-            Metrics.automatiskJournalførtJaTellerInc(event.behandlendeEnhet)
-        } else {
-            Metrics.automatiskJournalførtNeiTellerInc(event.type.name, event.behandlendeEnhet)
         }
     }
 }
@@ -32,13 +27,13 @@ internal object Metrics {
         .build()
         .namespace(DAGPENGER_NAMESPACE)
         .name("journalpost_ferdigstilt")
-        .labelNames("kategorisering", "skjema")
+        .labelNames("kategorisering", "skjema", "enhet")
         .help("Number of journal post processed succesfully")
         .register()
 
-    fun jpFerdigStillInc(kategorisertSom: String, skjemaKode: String) =
+    fun jpFerdigStillInc(kategorisertSom: String, skjemaKode: String, enhet: String) =
         jpFerdigstiltCounter
-            .labels(kategorisertSom, skjemaKode)
+            .labels(kategorisertSom, skjemaKode, enhet)
             .inc()
 
     fun oppfyllerMinsteinntektArbeidsinntekt(boolean: Boolean) =
@@ -52,19 +47,6 @@ internal object Metrics {
         .help("Antall søknader som oppfyller / ikke oppfyller inngangsvilkårene vi tester")
         .labelNames("oppfyller")
         .register()
-
-    private val automatiskJournalførtTeller = Counter
-        .build()
-        .name("automatisk_journalfort_arena")
-        .help("Antall søknader som er automatisk journalført i Arena")
-        .labelNames("opprettet", "grunn", "enhet")
-        .register()
-
-    fun automatiskJournalførtJaTellerInc(enhet: String) =
-        automatiskJournalførtTeller.labels("true", "arena_ok", enhet).inc()
-
-    fun automatiskJournalførtNeiTellerInc(reason: String, enhet: String) =
-        automatiskJournalførtTeller.labels("false", reason, enhet).inc()
 
     private val tilstandCounter = Counter
         .build("dp_innsending_endret", "Antall tilstandsendringer")
