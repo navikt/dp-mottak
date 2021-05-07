@@ -14,6 +14,9 @@ internal class MetrikkObserver : InnsendingObserver {
 
     override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
         Metrics.jpFerdigStillInc(event.type.name)
+        event.oppfyllerMinsteinntektArbeidsinntekt?.let {
+            Metrics.oppfyllerMinsteinntektArbeidsinntekt(it)
+        }
         if (event.fagsakId != null) {
             Metrics.automatiskJournalførtJaTellerInc(event.behandlendeEnhet)
         } else {
@@ -37,6 +40,18 @@ internal object Metrics {
         jpFerdigstiltCounter
             .labels(kategorisertSom)
             .inc()
+
+    fun oppfyllerMinsteinntektArbeidsinntekt(boolean: Boolean) =
+        inngangsvilkårResultatTeller
+            .labels(boolean.toString())
+            .inc()
+
+    private val inngangsvilkårResultatTeller = Counter
+        .build()
+        .name("inngangsvilkaar_resultat_journalfort")
+        .help("Antall søknader som oppfyller / ikke oppfyller inngangsvilkårene vi tester")
+        .labelNames("oppfyller")
+        .register()
 
     private val automatiskJournalførtTeller = Counter
         .build()

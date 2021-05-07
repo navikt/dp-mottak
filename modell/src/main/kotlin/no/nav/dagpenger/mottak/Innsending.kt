@@ -633,7 +633,8 @@ class Innsending private constructor(
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = søknad?.data,
             behandlendeEnhet = jp.kategorisertJournalpost()
-                .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id
+                .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id,
+            oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt
         ).also { ferdig ->
             observers.forEach { it.innsendingFerdigstilt(ferdig) }
         }
@@ -650,7 +651,8 @@ class Innsending private constructor(
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = søknad?.data,
             behandlendeEnhet = jp.kategorisertJournalpost()
-                .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id
+                .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id,
+            oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt
         ).also { mottatt ->
             observers.forEach { it.innsendingMottatt(mottatt) }
         }

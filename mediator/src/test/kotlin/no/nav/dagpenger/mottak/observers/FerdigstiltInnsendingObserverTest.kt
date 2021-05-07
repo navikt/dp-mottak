@@ -99,6 +99,7 @@ internal class FerdigstiltInnsendingObserverTest {
             søknadsData = JsonMapper.jacksonJsonAdapter.createObjectNode().also {
                 it.put("test", "test")
             },
-            behandlendeEnhet = "Tadda"
+            behandlendeEnhet = "Tadda",
+            oppfyllerMinsteinntektArbeidsinntekt = false
         )
 }
