@@ -203,6 +203,22 @@ internal class InnsendingPostgresRepositoryTest {
         }
     }
 
+    @Test
+    fun `Lagring der arena sak er null`() {
+        val innsending = innsendingData.copy(arenaSakData = InnsendingData.ArenaSakData(oppgaveId = null, fagsakId = "2234")).createInnsending()
+        withMigratedDb {
+            with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
+                lagre(innsending).also {
+                    assertTrue(it > 0, "lagring av innsending feilet")
+                }
+
+                hent(innsending.journalpostId()).also {
+                    assertDeepEquals(innsending, it)
+                }
+            }
+        }
+    }
+
     private fun assertAntallRader(tabell: String, anntallRader: Int) {
         val faktiskeRader = using(sessionOf(PostgresTestHelper.dataSource)) { session ->
             session.run(

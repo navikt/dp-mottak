@@ -125,7 +125,7 @@ data class InnsendingData(
     }
 
     data class ArenaSakData(
-        val oppgaveId: String,
+        val oppgaveId: String?,
         val fagsakId: String
     )
 

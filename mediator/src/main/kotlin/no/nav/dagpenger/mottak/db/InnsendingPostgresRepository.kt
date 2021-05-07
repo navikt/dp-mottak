@@ -98,7 +98,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         },
                         arenaSakData = row.stringOrNull("fagsakId")?.let {
                             InnsendingData.ArenaSakData(
-                                oppgaveId = row.string("oppgaveId"),
+                                oppgaveId = row.stringOrNull("oppgaveId"),
                                 fagsakId = it
                             )
                         },
