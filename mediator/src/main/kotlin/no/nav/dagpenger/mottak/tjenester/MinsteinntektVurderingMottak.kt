@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.InnsendingMediator
+import no.nav.dagpenger.mottak.JsonMessageExtensions.getOrNull
 import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -35,7 +36,7 @@ internal class MinsteinntektVurderingMottak(
         val minsteinntektVurdering = MinsteinntektArbeidsinntektVurdert(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = journalpostId,
-            oppfyllerMinsteArbeidsinntekt = packet[løsning]["oppfyllerMinsteArbeidsinntekt"]?.asBoolean()
+            oppfyllerMinsteArbeidsinntekt = packet[løsning].getOrNull("oppfyllerMinsteArbeidsinntekt")?.asBoolean()
         )
 
         innsendingMediator.håndter(minsteinntektVurdering)

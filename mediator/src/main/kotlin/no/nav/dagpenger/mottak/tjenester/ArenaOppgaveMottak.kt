@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.InnsendingMediator
+import no.nav.dagpenger.mottak.JsonMessageExtensions.getOrNull
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -44,7 +45,7 @@ internal class OpprettArenaOppgaveMottak(
                 ArenaOppgaveOpprettet(
                     aktivitetslogg = Aktivitetslogg(),
                     journalpostId = journalpostId,
-                    oppgaveId = it["oppgaveId"]?.asText(),
+                    oppgaveId = it.getOrNull("oppgaveId")?.asText(),
                     fagsakId = it["fagsakId"].asText()
                 )
             }

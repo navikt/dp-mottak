@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.InnsendingMediator
+import no.nav.dagpenger.mottak.JsonMessageExtensions.getOrNull
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -42,7 +43,7 @@ internal class JournalpostMottak(
                     aktivitetslogg = Aktivitetslogg(),
                     journalpostId = journalpostId,
                     journalpostStatus = it["journalstatus"].asText(),
-                    bruker = it["bruker"]?.let { jsonBruker ->
+                    bruker = it.getOrNull("bruker")?.let { jsonBruker ->
                         Journalpost.Bruker(
                             id = jsonBruker["id"].asText(),
                             type = Journalpost.BrukerType.valueOf(jsonBruker["type"].asText())
