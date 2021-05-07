@@ -86,7 +86,7 @@ internal class Pdl {
     object PersonDeserializer : JsonDeserializer<Person>() {
         internal fun JsonNode.aktørId() = this.ident("AKTORID")
         internal fun JsonNode.fødselsnummer() = this.ident("FOLKEREGISTERIDENT")
-        internal fun JsonNode.norskTilknyting(): Boolean = findValue("gtLand").isNull
+        internal fun JsonNode.norskTilknyting(): Boolean = findValue("gtLand")?.isNull ?: false
         internal fun JsonNode.diskresjonsKode(): String? {
             return findValue("adressebeskyttelse").firstOrNull()?.path("gradering")?.asText(null)
         }

@@ -58,6 +58,11 @@ internal class PersonDeserialiseringTest {
             jacksonJsonAdapter.readTree("""{ "data": { "hentGeografiskTilknytning": { "gtLand": null } } } """.trimIndent())
         assertTrue(jsonTrue.norskTilknyting())
 
+        //language=JSON
+        val jsonNull =
+            jacksonJsonAdapter.readTree("""{ "data": { "hentGeografiskTilknytning": null } } """.trimIndent())
+        assertFalse(jsonNull.norskTilknyting())
+
         val jsonFalse =
             jacksonJsonAdapter.readTree("""{ "data": { "hentGeografiskTilknytning": { "gtLand": "sdfsafd" } } } """.trimIndent())
         assertFalse(jsonFalse.norskTilknyting())
