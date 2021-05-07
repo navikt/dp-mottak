@@ -59,7 +59,7 @@ internal class MinsteinntektVurderingLøserTest {
         testRapid.sendTestMessage(minsteinntektBehov())
         with(testRapid.inspektør) {
             assertEquals(1, size)
-            assertTrue(field(0, "@løsning")["MinsteinntektVurdering"].isNull)
+            assertTrue(field(0, "@løsning")["MinsteinntektVurdering"]["oppfyllerMinsteArbeidsinntekt"].isNull)
         }
     }
 

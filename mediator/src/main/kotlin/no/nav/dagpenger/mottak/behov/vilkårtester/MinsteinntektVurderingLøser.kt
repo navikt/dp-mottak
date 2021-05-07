@@ -60,7 +60,7 @@ internal class MinsteinntektVurderingLøser(
                     repository.lagre(journalpostId, packet)
                 } catch (e: Exception) {
                     logger.warn(e) { "Feil ved start av minsteinntekts vurdering for journalpost med id $journalpostId" }
-                    packet["@løsning"] = mapOf("MinsteinntektVurdering" to null)
+                    packet["@løsning"] = ikkeFåttSvar()
                     context.publish(packet.toJson())
                 }
             }
@@ -71,12 +71,7 @@ internal class MinsteinntektVurderingLøser(
         fun rydd() {
             logger.info { "Starter MinsteInntektVurderingVaktmester jobb" }
             repository.slettUtgåtteVurderinger().forEach { (jpId, packet) ->
-                packet["@løsning"] =
-                    mapOf(
-                        "MinsteinntektVurdering" to mapOf(
-                            "oppfyllerMinsteArbeidsinntekt" to null
-                        )
-                    )
+                packet["@løsning"] = ikkeFåttSvar()
                 rapidsConnection.publish(jpId, packet.toJson()).also {
                     logger.info { "Ryddet opp utgått innsending for journalpostId $jpId" }
                 }
@@ -110,6 +105,12 @@ internal class MinsteinntektVurderingLøser(
     }
 
     private data class MinsteinntektVurdering(val oppfyllerMinsteArbeidsinntekt: Boolean)
+
+    private fun ikkeFåttSvar() = mapOf(
+        "MinsteinntektVurdering" to mapOf(
+            "oppfyllerMinsteArbeidsinntekt" to null
+        )
+    )
 }
 
 interface MinsteinntektVurderingRepository {
