@@ -19,6 +19,7 @@ import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.MinsteinntektVurderingPostgresRepository
 import no.nav.dagpenger.mottak.db.runMigration
 import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
+import no.nav.dagpenger.mottak.observers.InnsendingProbe
 import no.nav.dagpenger.mottak.observers.MetrikkObserver
 import no.nav.dagpenger.mottak.proxy.proxyPing
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
@@ -49,7 +50,8 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
                 unleash = Config.unleash(),
                 observatører = listOf(
                     ferdigstiltInnsendingObserver,
-                    MetrikkObserver()
+                    MetrikkObserver(),
+                    InnsendingProbe
                 )
             )
             // Behovmottakere

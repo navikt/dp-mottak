@@ -121,7 +121,7 @@ internal class InnsendingMediator(
         val innsending = innsendingRepository.hent(hendelse.journalpostId())
         return when (innsending) {
             is Innsending -> {
-                log.info { "Fant Innsending for ${hendelse.journalpostId()}" }
+                log.debug { "Fant Innsending for ${hendelse.journalpostId()}" }
                 innsending
             }
             else -> {
