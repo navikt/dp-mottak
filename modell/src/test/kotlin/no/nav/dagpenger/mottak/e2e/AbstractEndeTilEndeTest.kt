@@ -95,13 +95,15 @@ abstract class AbstractEndeTilEndeTest {
     protected fun håndterJournalpostData(
         brevkode: String = "NAV 04-01.03",
         behandlingstema: String? = null,
-        bruker: Bruker? = Bruker(id = "1234", type = Journalpost.BrukerType.AKTOERID)
+        bruker: Bruker? = Bruker(id = "1234", type = Journalpost.BrukerType.AKTOERID),
+        journalpostStatus: String = "MOTTATT"
     ) {
         innsending.håndter(
             journalpostData(
                 brevkode = brevkode,
                 behandlingstema = behandlingstema,
-                bruker = bruker
+                bruker = bruker,
+                journalpostStatus = journalpostStatus
             )
         )
     }
@@ -198,11 +200,12 @@ abstract class AbstractEndeTilEndeTest {
     private fun journalpostData(
         brevkode: String,
         behandlingstema: String? = null,
-        bruker: Bruker?
+        bruker: Bruker?,
+        journalpostStatus: String
     ): Journalpost = Journalpost(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
-        journalpostStatus = "MOTTATT",
+        journalpostStatus = journalpostStatus,
         bruker = bruker,
         behandlingstema = behandlingstema,
         registrertDato = LocalDateTime.now(),

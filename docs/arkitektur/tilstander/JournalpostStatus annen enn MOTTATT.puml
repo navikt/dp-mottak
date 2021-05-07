@@ -1,0 +1,9 @@
+@startuml
+title 
+Innløpet – flyt for brevkode JournalpostStatus annen enn MOTTATT
+end title           
+[*]-->MottattType 
+MottattType --> AvventerJournalpostType
+AvventerJournalpostType --> InnsendingFerdigstiltType
+InnsendingFerdigstiltType--> [*]
+@enduml

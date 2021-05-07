@@ -346,6 +346,19 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     }
 
     @Test
+    fun `skal bare behandle journalposter med status mottatt`() {
+        håndterJoarkHendelse()
+        håndterJournalpostData(journalpostStatus = "JOURNALFOERT")
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            InnsendingFerdigstiltType
+        )
+
+        plantUmlObservatør.writePlantUml("JournalpostStatus annen enn MOTTATT")
+    }
+
+    @Test
     fun `skal håndtere klage og anke for lønnskompensasjon`() {
         val brevkode = "NAV 90-00.08"
         håndterJoarkHendelse()

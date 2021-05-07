@@ -217,12 +217,17 @@ class Innsending private constructor(
 
         override fun håndter(innsending: Innsending, journalpost: Journalpost) {
             innsending.journalpost = journalpost
-            when (requireNotNull(innsending.journalpost).kategorisertJournalpost()) {
-                is UtenBruker -> {
-                    journalpost.warn("Journalpost uten registrert bruker")
-                    innsending.tilstand(journalpost, Kategorisering)
+            if (journalpost.status() != "MOTTATT") {
+                journalpost.warn("Journalpost har en annen status enn MOTTATT, var ${journalpost.status()}")
+                innsending.tilstand(journalpost, InnsendingFerdigStilt)
+            } else {
+                when (requireNotNull(innsending.journalpost).kategorisertJournalpost()) {
+                    is UtenBruker -> {
+                        journalpost.warn("Journalpost uten registrert bruker")
+                        innsending.tilstand(journalpost, Kategorisering)
+                    }
+                    else -> innsending.tilstand(journalpost, AvventerPersondata)
                 }
-                else -> innsending.tilstand(journalpost, AvventerPersondata)
             }
         }
     }

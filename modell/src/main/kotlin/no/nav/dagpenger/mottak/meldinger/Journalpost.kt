@@ -82,6 +82,7 @@ class Journalpost constructor(
     fun hovedskjema() = dokumenter.first().brevkode
     fun tittel() = dokumenter.first().tittel
     fun bruker() = bruker
+    fun status() = journalpostStatus
 
     fun dokumenter(): List<DokumentInfo> = dokumenter
     fun datoRegistrert(): LocalDateTime = registrertDato
