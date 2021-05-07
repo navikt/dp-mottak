@@ -52,14 +52,14 @@ internal class MinsteinntektVurderingLøser(
             runBlocking {
                 val journalpostId = packet["journalpostId"].asText()
                 try {
-                    logger.info { "Forsøker å opprette minsteinntektvurderingsbehov i regel-api for journalpost med ${packet["journalpostId"]}" }
+                    logger.info { "Forsøker å opprette minsteinntektvurderingsbehov i regel-api for journalpost med $journalpostId" }
                     regelApiClient.startMinsteinntektVurdering(
                         aktørId = packet["aktørId"].asText(),
                         journalpostId = journalpostId
                     )
                     repository.lagre(journalpostId, packet)
                 } catch (e: Exception) {
-                    logger.warn(e) { "Feil ved start av minsteinntekts vurdering for journalpost med id ${packet["journalpostId"]}" }
+                    logger.warn(e) { "Feil ved start av minsteinntekts vurdering for journalpost med id $journalpostId" }
                     packet["@løsning"] = mapOf("MinsteinntektVurdering" to null)
                     context.publish(packet.toJson())
                 }

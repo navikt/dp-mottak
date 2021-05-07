@@ -43,7 +43,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                     }
                 }
             } catch (e: Exception) {
-                logger.info { "Kunne ikke hente eksisterende saker for søknad med journalpostId ${packet["journalpostId"]}" }
+                logger.info { "Kunne ikke hente eksisterende saker for søknad med journalpostId ${packet["journalpostId"].asText()}" }
                 throw e
             }
         }
@@ -114,7 +114,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                     context.publish(packet.toJson())
                 }
             } catch (e: Exception) {
-                logger.error(e) { "Kunne opprette arena sak med journalpostId ${packet["journalpostId"]}" }
+                logger.error(e) { "Kunne ikke opprette arena sak med journalpostId $journalpostId" }
                 throw e
             }
         }

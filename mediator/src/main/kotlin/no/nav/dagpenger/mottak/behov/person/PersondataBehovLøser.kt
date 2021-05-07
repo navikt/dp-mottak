@@ -30,7 +30,7 @@ internal class PersondataBehovLøser(
         runBlocking { personOppslag.hentPerson(packet["brukerId"].asText()) }.also {
             packet["@løsning"] = mapOf("Persondata" to it)
             context.publish(packet.toJson())
-            logger.info("Løst behov Persondata for journalpost med id ${packet["journalpostId"]}")
+            logger.info("Løst behov Persondata for journalpost med id ${packet["journalpostId"].asText()}")
         }
     }
 }

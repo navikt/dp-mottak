@@ -26,6 +26,7 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        val journalpostId = packet["journalpostId"].asText()
         try {
             runBlocking {
                 gosysOppslag.opprettOppgave(
@@ -35,14 +36,14 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
 
                 packet["@løsning"] = mapOf(
                     "OpprettGosysoppgave" to mapOf(
-                        "journalpostId" to packet["journalpostId"],
+                        "journalpostId" to journalpostId,
                         "oppgaveId" to it
                     )
                 )
                 context.publish(packet.toJson())
             }
         } catch (e: Exception) {
-            logger.info { "Kunne ikke opprette gosys oppgave for journalpost med id ${packet["journalpostId"]}" }
+            logger.info { "Kunne ikke opprette gosys oppgave for journalpost med id $journalpostId" }
             throw e
         }
     }

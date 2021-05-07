@@ -110,6 +110,7 @@ internal class Pdl {
 
         override fun deserialize(p: JsonParser, ctxt: DeserializationContext?): Person? {
             val node: JsonNode = p.readValueAsTree()
+            sikkerLogg.info(node.toString())
             return kotlin.runCatching {
                 Person(
                     navn = node.personNavn(),
