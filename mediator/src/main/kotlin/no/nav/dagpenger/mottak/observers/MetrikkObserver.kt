@@ -13,7 +13,7 @@ internal class MetrikkObserver : InnsendingObserver {
     }
 
     override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
-        Metrics.jpFerdigStillInc(event.type.name)
+        Metrics.jpFerdigStillInc(event.type.name, event.skjemaKode)
         event.oppfyllerMinsteinntektArbeidsinntekt?.let {
             Metrics.oppfyllerMinsteinntektArbeidsinntekt(it)
         }
@@ -32,13 +32,13 @@ internal object Metrics {
         .build()
         .namespace(DAGPENGER_NAMESPACE)
         .name("journalpost_ferdigstilt")
-        .labelNames("kategorisering")
+        .labelNames("kategorisering", "skjema")
         .help("Number of journal post processed succesfully")
         .register()
 
-    fun jpFerdigStillInc(kategorisertSom: String) =
+    fun jpFerdigStillInc(kategorisertSom: String, skjemaKode: String) =
         jpFerdigstiltCounter
-            .labels(kategorisertSom)
+            .labels(kategorisertSom, skjemaKode)
             .inc()
 
     fun oppfyllerMinsteinntektArbeidsinntekt(boolean: Boolean) =

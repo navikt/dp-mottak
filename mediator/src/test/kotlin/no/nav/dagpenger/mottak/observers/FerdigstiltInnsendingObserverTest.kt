@@ -91,6 +91,7 @@ internal class FerdigstiltInnsendingObserverTest {
     private fun ferdigstiltEvent(): InnsendingObserver.InnsendingEvent =
         InnsendingObserver.InnsendingEvent(
             type = NySøknad,
+            skjemaKode = "test",
             journalpostId = journalpostId,
             aktørId = "1234455",
             fødselsnummer = "12345678901",

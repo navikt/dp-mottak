@@ -27,6 +27,7 @@ interface InnsendingObserver {
 
     data class InnsendingEvent(
         val type: Type,
+        val skjemaKode: String,
         val journalpostId: String,
         val aktørId: String?,
         val fødselsnummer: String?,

@@ -626,6 +626,7 @@ class Innsending private constructor(
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
         InnsendingEvent(
             type = mapToHendelseType(jp),
+            skjemaKode = jp.hovedskjema(),
             journalpostId = journalpostId,
             aktørId = person?.aktørId,
             fødselsnummer = person?.fødselsnummer,
@@ -644,6 +645,7 @@ class Innsending private constructor(
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
         InnsendingEvent(
             type = mapToHendelseType(jp),
+            skjemaKode = jp.hovedskjema(),
             journalpostId = journalpostId,
             aktørId = person?.aktørId,
             fødselsnummer = person?.fødselsnummer,
