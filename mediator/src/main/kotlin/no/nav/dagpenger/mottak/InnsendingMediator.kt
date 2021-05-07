@@ -1,8 +1,6 @@
 package no.nav.dagpenger.mottak
 
 import mu.KotlinLogging
-import no.finn.unleash.Unleash
-import no.nav.dagpenger.mottak.ByClusterStrategy.Companion.SLÅ_PÅ_HÅNDTERING
 import no.nav.dagpenger.mottak.db.InnsendingRepository
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
@@ -24,7 +22,6 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 internal class InnsendingMediator(
     private val innsendingRepository: InnsendingRepository,
     private val observatører: List<InnsendingObserver> = emptyList(),
-    private val unleash: Unleash,
     rapidsConnection: RapidsConnection
 ) {
 
@@ -34,12 +31,8 @@ internal class InnsendingMediator(
     )
 
     fun håndter(joarkHendelse: JoarkHendelse) {
-        if (unleash.isEnabled(SLÅ_PÅ_HÅNDTERING)) {
-            håndter(joarkHendelse) { innsending ->
-                innsending.håndter(joarkHendelse)
-            }
-        } else {
-            log.info { "Håndterte ikke journalpost med id ${joarkHendelse.journalpostId()} JoarkHendelse  fordi dp-mottak er slått av i unleash" }
+        håndter(joarkHendelse) { innsending ->
+            innsending.håndter(joarkHendelse)
         }
     }
 

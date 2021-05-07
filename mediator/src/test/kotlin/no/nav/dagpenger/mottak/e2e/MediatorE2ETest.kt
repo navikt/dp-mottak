@@ -29,7 +29,6 @@ internal class MediatorE2ETest {
     private val innsendingMediator = InnsendingMediator(
         innsendingRepository = innsendingRepository,
         rapidsConnection = testRapid,
-        unleash = fakeUnleash,
         observatører = listOf(testObservatør)
     )
 
@@ -120,13 +119,6 @@ internal class MediatorE2ETest {
         håndterHendelse(oppdatertJournalpostMotattHendelse())
 
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
-    }
-
-    @Test
-    fun `Skal ikke håndtere hendelser hvis unleash er av`() {
-        fakeUnleash.disableAll()
-        håndterHendelse(joarkMelding())
-        assertEquals(0, testRapid.inspektør.size)
     }
 
     private fun assertBehov(expectedBehov: String, indexPåMelding: Int) {
