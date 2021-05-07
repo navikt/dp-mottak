@@ -47,7 +47,6 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             val mediator = InnsendingMediator(
                 innsendingRepository = innsendingRepository,
                 rapidsConnection = this,
-                unleash = Config.unleash(),
                 observatører = listOf(
                     ferdigstiltInnsendingObserver,
                     MetrikkObserver(),
