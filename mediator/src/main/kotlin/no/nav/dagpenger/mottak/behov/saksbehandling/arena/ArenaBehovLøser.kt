@@ -88,7 +88,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
             try {
                 runBlocking {
                     val behovNavn = packet["@behov"].first().asText()
-                    if (journalpostId == "506723123") {
+                    if (journalpostId == "506726563") {
                         packet["@feil"] = behovNavn
                         logger.error { "Kunne ikke opprette arena sak med journalpostId $journalpostId" }
                     } else {
