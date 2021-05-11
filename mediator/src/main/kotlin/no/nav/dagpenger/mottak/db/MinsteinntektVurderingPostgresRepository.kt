@@ -82,9 +82,9 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
         return using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf( //language=PostgreSQL
-                    "SELECT pg_advisory_lock(:key)", mapOf("key" to 573463)
+                    "SELECT pg_try_advisory_lock(:key)", mapOf("key" to 573463)
                 ).map { res ->
-                    res.boolean(0)
+                    res.boolean("pg_try_advisory_lock")
                 }.asSingle) ?: false
         }
     }
@@ -94,7 +94,7 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
                 queryOf( //language=PostgreSQL
                     "SELECT pg_advisory_unlock(:key)", mapOf("key" to 573463)
                 ).map { res ->
-                    res.boolean(1)
+                    res.boolean("pg_advisory_unlock")
                 }.asSingle) ?: false
         }
     }
