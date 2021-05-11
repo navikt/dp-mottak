@@ -13,7 +13,6 @@ import no.nav.dagpenger.mottak.harAvtjentVerneplikt
 import no.nav.dagpenger.mottak.harEøsArbeidsforhold
 import no.nav.dagpenger.mottak.harInntektFraFangstOgFiske
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.ParameterizedTest
@@ -150,11 +149,13 @@ class OppgavebenkTest {
             assertEquals("4465", oppgaveBenk.id)
         }
     }
+
     @ParameterizedTest
     @ValueSource(strings = ["NAV 04-01.03", "NAV 04-01.04", "NAV 04-16.03", "NAV 04-16.04"])
     fun `finner riktig benk for  fornyet rettighet`(brevkode: String) {
         withSøknad(erFornyetRettighet = true) {
-            val oppgavebenk = lagjournalpostData(brevkode).kategorisertJournalpost().oppgaveBenk(person = person, søknadFakta = it)
+            val oppgavebenk =
+                lagjournalpostData(brevkode).kategorisertJournalpost().oppgaveBenk(person = person, søknadFakta = it)
             assertEquals("4451", oppgavebenk.id)
             assertEquals("Anmodningsvedtak 538", oppgavebenk.beskrivelse)
             assertDoesNotThrow { jacksonObjectMapper().readTree(oppgavebenk.tilleggsinformasjon) }
@@ -170,14 +171,11 @@ class OppgavebenkTest {
         }
     }
 
-    @Test
-    @Disabled("TODO: Få inne koronaregler")
-    fun `Finn riktig oppgave beskrivelse og benk ved oppfyller minsteinntekt ved korona regler`() {
-        withSøknad {
-            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it, oppfyllerMinsteArbeidsinntekt = false)
-            assertEquals("Minsteinntekt - mulig avslag - korona\n", oppgaveBenk.beskrivelse)
-            assertEquals("4451", oppgaveBenk.id)
-        }
+    @ParameterizedTest
+    @ValueSource(strings = ["NAV 04-02.01", "NAVe 04-02.01", "NAV 04-02.03", "NAV 04-02.05", "NAVe 04-02.05"])
+    fun `finner riktig benk for brevkoder som skal til utlandet`(brevkode: String) {
+        val oppgavebenk = lagjournalpostData(brevkode).kategorisertJournalpost().oppgaveBenk(person = person)
+        assertEquals("4470", oppgavebenk.id)
     }
 
     private fun withSøknad(
