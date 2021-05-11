@@ -70,6 +70,7 @@ internal class MinsteinntektVurderingLøser(
     private inner class MinsteInntektVurderingVaktmester {
         fun rydd() {
             logger.info { "Starter MinsteInntektVurderingVaktmester jobb" }
+
             repository.slettUtgåtteVurderinger().forEach { (jpId, packet) ->
                 packet["@løsning"] = ikkeFåttSvar()
                 rapidsConnection.publish(jpId, packet.toJson()).also {

@@ -15,6 +15,7 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
 
     private companion object {
         val logger = KotlinLogging.logger {}
+        private val låseNøkkel = 573463
     }
     override fun lagre(journalpostId: String, packet: JsonMessage): Int {
         return using(sessionOf(dataSource)) { session ->
@@ -55,7 +56,6 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
             try {
                 logger.info { "Fikk lås, kjører vaktmesterspørring" }
                 return using(sessionOf(dataSource)) { session ->
-
                     session.run(
                         queryOf( //language=PostgreSQL
                             "DELETE FROM minsteinntekt_vurdering_v1 WHERE opprettet < (now() - (make_interval(mins := 5))) RETURNING *"
@@ -73,29 +73,28 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
             logger.info { "Fikk IKKE lås, kjører IKKE vaktmesterspørring" }
             emptyList()
         }
-
     }
-
-
 
     private fun lås(): Boolean {
         return using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf( //language=PostgreSQL
-                    "SELECT pg_try_advisory_lock(:key)", mapOf("key" to 573463)
+                    "SELECT pg_try_advisory_lock(:key)", mapOf("key" to låseNøkkel)
                 ).map { res ->
                     res.boolean("pg_try_advisory_lock")
-                }.asSingle) ?: false
+                }.asSingle
+            ) ?: false
         }
     }
     private fun låsOpp(): Boolean {
         return using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf( //language=PostgreSQL
-                    "SELECT pg_advisory_unlock(:key)", mapOf("key" to 573463)
+                    "SELECT pg_advisory_unlock(:key)", mapOf("key" to låseNøkkel)
                 ).map { res ->
                     res.boolean("pg_advisory_unlock")
-                }.asSingle) ?: false
+                }.asSingle
+            ) ?: false
         }
     }
 }

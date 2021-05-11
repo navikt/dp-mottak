@@ -80,7 +80,7 @@ internal class MinsteinntektVurderingLøserTest {
                 oppryddningPeriode = 100.toLong(),
                 regelApiClient = mockk(),
                 repository = repository,
-                testRapid
+                rapidsConnection = testRapid
             )
             delay(500)
 
@@ -93,7 +93,7 @@ internal class MinsteinntektVurderingLøserTest {
     }
 
     @Test
-    fun `lås`() {
+    fun `Kun en minsteinntekt opprydder skal kunne kjøre samtidig`() {
         runBlocking {
             using(sessionOf(PostgresTestHelper.dataSource)) { session ->
                 session.run(
@@ -111,20 +111,30 @@ internal class MinsteinntektVurderingLøserTest {
                 )
 
                 MinsteinntektVurderingLøser(
-                    oppryddningPeriode = 100.toLong(),
+                    oppryddningPeriode = 400.toLong(),
                     regelApiClient = mockk(),
                     repository = minsteinntektVurderingRepository,
-                    testRapid
+                    rapidsConnection = testRapid
+                )
+                MinsteinntektVurderingLøser(
+                    oppryddningPeriode = 401.toLong(),
+                    regelApiClient = mockk(),
+                    repository = minsteinntektVurderingRepository,
+                    rapidsConnection = testRapid
+                )
+                MinsteinntektVurderingLøser(
+                    oppryddningPeriode = 402.toLong(),
+                    regelApiClient = mockk(),
+                    repository = minsteinntektVurderingRepository,
+                    rapidsConnection = testRapid
                 )
             }
 
             delay(500)
 
             assertEquals(1, testRapid.inspektør.size)
-            //INSERT INTO  minsteinntekt_vurdering_v1(journalpostId,packet) VALUES(:journalpostId,:packet) ON CONFLICT DO NOTHING
         }
     }
-
 
     private fun minsteinntektBehov(): String =
         """{
