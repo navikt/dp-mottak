@@ -7,6 +7,7 @@ interface SøknadFakta {
     fun getBooleanFaktum(faktaNavn: String): Boolean
     fun getBooleanFaktum(faktaNavn: String, defaultValue: Boolean): Boolean
     fun getChildFakta(faktumId: Int): List<JsonNode>
+    fun getField(navn: String): JsonNode
 }
 
 internal typealias AvsluttedeArbeidsforhold = List<AvsluttetArbeidsforhold>
