@@ -56,13 +56,13 @@ internal class SøknadFaktaLøserTest {
     }
 
     @Test
-    fun `besvarer medlinger med flere behov enn ett`() {
+    fun `besvarer medlinger med flere behov enn ett`(){
         testRapid.sendTestMessage(meldingMedFlereBehov())
         assertEquals(1, testRapid.inspektør.size)
 
         with(testRapid.inspektør) {
-            assertEquals("true", field(0, "@løsning")["Lærling"].asText())
-            assertEquals("2020-03-20", field(0, "@løsning")["SisteDagMedArbeidsplikt"].asText())
+            assertEquals("true", field(0,"@løsning")["Lærling"].asText())
+            assertEquals("2020-03-20", field(0,"@løsning")["SisteDagMedArbeidsplikt"].asText())
         }
     }
 

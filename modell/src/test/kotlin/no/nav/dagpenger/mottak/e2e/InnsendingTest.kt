@@ -101,14 +101,14 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         }
         assertMottatt {
             assertEquals("NySøknad", it.type.name)
-            assertNotNull(it.søknad)
+            assertNotNull(it.søknadsData)
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
         }
         assertFerdigstilt {
             assertEquals("NySøknad", it.type.name)
-            assertNotNull(it.søknad)
+            assertNotNull(it.søknadsData)
             assertNotNull(it.fagsakId)
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
@@ -180,7 +180,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
         assertFerdigstilt {
             assertEquals("Gjenopptak", it.type.name)
-            assertNotNull(it.søknad)
+            assertNotNull(it.søknadsData)
             assertNotNull(it.fagsakId)
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
@@ -306,7 +306,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
-            assertNotNull(it.søknad)
+            assertNotNull(it.søknadsData)
         }
 
         plantUmlObservatør.writePlantUml(brevkode)

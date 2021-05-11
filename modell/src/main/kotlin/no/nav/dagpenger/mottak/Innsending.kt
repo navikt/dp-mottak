@@ -637,7 +637,7 @@ class Innsending private constructor(
             fødselsnummer = person?.fødselsnummer,
             fagsakId = arenaSak?.fagsakId,
             datoRegistrert = jp.datoRegistrert(),
-            søknad = søknad,
+            søknadsData = søknad?.data,
             behandlendeEnhet = jp.kategorisertJournalpost()
                 .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id,
             oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt
@@ -656,7 +656,7 @@ class Innsending private constructor(
             fødselsnummer = person?.fødselsnummer,
             fagsakId = null,
             datoRegistrert = jp.datoRegistrert(),
-            søknad = søknad,
+            søknadsData = søknad?.data,
             behandlendeEnhet = jp.kategorisertJournalpost()
                 .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id,
             oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt

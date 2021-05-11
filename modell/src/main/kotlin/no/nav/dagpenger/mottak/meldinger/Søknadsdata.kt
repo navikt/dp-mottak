@@ -18,6 +18,7 @@ class Søknadsdata(
     class Søknad(
         val data: JsonNode
     ) : SøknadFakta {
+        fun søknadsId(): String? = data["brukerBehandlingId"].textValue()
 
         override fun getFakta(faktaNavn: String): List<JsonNode> =
             data.get("fakta")?.filter { it["key"].asText() == faktaNavn } ?: emptyList()

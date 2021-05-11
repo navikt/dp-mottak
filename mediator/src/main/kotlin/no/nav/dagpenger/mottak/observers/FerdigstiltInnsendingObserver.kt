@@ -72,7 +72,6 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
 
         logger.info { "Send InnsendingFerdigstiltEvent til kafka for journalpostId $key" }
         sikkerLogger.info { message.toJson() }
-        println(message.toJson())
     }
 
     private fun shutdownHook() {
@@ -92,6 +91,5 @@ private fun InnsendingObserver.InnsendingEvent.toPayload() =
         fødselsnummer?.let { set("fødselsnummer", it) }
         aktørId?.let { set("aktørId", it) }
         fagsakId?.let { set("fagsakId", it) }
-        søknad?.let { set("søknadsData", it.data) }
-        søknad?.let { set("søknadId", it.søknadsId()) }
+        søknadsData?.let { set("søknadsData", it) }
     }
