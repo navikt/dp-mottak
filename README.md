@@ -19,6 +19,22 @@ Tilstander se [tilstander](docs/arkitektur/tilstander)
 Databasediagram
 ![databasediagram](docs/db/DB-layout-2020-05-06.png)
 
+## HOWTOS
+
+
+Finne journalposter registrert innenfor en periode:
+
+````postgresql
+
+SELECT person.fødselsnummer, journalpost.registrertdato, journalpostid FROM innsending_v1 AS innsending
+LEFT JOIN person_innsending_v1 person_innsending on innsending.id = person_innsending.id
+LEFT JOIN person_v1 person on person_innsending.personid = person.id
+LEFT JOIN journalpost_v1 journalpost on innsending.id = journalpost.id
+WHERE journalpost.registrertdato BETWEEN '2021-05-05 13:07'::timestamp AND '2021-05-06 21:07'::timestamp;
+
+````
+ps- bytt ut datoene mellom BETWEEN med tidsperiode
+
 # Henvendelser
 
 Spørsmål knyttet til koden eller prosjektet kan rettes mot:
