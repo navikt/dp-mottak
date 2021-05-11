@@ -56,6 +56,17 @@ internal class SøknadFaktaLøserTest {
     }
 
     @Test
+    fun `besvarer medlinger med flere behov enn ett`(){
+        testRapid.sendTestMessage(meldingMedFlereBehov())
+        assertEquals(1, testRapid.inspektør.size)
+
+        with(testRapid.inspektør) {
+            assertEquals("true", field(0,"@løsning")["Lærling"].asText())
+            assertEquals("2020-03-20", field(0,"@løsning")["SisteDagMedArbeidsplikt"].asText())
+        }
+    }
+
+    @Test
     fun `mapper avsluttede arbeidsforhold til lønnsgaranti`() {
         rettighetstypeUtregning(
             listOf<AvsluttetArbeidsforhold>(
@@ -159,6 +170,23 @@ internal class SøknadFaktaLøserTest {
       "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
       "@behov": [
        "$behovNavn"
+      ],
+      "InnsendtSøknadsId":{"lastOppTidsstempel":"2020-11-26T10:33:38.684844","url":"321"}
+    }
+        """.trimIndent()
+
+    //language=JSON
+    private fun meldingMedFlereBehov() =
+        """
+    {
+      "@event_name": "faktum_svar",
+      "@opprettet": "2020-11-18T11:04:32.867824",
+      "@id": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
+      "identer":[{"id":"12345678910","type":"folkeregisterident","historisk":false}],
+      "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
+      "@behov": [
+       "SisteDagMedArbeidsplikt",
+       "Lærling"
       ],
       "InnsendtSøknadsId":{"lastOppTidsstempel":"2020-11-26T10:33:38.684844","url":"321"}
     }
