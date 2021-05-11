@@ -1,6 +1,8 @@
 package no.nav.dagpenger.mottak
 
 import mu.KotlinLogging
+import no.nav.dagpenger.mottak.behov.eksterne.PostgresSøknadQuizOppslag
+import no.nav.dagpenger.mottak.behov.eksterne.SøknadFaktaQuizLøser
 import no.nav.dagpenger.mottak.behov.journalpost.FerdigstillJournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApiClient
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
@@ -69,6 +71,9 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             )
             ArenaBehovLøser(arenaApiClient, this)
             OpprettGosysOppgaveLøser(gosysProxyClient, this)
+
+            // Eksterne behovløsere
+            SøknadFaktaQuizLøser(PostgresSøknadQuizOppslag(Config.dataSource), this)
         }
 
     init {

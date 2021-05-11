@@ -25,16 +25,18 @@ internal class PostgresSøknadQuizOppslagTest {
                         "INSERT INTO innsending_v1(journalpostId, tilstand) VALUES($journalpostID, 'superduper') RETURNING id"
                     ).map { row -> row.long("id") }.asSingle
                 )
-                session.run(queryOf(
-                    "INSERT INTO soknad_v1(id,data) VALUES(:id, :data)",
-                    mapOf(
-                        "id" to id,
-                        "data" to PGobject().apply {
-                            type = "jsonb"
-                            value = data
-                        }
-                    )
-                ).asUpdate)
+                session.run(
+                    queryOf(
+                        "INSERT INTO soknad_v1(id,data) VALUES(:id, :data)",
+                        mapOf(
+                            "id" to id,
+                            "data" to PGobject().apply {
+                                type = "jsonb"
+                                value = data
+                            }
+                        )
+                    ).asUpdate
+                )
             }
 
             PostgresSøknadQuizOppslag(PostgresTestHelper.dataSource).also {
@@ -42,10 +44,7 @@ internal class PostgresSøknadQuizOppslagTest {
                     assertEquals("1000S63MA", søknadFakta.getField("brukerBehandlingId").asText())
                 }
                 assertThrows<IllegalArgumentException> { it.hentSøknad("Nehehehei") }
-
             }
         }
-
-
     }
 }
