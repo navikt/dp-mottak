@@ -22,7 +22,7 @@ internal class SøknadFaktaLøserTest {
     init {
         SøknadFaktaQuizLøser(
             søknadQuizOppslag = object : SøknadQuizOppslag {
-                override fun hentSøknad(journalpostId: String): SøknadFakta = testSøknad
+                override fun hentSøknad(innsendtSøknadsId: String): SøknadFakta = testSøknad
             },
             rapidsConnection = testRapid
         )
