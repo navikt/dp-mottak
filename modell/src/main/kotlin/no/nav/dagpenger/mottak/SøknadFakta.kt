@@ -3,6 +3,7 @@ package no.nav.dagpenger.mottak
 import com.fasterxml.jackson.databind.JsonNode
 
 interface SøknadFakta {
+    fun søknadsId(): String = getField("brukerBehandlingId").asText()
     fun getFakta(faktaNavn: String): List<JsonNode>
     fun getBooleanFaktum(faktaNavn: String): Boolean
     fun getBooleanFaktum(faktaNavn: String, defaultValue: Boolean): Boolean

@@ -3,6 +3,7 @@ package no.nav.dagpenger.mottak.observers
 import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingObserver.Type.NySøknad
 import no.nav.dagpenger.mottak.behov.JsonMapper
+import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import org.apache.kafka.clients.producer.MockProducer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -33,6 +34,7 @@ internal class FerdigstiltInnsendingObserverTest {
         assertNotNull(message["fødselsnummer"].asText())
         assertNotNull(message["datoRegistrert"].asText())
         assertNotNull(message["søknadsData"].asText())
+        assertNotNull(message["søknadId"].asText())
         assertNotNull(message["fagsakId"].asText())
     }
 
@@ -55,6 +57,7 @@ internal class FerdigstiltInnsendingObserverTest {
         assertNotNull(message["fødselsnummer"].asText())
         assertNotNull(message["datoRegistrert"].asText())
         assertNotNull(message["søknadsData"].asText())
+        assertNotNull(message["søknadId"].asText())
         assertNotNull(message["fagsakId"].asText())
     }
 
@@ -84,7 +87,7 @@ internal class FerdigstiltInnsendingObserverTest {
     private fun ukjentPersonEvent(): InnsendingObserver.InnsendingEvent = ferdigstiltEvent().copy(
         fødselsnummer = null,
         aktørId = null,
-        søknadsData = null,
+        søknad = null,
         fagsakId = null
     )
 
@@ -97,9 +100,12 @@ internal class FerdigstiltInnsendingObserverTest {
             fødselsnummer = "12345678901",
             fagsakId = "1234",
             datoRegistrert = LocalDateTime.now(),
-            søknadsData = JsonMapper.jacksonJsonAdapter.createObjectNode().also {
-                it.put("test", "test")
-            },
+            søknad = Søknadsdata.Søknad(
+                JsonMapper.jacksonJsonAdapter.createObjectNode().also {
+                    it.put("brukerBehandlingId", "id")
+                    it.put("test", "test")
+                }
+            ),
             behandlendeEnhet = "Tadda",
             oppfyllerMinsteinntektArbeidsinntekt = false
         )

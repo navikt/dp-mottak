@@ -1,6 +1,6 @@
 package no.nav.dagpenger.mottak
 
-import com.fasterxml.jackson.databind.JsonNode
+import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -33,9 +33,9 @@ interface InnsendingObserver {
         val fødselsnummer: String?,
         val fagsakId: String?,
         val datoRegistrert: LocalDateTime,
-        val søknadsData: JsonNode?,
+        val søknad: Søknadsdata.Søknad?,
         val behandlendeEnhet: String,
-        val oppfyllerMinsteinntektArbeidsinntekt: Boolean?,
+        val oppfyllerMinsteinntektArbeidsinntekt: Boolean?
     )
 
     fun tilstandEndret(event: InnsendingEndretTilstandEvent) {}

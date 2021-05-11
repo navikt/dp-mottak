@@ -39,7 +39,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             arenasak.oppgaveId                        as "oppgaveId",
             innsending_eksisterende_arena_saker.verdi as "harEksisterendeSaker",
             innsending_oppfyller_minsteinntekt.verdi  as "oppfyllerMinsteArbeidsinntekt",
-            soknad.data                               as "søknadsData",
+            soknad.data                               as "søknad",
             person_innsending.navn                    as "navn",
             person_innsending.diskresjonskode         as "diskresjonsKode",
             person_innsending.norsktilknytning        as "norsktilknytning",
@@ -102,7 +102,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                                 fagsakId = it
                             )
                         },
-                        søknadsData = row.binaryStreamOrNull("søknadsData")?.use {
+                        søknadsData = row.binaryStreamOrNull("søknad")?.use {
                             JsonMapper.jacksonJsonAdapter.readTree(it)
                         },
                         aktivitetslogg = row.binaryStream("aktivitetslogg").use {

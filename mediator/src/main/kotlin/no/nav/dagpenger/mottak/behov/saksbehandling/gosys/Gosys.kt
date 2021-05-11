@@ -53,18 +53,18 @@ internal class GosysProxyClient(config: Configuration) : GosysOppslag {
         }
     }
 
-    override suspend fun opprettOppgave(oppgaveRequest: GosysOppgaveRequest): String {
+    override suspend fun opprettOppgave(oppgave: GosysOppgaveRequest): String {
         return try {
-            logger.info { "Forsøker å opprette oppgave i gosys for sak med journalpostId ${oppgaveRequest.journalpostId}" }
+            logger.info { "Forsøker å opprette oppgave i gosys for sak med journalpostId ${oppgave.journalpostId}" }
             proxyGosysClient.request<GosysOppgaveResponse> {
-                header("X-Correlation-ID", oppgaveRequest.journalpostId)
+                header("X-Correlation-ID", oppgave.journalpostId)
                 header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
                 header(HttpHeaders.ContentType, "application/json")
                 header(HttpHeaders.Accept, "application/json")
-                body = oppgaveRequest
+                body = oppgave
             }.id
         } catch (e: Exception) {
-            logger.info { "Kunne ikke opprette oppgave i gosys for sak med journalpostId ${oppgaveRequest.journalpostId}" }
+            logger.info { "Kunne ikke opprette oppgave i gosys for sak med journalpostId ${oppgave.journalpostId}" }
             throw e
         }
     }
