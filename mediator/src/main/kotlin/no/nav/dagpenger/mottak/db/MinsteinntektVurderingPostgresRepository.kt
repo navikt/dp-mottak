@@ -3,6 +3,7 @@ package no.nav.dagpenger.mottak.db
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
+import mu.KotlinLogging
 import no.nav.dagpenger.mottak.behov.vilkårtester.MinsteinntektVurderingRepository
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageProblems
@@ -11,6 +12,11 @@ import javax.sql.DataSource
 
 internal class MinsteinntektVurderingPostgresRepository(private val dataSource: DataSource) :
     MinsteinntektVurderingRepository {
+
+    private companion object {
+        val logger = KotlinLogging.logger {}
+        private val låseNøkkel = 573463
+    }
     override fun lagre(journalpostId: String, packet: JsonMessage): Int {
         return using(sessionOf(dataSource)) { session ->
             session.run(
@@ -46,17 +52,49 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
     }
 
     override fun slettUtgåtteVurderinger(): List<Pair<String, JsonMessage>> {
+        return if (lås()) {
+            try {
+                logger.info { "Fikk lås, kjører vaktmesterspørring" }
+                return using(sessionOf(dataSource)) { session ->
+                    session.run(
+                        queryOf( //language=PostgreSQL
+                            "DELETE FROM minsteinntekt_vurdering_v1 WHERE opprettet < (now() - (make_interval(mins := 5))) RETURNING *"
+                        ).map { res ->
+                            val jpId = res.string("journalpostId")
+                            val packet = res.string("packet")
+                            Pair(jpId, JsonMessage(packet, MessageProblems(packet)))
+                        }.asList
+                    )
+                }
+            } finally {
+                logger.info { "Lås opp? ${låsOpp()}, ferdig med vaktmesterspørring" }
+            }
+        } else {
+            logger.info { "Fikk IKKE lås, kjører IKKE vaktmesterspørring" }
+            emptyList()
+        }
+    }
+
+    private fun lås(): Boolean {
         return using(sessionOf(dataSource)) { session ->
-            //language=PostgreSQL
             session.run(
-                queryOf(
-                    "DELETE FROM minsteinntekt_vurdering_v1 WHERE opprettet < (now() - (make_interval(mins := 5))) RETURNING *"
+                queryOf( //language=PostgreSQL
+                    "SELECT pg_try_advisory_lock(:key)", mapOf("key" to låseNøkkel)
                 ).map { res ->
-                    val jpId = res.string("journalpostId")
-                    val packet = res.string("packet")
-                    Pair(jpId, JsonMessage(packet, MessageProblems(packet)))
-                }.asList
-            )
+                    res.boolean("pg_try_advisory_lock")
+                }.asSingle
+            ) ?: false
+        }
+    }
+    private fun låsOpp(): Boolean {
+        return using(sessionOf(dataSource)) { session ->
+            session.run(
+                queryOf( //language=PostgreSQL
+                    "SELECT pg_advisory_unlock(:key)", mapOf("key" to låseNøkkel)
+                ).map { res ->
+                    res.boolean("pg_advisory_unlock")
+                }.asSingle
+            ) ?: false
         }
     }
 }

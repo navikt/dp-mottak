@@ -6,6 +6,9 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotliquery.queryOf
+import kotliquery.sessionOf
+import kotliquery.using
 import no.nav.dagpenger.mottak.db.MinsteinntektVurderingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresTestHelper
 import no.nav.dagpenger.mottak.db.runMigration
@@ -15,6 +18,7 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.postgresql.util.PGobject
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -76,7 +80,7 @@ internal class MinsteinntektVurderingLøserTest {
                 oppryddningPeriode = 100.toLong(),
                 regelApiClient = mockk(),
                 repository = repository,
-                testRapid
+                rapidsConnection = testRapid
             )
             delay(500)
 
@@ -85,6 +89,50 @@ internal class MinsteinntektVurderingLøserTest {
             assertTrue(testRapid.inspektør.message(1)["@løsning"]["MinsteinntektVurdering"]["oppfyllerMinsteArbeidsinntekt"].isNull)
             assertEquals("0", testRapid.inspektør.key(0))
             assertEquals("1", testRapid.inspektør.key(1))
+        }
+    }
+
+    @Test
+    fun `Kun en minsteinntekt opprydder skal kunne kjøre samtidig`() {
+        runBlocking {
+            using(sessionOf(PostgresTestHelper.dataSource)) { session ->
+                session.run(
+                    queryOf(
+                        "INSERT INTO  minsteinntekt_vurdering_v1(journalpostId,packet, opprettet) VALUES(:journalpostId,:packet, :opprettet) ON CONFLICT DO NOTHING",
+                        mapOf(
+                            "journalpostId" to 12345,
+                            "opprettet" to LocalDateTime.now().minusDays(2),
+                            "packet" to PGobject().apply {
+                                type = "jsonb"
+                                value = JsonMessage("""{}""", MessageProblems("")).toJson()
+                            }
+                        )
+                    ).asUpdate
+                )
+
+                MinsteinntektVurderingLøser(
+                    oppryddningPeriode = 400.toLong(),
+                    regelApiClient = mockk(),
+                    repository = minsteinntektVurderingRepository,
+                    rapidsConnection = testRapid
+                )
+                MinsteinntektVurderingLøser(
+                    oppryddningPeriode = 401.toLong(),
+                    regelApiClient = mockk(),
+                    repository = minsteinntektVurderingRepository,
+                    rapidsConnection = testRapid
+                )
+                MinsteinntektVurderingLøser(
+                    oppryddningPeriode = 402.toLong(),
+                    regelApiClient = mockk(),
+                    repository = minsteinntektVurderingRepository,
+                    rapidsConnection = testRapid
+                )
+            }
+
+            delay(500)
+
+            assertEquals(1, testRapid.inspektør.size)
         }
     }
 
