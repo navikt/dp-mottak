@@ -36,6 +36,8 @@ class Søknadsdata(
         override fun getChildFakta(faktumId: Int): List<JsonNode> =
             data.get("fakta").filter { it["parrentFaktum"].asInt() == faktumId }
 
+        override fun getField(navn: String): JsonNode = data.get(navn)
+
         private fun getFaktumValue(fakta: List<JsonNode>): JsonNode = fakta
             .first()
             .get("value")

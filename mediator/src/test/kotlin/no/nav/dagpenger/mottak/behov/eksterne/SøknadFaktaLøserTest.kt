@@ -1,34 +1,28 @@
 package no.nav.dagpenger.mottak.behov.eksterne
 
-import io.mockk.every
-import io.mockk.mockkClass
-import no.nav.dagpenger.mottak.behov.eksterne.AvsluttetArbeidsforhold.Sluttårsak
+import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
+import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak
+import no.nav.dagpenger.mottak.SøknadFakta
+import no.nav.dagpenger.mottak.behov.JsonMapper
+import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
-import java.time.LocalDate
 
 internal class SøknadFaktaLøserTest {
 
     val testRapid = TestRapid()
-    val testSøknad = mockkClass(Søknad::class).apply {
-        every { ønskerDagpengerFraDato() } returns LocalDate.parse("2021-05-25")
-        every { søknadstidspunkt() } returns LocalDate.parse("2021-05-23")
-        every { verneplikt() } returns false
-        every { fangstOgFisk() } returns false
-        every { sisteDagMedArbeidsplikt() } returns LocalDate.parse("2021-05-24")
-        every { sisteDagMedLønn() } returns LocalDate.parse("2021-06-15")
-        every { lærling() } returns true
-        every { jobbetIeøs() } returns false
-        every { rettighetstype() } returns Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
-    }
+    val testSøknad = Søknadsdata.Søknad(JsonMapper.jacksonJsonAdapter.readTree(this.javaClass.getResource("/testdata/soknadsdata.json")))
 
     init {
-        SøknadFaktaLøser(
-            søknadsOppslag = object : SøknadsOppslag {
-                override fun hentSøknad(journalpostId: String): Søknad = testSøknad
+        SøknadFaktaQuizLøser(
+            søknadQuizOppslag = object : SøknadQuizOppslag {
+                override fun hentSøknad(journalpostId: String): SøknadFakta = testSøknad
             },
             rapidsConnection = testRapid
         )
@@ -42,15 +36,14 @@ internal class SøknadFaktaLøserTest {
     @ParameterizedTest
     @CsvSource(
         value = [
-            "ØnskerDagpengerFraDato:2021-05-25",
-            "Søknadstidspunkt:2021-05-23",
+            "ØnskerDagpengerFraDato:2020-03-19",
+            "Søknadstidspunkt:2020-03-19",
             "Verneplikt:false",
-            "FangstOgFiske:false",
-            "SisteDagMedArbeidsplikt:2021-05-24",
-            "SisteDagMedLønn:2021-06-15",
+            "FangstOgFiske:true",
+            "SisteDagMedArbeidsplikt:2020-03-20",
+            "SisteDagMedLønn:2020-03-20",
             "Lærling:true",
-            "EØSArbeid:false",
-            "Rettighetstype:SAGT_OPP_AV_ARBEIDSGIVER"
+            "EØSArbeid:true"
         ],
         delimiter = ':'
     )
@@ -59,6 +52,99 @@ internal class SøknadFaktaLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertEquals(forventetVerdi, field(0, "@løsning")[behovNavn].asText())
+        }
+    }
+
+    @Test
+    fun `mapper avsluttede arbeidsforhold til lønnsgaranti`() {
+        rettighetstypeUtregning(
+            listOf<AvsluttetArbeidsforhold>(
+                AvsluttetArbeidsforhold(
+                    sluttårsak = Sluttårsak.ARBEIDSGIVER_KONKURS,
+                    fiskeforedling = false,
+                    grensearbeider = true
+                )
+            )
+        ).also {
+            assertEquals(1, it.size)
+            it[0].assertRettighetstype("Lønnsgaranti")
+        }
+    }
+
+    @Test
+    fun `mapper avsluttede arbeidsforhold til permitert fiskeforedling`() {
+        rettighetstypeUtregning(
+            listOf<AvsluttetArbeidsforhold>(
+                AvsluttetArbeidsforhold(
+                    sluttårsak = Sluttårsak.PERMITTERT,
+                    fiskeforedling = true,
+                    grensearbeider = false
+                )
+            )
+        ).also {
+            assertEquals(1, it.size)
+            it[0].assertRettighetstype("PermittertFiskeforedling")
+        }
+    }
+
+    @Test
+    fun `mapper avsluttede arbeidsforhold til permittert`() {
+        rettighetstypeUtregning(
+            listOf<AvsluttetArbeidsforhold>(
+                AvsluttetArbeidsforhold(
+                    sluttårsak = Sluttårsak.PERMITTERT,
+                    fiskeforedling = false,
+                    grensearbeider = false
+                )
+            )
+        ).also {
+            assertEquals(1, it.size)
+            it[0].assertRettighetstype("Permittert")
+        }
+    }
+
+    @Test
+    fun `mapper avsluttede arbeidsforhold til ordinær`() {
+        rettighetstypeUtregning(
+            listOf<AvsluttetArbeidsforhold>(
+                AvsluttetArbeidsforhold(
+                    sluttårsak = Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER,
+                    fiskeforedling = false,
+                    grensearbeider = true
+                )
+            )
+        ).also {
+            assertEquals(1, it.size)
+            it[0].assertRettighetstype("Ordinær")
+        }
+    }
+
+    @Test
+    fun `mapper flere avsluttede arbeidsforhold til rettoghetstype`() {
+        rettighetstypeUtregning(
+            listOf<AvsluttetArbeidsforhold>(
+                AvsluttetArbeidsforhold(
+                    sluttårsak = Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER,
+                    fiskeforedling = false,
+                    grensearbeider = false
+                ),
+                AvsluttetArbeidsforhold(
+                    sluttårsak = Sluttårsak.PERMITTERT,
+                    fiskeforedling = false,
+                    grensearbeider = false
+                )
+            )
+        ).also {
+            assertEquals(2, it.size)
+            it[0].assertRettighetstype("Ordinær")
+            it[1].assertRettighetstype("Permittert")
+        }
+    }
+
+    fun Map<String, Boolean>.assertRettighetstype(nøkkel: String) {
+        Assertions.assertTrue(this[nøkkel]!!)
+        this.filterKeys { it != nøkkel }.values.forEach { value ->
+            assertFalse(value)
         }
     }
 
