@@ -73,7 +73,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             OpprettGosysOppgaveLøser(gosysProxyClient, this)
 
             // Eksterne behovløsere
-            SøknadFaktaQuizLøser(PostgresSøknadQuizOppslag(Config.dataSource), this)
+            // SøknadFaktaQuizLøser(PostgresSøknadQuizOppslag(Config.dataSource), this)
         }
 
     init {
