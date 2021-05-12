@@ -1,14 +1,19 @@
 package no.nav.dagpenger.mottak.e2e
 
+import com.spun.util.persistence.Loader
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.InnsendingVisitor
+import org.approvaltests.Approvals
+import org.approvaltests.core.Options
+import org.approvaltests.namer.ApprovalNamer
+import org.approvaltests.namer.NamerWrapper
 import java.io.File
 import java.nio.file.Paths
 
-class TestInnsendingInspektør(innsending: Innsending) : InnsendingVisitor {
+internal class TestInnsendingInspektør(innsending: Innsending) : InnsendingVisitor {
 
     lateinit var gjeldendetilstand: InnsendingTilstandType
     internal lateinit var innsendingLogg: Aktivitetslogg
@@ -26,8 +31,17 @@ class TestInnsendingInspektør(innsending: Innsending) : InnsendingVisitor {
     }
 }
 
-class PlantUmlObservatør() : InnsendingObserver {
-    internal val tilstander = mutableListOf<String>()
+internal class PlantUmlObservatør() : InnsendingObserver {
+    private val tilstander = mutableListOf<String>()
+
+    private companion object {
+        val path = "${
+        Paths.get("").toAbsolutePath().toString().substringBeforeLast("/")
+        }/docs/arkitektur/"
+        val options = Options()
+            .forFile()
+            .withExtension(".puml")
+    }
 
     override fun tilstandEndret(event: InnsendingObserver.InnsendingEndretTilstandEvent) {
         tilstander.add("${event.forrigeTilstand} --> ${event.gjeldendeTilstand.name}")
@@ -49,13 +63,11 @@ class PlantUmlObservatør() : InnsendingObserver {
           |@enduml
       """.trimMargin()
 
-    fun writePlantUml(brevkode: String, subPath: String? = null) {
-        println(Paths.get("").toAbsolutePath().toString())
-        var path = "${Paths.get("").toAbsolutePath().toString().substringBeforeLast("/")}/docs/arkitektur/tilstander"
-        if (subPath != null)
-            path += "/$subPath"
-
-        File("$path/$brevkode.puml").writeText(toPlantUml(brevkode))
+    fun verify(brevkode: String) {
+        Approvals.namerCreater = Loader<ApprovalNamer> { NamerWrapper({ "tilstander/$brevkode" }, { path }) }
+        Approvals.verify(
+            toPlantUml(brevkode), options
+        )
     }
 }
 

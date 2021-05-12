@@ -115,7 +115,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.datoRegistrert)
         }
 
-        plantUmlObservatør.writePlantUml(brevkode)
+        assertPuml(brevkode)
     }
 
     @ParameterizedTest
@@ -187,7 +187,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.datoRegistrert)
         }
 
-        plantUmlObservatør.writePlantUml(brevkode)
+        assertPuml(brevkode)
     }
 
     @ParameterizedTest
@@ -309,7 +309,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.søknadsData)
         }
 
-        plantUmlObservatør.writePlantUml(brevkode)
+        assertPuml(brevkode)
     }
 
     @Test
@@ -342,7 +342,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.datoRegistrert)
         }
 
-        plantUmlObservatør.writePlantUml("Ukjente brevkoder")
+        assertPuml("Ukjente brevkoder")
     }
 
     @Test
@@ -355,7 +355,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             InnsendingFerdigstiltType
         )
 
-        plantUmlObservatør.writePlantUml("JournalpostStatus annen enn MOTTATT")
+        assertPuml("JournalpostStatus annen enn MOTTATT")
     }
 
     @Test
@@ -409,7 +409,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.datoRegistrert)
         }
 
-        plantUmlObservatør.writePlantUml(brevkode)
+        assertPuml(brevkode)
     }
 
     @ParameterizedTest
@@ -489,7 +489,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.datoRegistrert)
         }
 
-        plantUmlObservatør.writePlantUml("Ukjent bruker")
+        assertPuml("Ukjent bruker")
     }
 
     @Test
@@ -515,7 +515,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerGosysType,
             InnsendingFerdigstiltType
         )
-
-        plantUmlObservatør.writePlantUml("Ferdigstilte journalposter")
+        assertPuml("Ferdigstilte journalposter")
     }
 }
