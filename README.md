@@ -22,7 +22,7 @@ Databasediagram
 ## HOWTOS
 
 
-Finne journalposter registrert innenfor en periode:
+###Finne journalposter registrert innenfor en periode:
 
 ````postgresql
 
@@ -34,6 +34,22 @@ WHERE journalpost.registrertdato BETWEEN '2021-05-05 13:07'::timestamp AND '2021
 
 ````
 ps- bytt ut datoene mellom BETWEEN med tidsperiode
+
+###Replay i dev
+```
+curl -X PUT -u <bruker>:<passord> http://dp-mottak.dev.intern.no/internal/replay/<journalpostId>
+```
+
+hente bruker:
+```
+kubectl get secret dp-mottak-basic-auth-secret -o yaml | grep BASIC_AUTH_USERNAME | awk '{print $2}' | base64 -d
+```
+
+hente passord:
+```
+kubectl get secret dp-mottak-basic-auth-secret -o yaml | grep BASIC_AUTH_PASSWORD | awk '{print $2}' | base64 -d
+```
+
 
 # Henvendelser
 

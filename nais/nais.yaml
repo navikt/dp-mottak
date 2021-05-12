@@ -36,7 +36,7 @@ spec:
     outbound:
       external:
         - host: {{ DP_PROXY_HOST }}
-  {{#if secrets }}
+  {{#if ingresses }}
   ingresses:
   {{#each ingresses as |url|}}
      - {{url}}
