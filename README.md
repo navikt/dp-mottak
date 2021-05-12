@@ -61,7 +61,7 @@ hente passord:
 kubectl get secret dp-mottak-basic-auth-secret -o yaml | grep BASIC_AUTH_PASSWORD | awk '{print $2}' | base64 -d
 ```
 
-Eventuelt kan en installere pluginen ![view-secret](https://github.com/elsesiy/kubectl-view-secret)
+Eventuelt kan en installere pluginen [view-secret](https://github.com/elsesiy/kubectl-view-secret)
 
 ```shell
 kubectl view-secret dp-mottak-basic-auth-secret -a
