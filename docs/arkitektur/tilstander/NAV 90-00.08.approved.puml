@@ -6,7 +6,8 @@ end title
 MottattType --> AvventerJournalpostType
 AvventerJournalpostType --> AvventerPersondataType
 AvventerPersondataType --> KategoriseringType
-KategoriseringType --> AvventerGosysType
-AvventerGosysType --> InnsendingFerdigstiltType
+KategoriseringType --> AventerArenaOppgaveType
+AventerArenaOppgaveType --> AvventerFerdigstillJournalpostType
+AvventerFerdigstillJournalpostType --> InnsendingFerdigstiltType
 InnsendingFerdigstiltType--> [*]
 @enduml

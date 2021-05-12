@@ -10,10 +10,9 @@ import org.approvaltests.Approvals
 import org.approvaltests.core.Options
 import org.approvaltests.namer.ApprovalNamer
 import org.approvaltests.namer.NamerWrapper
-import java.io.File
 import java.nio.file.Paths
 
-internal class TestInnsendingInspektør(innsending: Innsending) : InnsendingVisitor {
+class TestInnsendingInspektør(innsending: Innsending) : InnsendingVisitor {
 
     lateinit var gjeldendetilstand: InnsendingTilstandType
     internal lateinit var innsendingLogg: Aktivitetslogg
@@ -31,7 +30,7 @@ internal class TestInnsendingInspektør(innsending: Innsending) : InnsendingVisi
     }
 }
 
-internal class PlantUmlObservatør() : InnsendingObserver {
+class PlantUmlObservatør() : InnsendingObserver {
     private val tilstander = mutableListOf<String>()
 
     private companion object {

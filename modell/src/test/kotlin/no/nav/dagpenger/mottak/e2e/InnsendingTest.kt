@@ -247,7 +247,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.datoRegistrert)
         }
 
-        plantUmlObservatør.writePlantUml(brevkode)
+        assertPuml(brevkode)
     }
 
     @ParameterizedTest
@@ -409,7 +409,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.datoRegistrert)
         }
 
-        assertPuml(brevkode)
+        assertPuml("$brevkode-lønnskompensasjon")
     }
 
     @ParameterizedTest
