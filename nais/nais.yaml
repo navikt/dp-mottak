@@ -41,8 +41,8 @@ spec:
      - {{url}}
   {{/each}}
   envFrom:
-  {{#each secrets as |secret|}}
-    - {{secret}}
+  {{#each secrets as |value key|}}
+     {{key}}: {{value}}
   {{/each}}
   gcp:
     sqlInstances:
