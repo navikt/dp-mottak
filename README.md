@@ -38,6 +38,9 @@ ps- bytt ut datoene mellom BETWEEN med tidsperiode
 ### Replay av ferdigtilt_event i dev 
 
 
+[Produserer ferdigstilt event.](https://github.com/navikt/dp-mottak/blob/main/mediator/src/main/kotlin/no/nav/dagpenger/mottak/observers/FerdigstiltInnsendingObserver.kt#L35) 
+
+
 Forutsetninger:
 - Du må være koblet på naisdevice
 - Funker kun i dev-gcp
@@ -48,8 +51,6 @@ Forutsetninger:
 ```shell
 curl -X PUT -u <bruker>:<passord> http://dp-mottak.dev.intern.no/internal/replay/<journalpostId>
 ```
-
-Produserer ferdigstilt event. 
 
 hente bruker:
 ```shell
