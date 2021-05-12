@@ -35,7 +35,7 @@ WHERE journalpost.registrertdato BETWEEN '2021-05-05 13:07'::timestamp AND '2021
 ````
 ps- bytt ut datoene mellom BETWEEN med tidsperiode
 
-###Replay av ferdigtilt_event i dev 
+### Replay av ferdigtilt_event i dev 
 
 
 Forutsetninger:
