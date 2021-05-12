@@ -40,10 +40,10 @@ spec:
   {{#each ingresses as |url|}}
      - {{url}}
   {{/each}}
+  {{#if secrets }}
   envFrom:
-  {{#each secrets as |value key|}}
-    - {{key}}:{{value}}
-  {{/each}}
+    - {{secrets}}
+  {{/if}}
   gcp:
     sqlInstances:
       - name: dp-mottak
