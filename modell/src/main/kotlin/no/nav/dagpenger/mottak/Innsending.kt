@@ -705,4 +705,11 @@ class Innsending private constructor(
             "journalpostId" to journalpostId
         )
     )
+
+    fun håndter(replayFerdigstillEvent: ReplayFerdigstillEvent) {
+        if (journalpostId != replayFerdigstillEvent.journalpostId) throw IllegalArgumentException("Innsending matcher ikke journalpostId ${journalpostId()}")
+        if (erFerdigBehandlet()) {
+            emitFerdigstilt()
+        } else throw IllegalArgumentException("Innsending er ikke i tilstand ferdigstilt, er ${tilstand.type}")
+    }
 }

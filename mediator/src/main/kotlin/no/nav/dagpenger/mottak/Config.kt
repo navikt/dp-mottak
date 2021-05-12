@@ -96,6 +96,10 @@ internal object Config {
         }
     }
 
+    val basicCredentials: Pair<String, String>? = properties.getOrNull(Key("BASIC_AUTH_USERNAME", stringType))?.let {
+        Pair(it, properties[Key("BASIC_AUTH_PASSWORD", stringType)])
+    }
+
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_URL", stringType)]
     fun Configuration.dpProxyScope() = this[Key("DP_PROXY_SCOPE", stringType)]
     fun Configuration.pdlApiScope() = this[Key("PDL_API_SCOPE", stringType)]

@@ -1,102 +1,19 @@
 package no.nav.dagpenger.mottak.db
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
+import no.nav.dagpenger.innsendingData
+import no.nav.dagpenger.journalpostId
 import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
 import no.nav.dagpenger.mottak.helpers.assertDeepEquals
 import no.nav.dagpenger.mottak.serder.InnsendingData
-import no.nav.dagpenger.mottak.serder.InnsendingData.JournalpostData.DokumentInfoData
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 internal class InnsendingPostgresRepositoryTest {
-
-    private val journalpostId = "187689"
-    private val journalpostStatus = "aktiv"
-    private val fnr = "12345678910"
-    private val registrertdato = LocalDateTime.now()
-    private val dokumenter = listOf(
-        DokumentInfoData(
-            tittel = "Fin tittel",
-            brevkode = "NAV 04-01.03",
-            dokumentInfoId = "12345678"
-        ),
-        DokumentInfoData(
-            tittel = "Annen Fin tittel",
-            brevkode = "NAV 04-01.03",
-            dokumentInfoId = "123456567"
-        ),
-
-        DokumentInfoData(
-            tittel = "Permitteringsvarsel: Koko's AS",
-            brevkode = "NAV 04-01.03",
-            dokumentInfoId = "12366732"
-        )
-    )
-
-    private val aktivitetsloggData = InnsendingData.AktivitetsloggData(
-        listOf(
-            InnsendingData.AktivitetsloggData.AktivitetData(
-                alvorlighetsgrad = InnsendingData.AktivitetsloggData.Alvorlighetsgrad.INFO,
-                label = 'N',
-                melding = "TEST",
-                tidsstempel = LocalDateTime.now().toString(),
-                detaljer = mapOf("detaljVariabel" to "tt"),
-                kontekster = listOf(
-                    InnsendingData.AktivitetsloggData.SpesifikkKontekstData(
-                        kontekstType = "TEST",
-                        kontekstMap = mapOf("kontekstVariabel" to "foo")
-                    )
-                ),
-                behovtype = null
-            )
-        )
-
-    )
-
-    //language=JSON
-    private val søknadsjson = jacksonObjectMapper().readTree(
-        """
-            {
-            "tadda":"it´s short for"
-            }
-        """.trimIndent()
-    )
-
-    val innsendingData = InnsendingData(
-        id = 1,
-        journalpostId = journalpostId,
-        tilstand = InnsendingData.TilstandData(
-            InnsendingData.TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType,
-        ),
-        journalpostData = InnsendingData.JournalpostData(
-            journalpostId = journalpostId,
-            journalpostStatus = journalpostStatus,
-            bruker = InnsendingData.JournalpostData.BrukerData(InnsendingData.JournalpostData.BrukerTypeData.FNR, fnr),
-            behandlingstema = "DAG",
-            registertDato = registrertdato,
-            dokumenter = dokumenter
-        ),
-        oppfyllerMinsteArbeidsinntekt = true,
-        eksisterendeSaker = false,
-        personData = InnsendingData.PersonData(
-            navn = "Hubba Bubba's",
-            fødselsnummer = fnr,
-            aktørId = "345678",
-            norskTilknytning = true,
-            diskresjonskode = false
-        ),
-        arenaSakData = InnsendingData.ArenaSakData(
-            oppgaveId = "123487",
-            fagsakId = "129678"
-        ),
-        søknadsData = søknadsjson,
-        aktivitetslogg = aktivitetsloggData
-    )
 
     @Test
     fun `hent skal kunne hente innsending`() {

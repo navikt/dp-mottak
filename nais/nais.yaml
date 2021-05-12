@@ -50,4 +50,5 @@ spec:
           - name: mottak
             envVarPrefix: DB
         cascadingDelete: false
-
+  {{secrets}}
+  {{ingresses}}

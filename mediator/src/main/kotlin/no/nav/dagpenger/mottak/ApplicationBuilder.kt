@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak
 
 import mu.KotlinLogging
+import no.nav.dagpenger.mottak.api.innsendingApi
 import no.nav.dagpenger.mottak.behov.eksterne.PostgresSøknadQuizOppslag
 import no.nav.dagpenger.mottak.behov.eksterne.SøknadFaktaQuizLøser
 import no.nav.dagpenger.mottak.behov.journalpost.FerdigstillJournalpostBehovLøser
@@ -23,7 +24,6 @@ import no.nav.dagpenger.mottak.db.runMigration
 import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
 import no.nav.dagpenger.mottak.observers.InnsendingProbe
 import no.nav.dagpenger.mottak.observers.MetrikkObserver
-import no.nav.dagpenger.mottak.proxy.proxyPing
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -44,7 +44,17 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
     )
-        .withKtorModule(proxyPing(Config.properties))
+        .also { builder ->
+            Config.basicCredentials?.let {
+                builder.withKtorModule(
+                    innsendingApi(
+                        innsendingRepository,
+                        ferdigstiltInnsendingObserver,
+                        it
+                    )
+                )
+            }
+        }
         .build().apply {
             val mediator = InnsendingMediator(
                 innsendingRepository = innsendingRepository,

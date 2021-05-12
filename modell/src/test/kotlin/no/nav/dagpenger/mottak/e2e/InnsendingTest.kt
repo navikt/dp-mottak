@@ -27,8 +27,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import java.lang.IllegalArgumentException
 
 internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
@@ -517,5 +519,12 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         )
 
         plantUmlObservatør.writePlantUml("Ferdigstilte journalposter")
+    }
+
+    @Test
+    fun `Skal ikke håndtere replay eventer for andre tilstander enn ferdigstilt`() {
+
+        håndterJoarkHendelse()
+        assertThrows<IllegalArgumentException> { hånderReplayFerdigstilt() }
     }
 }

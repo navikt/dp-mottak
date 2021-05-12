@@ -7,6 +7,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingTilstandType
+import no.nav.dagpenger.mottak.ReplayFerdigstillEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
@@ -90,6 +91,10 @@ abstract class AbstractEndeTilEndeTest {
 
     protected fun håndterJoarkHendelse() {
         innsending.håndter(joarkhendelse())
+    }
+
+    protected fun hånderReplayFerdigstilt() {
+        innsending.håndter(ReplayFerdigstillEvent(JOURNALPOST_ID))
     }
 
     protected fun håndterJournalpostData(

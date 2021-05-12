@@ -18,6 +18,7 @@ dependencies {
     implementation(Jackson.kotlin)
     implementation(Ktor.library("client-cio-jvm"))
     implementation(Ktor.library("client-jackson"))
+    implementation(Ktor.auth)
 
     // unleash
     implementation("no.finn.unleash:unleash-client-java:4.2.1") {
@@ -27,4 +28,5 @@ dependencies {
     testImplementation(Mockk.mockk)
     testImplementation(TestContainers.postgresql)
     testImplementation(Junit5.params)
+    testImplementation(Ktor.ktorTest)
 }
