@@ -36,10 +36,12 @@ spec:
     outbound:
       external:
         - host: {{ DP_PROXY_HOST }}
+  {{#if secrets }}
   ingresses:
   {{#each ingresses as |url|}}
      - {{url}}
   {{/each}}
+  {{/if}}
   {{#if secrets }}
   envFrom:
     - {{secrets}}
