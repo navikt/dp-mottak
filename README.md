@@ -22,7 +22,7 @@ Databasediagram
 ## HOWTOS
 
 
-###Finne journalposter registrert innenfor en periode:
+### Finne journalposter for NYE søknader registrert innenfor en periode:
 
 ````postgresql
 
@@ -30,7 +30,9 @@ SELECT person.fødselsnummer, journalpost.registrertdato, journalpostid FROM inn
 LEFT JOIN person_innsending_v1 person_innsending on innsending.id = person_innsending.id
 LEFT JOIN person_v1 person on person_innsending.personid = person.id
 LEFT JOIN journalpost_v1 journalpost on innsending.id = journalpost.id
-WHERE journalpost.registrertdato BETWEEN '2021-05-05 13:07'::timestamp AND '2021-05-06 21:07'::timestamp;
+LEFT JOIN journalpost_dokumenter_v1 dokumenter on journalpost.id = dokumenter.id
+WHERE journalpost.registrertdato BETWEEN '2021-05-05 13:07'::timestamp AND '2021-05-06 21:07'::timestamp 
+AND dokumenter.brevkode in ('NAV 04-01.03', 'NAV 04-01.04');
 
 ````
 ps- bytt ut datoene mellom BETWEEN med tidsperiode
