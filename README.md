@@ -44,6 +44,7 @@ ps- bytt ut datoene mellom BETWEEN med tidsperiode
 Forutsetninger:
 - Du må være koblet på naisdevice
 - Funker kun i dev-gcp
+- Du må være i teamdagpenger namespace
 - Innsendingen må finnes, curl kallet feiler hvis ikke
 - Innsendingen må være ferdigstilt, curl kallet feiler hvis ikke
 
