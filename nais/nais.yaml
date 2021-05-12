@@ -42,7 +42,7 @@ spec:
   {{/each}}
   envFrom:
   {{#each secrets as |value key|}}
-     {{key}}:{{value}}
+    - {{key}}:{{value}}
   {{/each}}
   gcp:
     sqlInstances:
