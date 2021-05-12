@@ -37,11 +37,11 @@ spec:
       external:
         - host: {{ DP_PROXY_HOST }}
   ingresses:
-  {{ #each ingresses as |url| }}
+  {{#each ingresses as |url|}}
      - {{url}}
   {{/each}}
   envFrom:
-  {{ #each secrets as |secret| }}
+  {{#each secrets as |secret|}}
     - {{secret}}
   {{/each}}
   gcp:
