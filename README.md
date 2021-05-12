@@ -35,21 +35,37 @@ WHERE journalpost.registrertdato BETWEEN '2021-05-05 13:07'::timestamp AND '2021
 ````
 ps- bytt ut datoene mellom BETWEEN med tidsperiode
 
-###Replay i dev
-```
+###Replay av ferdigtilt_event i dev 
+
+
+Forutsetninger:
+- Du må være koblet på naisdevice
+- Funker kun i dev-gcp
+- Innsendingen må finnes, curl kallet feiler hvis ikke
+- Innsendingen må være ferdigstilt, curl kallet feiler hvis ikke
+
+
+```shell
 curl -X PUT -u <bruker>:<passord> http://dp-mottak.dev.intern.no/internal/replay/<journalpostId>
 ```
 
+Produserer ferdigstilt event. 
+
 hente bruker:
-```
+```shell
 kubectl get secret dp-mottak-basic-auth-secret -o yaml | grep BASIC_AUTH_USERNAME | awk '{print $2}' | base64 -d
 ```
 
 hente passord:
-```
+```shell
 kubectl get secret dp-mottak-basic-auth-secret -o yaml | grep BASIC_AUTH_PASSWORD | awk '{print $2}' | base64 -d
 ```
 
+Eventuelt kan en installere pluginen ![view-secret](https://github.com/elsesiy/kubectl-view-secret)
+
+```shell
+kubectl view-secret dp-mottak-basic-auth-secret -a
+```
 
 # Henvendelser
 
