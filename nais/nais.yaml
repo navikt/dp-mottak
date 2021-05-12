@@ -36,6 +36,14 @@ spec:
     outbound:
       external:
         - host: {{ DP_PROXY_HOST }}
+  ingresses:
+  {{ #each ingresses as |url| }}
+     - {{url}}
+  {{/each}}
+  envFrom:
+  {{ #each secrets as |secret| }}
+    - {{secret}}
+  {{/each}}
   gcp:
     sqlInstances:
       - name: dp-mottak
@@ -50,5 +58,3 @@ spec:
           - name: mottak
             envVarPrefix: DB
         cascadingDelete: false
-  {{secrets}}
-  {{ingresses}}
