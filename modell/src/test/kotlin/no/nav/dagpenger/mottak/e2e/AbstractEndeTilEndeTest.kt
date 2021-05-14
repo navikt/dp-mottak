@@ -83,6 +83,10 @@ abstract class AbstractEndeTilEndeTest {
         test(observatør.event!!)
     }
 
+    protected fun assertPuml(brevkode: String) {
+        plantUmlObservatør.verify(brevkode)
+    }
+
     protected fun assertMottatt(test: (InnsendingObserver.InnsendingEvent) -> Unit) {
         assertNotNull(observatør.mottattEvent)
         assertEquals(JOURNALPOST_ID, observatør.mottattEvent?.journalpostId)

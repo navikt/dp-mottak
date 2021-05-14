@@ -9,4 +9,5 @@ dependencies {
 
     testImplementation(Junit5.params)
     testImplementation(Mockk.mockk)
+    testImplementation("com.approvaltests:approvaltests:11.2.3")
 }
