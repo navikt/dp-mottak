@@ -30,7 +30,7 @@ internal class JoarkMottak(
                     if (json.asText() == "EESSI") throw IllegalArgumentException("Kan ikke håndtere 'EESSI' mottakskanal")
                 }
             }
-            validate { it.interestedIn("temaNytt", "hendelsesType", "mottaksKanal", "behandlingstema", "timestamp") }
+            validate { it.interestedIn("temaNytt", "hendelsesType", "mottaksKanal", "behandlingsTema", "timestamp") }
         }.register(this)
     }
 
@@ -39,8 +39,8 @@ internal class JoarkMottak(
             """Received journalpost with journalpost id: ${packet["journalpostId"].asText()} 
                         |tema: ${packet["temaNytt"].asText()}, 
                         |hendelsesType: ${packet["hendelsesType"].asText()}, 
-                        |mottakskanal, ${packet["mottaksKanal"].asText()}, 
-                        |behandlingstema: ${packet["behandlingstema"].asText()}
+                        |mottaksKanal, ${packet["mottaksKanal"].asText()}, 
+                        |behandlingsTema: ${packet["behandlingsTema"].asText()}
                         |produsert: ${packet["timestamp"].asOptionalLocalDateTime()}
                         |""".trimMargin()
         )
