@@ -8,6 +8,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.asOptionalLocalDateTime
 
 internal class JoarkMottak(
     private val innsendingMediator: InnsendingMediator,
@@ -29,7 +30,7 @@ internal class JoarkMottak(
                     if (json.asText() == "EESSI") throw IllegalArgumentException("Kan ikke håndtere 'EESSI' mottakskanal")
                 }
             }
-            validate { it.interestedIn("temaNytt", "hendelsesType", "mottaksKanal", "behandlingstema") }
+            validate { it.interestedIn("temaNytt", "hendelsesType", "mottaksKanal", "behandlingstema", "timestamp") }
         }.register(this)
     }
 
@@ -39,7 +40,9 @@ internal class JoarkMottak(
                         |tema: ${packet["temaNytt"].asText()}, 
                         |hendelsesType: ${packet["hendelsesType"].asText()}, 
                         |mottakskanal, ${packet["mottaksKanal"].asText()}, 
-                        |behandlingstema: ${packet["behandlingstema"].asText()}""".trimMargin()
+                        |behandlingstema: ${packet["behandlingstema"].asText()}
+                        |produsert: ${packet["timestamp"].asOptionalLocalDateTime()}
+                        |""".trimMargin()
         )
 
         val joarkHendelse = JoarkHendelse(

@@ -11,7 +11,6 @@ internal class JournalpostBehovLøser(
     private val journalpostArkiv: JournalpostArkiv,
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
-
     companion object {
         private val logger = KotlinLogging.logger { }
     }
@@ -26,11 +25,10 @@ internal class JournalpostBehovLøser(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-
         runBlocking { journalpostArkiv.hentJournalpost(packet["journalpostId"].asText()) }.also {
             packet["@løsning"] = mapOf("Journalpost" to it)
             context.publish(packet.toJson())
-            logger.info("Løst behov Journalpost for journalpost med id ${it.journalpostId}")
+            logger.info { "Løst behov Journalpost for journalpost med id ${it.journalpostId}. Først mottatt ${it.datoOpprettet}." }
         }
     }
 }
