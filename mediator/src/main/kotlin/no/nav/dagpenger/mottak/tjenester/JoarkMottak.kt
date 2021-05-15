@@ -14,9 +14,9 @@ internal class JoarkMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
-
     private companion object {
         private val logg = KotlinLogging.logger {}
+        private val sikkerlogg = KotlinLogging.logger("tjenestekall.JoarkMottak")
     }
 
     init {
@@ -44,7 +44,7 @@ internal class JoarkMottak(
                         |produsert: ${packet["timestamp"].asOptionalLocalDateTime()}
                         |""".trimMargin()
         )
-
+        sikkerlogg.info { "Mottok journalpost: $packet" }
         val joarkHendelse = JoarkHendelse(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = packet["journalpostId"].asText(),
