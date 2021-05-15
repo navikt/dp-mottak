@@ -44,7 +44,7 @@ internal class JoarkMottak(
                         |produsert: ${packet["timestamp"].asOptionalLocalDateTime()}
                         |""".trimMargin()
         )
-        sikkerlogg.info { "Mottok journalpost: $packet" }
+        sikkerlogg.info { "Mottok journalpost: ${packet.toJson()}" }
         val joarkHendelse = JoarkHendelse(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = packet["journalpostId"].asText(),
