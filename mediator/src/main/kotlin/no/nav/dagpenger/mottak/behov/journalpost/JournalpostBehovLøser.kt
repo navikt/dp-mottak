@@ -6,6 +6,8 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import java.time.Duration
+import java.time.LocalDateTime
 
 internal class JournalpostBehovLøser(
     private val journalpostArkiv: JournalpostArkiv,
@@ -28,7 +30,12 @@ internal class JournalpostBehovLøser(
         runBlocking { journalpostArkiv.hentJournalpost(packet["journalpostId"].asText()) }.also {
             packet["@løsning"] = mapOf("Journalpost" to it)
             context.publish(packet.toJson())
-            logger.info { "Løst behov Journalpost for journalpost med id ${it.journalpostId}. Først mottatt ${it.datoOpprettet}." }
+            logger.info {
+                val tidSidenOpprettet = it.datoOpprettet?.let { datoOpprettet ->
+                    Duration.between(LocalDateTime.parse(datoOpprettet), LocalDateTime.now())
+                }
+                "Løst behov Journalpost for journalpost med id ${it.journalpostId}. Opprettet Joark for $tidSidenOpprettet siden."
+            }
         }
     }
 }

@@ -40,7 +40,7 @@ internal class JoarkMottak(
                         |tema: ${packet["temaNytt"].asText()}, 
                         |hendelsesType: ${packet["hendelsesType"].asText()}, 
                         |mottaksKanal, ${packet["mottaksKanal"].asText()}, 
-                        |behandlingsTema: ${packet["behandlingsTema"].asText()}
+                        |behandlingsTema: ${packet["behandlingsTema"].asText()},
                         |produsert: ${packet["timestamp"].asOptionalLocalDateTime()}
                         |""".trimMargin()
         )
