@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.behov.eksterne
 
+import mu.KotlinLogging
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.SøknadFakta
 import no.nav.dagpenger.mottak.avsluttetArbeidsforhold
@@ -15,8 +16,12 @@ import java.time.ZonedDateTime
 internal class SøknadFaktaQuizLøser(
     private val søknadQuizOppslag: SøknadQuizOppslag,
     rapidsConnection: RapidsConnection
-) :
-    River.PacketListener {
+) : River.PacketListener {
+
+    private companion object {
+        val logger = KotlinLogging.logger { }
+    }
+
     private val løserBehov = listOf(
         "ØnskerDagpengerFraDato",
         "Søknadstidspunkt",
@@ -33,6 +38,7 @@ internal class SøknadFaktaQuizLøser(
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "faktum_svar") }
             validate { it.demandAllOrAny("@behov", løserBehov) }
+            validate { it.rejectKey("@løsning") }
             validate { it.requireKey("InnsendtSøknadsId") }
         }.register(this)
     }
@@ -55,7 +61,9 @@ internal class SøknadFaktaQuizLøser(
                 else -> throw IllegalArgumentException("Ukjent behov $behov")
             }
         }.toMap()
+
         context.publish(packet.toJson())
+        logger.info("løste søknadfakta-behov for innsendt søknad med id ${packet["InnsendtSøknadsId"]["url"].asText()}")
     }
 }
 
