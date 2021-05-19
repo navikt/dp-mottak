@@ -33,7 +33,7 @@ jobs:
         run: ./gradlew build --info
 
       - name: Build and Publish Docker image
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/pdl'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -42,7 +42,7 @@ jobs:
           docker push $IMAGE
 
       - name: Archive NAIS yaml
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/pdl'
         uses: actions/upload-artifact@v1
         with:
           name: nais-yaml
