@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
+import no.nav.dagpenger.mottak.observers.Metrics
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -47,6 +48,9 @@ internal class JoarkMottak(
               |behandlingstema: ${packet["behandlingstema"].asText()}
               |""".trimMargin()
         )
+
+        Metrics.mottakskanalInc(packet["mottaksKanal"].asText())
+
         val joarkHendelse = JoarkHendelse(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = packet["journalpostId"].asText(),

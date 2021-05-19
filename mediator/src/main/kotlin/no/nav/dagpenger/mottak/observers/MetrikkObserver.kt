@@ -57,4 +57,13 @@ internal object Metrics {
         tilstandCounter
             .labels(gjeldendeTilstand, forrigeTilstand)
             .inc()
+
+    private val mottakskanalCounter = Counter
+        .build()
+        .name("dp_mottak_kanal")
+        .help("Antall journalposter dom dp-mottak mottar sortert på mottakskanal")
+        .labelNames("mottakskanal")
+        .register()
+
+    fun mottakskanalInc(type: String) = mottakskanalCounter.labels(type).inc()
 }
