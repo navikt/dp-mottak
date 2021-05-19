@@ -14,6 +14,8 @@ import no.nav.dagpenger.mottak.SpesifikkKontekst
 import no.nav.dagpenger.mottak.UkjentSkjemaKode
 import no.nav.dagpenger.mottak.Utdanning
 import no.nav.dagpenger.mottak.UtenBruker
+import no.nav.dagpenger.mottak.meldinger.Journalpost.DokumentInfo.Companion.hovedDokument
+import no.nav.dagpenger.mottak.meldinger.Journalpost.DokumentInfo.Companion.vedlegg
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -79,17 +81,22 @@ class Journalpost constructor(
     }
 
     override fun journalpostId(): String = journalpostId
-    fun hovedskjema() = dokumenter.first().brevkode
-    fun tittel() = dokumenter.first().tittel
+    fun dokumenter() = dokumenter
+    fun hovedskjema() = dokumenter.hovedDokument().brevkode
+    fun hovedDokument() = dokumenter.hovedDokument()
+    fun tittel() = dokumenter.hovedDokument().tittel
     fun bruker() = bruker
     fun status() = journalpostStatus
-
-    fun dokumenter(): List<DokumentInfo> = dokumenter
+    fun vedlegg(): List<DokumentInfo> = dokumenter.vedlegg()
     fun datoRegistrert(): LocalDateTime = registrertDato
-    class DokumentInfo(tittelHvisTilgjengelig: String?, dokumentInfoId: String, brevkode: String) {
+
+    class DokumentInfo(tittelHvisTilgjengelig: String?, val dokumentInfoId: String, val brevkode: String, val hovedDokument: Boolean) {
         val tittel = tittelHvisTilgjengelig ?: allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
-        val dokumentInfoId = dokumentInfoId
-        val brevkode = brevkode
+
+        companion object {
+            fun List<DokumentInfo>.vedlegg() = this.filter { it.hovedDokument == false }
+            fun List<DokumentInfo>.hovedDokument() = this.find { it.hovedDokument == true } ?: this.first()
+        }
     }
 
     data class RelevantDato(

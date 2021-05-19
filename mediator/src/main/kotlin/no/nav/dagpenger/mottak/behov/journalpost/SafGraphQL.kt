@@ -1,7 +1,11 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 
@@ -24,10 +28,7 @@ internal class SafGraphQL {
         val datotype: Datotype
     )
 
-    class DokumentInfo(tittel: String?, dokumentInfoId: String, brevkode: String?) {
-        val tittel = tittel
-        val dokumentInfoId = dokumentInfoId
-        val brevkode = brevkode
+    class DokumentInfo(val tittel: String?, val dokumentInfoId: String, val brevkode: String?, val hovedDokument: Boolean) {
 
         override fun toString(): String {
             return "DokumentInfo(tittel=$tittel, dokumentInfoId=$dokumentInfoId, brevkode=$brevkode)"
@@ -41,6 +42,7 @@ internal class SafGraphQL {
         val datoOpprettet: String?,
         val journalfoerendeEnhet: String?,
         val relevanteDatoer: List<RelevantDato>,
+        @JsonDeserialize(using = DokumentInfoDeserializer::class)
         val dokumenter: List<DokumentInfo>,
         val behandlingstema: String? = null
     ) {
@@ -80,5 +82,19 @@ internal class SafGraphQL {
         UNDER_ARBEID, FEILREGISTRERT, UTGAAR, AVBRUTT,
         UKJENT_BRUKER, RESERVERT, OPPLASTING_DOKUMENT,
         UKJENT
+    }
+}
+
+internal class DokumentInfoDeserializer : JsonDeserializer<List<SafGraphQL.DokumentInfo>>() {
+    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): List<SafGraphQL.DokumentInfo> {
+        val node: JsonNode = p.readValueAsTree()
+        return node.mapIndexed { index, dokument ->
+            SafGraphQL.DokumentInfo(
+                tittel = dokument["tittel"].textValue(),
+                brevkode = dokument["brevkode"].textValue(),
+                dokumentInfoId = dokument["dokumentInfoId"].asText(),
+                hovedDokument = index == 0
+            )
+        }
     }
 }

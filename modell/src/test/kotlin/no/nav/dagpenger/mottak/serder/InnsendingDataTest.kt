@@ -22,7 +22,8 @@ internal class InnsendingDataTest {
         DokumentInfoData(
             tittel = "Fin tittel",
             brevkode = "NAV 04-01.03",
-            dokumentInfoId = "12345678"
+            dokumentInfoId = "12345678",
+            hovedDokument = true
         )
     )
 

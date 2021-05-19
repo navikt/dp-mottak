@@ -39,7 +39,8 @@ data class InnsendingData(
                             Journalpost.DokumentInfo(
                                 it.tittel,
                                 it.dokumentInfoId,
-                                it.brevkode
+                                it.brevkode,
+                                it.hovedDokument
                             )
                         }
                     )
@@ -169,7 +170,8 @@ data class InnsendingData(
         data class DokumentInfoData(
             val tittel: String,
             val brevkode: String,
-            val dokumentInfoId: String
+            val dokumentInfoId: String,
+            val hovedDokument: Boolean
         )
     }
 }

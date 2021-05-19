@@ -12,18 +12,21 @@ private val dokumenter = listOf(
     InnsendingData.JournalpostData.DokumentInfoData(
         tittel = "Fin tittel",
         brevkode = "NAV 04-01.03",
-        dokumentInfoId = "12345678"
+        dokumentInfoId = "12345678",
+        hovedDokument = true
     ),
     InnsendingData.JournalpostData.DokumentInfoData(
         tittel = "Annen Fin tittel",
-        brevkode = "NAV 04-01.03",
-        dokumentInfoId = "123456567"
+        brevkode = "O2",
+        dokumentInfoId = "123456567",
+        hovedDokument = false
     ),
 
     InnsendingData.JournalpostData.DokumentInfoData(
         tittel = "Permitteringsvarsel: Koko's AS",
-        brevkode = "NAV 04-01.03",
-        dokumentInfoId = "12366732"
+        brevkode = "T6",
+        dokumentInfoId = "12366732",
+        hovedDokument = false
     )
 )
 

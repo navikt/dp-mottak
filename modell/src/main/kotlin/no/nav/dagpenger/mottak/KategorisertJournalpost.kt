@@ -19,7 +19,7 @@ sealed class KategorisertJournalpost(
         OppgaveBenk(behandlendeEnhet(person), henvendelseNavn(), journalpost.datoRegistrert(), tilleggsinformasjon())
 
     protected fun behandlendeEnhet(person: Person?): String {
-        val brevkode = journalpost.dokumenter().firstOrNull()?.brevkode ?: "ukjent"
+        val brevkode = journalpost.hovedskjema()
         return when {
             brevkode in PERMITTERING_BREVKODER && person?.norskTilknytning == false -> "4465"
             brevkode in PERMITTERING_BREVKODER -> "4455"
@@ -58,9 +58,9 @@ sealed class KategorisertJournalpost(
         listOf("NAV 04-02.01", "NAVe 04-02.01", "NAV 04-02.03", "NAV 04-02.05", "NAVe 04-02.05")
 
     fun tilleggsinformasjon(): String {
-        val titler = journalpost.dokumenter().map { it.tittel }
-        val hovedDokument = titler.first()
-        val vedlegg = titler.drop(1)
+
+        val hovedDokument = journalpost.tittel()
+        val vedlegg = journalpost.vedlegg().map { it.tittel }
 
         val formatertVedlegg =
             if (vedlegg.isNotEmpty()) {
@@ -106,8 +106,6 @@ data class NySøknad(
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ): OppgaveBenk {
-        // val koronaRegelverkMinsteinntektBrukt =
-        //     packet.getNullableBoolean(PacketKeys.KORONAREGELVERK_MINSTEINNTEKT_BRUKT) == true
         val konkurs = søknadFakta?.harAvsluttetArbeidsforholdFraKonkurs() == true
         val kanAvslåsPåMinsteinntekt = oppfyllerMinsteArbeidsinntekt == false
         val grenseArbeider = søknadFakta?.erGrenseArbeider() == true
@@ -230,13 +228,13 @@ data class Ettersending(
 data class UkjentSkjemaKode(
     override val journalpost: Journalpost
 ) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String = "${journalpost.dokumenter().first().tittel}\n"
+    override fun henvendelseNavn(): String = "${journalpost.tittel()}\n"
 }
 
 data class UtenBruker(
     override val journalpost: Journalpost
 ) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String = "${journalpost.dokumenter().first().tittel}\n"
+    override fun henvendelseNavn(): String = "${journalpost.tittel()}\n"
 }
 
 private fun fornyetRettEllerOrginal(

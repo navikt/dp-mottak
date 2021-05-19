@@ -222,7 +222,8 @@ abstract class AbstractEndeTilEndeTest {
             Journalpost.DokumentInfo(
                 tittelHvisTilgjengelig = null,
                 dokumentInfoId = "123",
-                brevkode = brevkode
+                brevkode = brevkode,
+                hovedDokument = true
             )
         )
     )

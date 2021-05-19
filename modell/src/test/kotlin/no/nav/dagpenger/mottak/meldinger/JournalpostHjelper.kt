@@ -19,12 +19,14 @@ internal fun lagjournalpostData(
             Journalpost.DokumentInfo(
                 tittelHvisTilgjengelig = null,
                 dokumentInfoId = "1223",
-                brevkode = brevkode
+                brevkode = brevkode,
+                hovedDokument = true
             ),
             Journalpost.DokumentInfo(
                 tittelHvisTilgjengelig = vedlegg,
                 dokumentInfoId = "12234",
-                brevkode = "N6"
+                brevkode = "N6",
+                hovedDokument = false
             )
         ),
         behandlingstema = behandlingstema

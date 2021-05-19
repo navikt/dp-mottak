@@ -161,12 +161,14 @@ internal class MediatorE2ETest {
                   {
                     "tittel" : null,
                     "dokumentInfoId" : 1234,
-                    "brevkode" : "$brevkode"
+                    "brevkode" : "$brevkode",
+                    "hovedDokument" : true
                   },
                    {
                     "tittel" : null,
                     "dokumentInfoId" : 5678,
-                    "brevkode" : "N6"
+                    "brevkode" : "N6",
+                    "hovedDokument" : false
                   }
                 ],
                 "behandlingstema" : null

@@ -5,8 +5,12 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.innsendingData
 import no.nav.dagpenger.journalpostId
+import no.nav.dagpenger.mottak.Innsending
+import no.nav.dagpenger.mottak.InnsendingVisitor
 import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
 import no.nav.dagpenger.mottak.helpers.assertDeepEquals
+import no.nav.dagpenger.mottak.meldinger.Journalpost
+import no.nav.dagpenger.mottak.meldinger.Journalpost.DokumentInfo.Companion.hovedDokument
 import no.nav.dagpenger.mottak.serder.InnsendingData
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -14,6 +18,25 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 internal class InnsendingPostgresRepositoryTest {
+
+    class TestVisotor(val innsending: Innsending) : InnsendingVisitor {
+
+        val forventetDokumenter = mutableListOf<Journalpost.DokumentInfo>()
+        init {
+
+            innsending.accept(this)
+        }
+        override fun visitJournalpost(
+            journalpostId: String,
+            journalpostStatus: String,
+            bruker: Journalpost.Bruker?,
+            behandlingstema: String?,
+            registrertDato: LocalDateTime,
+            dokumenter: List<Journalpost.DokumentInfo>
+        ) {
+            forventetDokumenter.addAll(dokumenter)
+        }
+    }
 
     @Test
     fun `hent skal kunne hente innsending`() {
@@ -27,6 +50,7 @@ internal class InnsendingPostgresRepositoryTest {
 
                 hent(journalpostId).also {
                     assertDeepEquals(innsending, it)
+                    assertEquals("NAV 04-01.03", TestVisotor(it!!).forventetDokumenter.hovedDokument().brevkode)
                 }
             }
         }

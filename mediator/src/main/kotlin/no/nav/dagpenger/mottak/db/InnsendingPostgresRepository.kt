@@ -120,7 +120,8 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                             SELECT 
                             brevkode,
                             tittel,
-                            dokumentinfoid
+                            dokumentinfoid,
+                            hovedDokument
                             FROM journalpost_dokumenter_v1 WHERE id = :internId
                         """.trimIndent(),
                         mapOf(
@@ -131,7 +132,8 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         InnsendingData.JournalpostData.DokumentInfoData(
                             brevkode = row.string("brevkode"),
                             tittel = row.string("tittel"),
-                            dokumentInfoId = row.string("dokumentInfoId")
+                            dokumentInfoId = row.string("dokumentInfoId"),
+                            hovedDokument = row.boolean("hovedDokument")
                         )
                     }.asList
                 )
@@ -264,14 +266,15 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             val dokumentQueries = dokumenter.map {
                 queryOf( //language=PostgreSQL
                     """
-                        INSERT INTO journalpost_dokumenter_v1(id,tittel,dokumentInfoId,brevkode) 
-                        VALUES(:internId, :tittel, :dokumentInfoId, :brevkode) ON CONFLICT DO NOTHING
+                        INSERT INTO journalpost_dokumenter_v1(id,tittel,dokumentInfoId,brevkode, hovedDokument) 
+                        VALUES(:internId, :tittel, :dokumentInfoId, :brevkode, :hovedDokument) ON CONFLICT DO NOTHING
                     """.trimIndent(),
                     mapOf(
                         "internId" to internId,
                         "tittel" to it.tittel,
                         "dokumentInfoId" to it.dokumentInfoId.toLong(),
-                        "brevkode" to it.brevkode
+                        "brevkode" to it.brevkode,
+                        "hovedDokument" to it.hovedDokument
                     )
                 )
             }

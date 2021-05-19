@@ -69,7 +69,8 @@ internal class JournalpostMottakTest {
                     {
                       "tittel": "Bekreftelse på sluttårsak/nedsatt arbeidstid (ikke permittert)",
                       "dokumentInfoId": "529249966",
-                      "brevkode": "NAV 04-08.03"
+                      "brevkode": "NAV 04-08.03",
+                      "hovedDokument": true
                     }
                   ],
                   "behandlingstema": null

@@ -53,7 +53,8 @@ internal class JournalpostMottak(
                         Journalpost.DokumentInfo(
                             tittelHvisTilgjengelig = jsonDokument["tittel"].textValue(),
                             dokumentInfoId = jsonDokument["dokumentInfoId"].asText(),
-                            brevkode = jsonDokument["brevkode"].asText()
+                            brevkode = jsonDokument["brevkode"].asText(),
+                            hovedDokument = jsonDokument["hovedDokument"].asBoolean()
                         )
                     },
                     registrertDato = it["relevanteDatoer"].firstOrNull {
