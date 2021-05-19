@@ -15,7 +15,7 @@ internal object InnsendingProbe : InnsendingObserver {
 
     override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
         log.info {
-            "Innsending ${event.journalpostId} ferdigstilt. Ble sendt til behandlende enhet ${event.behandlendeEnhet}"
+            "Innsending ${event.journalpostId} ferdigstilt. Kategorisert som ${event.type}, ble sendt til behandlende enhet ${event.behandlendeEnhet}"
         }
     }
 }
