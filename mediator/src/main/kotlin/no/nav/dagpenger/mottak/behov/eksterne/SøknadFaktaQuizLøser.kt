@@ -9,6 +9,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.helse.rapids_rivers.asOptionalLocalDate
+import java.time.LocalDate
 import java.time.ZonedDateTime
 
 internal class SøknadFaktaQuizLøser(
@@ -59,14 +60,17 @@ internal class SøknadFaktaQuizLøser(
 }
 
 // Varighet på arbeidsforholdet (til dato) ?: Lønnspliktperiode for arbeidsgiver (til dato) ?: Arbeidstid redusert fra ?: Permitteringsperiode (fra dato)
-private fun SøknadFakta.sisteDagMedLønnEllerArbeidsplikt() = getFakta("arbeidsforhold").first()
-    .let {
+private fun SøknadFakta.sisteDagMedLønnEllerArbeidsplikt(): LocalDate {
+    if (getFakta("arbeidsforhold").isEmpty())
+        return getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()
+    return getFakta("arbeidsforhold").first().let {
         it["properties"]["datotil"]?.asOptionalLocalDate()
             ?: it["properties"]["lonnspliktigperiodedatotil"]?.asOptionalLocalDate()
             ?: it["properties"]["redusertfra"]?.asOptionalLocalDate()
             ?: getFakta("arbeidsforhold.permitteringsperiode")
                 .first()["properties"]["permiteringsperiodedatofra"].asLocalDate()
     }
+}
 
 private fun SøknadFakta.lærling() = getFakta("arbeidsforhold").any {
     it["properties"]?.get("laerling")?.asBoolean() ?: false
