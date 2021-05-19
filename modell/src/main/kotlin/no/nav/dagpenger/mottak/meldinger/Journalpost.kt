@@ -29,7 +29,7 @@ class Journalpost constructor(
     private val dokumenter: List<DokumentInfo>
 ) : Hendelse(aktivitetslogg) {
 
-    private val registrertDato: LocalDateTime = registrertDato.truncatedTo(ChronoUnit.MINUTES)
+    private val registrertDato: LocalDateTime = registrertDato.truncatedTo(ChronoUnit.MILLIS)
 
     internal companion object {
         val allKnownTypes = mapOf(
