@@ -15,7 +15,11 @@ internal class JoarkMottak(
 ) : River.PacketListener {
     private companion object {
         private val logg = KotlinLogging.logger {}
-        private val sikkerlogg = KotlinLogging.logger("tjenestekall.JoarkMottak")
+
+        private val forbudteMottaksKanaler = setOf<String>(
+            "EESSI",
+            "NAV_NO_CHAT"
+        )
     }
 
     init {
@@ -25,8 +29,9 @@ internal class JoarkMottak(
             validate { it.requireValue("temaNytt", "DAG") }
             validate { it.requireValue("hendelsesType", "MidlertidigJournalført") }
             validate {
-                it.require("mottaksKanal") { json ->
-                    if (json.asText() == "EESSI") throw IllegalArgumentException("Kan ikke håndtere 'EESSI' mottakskanal")
+                it.require("mottaksKanal") { mottaksKanal ->
+                    val kanal = mottaksKanal.asText()
+                    if (kanal in forbudteMottaksKanaler) throw IllegalArgumentException("Kan ikke håndtere '$kanal' mottakskanal")
                 }
             }
             validate { it.interestedIn("temaNytt", "hendelsesType", "mottaksKanal", "behandlingstema") }
@@ -36,11 +41,11 @@ internal class JoarkMottak(
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         logg.info(
             """Received journalpost with journalpost id: ${packet["journalpostId"].asText()} 
-                        |tema: ${packet["temaNytt"].asText()}, 
-                        |hendelsesType: ${packet["hendelsesType"].asText()}, 
-                        |mottakskanal, ${packet["mottaksKanal"].asText()}, 
-                        |behandlingstema: ${packet["behandlingstema"].asText()}
-                        |""".trimMargin()
+              |tema: ${packet["temaNytt"].asText()}, 
+              |hendelsesType: ${packet["hendelsesType"].asText()}, 
+              |mottakskanal, ${packet["mottaksKanal"].asText()}, 
+              |behandlingstema: ${packet["behandlingstema"].asText()}
+              |""".trimMargin()
         )
         val joarkHendelse = JoarkHendelse(
             aktivitetslogg = Aktivitetslogg(),
