@@ -6,6 +6,6 @@ import no.nav.dagpenger.mottak.Hendelse
 class ArenaOppgaveFeilet(
     aktivitetslogg: Aktivitetslogg,
     private val journalpostId: String
-) : Hendelse() {
+) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
 }

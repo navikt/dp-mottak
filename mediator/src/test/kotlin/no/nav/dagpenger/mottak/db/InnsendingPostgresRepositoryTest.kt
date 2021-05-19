@@ -19,7 +19,7 @@ import java.time.LocalDateTime
 
 internal class InnsendingPostgresRepositoryTest {
 
-    class TestVisotor(val innsending: Innsending) : InnsendingVisitor {
+    class TestVisitor(innsending: Innsending) : InnsendingVisitor {
 
         val forventetDokumenter = mutableListOf<Journalpost.DokumentInfo>()
         init {
@@ -50,7 +50,7 @@ internal class InnsendingPostgresRepositoryTest {
 
                 hent(journalpostId).also {
                     assertDeepEquals(innsending, it)
-                    assertEquals("NAV 04-01.03", TestVisotor(it!!).forventetDokumenter.hovedDokument().brevkode)
+                    assertEquals("NAV 04-01.03", TestVisitor(it!!).forventetDokumenter.hovedDokument().brevkode)
                 }
             }
         }
