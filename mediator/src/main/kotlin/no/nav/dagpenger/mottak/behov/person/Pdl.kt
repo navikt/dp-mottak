@@ -39,6 +39,7 @@ internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
         header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
         body = PersonQuery(id).toJson().also { sikkerLogg.info { "Forsøker å hente person med id $id fra PDL" } }
     }.let {
+        sikkerLogg.info { it }
         Pdl.Person.fromGraphQlJson(it)
     }
 }
