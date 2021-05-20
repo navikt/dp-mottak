@@ -25,6 +25,62 @@ internal class PersonDeserialiseringTest {
     }
 
     @Test
+    fun `Kaste exception hvis svar fra PDL inneholder feil`() {
+        //language=JSON
+        assertTrue(
+            hasError(
+                """
+               {
+                 "errors": [
+                   {
+                     "message": "Ikke tilgang til å se person",
+                     "locations": [
+                       {
+                         "line": 12,
+                         "column": 5
+                       }
+                     ],
+                     "path": [
+                       "hentGeografiskTilknytning"
+                     ],
+                     "extensions": {
+                       "code": "unauthorized",
+                       "classification": "ExecutionAborted"
+                     }
+                   }
+                 ],
+                 "data": {
+                   "hentPerson": {
+                     "navn": [
+                       {
+                         "fornavn": "DØLL",
+                         "mellomnavn": null,
+                         "etternavn": "MYGG"
+                       }
+                     ],
+                     "adressebeskyttelse": []
+                   },
+                   "hentGeografiskTilknytning": null,
+                   "hentIdenter": {
+                     "identer": [
+                       {
+                         "ident": "21341",
+                         "gruppe": "FOLKEREGISTERIDENT"
+                       },
+                       {
+                         "ident": "21341",
+                         "gruppe": "AKTORID"
+                       }
+                     ]
+                   }
+                 }
+               }
+                """.trimIndent()
+            )
+        )
+    }
+
+    @Test
     fun `Takler manglende mellom navn`() {
         assertEquals(
             "LITEN BRANNHYDRANT",

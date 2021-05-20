@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.features.DefaultRequest
@@ -39,9 +40,19 @@ internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
         header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
         body = PersonQuery(id).toJson().also { sikkerLogg.info { "Forsøker å hente person med id $id fra PDL" } }
     }.let {
-        sikkerLogg.info { it }
-        Pdl.Person.fromGraphQlJson(it)
+        if (hasError(it)) {
+            sikkerLogg.error { "Feil i person oppslag for person med id $id: $it" }
+            throw PdlPersondataOppslagException(it)
+        } else {
+            Pdl.Person.fromGraphQlJson(it)
+        }
     }
+}
+
+internal class PdlPersondataOppslagException(s: String) : Throwable(s)
+
+internal fun hasError(json: String): Boolean {
+    return !jacksonObjectMapper().readTree(json)["errors"].isEmpty
 }
 
 internal data class PersonQuery(val id: String) : GraphqlQuery(
