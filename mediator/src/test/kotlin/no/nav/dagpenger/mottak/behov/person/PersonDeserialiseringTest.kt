@@ -81,6 +81,44 @@ internal class PersonDeserialiseringTest {
     }
 
     @Test
+    fun `Kaste ikke kaste exception hvis svar fra PDL er OK`() {
+        //language=JSON
+        assertFalse(
+            hasError(
+                """
+               {
+                 "data": {
+                   "hentPerson": {
+                     "navn": [
+                       {
+                         "fornavn": "DØLL",
+                         "mellomnavn": null,
+                         "etternavn": "MYGG"
+                       }
+                     ],
+                     "adressebeskyttelse": []
+                   },
+                   "hentGeografiskTilknytning": null,
+                   "hentIdenter": {
+                     "identer": [
+                       {
+                         "ident": "21341",
+                         "gruppe": "FOLKEREGISTERIDENT"
+                       },
+                       {
+                         "ident": "21341",
+                         "gruppe": "AKTORID"
+                       }
+                     ]
+                   }
+                 }
+               }
+                """.trimIndent()
+            )
+        )
+    }
+
+    @Test
     fun `Takler manglende mellom navn`() {
         assertEquals(
             "LITEN BRANNHYDRANT",

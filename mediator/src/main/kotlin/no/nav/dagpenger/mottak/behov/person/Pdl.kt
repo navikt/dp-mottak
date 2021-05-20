@@ -52,7 +52,8 @@ internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
 internal class PdlPersondataOppslagException(s: String) : Throwable(s)
 
 internal fun hasError(json: String): Boolean {
-    return !jacksonObjectMapper().readTree(json)["errors"].isEmpty
+    val errors = jacksonObjectMapper().readTree(json)["errors"]
+    return (errors != null && !errors.isEmpty)
 }
 
 internal data class PersonQuery(val id: String) : GraphqlQuery(
