@@ -20,6 +20,7 @@ internal class SøknadFaktaQuizLøser(
 
     private companion object {
         val logger = KotlinLogging.logger { }
+        val sikkerlogg = KotlinLogging.logger("tjenestekall")
     }
 
     private val løserBehov = listOf(
@@ -44,26 +45,32 @@ internal class SøknadFaktaQuizLøser(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val søknad = søknadQuizOppslag.hentSøknad(packet["InnsendtSøknadsId"]["url"].asText())
-        packet["@løsning"] = packet["@behov"].map { it.asText() }.filter { it in løserBehov }.map { behov ->
-            behov to when (behov) {
-                "ØnskerDagpengerFraDato" ->
-                    søknad.ønskerDagpengerFraDato()
-                "Søknadstidspunkt" -> søknad.søknadstidspunkt()
-                "Verneplikt" -> søknad.verneplikt()
-                "FangstOgFiske" -> søknad.fangstOgFisk()
-                "EØSArbeid" -> søknad.harJobbetIeøsOmråde()
-                "SisteDagMedArbeidsplikt" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
-                "SisteDagMedLønn" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
-                "Lærling" -> søknad.lærling()
-                "Rettighetstype" -> søknad.rettighetstypeUtregning()
+        try {
+            val søknad = søknadQuizOppslag.hentSøknad(packet["InnsendtSøknadsId"]["url"].asText())
+            packet["@løsning"] = packet["@behov"].map { it.asText() }.filter { it in løserBehov }.map { behov ->
+                behov to when (behov) {
+                    "ØnskerDagpengerFraDato" ->
+                        søknad.ønskerDagpengerFraDato()
+                    "Søknadstidspunkt" -> søknad.søknadstidspunkt()
+                    "Verneplikt" -> søknad.verneplikt()
+                    "FangstOgFiske" -> søknad.fangstOgFisk()
+                    "EØSArbeid" -> søknad.harJobbetIeøsOmråde()
+                    "SisteDagMedArbeidsplikt" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
+                    "SisteDagMedLønn" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
+                    "Lærling" -> søknad.lærling()
+                    "Rettighetstype" -> søknad.rettighetstypeUtregning()
 
-                else -> throw IllegalArgumentException("Ukjent behov $behov")
-            }
-        }.toMap()
+                    else -> throw IllegalArgumentException("Ukjent behov $behov")
+                }
+            }.toMap()
 
-        context.publish(packet.toJson())
-        logger.info("løste søknadfakta-behov for innsendt søknad med id ${packet["InnsendtSøknadsId"]["url"].asText()}")
+            context.publish(packet.toJson())
+            logger.info("løste søknadfakta-behov for innsendt søknad med id ${packet["InnsendtSøknadsId"]["url"].asText()}")
+        } catch (e: Exception) {
+            // midlertig til vi klarer å nøste opp i det som faktisk får dette til å kræsje
+            logger.error { e }
+            sikkerlogg.error { "feil ved søknadfakta-behov, ${e.message}, packet: ${packet.toJson()}" }
+        }
     }
 }
 

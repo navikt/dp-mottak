@@ -319,7 +319,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                     mapOf(
                         "id" to internId,
                         "fnr" to fødselsnummer,
-                        "aktoerId" to aktørId,
+                        "aktoerId" to aktørId
                     )
                 )
             )
