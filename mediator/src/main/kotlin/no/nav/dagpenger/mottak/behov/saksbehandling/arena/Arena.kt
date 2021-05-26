@@ -93,6 +93,6 @@ internal data class OpprettArenaOppgaveParametere(
 )
 
 internal data class OpprettVedtakOppgaveResponse(
-    val fagsakId: String,
-    val oppgaveId: String?
+    val fagsakId: String?,
+    val oppgaveId: String
 )

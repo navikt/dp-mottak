@@ -18,14 +18,13 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 internal class InnsendingPostgresRepositoryTest {
-
     class TestVisitor(innsending: Innsending) : InnsendingVisitor {
-
         val forventetDokumenter = mutableListOf<Journalpost.DokumentInfo>()
-        init {
 
+        init {
             innsending.accept(this)
         }
+
         override fun visitJournalpost(
             journalpostId: String,
             journalpostStatus: String,
@@ -40,7 +39,6 @@ internal class InnsendingPostgresRepositoryTest {
 
     @Test
     fun `hent skal kunne hente innsending`() {
-
         val innsending = innsendingData.createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
@@ -146,7 +144,12 @@ internal class InnsendingPostgresRepositoryTest {
 
     @Test
     fun `Lagring der arena sak er null`() {
-        val innsending = innsendingData.copy(arenaSakData = InnsendingData.ArenaSakData(oppgaveId = null, fagsakId = "2234")).createInnsending()
+        val innsending = innsendingData.copy(
+            arenaSakData = InnsendingData.ArenaSakData(
+                oppgaveId = "2234",
+                fagsakId = null
+            )
+        ).createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
                 lagre(innsending).also {

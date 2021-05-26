@@ -30,8 +30,8 @@ internal class ArenaBehovLøserTest {
                     journalpostId: String,
                     parametere: OpprettArenaOppgaveParametere
                 ) = OpprettVedtakOppgaveResponse(
-                    fagsakId = "123",
-                    oppgaveId = null
+                    fagsakId = null,
+                    oppgaveId = "123"
                 )
             },
             rapidsConnection = testRapid
@@ -71,8 +71,8 @@ internal class ArenaBehovLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
-            assertEquals("123", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["fagsakId"].asText())
-            assertEquals(null, field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["oppgaveId"].textValue())
+            assertEquals(null, field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["fagsakId"].textValue())
+            assertEquals("123", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["oppgaveId"].asText())
             assertEquals(JOURNALPOST_ID, field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["journalpostId"].asText())
         }
     }

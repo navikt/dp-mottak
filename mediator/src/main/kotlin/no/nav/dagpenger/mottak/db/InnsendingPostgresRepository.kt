@@ -98,7 +98,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         },
                         arenaSakData = row.stringOrNull("fagsakId")?.let {
                             InnsendingData.ArenaSakData(
-                                oppgaveId = row.stringOrNull("oppgaveId"),
+                                oppgaveId = row.string("oppgaveId"),
                                 fagsakId = it
                             )
                         },
@@ -344,7 +344,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             )
         }
 
-        override fun visitArenaSak(oppgaveId: String?, fagsakId: String) {
+        override fun visitArenaSak(oppgaveId: String, fagsakId: String?) {
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
                     """

@@ -45,8 +45,8 @@ internal class OpprettArenaOppgaveMottak(
                 ArenaOppgaveOpprettet(
                     aktivitetslogg = Aktivitetslogg(),
                     journalpostId = journalpostId,
-                    oppgaveId = it.getOrNull("oppgaveId")?.asText(),
-                    fagsakId = it["fagsakId"].asText()
+                    oppgaveId = it["oppgaveId"].asText(),
+                    fagsakId = it.getOrNull("fagsakId")?.asText()
                 )
             }
 
