@@ -70,7 +70,7 @@ internal class SøknadFaktaQuizLøser(
         } catch (e: Exception) {
             // midlertig til vi klarer å nøste opp i det som faktisk får dette til å kræsje
             logger.error { e }
-            sikkerlogg.error { "feil ved søknadfakta-behov, ${e.message}, packet: ${packet.toJson()}" }
+            sikkerlogg.error { "feil ved søknadfakta-behov, ${e.stackTraceToString()} \n packet: ${packet.toJson()}" }
         }
     }
 }
