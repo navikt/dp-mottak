@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.behov.eksterne
 
+import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.SøknadFakta
@@ -9,9 +10,9 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDate
-import no.nav.helse.rapids_rivers.asOptionalLocalDate
 import java.time.LocalDate
 import java.time.ZonedDateTime
+import java.time.format.DateTimeParseException
 
 internal class SøknadFaktaQuizLøser(
     private val søknadQuizOppslag: SøknadQuizOppslag,
@@ -79,11 +80,19 @@ private fun SøknadFakta.sisteDagMedLønnEllerArbeidsplikt(): LocalDate {
     if (getFakta("arbeidsforhold").isEmpty())
         return getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()
     return getFakta("arbeidsforhold").first().let {
-        it["properties"]["datotil"]?.asOptionalLocalDate()
-            ?: it["properties"]["lonnspliktigperiodedatotil"]?.asOptionalLocalDate()
-            ?: it["properties"]["redusertfra"]?.asOptionalLocalDate()
+        localDateEllerNull(it["properties"]["datotil"])
+            ?: localDateEllerNull(it["properties"]["lonnspliktigperiodedatotil"])
+            ?: localDateEllerNull(it["properties"]["redusertfra"])
             ?: getFakta("arbeidsforhold.permitteringsperiode")
                 .first()["properties"]["permiteringsperiodedatofra"].asLocalDate()
+    }
+}
+
+private fun localDateEllerNull(jsonNode: JsonNode?): LocalDate? = jsonNode?.let {
+    try {
+        LocalDate.parse(jsonNode.asText())
+    } catch (e: DateTimeParseException) { // Optional datoer får noen ganger verdi “NaN-aN-aN”
+        null
     }
 }
 

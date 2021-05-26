@@ -40,8 +40,8 @@ internal class SøknadFaktaLøserTest {
             "Søknadstidspunkt:2020-03-19",
             "Verneplikt:false",
             "FangstOgFiske:true",
-            "SisteDagMedArbeidsplikt:2020-03-20",
-            "SisteDagMedLønn:2020-03-20",
+            "SisteDagMedArbeidsplikt:2020-03-23",
+            "SisteDagMedLønn:2020-03-23",
             "Lærling:true",
             "EØSArbeid:true"
         ],
@@ -62,7 +62,7 @@ internal class SøknadFaktaLøserTest {
 
         with(testRapid.inspektør) {
             assertEquals("true", field(0, "@løsning")["Lærling"].asText())
-            assertEquals("2020-03-20", field(0, "@løsning")["SisteDagMedArbeidsplikt"].asText())
+            assertEquals("2020-03-23", field(0, "@løsning")["SisteDagMedArbeidsplikt"].asText())
         }
     }
 
