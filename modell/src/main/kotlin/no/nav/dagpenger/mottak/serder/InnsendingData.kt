@@ -57,7 +57,7 @@ data class InnsendingData(
                         it.diskresjonskode
                     )
                 },
-                arenaSakData?.let { ArenaOppgaveOpprettet.ArenaSak(it.oppgaveId, it.fagsakId) },
+                arenaSakData?.takeIf { it.fagsakId != null }?.let { ArenaOppgaveOpprettet.ArenaSak(it.oppgaveId, it.fagsakId) },
                 aktivitetslogg.let(::konverterTilAktivitetslogg)
             )
     }
@@ -126,8 +126,8 @@ data class InnsendingData(
     }
 
     data class ArenaSakData(
-        val oppgaveId: String?,
-        val fagsakId: String
+        val oppgaveId: String,
+        val fagsakId: String?
     )
 
     data class PersonData(
