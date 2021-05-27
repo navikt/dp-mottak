@@ -75,10 +75,24 @@ internal class SøknadFaktaQuizLøser(
     }
 }
 
-// Varighet på arbeidsforholdet (til dato) ?: Lønnspliktperiode for arbeidsgiver (til dato) ?: Arbeidstid redusert fra ?: Permitteringsperiode (fra dato)
 private fun SøknadFakta.sisteDagMedLønnEllerArbeidsplikt(): LocalDate {
     if (getFakta("arbeidsforhold").isEmpty())
         return getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()
+    return when (avsluttetArbeidsforhold().first().sluttårsak) {
+        AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS -> sisteDagMedLønnKonkurs()
+        else -> sisteDagMedLønnEllerArbeidspliktResten()
+    }
+}
+
+private fun SøknadFakta.sisteDagMedLønnKonkurs(): LocalDate {
+    return getFakta("arbeidsforhold").first().let {
+        localDateEllerNull(it["properties"]["lonnkonkursmaaned_dato"])
+            ?: it["properties"]["konkursdato"].asLocalDate()
+    }
+}
+
+// Varighet på arbeidsforholdet (til dato) ?: Lønnspliktperiode for arbeidsgiver (til dato) ?: Arbeidstid redusert fra ?: Permitteringsperiode (fra dato)
+private fun SøknadFakta.sisteDagMedLønnEllerArbeidspliktResten(): LocalDate {
     return getFakta("arbeidsforhold").first().let {
         localDateEllerNull(it["properties"]["datotil"])
             ?: localDateEllerNull(it["properties"]["lonnspliktigperiodedatotil"])
