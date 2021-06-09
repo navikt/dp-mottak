@@ -70,7 +70,7 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
             )
         ).get(500, TimeUnit.MILLISECONDS)
 
-        logger.info { "Send ${message["@event_name"].asText()} til kafka for journalpostId $key" }
+        logger.info { "Send InnsendingFerdigstiltEvent til kafka for journalpostId $key" }
         sikkerLogger.info { message.toJson() }
     }
 
