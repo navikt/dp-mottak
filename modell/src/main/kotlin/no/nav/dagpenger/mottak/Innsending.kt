@@ -521,7 +521,7 @@ class Innsending private constructor(
         hendelse: Hendelse
     ) {
         val journalpost = requireNotNull(journalpost).kategorisertJournalpost()
-        val person = requireNotNull(person)
+        val person = requireNotNull(person) { "Krever at person er satt her. Mangler for journalpostId ${journalpostId()}" }
         val oppgavebenk = journalpost.oppgaveBenk(person)
         val parametre = mapOf(
             "fødselsnummer" to person.fødselsnummer,
