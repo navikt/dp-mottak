@@ -27,6 +27,7 @@ internal interface JournalpostFeil {
             "er ikke midlertidig journalf&oslash;rt"
         )
     }
+
     class JournalpostException(val statusCode: Int, val content: String?) : RuntimeException()
 
     fun ignorerKjenteTilstander(journalpostException: JournalpostException) {
@@ -36,9 +37,18 @@ internal interface JournalpostFeil {
                 val json = JsonMapper.jacksonJsonAdapter.readTree(journalpostException.content)
 
                 val feilmelding = json["message"].asText()
-                if (feilmelding in whitelistFeilmeldinger) {
-                    return
-                } else throw journalpostException
+
+                when {
+                    feilmelding in whitelistFeilmeldinger -> {
+                        return
+                    }
+                    whitelistFeilmeldinger.any { feilmelding.endsWith(it) } -> {
+                        return
+                    }
+                    else -> {
+                        throw journalpostException
+                    }
+                }
             }
         }
     }
