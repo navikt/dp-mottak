@@ -300,6 +300,7 @@ class Innsending private constructor(
             if (innsending.journalpostId() == "508854298") {
                 søknadsdata.warn("Journalpost uten registrert bruker")
                 innsending.tilstand(søknadsdata, UkjentBruker)
+                return
             }
             when (kategorisertJournalpost) {
                 is NySøknad -> innsending.tilstand(søknadsdata, AventerMinsteinntektVurdering)
