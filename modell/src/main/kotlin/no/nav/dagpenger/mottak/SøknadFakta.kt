@@ -45,7 +45,8 @@ data class AvsluttetArbeidsforhold(
         PERMITTERT,
         REDUSERT_ARBEIDSTID,
         SAGT_OPP_AV_ARBEIDSGIVER,
-        SAGT_OPP_SELV
+        SAGT_OPP_SELV,
+        IKKE_ENDRET
     }
 }
 
@@ -57,7 +58,8 @@ private fun asÅrsak(type: String): AvsluttetArbeidsforhold.Sluttårsak = when (
     "sagtoppavarbeidsgiver" -> AvsluttetArbeidsforhold.Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
     "sagtoppselv" -> AvsluttetArbeidsforhold.Sluttårsak.SAGT_OPP_SELV
     "arbeidsgivererkonkurs" -> AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS
-    else -> throw Exception("Missing permitteringstype")
+    "ikke-endret" -> AvsluttetArbeidsforhold.Sluttårsak.IKKE_ENDRET
+    else -> throw Exception("Missing permitteringstype: $type")
 }
 
 internal fun SøknadFakta.harInntektFraFangstOgFiske(): Boolean =
