@@ -2,8 +2,10 @@ package no.nav.dagpenger.mottak.behov.saksbehandling.arena
 
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
 import io.ktor.client.features.ClientRequestException
 import io.ktor.client.features.DefaultRequest
+import io.ktor.client.features.HttpTimeout
 import io.ktor.client.features.json.JacksonSerializer
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.request.header
@@ -15,6 +17,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.behov.JsonMapper
+import java.time.Duration
 import java.time.LocalDate
 
 internal interface ArenaOppslag {
@@ -33,9 +36,14 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
     private val tokenProvider = config.dpProxyTokenProvider
 
     private val baseUrl = "${config.dpProxyUrl()}/proxy/v1/arena"
-    private val proxyArenaClient = HttpClient() {
+    private val proxyArenaClient = HttpClient(engine = CIO.create { requestTimeout = Long.MAX_VALUE }) {
         install(DefaultRequest) {
             method = HttpMethod.Post
+        }
+        install(HttpTimeout) {
+            connectTimeoutMillis = Duration.ofSeconds(30).toMillis()
+            requestTimeoutMillis = Duration.ofSeconds(30).toMillis()
+            socketTimeoutMillis = Duration.ofSeconds(30).toMillis()
         }
         install(JsonFeature) {
             serializer = JacksonSerializer(jackson = JsonMapper.jacksonJsonAdapter)
