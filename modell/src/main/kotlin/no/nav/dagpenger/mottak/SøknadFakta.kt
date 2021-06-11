@@ -12,14 +12,19 @@ interface SøknadFakta {
 
 internal typealias AvsluttedeArbeidsforhold = List<AvsluttetArbeidsforhold>
 
+private fun avsluttedeArbeidsforhold(it: JsonNode) =
+    it["properties"]["type"].asText() != "ikke-endret"
+
 fun SøknadFakta.avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
-    return this.getFakta("arbeidsforhold").map {
-        AvsluttetArbeidsforhold(
-            sluttårsak = asÅrsak(it["properties"]["type"].asText()),
-            grensearbeider = !this.getBooleanFaktum("arbeidsforhold.grensearbeider", true),
-            fiskeforedling = it["properties"]["fangstogfiske"]?.asBoolean() ?: false
-        )
-    }
+    return this.getFakta("arbeidsforhold")
+        .filter { avsluttedeArbeidsforhold(it) }
+        .map {
+            AvsluttetArbeidsforhold(
+                sluttårsak = asÅrsak(it["properties"]["type"].asText()),
+                grensearbeider = !this.getBooleanFaktum("arbeidsforhold.grensearbeider", true),
+                fiskeforedling = it["properties"]["fangstogfiske"]?.asBoolean() ?: false
+            )
+        }
 }
 
 fun SøknadFakta.erGrenseArbeider(): Boolean =
@@ -45,8 +50,7 @@ data class AvsluttetArbeidsforhold(
         PERMITTERT,
         REDUSERT_ARBEIDSTID,
         SAGT_OPP_AV_ARBEIDSGIVER,
-        SAGT_OPP_SELV,
-        IKKE_ENDRET
+        SAGT_OPP_SELV
     }
 }
 
@@ -58,7 +62,6 @@ private fun asÅrsak(type: String): AvsluttetArbeidsforhold.Sluttårsak = when (
     "sagtoppavarbeidsgiver" -> AvsluttetArbeidsforhold.Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
     "sagtoppselv" -> AvsluttetArbeidsforhold.Sluttårsak.SAGT_OPP_SELV
     "arbeidsgivererkonkurs" -> AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS
-    "ikke-endret" -> AvsluttetArbeidsforhold.Sluttårsak.IKKE_ENDRET
     else -> throw Exception("Missing permitteringstype: $type")
 }
 
