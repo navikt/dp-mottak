@@ -84,10 +84,10 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
             val journalpostId = packet["journalpostId"].asText()
+            val behovNavn = packet["@behov"].first().asText()
 
             try {
                 runBlocking {
-                    val behovNavn = packet["@behov"].first().asText()
                     val oppgaveResponse = when (behovNavn) {
                         "OpprettVurderhenvendelseOppgave" -> arenaOppslag.opprettVurderHenvendelsOppgave(
                             journalpostId,
@@ -116,7 +116,13 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                 context.publish(packet.toJson())
             } catch (e: Exception) {
                 logger.error(e) { "Kunne ikke opprette arena sak med journalpostId $journalpostId" }
-                throw e
+                if(System.getenv().getOrDefault("NAIS_CLUSTER_NAME", "LOCAL") == "dev-gcp") {
+                    packet["@feil"] = behovNavn
+                    context.publish(packet.toJson())
+                } else {
+                    throw e
+                }
+
             }
         }
     }
