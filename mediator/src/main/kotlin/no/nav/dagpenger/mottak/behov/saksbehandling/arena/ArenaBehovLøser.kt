@@ -88,35 +88,28 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
             try {
                 runBlocking {
                     val behovNavn = packet["@behov"].first().asText()
+                    val oppgaveResponse = when (behovNavn) {
+                        "OpprettVurderhenvendelseOppgave" -> arenaOppslag.opprettVurderHenvendelsOppgave(
+                            journalpostId,
+                            packet.arenaOppgaveParametre()
+                        )
+                        "OpprettStartVedtakOppgave" -> arenaOppslag.opprettStartVedtakOppgave(
+                            journalpostId,
+                            packet.arenaOppgaveParametre()
+                        )
+                        else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
+                    }
 
-                    if (System.getenv()
-                        .getOrDefault("NAIS_CLUSTER_NAME", "LOCAL") == "dev-gcp" && journalpostId == "493795696"
-                    ) {
-                        packet["@feil"] = behovNavn
+                    if (oppgaveResponse != null) {
+                        packet["@løsning"] = mapOf(
+                            behovNavn to mapOf(
+                                "journalpostId" to journalpostId,
+                                "fagsakId" to oppgaveResponse.fagsakId,
+                                "oppgaveId" to oppgaveResponse.oppgaveId
+                            )
+                        )
                     } else {
-                        val oppgaveResponse = when (behovNavn) {
-                            "OpprettVurderhenvendelseOppgave" -> arenaOppslag.opprettVurderHenvendelsOppgave(
-                                journalpostId,
-                                packet.arenaOppgaveParametre()
-                            )
-                            "OpprettStartVedtakOppgave" -> arenaOppslag.opprettStartVedtakOppgave(
-                                journalpostId,
-                                packet.arenaOppgaveParametre()
-                            )
-                            else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
-                        }
-
-                        if (oppgaveResponse != null) {
-                            packet["@løsning"] = mapOf(
-                                behovNavn to mapOf(
-                                    "journalpostId" to journalpostId,
-                                    "fagsakId" to oppgaveResponse.fagsakId,
-                                    "oppgaveId" to oppgaveResponse.oppgaveId
-                                )
-                            )
-                        } else {
-                            packet["@feil"] = behovNavn
-                        }
+                        packet["@feil"] = behovNavn
                     }
                 }
 
