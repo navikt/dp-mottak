@@ -229,7 +229,7 @@ data class KlageOgAnkeForskudd(
         person: Person?
     ) = OppgaveBenk(
         beskrivelse = henvendelseNavn(),
-        id = "TODO!",
+        id = "4153",
         datoRegistrert = journalpost.datoRegistrert(),
         tilleggsinformasjon = tilleggsinformasjon()
     )
