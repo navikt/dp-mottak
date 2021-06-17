@@ -22,7 +22,8 @@ interface InnsendingObserver {
         KlageOgAnkeLønnskompensasjon,
         Ettersending,
         UkjentSkjemaKode,
-        UtenBruker
+        UtenBruker,
+        KlageOgAnkeForskudd
     }
 
     data class InnsendingEvent(

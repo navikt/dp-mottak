@@ -272,6 +272,7 @@ class Innsending private constructor(
                 is Ettersending -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
+                is KlageOgAnkeForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
             }
         }
     }
@@ -675,6 +676,7 @@ class Innsending private constructor(
         is UkjentSkjemaKode -> InnsendingObserver.Type.UkjentSkjemaKode
         is Utdanning -> InnsendingObserver.Type.Utdanning
         is UtenBruker -> InnsendingObserver.Type.UtenBruker
+        is KlageOgAnkeForskudd -> InnsendingObserver.Type.KlageOgAnkeForskudd
     }
 
     fun accept(visitor: InnsendingVisitor) {

@@ -1,0 +1,12 @@
+@startuml
+title 
+Innløpet – flyt for brevkode NAV 90-00.08-forskudd
+end title           
+[*]-->MottattType 
+MottattType --> AvventerJournalpostType
+AvventerJournalpostType --> AvventerPersondataType
+AvventerPersondataType --> KategoriseringType
+KategoriseringType --> AvventerGosysType
+AvventerGosysType --> InnsendingFerdigstiltType
+InnsendingFerdigstiltType--> [*]
+@enduml

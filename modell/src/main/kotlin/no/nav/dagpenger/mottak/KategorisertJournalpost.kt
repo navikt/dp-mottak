@@ -219,6 +219,22 @@ data class KlageOgAnkeLønnskompensasjon(
     )
 }
 
+data class KlageOgAnkeForskudd(
+    override val journalpost: Journalpost
+) : KategorisertJournalpost(journalpost) {
+    override fun henvendelseNavn(): String = "Klage og anke — Forskudd\n"
+    override fun finnOppgaveBenk(
+        søknadFakta: SøknadFakta?,
+        oppfyllerMinsteArbeidsinntekt: Boolean?,
+        person: Person?
+    ) = OppgaveBenk(
+        beskrivelse = henvendelseNavn(),
+        id = "TODO!",
+        datoRegistrert = journalpost.datoRegistrert(),
+        tilleggsinformasjon = tilleggsinformasjon()
+    )
+}
+
 data class Ettersending(
     override val journalpost: Journalpost
 ) : KategorisertJournalpost(journalpost) {

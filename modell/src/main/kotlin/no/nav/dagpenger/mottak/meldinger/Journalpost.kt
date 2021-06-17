@@ -8,6 +8,7 @@ import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.JournalpostVisitor
 import no.nav.dagpenger.mottak.KategorisertJournalpost
 import no.nav.dagpenger.mottak.KlageOgAnke
+import no.nav.dagpenger.mottak.KlageOgAnkeForskudd
 import no.nav.dagpenger.mottak.KlageOgAnkeLønnskompensasjon
 import no.nav.dagpenger.mottak.NySøknad
 import no.nav.dagpenger.mottak.SpesifikkKontekst
@@ -139,10 +140,13 @@ class Journalpost constructor(
 
     private fun klageOgAnkeType(
         journalpost: Journalpost
-    ) = if (this.behandlingstema == "ab0438") {
-        KlageOgAnkeLønnskompensasjon(journalpost)
-    } else KlageOgAnke(journalpost)
-
+    ): KategorisertJournalpost {
+        return when (journalpost.behandlingstema) {
+            "ab0438" -> KlageOgAnkeLønnskompensasjon(journalpost)
+            "TODO_FORSKUDD" -> KlageOgAnkeForskudd(journalpost)
+            else -> KlageOgAnke(journalpost)
+        }
+    }
     override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(
         "JournalpostData",
         mapOf(
