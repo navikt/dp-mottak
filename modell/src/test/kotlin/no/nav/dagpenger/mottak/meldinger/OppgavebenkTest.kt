@@ -180,6 +180,15 @@ class OppgavebenkTest {
         }
     }
 
+    @Test
+    fun `Finner riktig benk for klage og anke når behandligstema er feripenger dangper`() {
+        val jp = lagjournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0452").kategorisertJournalpost()
+        jp.oppgaveBenk(person = person, søknadFakta = null, oppfyllerMinsteArbeidsinntekt = null).also {
+            assertEquals("Klage og anke — Feriepenger\n", it.beskrivelse)
+            assertEquals("4156", it.id)
+        }
+    }
+
     @ParameterizedTest
     @ValueSource(strings = ["NAV 04-02.01", "NAVe 04-02.01", "NAV 04-02.03", "NAV 04-02.05", "NAVe 04-02.05"])
     fun `finner riktig benk for brevkoder som skal til utlandet`(brevkode: String) {

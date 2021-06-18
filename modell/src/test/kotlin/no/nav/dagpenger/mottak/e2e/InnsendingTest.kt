@@ -468,6 +468,41 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         assertPuml("$brevkode-forskudd")
     }
 
+    @Test
+    fun `skal håndtere klage og anke for feriepenger dagpenger`() {
+        val brevkode = "NAV 90-00.08"
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0452")
+        håndterPersonInformasjon()
+        håndterArenaOppgaveOpprettet()
+        håndterJournalpostOppdatert()
+        håndterJournalpostFerdigstilt()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            AventerArenaOppgaveType,
+            AvventerFerdigstillJournalpostType,
+            InnsendingFerdigstiltType
+        )
+        inspektør.also { it ->
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+        }
+
+        assertFerdigstilt {
+            assertEquals("KlageOgAnkeFeriepenger", it.type.name)
+            assertNotNull(it.aktørId)
+            assertNotNull(it.fødselsnummer)
+            assertNotNull(it.datoRegistrert)
+        }
+
+        assertPuml("$brevkode-feriepenger")
+    }
+
     @ParameterizedTest
     @ValueSource(
         strings = [

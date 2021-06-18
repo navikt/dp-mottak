@@ -23,7 +23,8 @@ interface InnsendingObserver {
         Ettersending,
         UkjentSkjemaKode,
         UtenBruker,
-        KlageOgAnkeForskudd
+        KlageOgAnkeForskudd,
+        KlageOgAnkeFeriepenger
     }
 
     data class InnsendingEvent(
