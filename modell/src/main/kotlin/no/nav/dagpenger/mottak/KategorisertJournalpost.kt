@@ -235,6 +235,22 @@ data class KlageOgAnkeForskudd(
     )
 }
 
+data class KlageOgAnkeFeriepenger(
+    override val journalpost: Journalpost
+) : KategorisertJournalpost(journalpost) {
+    override fun henvendelseNavn(): String = "Klage og anke — Feriepenger\n"
+    override fun finnOppgaveBenk(
+        søknadFakta: SøknadFakta?,
+        oppfyllerMinsteArbeidsinntekt: Boolean?,
+        person: Person?
+    ) = OppgaveBenk(
+        beskrivelse = henvendelseNavn(),
+        id = "4156",
+        datoRegistrert = journalpost.datoRegistrert(),
+        tilleggsinformasjon = tilleggsinformasjon()
+    )
+}
+
 data class Ettersending(
     override val journalpost: Journalpost
 ) : KategorisertJournalpost(journalpost) {
