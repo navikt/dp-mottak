@@ -163,7 +163,7 @@ data class NySøknad(
                 tilleggsinformasjon()
             )
         }
-        return fornyetRettEllerOrginal(søknadFakta, originalOppgavebenk)
+        return fornyetRettEllerOriginal(søknadFakta, originalOppgavebenk)
     }
 
     private fun finnEnhetForHurtigAvslag(person: Person?) = when (behandlendeEnhet(person)) {
@@ -182,7 +182,7 @@ data class Gjenopptak(
         søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
-    ) = fornyetRettEllerOrginal(søknadFakta, super.finnOppgaveBenk(søknadFakta, oppfyllerMinsteArbeidsinntekt, person))
+    ) = fornyetRettEllerOriginal(søknadFakta, super.finnOppgaveBenk(søknadFakta, oppfyllerMinsteArbeidsinntekt, person))
 }
 
 data class Utdanning(
@@ -219,6 +219,22 @@ data class KlageOgAnkeLønnskompensasjon(
     )
 }
 
+data class KlageOgAnkeForskudd(
+    override val journalpost: Journalpost
+) : KategorisertJournalpost(journalpost) {
+    override fun henvendelseNavn(): String = "Klage og anke — Forskudd\n"
+    override fun finnOppgaveBenk(
+        søknadFakta: SøknadFakta?,
+        oppfyllerMinsteArbeidsinntekt: Boolean?,
+        person: Person?
+    ) = OppgaveBenk(
+        beskrivelse = henvendelseNavn(),
+        id = "4153",
+        datoRegistrert = journalpost.datoRegistrert(),
+        tilleggsinformasjon = tilleggsinformasjon()
+    )
+}
+
 data class Ettersending(
     override val journalpost: Journalpost
 ) : KategorisertJournalpost(journalpost) {
@@ -237,7 +253,7 @@ data class UtenBruker(
     override fun henvendelseNavn(): String = "${journalpost.tittel()}\n"
 }
 
-private fun fornyetRettEllerOrginal(
+private fun fornyetRettEllerOriginal(
     søknadFakta: SøknadFakta?,
     originalOppgavebenk: KategorisertJournalpost.OppgaveBenk
 ): KategorisertJournalpost.OppgaveBenk {
