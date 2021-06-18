@@ -173,7 +173,7 @@ class OppgavebenkTest {
 
     @Test
     fun `Finner riktig benk for klage og anke når behandligstema er forskudd`() {
-        val jp = lagjournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "TODO_FORSKUDD").kategorisertJournalpost()
+        val jp = lagjournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0451").kategorisertJournalpost()
         jp.oppgaveBenk(person = person, søknadFakta = null, oppfyllerMinsteArbeidsinntekt = null).also {
             assertEquals("Klage og anke — Forskudd\n", it.beskrivelse)
             assertEquals("4153", it.id)

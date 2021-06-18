@@ -143,7 +143,7 @@ class Journalpost constructor(
     ): KategorisertJournalpost {
         return when (journalpost.behandlingstema) {
             "ab0438" -> KlageOgAnkeLønnskompensasjon(journalpost)
-            "TODO_FORSKUDD" -> KlageOgAnkeForskudd(journalpost)
+            "ab0451" -> KlageOgAnkeForskudd(journalpost)
             else -> KlageOgAnke(journalpost)
         }
     }

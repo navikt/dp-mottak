@@ -418,7 +418,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     fun `skal håndtere klage og anke for forskudd`() {
         val brevkode = "NAV 90-00.08"
         håndterJoarkHendelse()
-        håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "TODO_FORSKUDD")
+        håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0451")
         håndterPersonInformasjon()
         håndterGosysOppgaveOpprettet()
         håndterJournalpostOppdatert()
