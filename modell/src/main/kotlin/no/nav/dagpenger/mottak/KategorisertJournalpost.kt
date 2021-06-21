@@ -206,7 +206,7 @@ data class KlageOgAnke(
 data class KlageOgAnkeLønnskompensasjon(
     override val journalpost: Journalpost
 ) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String = "Klage og anke — Lønnskompensasjon\n"
+    override fun henvendelseNavn(): String = "Klage og anke - Lønnskompensasjon\n"
     override fun finnOppgaveBenk(
         søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
@@ -222,7 +222,7 @@ data class KlageOgAnkeLønnskompensasjon(
 data class KlageOgAnkeForskudd(
     override val journalpost: Journalpost
 ) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String = "Klage og anke — Forskudd\n"
+    override fun henvendelseNavn(): String = "Klage og anke - Forskudd\n"
     override fun finnOppgaveBenk(
         søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
@@ -238,7 +238,7 @@ data class KlageOgAnkeForskudd(
 data class KlageOgAnkeFeriepenger(
     override val journalpost: Journalpost
 ) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String = "Klage og anke — Feriepenger\n"
+    override fun henvendelseNavn(): String = "Klage og anke - Feriepenger\n"
     override fun finnOppgaveBenk(
         søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
