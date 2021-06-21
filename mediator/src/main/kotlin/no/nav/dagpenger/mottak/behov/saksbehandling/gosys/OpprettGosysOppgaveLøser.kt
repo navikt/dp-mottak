@@ -27,24 +27,28 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val journalpostId = packet["journalpostId"].asText()
-        try {
-            runBlocking {
-                gosysOppslag.opprettOppgave(
-                    packet.gosysOppgave()
-                )
-            }.also {
+        if(journalpostId != "493796219") {
 
-                packet["@løsning"] = mapOf(
-                    "OpprettGosysoppgave" to mapOf(
-                        "journalpostId" to journalpostId,
-                        "oppgaveId" to it
+            try {
+
+                runBlocking {
+                    gosysOppslag.opprettOppgave(
+                        packet.gosysOppgave()
                     )
-                )
-                context.publish(packet.toJson())
+                }.also {
+
+                    packet["@løsning"] = mapOf(
+                        "OpprettGosysoppgave" to mapOf(
+                            "journalpostId" to journalpostId,
+                            "oppgaveId" to it
+                        )
+                    )
+                    context.publish(packet.toJson())
+                }
+            } catch (e: Exception) {
+                logger.info { "Kunne ikke opprette gosys oppgave for journalpost med id $journalpostId" }
+                throw e
             }
-        } catch (e: Exception) {
-            logger.info { "Kunne ikke opprette gosys oppgave for journalpost med id $journalpostId" }
-            throw e
         }
     }
 }
