@@ -116,12 +116,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                 context.publish(packet.toJson())
             } catch (e: Exception) {
                 logger.error(e) { "Kunne ikke opprette arena sak med journalpostId $journalpostId" }
-                if (System.getenv().getOrDefault("NAIS_CLUSTER_NAME", "LOCAL") == "dev-gcp") {
-                    packet["@feil"] = behovNavn
-                    context.publish(packet.toJson())
-                } else {
-                    throw e
-                }
+                throw e
             }
         }
     }
