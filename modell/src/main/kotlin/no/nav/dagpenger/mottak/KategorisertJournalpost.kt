@@ -245,7 +245,7 @@ data class KlageOgAnkeFeriepenger(
         person: Person?
     ) = OppgaveBenk(
         beskrivelse = henvendelseNavn(),
-        id = "4156",
+        id = "4450",
         datoRegistrert = journalpost.datoRegistrert(),
         tilleggsinformasjon = tilleggsinformasjon()
     )
