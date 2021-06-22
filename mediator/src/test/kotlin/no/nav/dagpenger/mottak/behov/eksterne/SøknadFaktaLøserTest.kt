@@ -43,7 +43,11 @@ internal class SøknadFaktaLøserTest {
             "SisteDagMedArbeidsplikt:2020-03-23",
             "SisteDagMedLønn:2020-03-23",
             "Lærling:true",
-            "EØSArbeid:true"
+            "EØSArbeid:true",
+            "KanJobbeDeltid:true",
+            "KanJobbeHvorSomHelst:true",
+            "HelseTilAlleTyperJobb:true",
+            "VilligTilÅBytteYrke:true"
         ],
         delimiter = ':'
     )

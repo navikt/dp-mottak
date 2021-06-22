@@ -33,7 +33,11 @@ internal class SøknadFaktaQuizLøser(
         "SisteDagMedLønn",
         "Lærling",
         "EØSArbeid",
-        "Rettighetstype"
+        "Rettighetstype",
+        "KanJobbeDeltid",
+        "KanJobbeHvorSomHelst",
+        "HelseTilAlleTyperJobb",
+        "VilligTilÅBytteYrke"
     )
 
     init {
@@ -60,7 +64,10 @@ internal class SøknadFaktaQuizLøser(
                     "SisteDagMedLønn" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
                     "Lærling" -> søknad.lærling()
                     "Rettighetstype" -> søknad.rettighetstypeUtregning()
-
+                    "KanJobbeDeltid" -> søknad.kanJobbeDeltid()
+                    "KanJobbeHvorSomHelst" -> søknad.kanJobbeHvorSomHelst()
+                    "HelseTilAlleTyperJobb" -> søknad.helseTilAlleTyperJobb()
+                    "VilligTilÅBytteYrke" -> søknad.villigTilÅBytteYrke()
                     else -> throw IllegalArgumentException("Ukjent behov $behov")
                 }
             }.toMap()
@@ -128,6 +135,11 @@ private fun SøknadFakta.fangstOgFisk() = getBooleanFaktum("egennaering.fangstog
 private fun SøknadFakta.harJobbetIeøsOmråde() = getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
 
 private fun SøknadFakta.rettighetstypeUtregning(): List<Map<String, Boolean>> = rettighetstypeUtregning(this.avsluttetArbeidsforhold())
+
+private fun SøknadFakta.kanJobbeDeltid() = getBooleanFaktum("reellarbeidssoker.villigdeltid")
+private fun SøknadFakta.kanJobbeHvorSomHelst() = getBooleanFaktum("reellarbeidssoker.villigpendle")
+private fun SøknadFakta.helseTilAlleTyperJobb() = getBooleanFaktum("reellarbeidssoker.villighelse")
+private fun SøknadFakta.villigTilÅBytteYrke() = getBooleanFaktum("reellarbeidssoker.villigjobb")
 
 internal fun rettighetstypeUtregning(avsluttedeArbeidsforhold: List<AvsluttetArbeidsforhold>) =
     avsluttedeArbeidsforhold.map {
