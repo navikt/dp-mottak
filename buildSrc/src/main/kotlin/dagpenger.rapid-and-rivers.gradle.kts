@@ -15,6 +15,7 @@ dependencies {
 }
 
 tasks.withType<Jar>().configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes(mapOf("Main-Class" to application.mainClass.get()))
     }
