@@ -401,12 +401,7 @@ class Innsending private constructor(
         }
 
         override fun håndter(innsending: Innsending, gosysOppgave: GosysOppgaveOpprettet) {
-            if (innsending.journalpostId() == "510462843") {
-                gosysOppgave.warn("Spesialhåndterer denne journalposten, dnr vs fnr problemantikk")
-                innsending.tilstand(gosysOppgave, InnsendingFerdigStilt)
-            } else {
-                innsending.oppdatereJournalpost(gosysOppgave)
-            }
+            innsending.oppdatereJournalpost(gosysOppgave)
         }
 
         override fun håndter(innsending: Innsending, oppdatertJournalpost: JournalpostOppdatert) {
