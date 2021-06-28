@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.SøknadFakta
 import no.nav.dagpenger.mottak.erFornyetRettighet
 import no.nav.dagpenger.mottak.erGrenseArbeider
@@ -23,7 +24,7 @@ class OppgavebenkTest {
     private val person = PersonInformasjon.Person(
         "Test Navn",
         "12344",
-        "12345678901",
+        GENERERT_FØDSELSNUMMER,
         norskTilknytning = true,
         diskresjonskode = false
     )

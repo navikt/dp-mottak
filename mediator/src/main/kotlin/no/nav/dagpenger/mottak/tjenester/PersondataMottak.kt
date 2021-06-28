@@ -25,7 +25,7 @@ internal class PersondataMottak(
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-            validate { it.require(løsning, {}) }
+            validate { it.requireKey(løsning) }
             validate { it.requireKey("journalpostId") }
         }.register(this)
     }
@@ -41,7 +41,7 @@ internal class PersondataMottak(
                 aktivitetslogg = Aktivitetslogg(),
                 journalpostId = journalpostId,
                 aktørId = persondata["aktørId"].asText(),
-                fødselsnummer = persondata["fødselsnummer"].asText(),
+                ident = persondata["fødselsnummer"].asText(),
                 diskresjonskode = persondata["diskresjonskode"].textValue(),
                 navn = persondata["navn"].asText(),
                 norskTilknytning = persondata["norskTilknytning"].asBoolean()

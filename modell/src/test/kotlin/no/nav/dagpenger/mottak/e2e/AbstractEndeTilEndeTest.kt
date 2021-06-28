@@ -7,6 +7,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingTilstandType
+import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.ReplayFerdigstillEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
@@ -31,7 +32,6 @@ abstract class AbstractEndeTilEndeTest {
 
     protected companion object {
         private const val NAVN = "TEST TESTEN"
-        private const val UNG_PERSON_FNR_2018 = "12020052345"
         private const val AKTØRID = "42"
         private const val JOURNALPOST_ID = "12345"
         private val mapper: ObjectMapper = jacksonObjectMapper()
@@ -197,7 +197,7 @@ abstract class AbstractEndeTilEndeTest {
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
         aktørId = AKTØRID,
-        fødselsnummer = UNG_PERSON_FNR_2018,
+        ident = GENERERT_FØDSELSNUMMER,
         norskTilknytning = true,
         navn = NAVN
     )

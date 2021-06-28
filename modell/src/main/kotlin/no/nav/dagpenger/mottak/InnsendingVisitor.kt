@@ -21,7 +21,7 @@ interface SøknadVisitor {
 }
 
 interface PersonVisitor {
-    fun visitPerson(navn: String, aktørId: String, fødselsnummer: String, norskTilknytning: Boolean, diskresjonskode: Boolean) {}
+    fun visitPerson(navn: String, aktørId: String, ident: String, norskTilknytning: Boolean, diskresjonskode: Boolean) {}
 }
 
 interface ArenaSakVisitor {

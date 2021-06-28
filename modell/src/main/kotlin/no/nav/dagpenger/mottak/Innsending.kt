@@ -65,7 +65,12 @@ class Innsending private constructor(
     fun håndter(personInformasjon: PersonInformasjon) {
         if (journalpostId != personInformasjon.journalpostId()) return
         kontekst(personInformasjon, "Mottatt informasjon om person")
-        tilstand.håndter(this, personInformasjon)
+        if (personInformasjon.validate()) {
+            tilstand.håndter(this, personInformasjon)
+        } else {
+            personInformasjon.warn("PersonInformasjon mottat er ikke gyldig")
+            håndter(PersonInformasjonIkkeFunnet(personInformasjon.aktivitetslogg, personInformasjon.journalpostId()))
+        }
     }
 
     fun håndter(personInformasjonIkkeFunnet: PersonInformasjonIkkeFunnet) {
@@ -495,7 +500,7 @@ class Innsending private constructor(
             requireNotNull(person) { "Person må eksistere på innsending ved behov ${Behovtype.EksisterendeSaker.name}" }
         hendelse.behov(
             Behovtype.EksisterendeSaker, "Trenger opplysninger om eksisterende saker",
-            mapOf("fnr" to person.fødselsnummer)
+            mapOf("fnr" to person.ident)
         )
     }
 
@@ -505,7 +510,7 @@ class Innsending private constructor(
         val person = requireNotNull(person)
         val oppgavebenk = journalpost.oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt)
         val parametre = mapOf(
-            "fødselsnummer" to person.fødselsnummer,
+            "fødselsnummer" to person.ident,
             "aktørId" to person.aktørId,
             "behandlendeEnhetId" to oppgavebenk.id,
             "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
@@ -526,7 +531,7 @@ class Innsending private constructor(
         val person = requireNotNull(person) { "Krever at person er satt her. Mangler for journalpostId ${journalpostId()}" }
         val oppgavebenk = journalpost.oppgaveBenk(person)
         val parametre = mapOf(
-            "fødselsnummer" to person.fødselsnummer,
+            "fødselsnummer" to person.ident,
             "aktørId" to person.aktørId,
             "behandlendeEnhetId" to oppgavebenk.id,
             "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
@@ -547,7 +552,7 @@ class Innsending private constructor(
         val arenaSakId = arenaSak?.fagsakId?.let { mapOf("fagsakId" to it) } ?: emptyMap()
         val parametre = mapOf(
             "aktørId" to person.aktørId,
-            "fødselsnummer" to person.fødselsnummer,
+            "fødselsnummer" to person.ident,
             "navn" to person.navn,
             "tittel" to journalpost.tittel(),
             "dokumenter" to journalpost.dokumenter().map {
@@ -576,7 +581,7 @@ class Innsending private constructor(
         val oppgavebenk = journalpost.oppgaveBenk(person)
         val person = person?.let {
             mapOf(
-                "fødselsnummer" to it.fødselsnummer,
+                "fødselsnummer" to it.ident,
                 "aktørId" to it.aktørId
             )
         } ?: emptyMap()
@@ -636,7 +641,7 @@ class Innsending private constructor(
             skjemaKode = jp.hovedskjema(),
             journalpostId = journalpostId,
             aktørId = person?.aktørId,
-            fødselsnummer = person?.fødselsnummer,
+            fødselsnummer = person?.ident,
             fagsakId = arenaSak?.fagsakId,
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = søknad?.data,
@@ -655,7 +660,7 @@ class Innsending private constructor(
             skjemaKode = jp.hovedskjema(),
             journalpostId = journalpostId,
             aktørId = person?.aktørId,
-            fødselsnummer = person?.fødselsnummer,
+            fødselsnummer = person?.ident,
             fagsakId = null,
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = søknad?.data,

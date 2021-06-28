@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.serder
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.serder.InnsendingData.AktivitetsloggData
 import no.nav.dagpenger.mottak.serder.InnsendingData.ArenaSakData
 import no.nav.dagpenger.mottak.serder.InnsendingData.JournalpostData
@@ -16,7 +17,7 @@ import java.time.LocalDateTime
 internal class InnsendingDataTest {
     private val journalpostId = "ertyu"
     private val journalpostStatus = "aktiv"
-    private val fnr = "12345678910"
+    private val fnr = GENERERT_FØDSELSNUMMER
     private val registrertdato = LocalDateTime.now()
     private val dokumenter = listOf(
         DokumentInfoData(

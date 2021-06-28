@@ -1,8 +1,8 @@
 package no.nav.dagpenger.mottak.e2e
 
-import no.finn.unleash.FakeUnleash
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.InnsendingTilstandType
+import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresTestHelper
 import no.nav.dagpenger.mottak.db.runMigration
@@ -25,7 +25,6 @@ internal class MediatorE2ETest {
         runMigration(PostgresTestHelper.dataSource)
     }
     private val testObservatør = TestObservatør()
-    private val fakeUnleash = FakeUnleash().also { it.enableAll() }
     private val innsendingMediator = InnsendingMediator(
         innsendingRepository = innsendingRepository,
         rapidsConnection = testRapid,
@@ -191,7 +190,7 @@ internal class MediatorE2ETest {
             "Persondata": {
               "navn": "Test Testen",
               "aktørId": "tadda",
-              "fødselsnummer": "12345678910",
+              "fødselsnummer": "$GENERERT_FØDSELSNUMMER",
               "norskTilknytning": true,
               "diskresjonskode": null
             }

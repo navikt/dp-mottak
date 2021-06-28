@@ -10,7 +10,7 @@ internal class SkjemaTest {
     @Test
     fun `riktig anntall migreringer`() {
         withCleanDb {
-            assertEquals(6, runMigration(dataSource))
+            assertEquals(7, runMigration(dataSource))
         }
     }
 }

@@ -6,8 +6,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.TestApplicationRequest
 import io.ktor.server.testing.handleRequest
 import io.ktor.server.testing.withTestApplication
-import io.ktor.util.InternalAPI
-import io.ktor.util.encodeBase64
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -20,6 +18,7 @@ import org.apache.kafka.clients.producer.MockProducer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import java.util.Base64
 
 internal class InnsendingApiTest {
 
@@ -71,10 +70,9 @@ internal class InnsendingApiTest {
         }
     }
 
-    @OptIn(InternalAPI::class)
     private fun withAuth(): TestApplicationRequest.() -> Unit = {
         val up = "${okCredential.first}:${okCredential.second}"
-        val encoded = up.toByteArray(Charsets.ISO_8859_1).encodeBase64()
+        val encoded = String(Base64.getEncoder().encode(up.toByteArray(Charsets.ISO_8859_1)))
         addHeader(HttpHeaders.Authorization, "Basic $encoded")
     }
 }

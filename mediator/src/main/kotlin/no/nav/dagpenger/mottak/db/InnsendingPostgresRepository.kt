@@ -43,7 +43,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             person_innsending.navn                    as "navn",
             person_innsending.diskresjonskode         as "diskresjonsKode",
             person_innsending.norsktilknytning        as "norsktilknytning",
-            person.fødselsnummer                      as "fødselsnummer",
+            person.ident                              as "ident",
             person.aktørid                            as "aktørid",
             aktivitetslogg.data                       as "aktivitetslogg"
      from innsending_v1 as innsending
@@ -87,11 +87,11 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         },
                         oppfyllerMinsteArbeidsinntekt = row.booleanOrNull("oppfyllerMinsteArbeidsinntekt"),
                         eksisterendeSaker = row.booleanOrNull("harEksisterendeSaker"),
-                        personData = row.stringOrNull("fødselsnummer")?.let {
+                        personData = row.stringOrNull("ident")?.let {
                             InnsendingData.PersonData(
                                 navn = row.string("navn"),
                                 aktørId = row.string("aktørId"),
-                                fødselsnummer = row.string("fødselsnummer"),
+                                fødselsnummer = row.string("ident"),
                                 norskTilknytning = row.boolean("norsktilknytning"),
                                 diskresjonskode = row.boolean("diskresjonskode")
                             )
@@ -158,7 +158,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         }
         val visitor = InnsendingQueryVisitor(innsending, internId)
         return using(sessionOf(datasource)) { session ->
-            session.transaction { tx -> visitor.lagreQueries.map { tx.run(it.asUpdate) }.sum() }
+            session.transaction { tx -> visitor.lagreQueries.sumOf { tx.run(it.asUpdate) } }
         }
     }
 
@@ -304,7 +304,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         override fun visitPerson(
             navn: String,
             aktørId: String,
-            fødselsnummer: String,
+            ident: String,
             norskTilknytning: Boolean,
             diskresjonskode: Boolean
         ) {
@@ -312,13 +312,13 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
                     """
-                       INSERT INTO person_v1(fødselsnummer,aktørId)
-                        VALUES(:fnr,:aktoerId) 
+                       INSERT INTO person_v1(ident, aktørId)
+                        VALUES(:ident,:aktoerId) 
                         ON CONFLICT DO NOTHING
                         """.trimMargin(),
                     mapOf(
                         "id" to internId,
-                        "fnr" to fødselsnummer,
+                        "ident" to ident,
                         "aktoerId" to aktørId
                     )
                 )
@@ -329,12 +329,12 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                     """
                         INSERT INTO person_innsending_v1(id,navn,personId,norsktilknytning,diskresjonskode) 
                         SELECT :id, :navn, id, :norskTilknytning, :diskresjonskode
-                        FROM public.person_v1 WHERE fødselsnummer = :fnr 
+                        FROM public.person_v1 WHERE ident = :ident 
                         AND aktørid = :aktoerId ON CONFLICT DO NOTHING 
                         """.trimMargin(),
                     mapOf(
                         "id" to internId,
-                        "fnr" to fødselsnummer,
+                        "ident" to ident,
                         "navn" to navn,
                         "aktoerId" to aktørId,
                         "norskTilknytning" to norskTilknytning,
