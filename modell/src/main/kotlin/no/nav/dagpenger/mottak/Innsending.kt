@@ -481,7 +481,7 @@ class Innsending private constructor(
 
     private fun trengerMinsteinntektVurdering(hendelse: Hendelse) {
         val person =
-            requireNotNull(person) { "Person må eksistere på innsending ved behov ${Behovtype.MinsteinntektVurdering.name}" }
+            requireNotNull(person) { "Person må eksistere på innsending ved behov ${Behovtype.MinsteinntektVurdering.name}, journalpostId: ${journalpostId()}" }
         hendelse.behov(
             Behovtype.MinsteinntektVurdering, "Trenger vurdering av minste arbeidsinntekt",
             mapOf(
