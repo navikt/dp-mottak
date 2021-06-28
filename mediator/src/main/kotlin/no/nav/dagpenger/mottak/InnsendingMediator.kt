@@ -15,6 +15,7 @@ import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import no.nav.helse.rapids_rivers.RapidsConnection
+import org.slf4j.MDC
 
 private val log = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall")
@@ -103,10 +104,15 @@ internal class InnsendingMediator(
     }
 
     private fun håndter(hendelse: Hendelse, handler: (Innsending) -> Unit) {
-        innsending(hendelse).also { innsending ->
-            observatører.forEach { innsending.addObserver(it) }
-            handler(innsending)
-            finalize(innsending, hendelse)
+        try {
+            MDC.put("journalpostId", hendelse.journalpostId())
+            innsending(hendelse).also { innsending ->
+                observatører.forEach { innsending.addObserver(it) }
+                handler(innsending)
+                finalize(innsending, hendelse)
+            }
+        } finally {
+            MDC.clear()
         }
     }
 
