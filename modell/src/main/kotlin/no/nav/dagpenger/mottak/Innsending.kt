@@ -542,7 +542,7 @@ class Innsending private constructor(
     }
 
     private fun oppdatereJournalpost(hendelse: Hendelse) {
-        val person = requireNotNull(person) { "Krever at person er satt her" }
+        val person = requireNotNull(person) { "Krever at person er satt her, $journalpostId" }
         val journalpost = requireNotNull(journalpost) { "Krever at journalpost her" }
         val arenaSakId = arenaSak?.fagsakId?.let { mapOf("fagsakId" to it) } ?: emptyMap()
         val parametre = mapOf(
