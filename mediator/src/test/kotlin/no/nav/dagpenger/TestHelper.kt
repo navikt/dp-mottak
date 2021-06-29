@@ -1,12 +1,15 @@
 package no.nav.dagpenger
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.dagpenger.mottak.PersonTestData.GENERERT_DNUMMER
+import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.serder.InnsendingData
 import java.time.LocalDateTime
 
 internal val journalpostId = "187689"
 internal val journalpostStatus = "aktiv"
-internal val fnr = "12345678910"
+internal val fnr = GENERERT_FØDSELSNUMMER
+internal val dnr = GENERERT_DNUMMER
 internal val registrertdato = LocalDateTime.now()
 private val dokumenter = listOf(
     InnsendingData.JournalpostData.DokumentInfoData(
