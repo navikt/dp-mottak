@@ -52,7 +52,7 @@ Forutsetninger:
 
 
 ```shell
-curl -X PUT -u <bruker>:<passord> http://dp-mottak.dev.intern.no/internal/replay/<journalpostId>
+curl -X PUT -u <bruker>:<passord> https://dp-mottak.dev.intern.nav.no/internal/replay/<journalpostId>
 ```
 
 hente bruker:
