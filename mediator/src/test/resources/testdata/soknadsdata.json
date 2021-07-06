@@ -76,6 +76,13 @@
           "key": "barnetillegg",
           "value": "true",
           "systemEgenskap": 0
+        },
+        {
+          "key": "fornyetrett",
+          "value": "true",
+          "faktumId": 869271,
+          "soknadId": 12024,
+          "systemEgenskap": 0
         }
       ],
       "properties": {
@@ -85,6 +92,7 @@
         "reellarbeidssoker": "true",
         "barnetillegg": "true",
         "egennaering": "true",
+        "fornyetrett": "true",
         "arbeidsforhold": "true",
         "ytelser": "true",
         "verneplikt": "true"
@@ -422,6 +430,16 @@
       "faktumEgenskaper": [],
       "properties": {},
       "type": "BRUKERREGISTRERT"
+    },
+    {
+      "key": "fornyetrett.bruktopp",
+      "type": "BRUKERREGISTRERT",
+      "value": "true",
+      "faktumId": 778469,
+      "soknadId": 10636,
+      "properties": {},
+      "parrentFaktum": null,
+      "faktumEgenskaper": []
     },
     {
       "faktumId": 776469,

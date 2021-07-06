@@ -47,7 +47,8 @@ internal class SøknadFaktaLøserTest {
             "KanJobbeDeltid:true",
             "KanJobbeHvorSomHelst:true",
             "HelseTilAlleTyperJobb:true",
-            "VilligTilÅBytteYrke:true"
+            "VilligTilÅBytteYrke:true",
+            "FortsattRettKorona:true"
         ],
         delimiter = ':'
     )
@@ -60,7 +61,7 @@ internal class SøknadFaktaLøserTest {
     }
 
     @Test
-    fun `besvarer medlinger med flere behov enn ett`() {
+    fun `besvarer meldinger med flere behov enn ett`() {
         testRapid.sendTestMessage(meldingMedFlereBehov())
         assertEquals(1, testRapid.inspektør.size)
 
