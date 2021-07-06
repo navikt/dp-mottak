@@ -136,13 +136,14 @@ private fun SøknadFakta.fangstOgFisk() = getBooleanFaktum("egennaering.fangstog
 // omvendt logikk i søknad; verdi == true --> søker har ikke jobbet i EØS området
 private fun SøknadFakta.harJobbetIeøsOmråde() = getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
 
+private fun SøknadFakta.fortsattRettKorona() = getBooleanFaktum("fornyetrett.bruktopp").not()
+
 private fun SøknadFakta.rettighetstypeUtregning(): List<Map<String, Boolean>> = rettighetstypeUtregning(this.avsluttetArbeidsforhold())
 
 private fun SøknadFakta.kanJobbeDeltid() = getBooleanFaktum("reellarbeidssoker.villigdeltid")
 private fun SøknadFakta.kanJobbeHvorSomHelst() = getBooleanFaktum("reellarbeidssoker.villigpendle")
 private fun SøknadFakta.helseTilAlleTyperJobb() = getBooleanFaktum("reellarbeidssoker.villighelse")
 private fun SøknadFakta.villigTilÅBytteYrke() = getBooleanFaktum("reellarbeidssoker.villigjobb")
-private fun SøknadFakta.fortsattRettKorona() = getBooleanFaktum("fornyetrett.bruktopp")
 
 internal fun rettighetstypeUtregning(avsluttedeArbeidsforhold: List<AvsluttetArbeidsforhold>) =
     avsluttedeArbeidsforhold.map {

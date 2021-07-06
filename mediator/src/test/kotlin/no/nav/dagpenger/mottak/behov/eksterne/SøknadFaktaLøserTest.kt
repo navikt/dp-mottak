@@ -48,7 +48,7 @@ internal class SøknadFaktaLøserTest {
             "KanJobbeHvorSomHelst:true",
             "HelseTilAlleTyperJobb:true",
             "VilligTilÅBytteYrke:true",
-            "FortsattRettKorona:true"
+            "FortsattRettKorona:false"
         ],
         delimiter = ':'
     )
