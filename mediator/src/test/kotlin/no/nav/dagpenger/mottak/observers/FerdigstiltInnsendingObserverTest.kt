@@ -56,6 +56,7 @@ internal class FerdigstiltInnsendingObserverTest {
         assertNotNull(message["datoRegistrert"].asText())
         assertNotNull(message["søknadsData"].asText())
         assertNotNull(message["fagsakId"].asText())
+        assertNotNull(message["skjemaKode"].asText())
     }
 
     @Test

@@ -86,6 +86,7 @@ private fun InnsendingObserver.InnsendingEvent.toPayload() =
         "@opprettet" to LocalDateTime.now(),
         "journalpostId" to journalpostId,
         "datoRegistrert" to datoRegistrert,
+        "skjemaKode" to skjemaKode,
         "type" to type.name
     ).apply {
         fødselsnummer?.let { set("fødselsnummer", it) }
