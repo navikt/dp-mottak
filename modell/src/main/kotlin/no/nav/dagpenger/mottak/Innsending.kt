@@ -647,7 +647,8 @@ class Innsending private constructor(
             søknadsData = søknad?.data,
             behandlendeEnhet = jp.kategorisertJournalpost()
                 .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id,
-            oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt
+            oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt,
+            tittel = jp.hovedDokument().tittel
         ).also { ferdig ->
             observers.forEach { it.innsendingFerdigstilt(ferdig) }
         }
@@ -666,7 +667,8 @@ class Innsending private constructor(
             søknadsData = søknad?.data,
             behandlendeEnhet = jp.kategorisertJournalpost()
                 .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id,
-            oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt
+            oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt,
+            tittel = jp.hovedDokument().tittel
         ).also { mottatt ->
             observers.forEach { it.innsendingMottatt(mottatt) }
         }

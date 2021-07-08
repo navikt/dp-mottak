@@ -34,6 +34,8 @@ internal class FerdigstiltInnsendingObserverTest {
         assertNotNull(message["datoRegistrert"].asText())
         assertNotNull(message["søknadsData"].asText())
         assertNotNull(message["fagsakId"].asText())
+        assertNotNull(message["skjemaKode"].asText())
+        assertNotNull(message["tittel"].asText())
     }
 
     @Test
@@ -57,6 +59,7 @@ internal class FerdigstiltInnsendingObserverTest {
         assertNotNull(message["søknadsData"].asText())
         assertNotNull(message["fagsakId"].asText())
         assertNotNull(message["skjemaKode"].asText())
+        assertNotNull(message["tittel"].asText())
     }
 
     @Test
@@ -102,6 +105,7 @@ internal class FerdigstiltInnsendingObserverTest {
                 it.put("test", "test")
             },
             behandlendeEnhet = "Tadda",
-            oppfyllerMinsteinntektArbeidsinntekt = false
+            oppfyllerMinsteinntektArbeidsinntekt = false,
+            tittel = "Tittel"
         )
 }

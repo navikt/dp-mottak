@@ -38,6 +38,7 @@ interface InnsendingObserver {
         val søknadsData: JsonNode?,
         val behandlendeEnhet: String,
         val oppfyllerMinsteinntektArbeidsinntekt: Boolean?,
+        val tittel: String,
     )
 
     fun tilstandEndret(event: InnsendingEndretTilstandEvent) {}

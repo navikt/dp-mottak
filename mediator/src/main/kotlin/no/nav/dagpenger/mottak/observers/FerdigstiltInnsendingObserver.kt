@@ -87,6 +87,7 @@ private fun InnsendingObserver.InnsendingEvent.toPayload() =
         "journalpostId" to journalpostId,
         "datoRegistrert" to datoRegistrert,
         "skjemaKode" to skjemaKode,
+        "tittel" to tittel,
         "type" to type.name
     ).apply {
         fødselsnummer?.let { set("fødselsnummer", it) }
