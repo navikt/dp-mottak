@@ -48,7 +48,8 @@ internal class SøknadFaktaLøserTest {
             "KanJobbeHvorSomHelst:true",
             "HelseTilAlleTyperJobb:true",
             "VilligTilÅBytteYrke:true",
-            "FortsattRettKorona:false"
+            "FortsattRettKorona:false",
+            "JobbetUtenforNorge:true"
         ],
         delimiter = ':'
     )
@@ -77,8 +78,9 @@ internal class SøknadFaktaLøserTest {
             listOf<AvsluttetArbeidsforhold>(
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.ARBEIDSGIVER_KONKURS,
+                    grensearbeider = true,
                     fiskeforedling = false,
-                    grensearbeider = true
+                    land = "NOR"
                 )
             )
         ).also {
@@ -93,8 +95,9 @@ internal class SøknadFaktaLøserTest {
             listOf<AvsluttetArbeidsforhold>(
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.PERMITTERT,
+                    grensearbeider = false,
                     fiskeforedling = true,
-                    grensearbeider = false
+                    land = "NOR"
                 )
             )
         ).also {
@@ -109,8 +112,9 @@ internal class SøknadFaktaLøserTest {
             listOf<AvsluttetArbeidsforhold>(
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.PERMITTERT,
+                    grensearbeider = false,
                     fiskeforedling = false,
-                    grensearbeider = false
+                    land = "NOR"
                 )
             )
         ).also {
@@ -125,8 +129,9 @@ internal class SøknadFaktaLøserTest {
             listOf<AvsluttetArbeidsforhold>(
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER,
+                    grensearbeider = true,
                     fiskeforedling = false,
-                    grensearbeider = true
+                    land = "NOR"
                 )
             )
         ).also {
@@ -141,13 +146,15 @@ internal class SøknadFaktaLøserTest {
             listOf<AvsluttetArbeidsforhold>(
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER,
+                    grensearbeider = false,
                     fiskeforedling = false,
-                    grensearbeider = false
+                    land = "NOR"
                 ),
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.PERMITTERT,
+                    grensearbeider = false,
                     fiskeforedling = false,
-                    grensearbeider = false
+                    land = "NOR"
                 )
             )
         ).also {

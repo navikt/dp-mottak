@@ -38,7 +38,8 @@ internal class SøknadFaktaQuizLøser(
         "KanJobbeHvorSomHelst",
         "HelseTilAlleTyperJobb",
         "VilligTilÅBytteYrke",
-        "FortsattRettKorona"
+        "FortsattRettKorona",
+        "JobbetUtenforNorge"
     )
 
     init {
@@ -70,6 +71,7 @@ internal class SøknadFaktaQuizLøser(
                     "HelseTilAlleTyperJobb" -> søknad.helseTilAlleTyperJobb()
                     "VilligTilÅBytteYrke" -> søknad.villigTilÅBytteYrke()
                     "FortsattRettKorona" -> søknad.fortsattRettKorona()
+                    "JobbetUtenforNorge" -> søknad.jobbetUtenforNorge()
                     else -> throw IllegalArgumentException("Ukjent behov $behov")
                 }
             }.toMap()
@@ -135,6 +137,8 @@ private fun SøknadFakta.fangstOgFisk() = getBooleanFaktum("egennaering.fangstog
 
 // omvendt logikk i søknad; verdi == true --> søker har ikke jobbet i EØS området
 private fun SøknadFakta.harJobbetIeøsOmråde() = getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
+
+private fun SøknadFakta.jobbetUtenforNorge() = this.avsluttetArbeidsforhold().any { it.land != "NOR" }
 
 private fun SøknadFakta.fortsattRettKorona() = getBooleanFaktum("fornyetrett.bruktopp").not()
 
