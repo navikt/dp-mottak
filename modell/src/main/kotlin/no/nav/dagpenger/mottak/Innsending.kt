@@ -305,7 +305,7 @@ class Innsending private constructor(
             søknadsdata.info("Fikk Søknadsdata for ${kategorisertJournalpost.javaClass.simpleName}")
             innsending.søknad = søknadsdata.søknad()
 
-            if (innsending.journalpostId() == "512787291") {
+            if (innsending.journalpostId() == "510535172") {
                 søknadsdata.warn("Journalpost uten registrert bruker")
                 innsending.tilstand(søknadsdata, UkjentBruker)
             }
