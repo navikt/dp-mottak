@@ -84,36 +84,41 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
             val journalpostId = packet["journalpostId"].asText()
-            val behovNavn = packet["@behov"].first().asText()
 
             try {
                 runBlocking {
-                    val oppgaveResponse = when (behovNavn) {
-                        "OpprettVurderhenvendelseOppgave" -> arenaOppslag.opprettVurderHenvendelsOppgave(
-                            journalpostId,
-                            packet.arenaOppgaveParametre()
-                        )
-                        "OpprettStartVedtakOppgave" -> arenaOppslag.opprettStartVedtakOppgave(
-                            journalpostId,
-                            packet.arenaOppgaveParametre()
-                        )
-                        else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
-                    }
-
-                    if (oppgaveResponse != null) {
-                        packet["@løsning"] = mapOf(
-                            behovNavn to mapOf(
-                                "journalpostId" to journalpostId,
-                                "fagsakId" to oppgaveResponse.fagsakId,
-                                "oppgaveId" to oppgaveResponse.oppgaveId
-                            )
-                        )
-                    } else {
+                    val behovNavn = packet["@behov"].first().asText()
+                    if (journalpostId == "510535172" || journalpostId == "512787291" ) {
                         packet["@feil"] = behovNavn
-                    }
-                }
+                        logger.error { "Kunne ikke opprette arena sak med journalpostId $journalpostId" }
+                    } else {
+                        val oppgaveResponse = when (behovNavn) {
+                            "OpprettVurderhenvendelseOppgave" -> arenaOppslag.opprettVurderHenvendelsOppgave(
+                                journalpostId,
+                                packet.arenaOppgaveParametre()
+                            )
+                            "OpprettStartVedtakOppgave" -> arenaOppslag.opprettStartVedtakOppgave(
+                                journalpostId,
+                                packet.arenaOppgaveParametre()
+                            )
+                            else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
+                        }
 
-                context.publish(packet.toJson())
+                        if (oppgaveResponse != null) {
+                            packet["@løsning"] = mapOf(
+                                behovNavn to mapOf(
+                                    "journalpostId" to journalpostId,
+                                    "fagsakId" to oppgaveResponse.fagsakId,
+                                    "oppgaveId" to oppgaveResponse.oppgaveId
+                                )
+                            )
+                        } else {
+                            packet["@feil"] = behovNavn
+                        }
+                    }
+
+                    context.publish(packet.toJson())
+                }
             } catch (e: Exception) {
                 logger.error(e) { "Kunne ikke opprette arena sak med journalpostId $journalpostId" }
                 throw e
