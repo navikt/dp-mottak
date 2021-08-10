@@ -1,3 +1,4 @@
+app: dp-mottak
 kafka_pool: nav-prod
 DP_PROXY_HOST: dp-proxy.prod-fss-pub.nais.io
 db_tier: db-custom-4-15360
