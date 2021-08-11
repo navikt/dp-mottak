@@ -15,6 +15,7 @@ internal class JournalpostBehovLøser(
 ) : River.PacketListener {
     companion object {
         private val logger = KotlinLogging.logger { }
+        private val sikkerlogg = KotlinLogging.logger("tjenestekall.JournalpostBehovLøser")
     }
 
     init {
@@ -30,6 +31,10 @@ internal class JournalpostBehovLøser(
         runBlocking { journalpostArkiv.hentJournalpost(packet["journalpostId"].asText()) }.also {
             packet["@løsning"] = mapOf("Journalpost" to it)
             context.publish(packet.toJson())
+            sikkerlogg.info {
+                val dokumentTitler = it.dokumenter.joinToString { dokument -> "${dokument.tittel}\n" }
+                "Mottok journalpost fra Joark. Dokumentene har tittlene:\n$dokumentTitler"
+            }
             logger.info {
                 val tidSidenOpprettet = it.datoOpprettet?.let { datoOpprettet ->
                     Duration.between(LocalDateTime.parse(datoOpprettet), LocalDateTime.now())
