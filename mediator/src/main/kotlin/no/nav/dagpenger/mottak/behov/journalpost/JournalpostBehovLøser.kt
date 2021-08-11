@@ -32,8 +32,10 @@ internal class JournalpostBehovLøser(
             packet["@løsning"] = mapOf("Journalpost" to it)
             context.publish(packet.toJson())
             sikkerlogg.info {
-                val dokumentTitler = it.dokumenter.joinToString { dokument -> "${dokument.tittel}\n" }
-                "Mottok journalpost fra Joark. Dokumentene har tittlene:\n$dokumentTitler"
+                if (it.harDokumentitlerLengreEnn(255)) {
+                    val dokumentTitler = it.dokumenter.joinToString { dokument -> "${dokument.tittel}\n" }
+                    "Mottok journalpost fra Joark. Dokumentene har tittlene:\n$dokumentTitler"
+                }
             }
             logger.info {
                 val tidSidenOpprettet = it.datoOpprettet?.let { datoOpprettet ->
@@ -43,4 +45,7 @@ internal class JournalpostBehovLøser(
             }
         }
     }
+
+    private fun SafGraphQL.Journalpost.harDokumentitlerLengreEnn(lengde: Int) =
+        dokumenter.mapNotNull { dokument -> dokument.tittel }.any { tittel -> tittel.length > lengde }
 }
