@@ -49,12 +49,18 @@ internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
     }
 }
 
-internal class PdlPersondataOppslagException(s: String) : Throwable(s)
+internal class PdlPersondataOppslagException(s: String) : RuntimeException(s)
 
 internal fun hasError(json: String): Boolean {
-    val errors = jacksonObjectMapper().readTree(json)["errors"]
-    return (errors != null && !errors.isEmpty)
+    val json = jacksonObjectMapper().readTree(json)
+    return (harGraphqlErrors(json) && !ukjentPersonIdent(json))
 }
+
+private fun harGraphqlErrors(json: JsonNode) =
+    json["errors"] != null && !json["errors"].isEmpty
+
+private fun ukjentPersonIdent(node: JsonNode) =
+    node["errors"].any { it["message"].asText() == "Fant ikke person" }
 
 internal data class PersonQuery(val id: String) : GraphqlQuery(
     //language=Graphql
@@ -149,8 +155,5 @@ internal class Pdl {
                 }
             )
         }
-
-        private fun ukjentPersonIdent(node: JsonNode) =
-            node["errors"].any { it["message"].asText() == "Fant ikke person" }
     }
 }

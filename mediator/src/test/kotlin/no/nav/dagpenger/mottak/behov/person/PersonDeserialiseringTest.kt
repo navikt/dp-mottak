@@ -119,6 +119,15 @@ internal class PersonDeserialiseringTest {
     }
 
     @Test
+    fun `Kaste ikke kaste exception hvis personen ikke finnes i PDL`() {
+        assertFalse(
+            hasError(
+                fantIkkePersonResponse
+            )
+        )
+    }
+
+    @Test
     fun `Takler manglende mellom navn`() {
         assertEquals(
             "LITEN BRANNHYDRANT",
