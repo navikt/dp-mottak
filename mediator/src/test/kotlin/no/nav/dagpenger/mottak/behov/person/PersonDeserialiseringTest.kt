@@ -119,7 +119,7 @@ internal class PersonDeserialiseringTest {
     }
 
     @Test
-    fun `Kaste ikke kaste exception hvis personen ikke finnes i PDL`() {
+    fun `Ikke kaste exception hvis personen ikke finnes i PDL`() {
         assertFalse(
             hasError(
                 fantIkkePersonResponse
