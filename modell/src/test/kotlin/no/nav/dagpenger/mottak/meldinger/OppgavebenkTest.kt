@@ -12,6 +12,7 @@ import no.nav.dagpenger.mottak.erPermittertFraFiskeForedling
 import no.nav.dagpenger.mottak.harAvsluttetArbeidsforholdFraKonkurs
 import no.nav.dagpenger.mottak.harAvtjentVerneplikt
 import no.nav.dagpenger.mottak.harEøsArbeidsforhold
+import no.nav.dagpenger.mottak.harEøsBostedsland
 import no.nav.dagpenger.mottak.harInntektFraFangstOgFiske
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -112,6 +113,29 @@ class OppgavebenkTest {
     }
 
     @Test
+    fun `Finn riktig benk og oppgavebeskrivelse ved eøs bostedsland`() {
+        withSøknad(
+            harEøsBostedsland = true
+        ) {
+            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
+            assertEquals("EØS\n", oppgaveBenk.beskrivelse)
+            assertEquals("4465", oppgaveBenk.id)
+        }
+    }
+
+    @Test
+    fun `Finn riktig benk og oppgavebeskrivelse når eøs arbeidsforhold overskriver eøs bostedsland`() {
+        withSøknad(
+            harEøsArbeidsforhold = true,
+            harEøsBostedsland = true
+        ) {
+            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
+            assertEquals("MULIG SAMMENLEGGING - EØS\n", oppgaveBenk.beskrivelse)
+            assertEquals("4470", oppgaveBenk.id)
+        }
+    }
+
+    @Test
     fun `Finn riktig oppgave beskrivelse og benk når søker er permittert fra fiskeforedling`() {
         withSøknad(
             erPermittertFraFiskeforedling = true
@@ -201,6 +225,7 @@ class OppgavebenkTest {
         harEøsArbeidsforhold: Boolean = false,
         harAvtjentVerneplikt: Boolean = false,
         harInntektFraFangstOgFiske: Boolean = false,
+        harEøsBostedsland: Boolean = false,
         erGrenseArbeider: Boolean = false,
         harAvsluttetArbeidsforholdFraKonkurs: Boolean = false,
         erPermittertFraFiskeforedling: Boolean = false,
@@ -215,6 +240,7 @@ class OppgavebenkTest {
                 every { it.harEøsArbeidsforhold() } returns harEøsArbeidsforhold
                 every { it.harAvtjentVerneplikt() } returns harAvtjentVerneplikt
                 every { it.harInntektFraFangstOgFiske() } returns harInntektFraFangstOgFiske
+                every { it.harEøsBostedsland() } returns harEøsBostedsland
                 every { it.erGrenseArbeider() } returns erGrenseArbeider
                 every { it.harAvsluttetArbeidsforholdFraKonkurs() } returns harAvsluttetArbeidsforholdFraKonkurs
                 every { it.erPermittertFraFiskeForedling() } returns erPermittertFraFiskeforedling
