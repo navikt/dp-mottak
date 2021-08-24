@@ -43,6 +43,40 @@ internal class SøknadFaktaTest {
         val søknad = Søknadsdata.Søknad(data)
         assertFalse(søknad.harAvsluttetArbeidsforholdFraKonkurs())
     }
+
+    @Test
+    fun `Skal sjekke om bostedsland er et EØS land`() {
+        val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
+        val søknad = Søknadsdata.Søknad(data)
+        assertTrue(søknad.harEøsBostedsland())
+    }
+
+    @Test
+    fun `Skal sjekke om bostedsland ikke er et EØS land`() {
+
+        //language=JSON
+        val data = JsonMapper.jacksonJsonAdapter.readTree(
+            """
+            {
+              "fakta": [
+                {
+                  "faktumId": 7,
+                  "soknadId": 1,
+                  "parrentFaktum": null,
+                  "key": "bostedsland.land",
+                  "value": "ABCD",
+                  "faktumEgenskaper": [],
+                  "properties": {},
+                  "type": "BRUKERREGISTRERT"
+                }
+              ]
+            }
+            """.trimIndent()
+        )
+
+        val søknad = Søknadsdata.Søknad(data)
+        assertFalse(søknad.harEøsBostedsland())
+    }
 }
 
 @Language("JSON")
@@ -58,6 +92,16 @@ private fun søknadWithArbeidsforhold(
       "parrentFaktum": null,
       "key": "arbeidsforhold.datodagpenger",
       "value": "2020-03-19",
+      "faktumEgenskaper": [],
+      "properties": {},
+      "type": "BRUKERREGISTRERT"
+    },
+    {
+      "faktumId": 7,
+      "soknadId": 1,
+      "parrentFaktum": null,
+      "key": "bostedsland.land",
+      "value": "DEU",
       "faktumEgenskaper": [],
       "properties": {},
       "type": "BRUKERREGISTRERT"

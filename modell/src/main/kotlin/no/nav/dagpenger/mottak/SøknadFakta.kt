@@ -73,5 +73,10 @@ internal fun SøknadFakta.harInntektFraFangstOgFiske(): Boolean =
 internal fun SøknadFakta.harEøsArbeidsforhold(): Boolean =
     this.getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
 
+private val eøsLand = setOf("BEL", "BGR", "DNK", "EST", "FIN", "FRA", "GRC", "IRL", "ISL", "ITA", "HRV", "CYP", "LVA", "LIE", "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "GBR", "CHE", "SWE", "CZE", "DEU", "HUN", "AUT")
+
+internal fun SøknadFakta.harEøsBostedsland(): Boolean =
+    this.getFakta("bostedsland.land").any { it["value"].asText() in eøsLand }
+
 internal fun SøknadFakta.harAvtjentVerneplikt(): Boolean =
     this.getFakta("ikkeavtjentverneplikt").getOrNull(0)?.get("value")?.asBoolean()?.not() ?: false
