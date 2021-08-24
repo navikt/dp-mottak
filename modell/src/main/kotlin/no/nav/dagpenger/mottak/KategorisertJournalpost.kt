@@ -108,6 +108,7 @@ data class NySøknad(
     ): OppgaveBenk {
         val konkurs = søknadFakta?.harAvsluttetArbeidsforholdFraKonkurs() == true
         val kanAvslåsPåMinsteinntekt = oppfyllerMinsteArbeidsinntekt == false
+        val eøsBostedsland = søknadFakta?.harEøsBostedsland() == true
         val grenseArbeider = søknadFakta?.erGrenseArbeider() == true
         val eøsArbeidsforhold = søknadFakta?.harEøsArbeidsforhold() == true
         val inntektFraFangstFisk = søknadFakta?.harInntektFraFangstOgFiske() == true
@@ -132,6 +133,12 @@ data class NySøknad(
             inntektFraFangstFisk -> OppgaveBenk(
                 behandlendeEnhet(person),
                 "FANGST OG FISKE\n",
+                datoRegistrert,
+                tilleggsinformasjon()
+            )
+            eøsBostedsland -> OppgaveBenk(
+                "4465",
+                "EØS\n",
                 datoRegistrert,
                 tilleggsinformasjon()
             )
