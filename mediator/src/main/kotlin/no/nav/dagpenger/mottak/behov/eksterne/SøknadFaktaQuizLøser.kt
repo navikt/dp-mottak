@@ -5,13 +5,8 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.SøknadFakta
 import no.nav.dagpenger.mottak.avsluttetArbeidsforhold
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.asLocalDate
+import no.nav.helse.rapids_rivers.*
 import java.time.LocalDate
-import java.time.ZonedDateTime
 import java.time.format.DateTimeParseException
 
 internal class SøknadFaktaQuizLøser(
@@ -125,7 +120,8 @@ private fun SøknadFakta.lærling() = getFakta("arbeidsforhold").any {
     it["properties"]?.get("laerling")?.asBoolean() ?: false
 }
 
-private fun SøknadFakta.søknadstidspunkt() = ZonedDateTime.parse(getField("sistLagret").asText()).toLocalDate()
+private fun SøknadFakta.søknadstidspunkt() =
+    getFakta("innsendtDato").first()["value"].asLocalDateTime().toLocalDate()
 
 private fun SøknadFakta.ønskerDagpengerFraDato() =
     getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()
@@ -142,7 +138,8 @@ private fun SøknadFakta.jobbetUtenforNorge() = this.avsluttetArbeidsforhold().a
 
 private fun SøknadFakta.fortsattRettKorona() = getBooleanFaktum("fornyetrett.bruktopp").not()
 
-private fun SøknadFakta.rettighetstypeUtregning(): List<Map<String, Boolean>> = rettighetstypeUtregning(this.avsluttetArbeidsforhold())
+private fun SøknadFakta.rettighetstypeUtregning(): List<Map<String, Boolean>> =
+    rettighetstypeUtregning(this.avsluttetArbeidsforhold())
 
 private fun SøknadFakta.kanJobbeDeltid() = getBooleanFaktum("reellarbeidssoker.villigdeltid")
 private fun SøknadFakta.kanJobbeHvorSomHelst() = getBooleanFaktum("reellarbeidssoker.villigpendle")
