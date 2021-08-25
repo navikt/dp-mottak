@@ -5,7 +5,12 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.SøknadFakta
 import no.nav.dagpenger.mottak.avsluttetArbeidsforhold
-import no.nav.helse.rapids_rivers.*
+import no.nav.helse.rapids_rivers.JsonMessage
+import no.nav.helse.rapids_rivers.MessageContext
+import no.nav.helse.rapids_rivers.RapidsConnection
+import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.asLocalDate
+import no.nav.helse.rapids_rivers.asLocalDateTime
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 

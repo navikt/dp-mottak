@@ -32,12 +32,12 @@ internal class SøknadFaktaLøserTest {
     fun setup() {
         testRapid.reset()
     }
-
+    
     @ParameterizedTest
     @CsvSource(
         value = [
             "ØnskerDagpengerFraDato:2020-03-19",
-            "Søknadstidspunkt:2020-03-19",
+            "Søknadstidspunkt:2021-08-25",
             "Verneplikt:false",
             "FangstOgFiske:true",
             "SisteDagMedArbeidsplikt:2020-03-23",
