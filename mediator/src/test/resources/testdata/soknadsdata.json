@@ -8,6 +8,16 @@
   "behandlingskjedeId": null,
   "fakta": [
     {
+      "faktumId": 776458,
+      "soknadId": 10636,
+      "parrentFaktum": null,
+      "key": "innsendtDato",
+      "value": "2021-08-25T11:03:50.577079",
+      "faktumEgenskaper": [],
+      "properties": {},
+      "type": "SYSTEMREGISTRERT"
+    },
+    {
       "faktumId": 776456,
       "soknadId": 10636,
       "parrentFaktum": null,
