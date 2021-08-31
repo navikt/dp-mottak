@@ -32,7 +32,7 @@ internal class SøknadFaktaLøserTest {
     fun setup() {
         testRapid.reset()
     }
-    
+
     @ParameterizedTest
     @CsvSource(
         value = [
@@ -78,7 +78,6 @@ internal class SøknadFaktaLøserTest {
             listOf<AvsluttetArbeidsforhold>(
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.ARBEIDSGIVER_KONKURS,
-                    grensearbeider = true,
                     fiskeforedling = false,
                     land = "NOR"
                 )
@@ -95,7 +94,6 @@ internal class SøknadFaktaLøserTest {
             listOf<AvsluttetArbeidsforhold>(
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.PERMITTERT,
-                    grensearbeider = false,
                     fiskeforedling = true,
                     land = "NOR"
                 )
@@ -112,7 +110,6 @@ internal class SøknadFaktaLøserTest {
             listOf<AvsluttetArbeidsforhold>(
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.PERMITTERT,
-                    grensearbeider = false,
                     fiskeforedling = false,
                     land = "NOR"
                 )
@@ -129,7 +126,6 @@ internal class SøknadFaktaLøserTest {
             listOf<AvsluttetArbeidsforhold>(
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER,
-                    grensearbeider = true,
                     fiskeforedling = false,
                     land = "NOR"
                 )
@@ -146,13 +142,11 @@ internal class SøknadFaktaLøserTest {
             listOf<AvsluttetArbeidsforhold>(
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER,
-                    grensearbeider = false,
                     fiskeforedling = false,
                     land = "NOR"
                 ),
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.PERMITTERT,
-                    grensearbeider = false,
                     fiskeforedling = false,
                     land = "NOR"
                 )

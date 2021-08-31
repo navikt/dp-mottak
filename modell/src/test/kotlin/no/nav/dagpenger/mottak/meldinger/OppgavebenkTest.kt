@@ -7,7 +7,6 @@ import io.mockk.mockkStatic
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.SøknadFakta
 import no.nav.dagpenger.mottak.erFornyetRettighet
-import no.nav.dagpenger.mottak.erGrenseArbeider
 import no.nav.dagpenger.mottak.erPermittertFraFiskeForedling
 import no.nav.dagpenger.mottak.harAvsluttetArbeidsforholdFraKonkurs
 import no.nav.dagpenger.mottak.harAvtjentVerneplikt
@@ -36,7 +35,6 @@ class OppgavebenkTest {
             harEøsArbeidsforhold = true,
             harAvtjentVerneplikt = true,
             harInntektFraFangstOgFiske = true,
-            erGrenseArbeider = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = null, søknadFakta = it)
@@ -50,7 +48,6 @@ class OppgavebenkTest {
         withSøknad(
             harAvtjentVerneplikt = true,
             harInntektFraFangstOgFiske = true,
-            erGrenseArbeider = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person.copy(diskresjonskode = true), søknadFakta = it)
@@ -64,7 +61,6 @@ class OppgavebenkTest {
         withSøknad(
             harAvtjentVerneplikt = true,
             harInntektFraFangstOgFiske = true,
-            erGrenseArbeider = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
@@ -77,7 +73,6 @@ class OppgavebenkTest {
     fun `Finn riktig oppgave beskrivelse og benk når søker har inntekt fra fangst og fisk ordinær`() {
         withSøknad(
             harInntektFraFangstOgFiske = true,
-            erGrenseArbeider = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
@@ -87,23 +82,10 @@ class OppgavebenkTest {
     }
 
     @Test
-    fun `Finn riktig oppgave beskrivelse når søker er grensearbeider `() {
-        withSøknad(
-            erGrenseArbeider = true,
-            harAvsluttetArbeidsforholdFraKonkurs = true
-        ) {
-            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
-            assertEquals("EØS\n", oppgaveBenk.beskrivelse)
-            assertEquals("4465", oppgaveBenk.id)
-        }
-    }
-
-    @Test
     fun `Finn riktig oppgave beskrivelse ved Konkurs `() {
         withSøknad(
             harEøsArbeidsforhold = false,
             harInntektFraFangstOgFiske = false,
-            erGrenseArbeider = false,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
@@ -226,7 +208,6 @@ class OppgavebenkTest {
         harAvtjentVerneplikt: Boolean = false,
         harInntektFraFangstOgFiske: Boolean = false,
         harEøsBostedsland: Boolean = false,
-        erGrenseArbeider: Boolean = false,
         harAvsluttetArbeidsforholdFraKonkurs: Boolean = false,
         erPermittertFraFiskeforedling: Boolean = false,
         erFornyetRettighet: Boolean = false,
@@ -241,7 +222,6 @@ class OppgavebenkTest {
                 every { it.harAvtjentVerneplikt() } returns harAvtjentVerneplikt
                 every { it.harInntektFraFangstOgFiske() } returns harInntektFraFangstOgFiske
                 every { it.harEøsBostedsland() } returns harEøsBostedsland
-                every { it.erGrenseArbeider() } returns erGrenseArbeider
                 every { it.harAvsluttetArbeidsforholdFraKonkurs() } returns harAvsluttetArbeidsforholdFraKonkurs
                 every { it.erPermittertFraFiskeForedling() } returns erPermittertFraFiskeforedling
                 every { it.erFornyetRettighet() } returns erFornyetRettighet

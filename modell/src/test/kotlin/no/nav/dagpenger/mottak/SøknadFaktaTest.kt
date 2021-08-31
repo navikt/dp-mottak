@@ -17,13 +17,6 @@ internal class SøknadFaktaTest {
     }
 
     @Test
-    fun `Skal kunne hente om søker er grensearbeider`() {
-        val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
-        val søknad = Søknadsdata.Søknad(data)
-        assertTrue(søknad.erGrenseArbeider())
-    }
-
-    @Test
     fun `Skal kunne hente om søker er permittert fra fiskeforedling`() {
         val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
         val søknad = Søknadsdata.Søknad(data)

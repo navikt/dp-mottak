@@ -21,15 +21,11 @@ fun SøknadFakta.avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
         .map {
             AvsluttetArbeidsforhold(
                 sluttårsak = asÅrsak(it["properties"]["type"].asText()),
-                grensearbeider = !this.getBooleanFaktum("arbeidsforhold.grensearbeider", true),
                 fiskeforedling = it["properties"]["fangstogfiske"]?.asBoolean() ?: false,
                 land = it["properties"]["land"].asText()
             )
         }
 }
-
-fun SøknadFakta.erGrenseArbeider(): Boolean =
-    this.avsluttetArbeidsforhold().any { it.grensearbeider }
 
 fun SøknadFakta.harAvsluttetArbeidsforholdFraKonkurs(): Boolean =
     this.avsluttetArbeidsforhold().any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS }
@@ -41,7 +37,6 @@ fun SøknadFakta.erFornyetRettighet(): Boolean = this.getBooleanFaktum("fornyetr
 
 data class AvsluttetArbeidsforhold(
     val sluttårsak: Sluttårsak,
-    val grensearbeider: Boolean,
     val fiskeforedling: Boolean,
     val land: String
 ) {

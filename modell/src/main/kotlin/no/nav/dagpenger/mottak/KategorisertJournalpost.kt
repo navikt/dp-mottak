@@ -109,7 +109,6 @@ data class NySøknad(
         val konkurs = søknadFakta?.harAvsluttetArbeidsforholdFraKonkurs() == true
         val kanAvslåsPåMinsteinntekt = oppfyllerMinsteArbeidsinntekt == false
         val eøsBostedsland = søknadFakta?.harEøsBostedsland() == true
-        val grenseArbeider = søknadFakta?.erGrenseArbeider() == true
         val eøsArbeidsforhold = søknadFakta?.harEøsArbeidsforhold() == true
         val inntektFraFangstFisk = søknadFakta?.harInntektFraFangstOgFiske() == true
         val harAvtjentVerneplikt = søknadFakta?.harAvtjentVerneplikt() == true
@@ -139,11 +138,6 @@ data class NySøknad(
             eøsBostedsland -> OppgaveBenk(
                 "4465",
                 "EØS\n",
-                datoRegistrert,
-                tilleggsinformasjon()
-            )
-            grenseArbeider -> OppgaveBenk(
-                "4465", "EØS\n",
                 datoRegistrert,
                 tilleggsinformasjon()
             )
