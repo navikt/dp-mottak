@@ -27,7 +27,7 @@ internal class SøknadFaktaTest {
     fun `Skal kun hente avsluttede arbeidsforhold`() {
         val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
         val søknad = Søknadsdata.Søknad(data)
-        assertEquals(2, søknad.avsluttetArbeidsforhold().size)
+        assertEquals(3, søknad.avsluttetArbeidsforhold().size)
     }
 
     @Test

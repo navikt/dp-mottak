@@ -12,12 +12,8 @@ interface SøknadFakta {
 
 internal typealias AvsluttedeArbeidsforhold = List<AvsluttetArbeidsforhold>
 
-private fun avsluttedeArbeidsforhold(it: JsonNode) =
-    it["properties"]["type"].asText() != "ikke-endret"
-
 fun SøknadFakta.avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
     return this.getFakta("arbeidsforhold")
-        .filter { avsluttedeArbeidsforhold(it) }
         .map {
             AvsluttetArbeidsforhold(
                 sluttårsak = asÅrsak(it["properties"]["type"].asText()),
@@ -47,7 +43,8 @@ data class AvsluttetArbeidsforhold(
         PERMITTERT,
         REDUSERT_ARBEIDSTID,
         SAGT_OPP_AV_ARBEIDSGIVER,
-        SAGT_OPP_SELV
+        SAGT_OPP_SELV,
+        IKKE_ENDRET
     }
 }
 
@@ -59,6 +56,7 @@ private fun asÅrsak(type: String): AvsluttetArbeidsforhold.Sluttårsak = when (
     "sagtoppavarbeidsgiver" -> AvsluttetArbeidsforhold.Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
     "sagtoppselv" -> AvsluttetArbeidsforhold.Sluttårsak.SAGT_OPP_SELV
     "arbeidsgivererkonkurs" -> AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS
+    "ikke-endret" -> AvsluttetArbeidsforhold.Sluttårsak.IKKE_ENDRET
     else -> throw Exception("Missing permitteringstype: $type")
 }
 
