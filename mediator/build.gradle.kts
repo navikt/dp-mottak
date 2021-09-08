@@ -25,6 +25,7 @@ dependencies {
         exclude("org.apache.logging.log4j")
     }
 
+    testImplementation(kotlin("test"))
     testImplementation(Mockk.mockk)
     testImplementation(TestContainers.postgresql)
     testImplementation(Junit5.params)
