@@ -7,6 +7,7 @@ import io.mockk.mockkStatic
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.SøknadFakta
 import no.nav.dagpenger.mottak.erFornyetRettighet
+import no.nav.dagpenger.mottak.erPermittert
 import no.nav.dagpenger.mottak.erPermittertFraFiskeForedling
 import no.nav.dagpenger.mottak.harAvsluttetArbeidsforholdFraKonkurs
 import no.nav.dagpenger.mottak.harAvtjentVerneplikt
@@ -95,13 +96,25 @@ class OppgavebenkTest {
     }
 
     @Test
-    fun `Finn riktig benk og oppgavebeskrivelse ved eøs bostedsland`() {
+    fun `Finn riktig benk og oppgavebeskrivelse ved eøs bostedsland og permittert`() {
         withSøknad(
-            harEøsBostedsland = true
+            harEøsBostedsland = true,
+            erPermittert = true
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
             assertEquals("EØS\n", oppgaveBenk.beskrivelse)
             assertEquals("4465", oppgaveBenk.id)
+        }
+    }
+
+    @Test
+    fun `Finn riktig benk og oppgavebeskrivelse ved eøs bostedsland og ikke permittert`() {
+        withSøknad(
+            harEøsBostedsland = true,
+        ) {
+            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
+            assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
+            assertEquals("4450", oppgaveBenk.id)
         }
     }
 
@@ -211,6 +224,7 @@ class OppgavebenkTest {
         harAvsluttetArbeidsforholdFraKonkurs: Boolean = false,
         erPermittertFraFiskeforedling: Boolean = false,
         erFornyetRettighet: Boolean = false,
+        erPermittert: Boolean = false,
         test: (søknadFakta: SøknadFakta) -> Unit
     ) {
 
@@ -224,6 +238,7 @@ class OppgavebenkTest {
                 every { it.harEøsBostedsland() } returns harEøsBostedsland
                 every { it.harAvsluttetArbeidsforholdFraKonkurs() } returns harAvsluttetArbeidsforholdFraKonkurs
                 every { it.erPermittertFraFiskeForedling() } returns erPermittertFraFiskeforedling
+                every { it.erPermittert() } returns erPermittert
                 every { it.erFornyetRettighet() } returns erFornyetRettighet
             }
             test(søknad)

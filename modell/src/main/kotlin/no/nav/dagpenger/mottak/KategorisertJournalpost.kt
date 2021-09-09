@@ -113,6 +113,7 @@ data class NySøknad(
         val inntektFraFangstFisk = søknadFakta?.harInntektFraFangstOgFiske() == true
         val harAvtjentVerneplikt = søknadFakta?.harAvtjentVerneplikt() == true
         val erPermittertFraFiskeforedling = søknadFakta?.erPermittertFraFiskeForedling() == true
+        val erPermittert = søknadFakta?.erPermittert() == true
         val datoRegistrert = journalpost.datoRegistrert()
         val originalOppgavebenk = when {
             eøsArbeidsforhold -> {
@@ -135,7 +136,7 @@ data class NySøknad(
                 datoRegistrert,
                 tilleggsinformasjon()
             )
-            eøsBostedsland -> OppgaveBenk(
+            eøsBostedsland && erPermittert -> OppgaveBenk(
                 "4465",
                 "EØS\n",
                 datoRegistrert,
