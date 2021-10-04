@@ -59,4 +59,6 @@ spec:
         databases:
           - name: mottak
             envVarPrefix: DB
+            users:
+              - name: bqconn_dataanalyse
         cascadingDelete: false
