@@ -52,7 +52,10 @@ private fun JsonMessage.tilJournalføringOppdaterRequest(): OppdaterJournalpostR
     )
 
 private fun JsonMessage.avsender(): JournalpostApi.Avsender =
-    JournalpostApi.Avsender(this["navn"].asText())
+    JournalpostApi.Avsender(
+        navn = this["navn"].asText(),
+        id = this["fødselsnummer"].asText()
+    )
 
 private fun JsonMessage.dokumenter(): List<JournalpostApi.Dokument> =
     this["dokumenter"].map {

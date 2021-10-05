@@ -40,6 +40,8 @@ internal class OppdaterJournalpostBehovLøserTest {
                 assertEquals(fagsakId, it.sak.fagsakId)
                 assertEquals(JournalpostApi.SaksType.FAGSAK, it.sak.saksType)
                 assertEquals(fødselsnummer, it.bruker.id)
+                assertEquals(fødselsnummer, it.avsenderMottaker.id)
+                assertEquals("FNR", it.avsenderMottaker.idType)
                 assertEquals(2, it.dokumenter.size)
             }
         }
