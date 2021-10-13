@@ -13,7 +13,10 @@ internal class JoarkMottakTest {
 
     private val testRapid = TestRapid()
     private val mediator = mockk<InnsendingMediator>(relaxed = true)
-    private val mottak = JoarkMottak(mediator, testRapid)
+
+    init {
+        JoarkMottak(mediator, testRapid)
+    }
 
     @Test
     fun `skal lese meldinger fra joark med tema DAG`() {
@@ -28,9 +31,16 @@ internal class JoarkMottakTest {
     }
 
     @Test
-    fun `skal skippe meldinger fra joark med andre hendelsetyper enn 'MidlertidigJournalført'`() {
+    fun `skal skippe meldinger fra joark med andre hendelsetyper enn 'MidlertidigJournalført' og 'JournalpostMottatt'`() {
         testRapid.sendTestMessage(joarkMelding(hendelseType = "ANNEN"))
         verify(exactly = 0) { mediator.håndter(any() as JoarkHendelse) }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["MidlertidigJournalført", "JournalpostMottatt"])
+    fun `skal lese meldinger fra joark hendelsetyper 'MidlertidigJournalført' og 'JournalpostMottatt'`(hendelseType: String) {
+        testRapid.sendTestMessage(joarkMelding(hendelseType = hendelseType))
+        verify(exactly = 1) { mediator.håndter(any() as JoarkHendelse) }
     }
 
     @ParameterizedTest

@@ -28,7 +28,7 @@ internal class JoarkMottak(
             validate { it.requireKey("journalpostId") }
             validate { it.requireKey("journalpostStatus") }
             validate { it.requireValue("temaNytt", "DAG") }
-            validate { it.requireValue("hendelsesType", "MidlertidigJournalført") }
+            validate { it.requireAny("hendelsesType", listOf("MidlertidigJournalført", "JournalpostMottatt")) }
             validate {
                 it.require("mottaksKanal") { mottaksKanal ->
                     val kanal = mottaksKanal.asText()
