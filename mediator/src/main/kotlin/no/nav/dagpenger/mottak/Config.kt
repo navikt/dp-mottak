@@ -9,12 +9,17 @@ import com.natpryce.konfig.intType
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
 import com.zaxxer.hikari.HikariDataSource
+import io.confluent.kafka.schemaregistry.client.SchemaRegistryClientConfig
+import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig
+import io.confluent.kafka.serializers.KafkaAvroDeserializer
 import no.finn.unleash.DefaultUnleash
 import no.finn.unleash.util.UnleashConfig
 import no.nav.dagpenger.aad.api.ClientCredentialsClient
 import org.apache.kafka.clients.CommonClientConfigs
+import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.security.auth.SecurityProtocol
+import org.apache.kafka.common.serialization.StringDeserializer
 import java.net.InetAddress
 import java.net.UnknownHostException
 import java.util.Properties
@@ -37,7 +42,8 @@ internal object Config {
             "KAFKA_RESET_POLICY" to "latest",
             "PDL_API_SCOPE" to "api://dev-fss.pdl.pdl-api/.default",
             "PDL_API_URL" to "https://pdl-api.dev-fss-pub.nais.io",
-            "UNLEASH_URL" to "https://unleash.nais.io/api/"
+            "UNLEASH_URL" to "https://unleash.nais.io/api/",
+            "AAPEN_DOK_JOURNALFORING_TOPIC" to "teamdokumenthandtering.aapen-dok-journalfoering-q1",
 
         )
     )
@@ -47,6 +53,7 @@ internal object Config {
             "DP_PROXY_URL" to "https://dp-proxy.prod-fss-pub.nais.io",
             "PDL_API_SCOPE" to "api://prod-fss.pdl.pdl-api/.default",
             "PDL_API_URL" to "https://pdl-api.prod-fss-pub.nais.io",
+            "AAPEN_DOK_JOURNALFORING_TOPIC" to "teamdokumenthandtering.aapen-dok-journalfoering",
         )
     )
 
@@ -90,7 +97,7 @@ internal object Config {
         }
     }
 
-    val kafkaProducerProperties: Properties by lazy {
+    val kafkaConfig: Properties by lazy {
         Properties().apply {
             put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, properties[Key("KAFKA_BROKERS", stringType)])
             put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SSL.name)
@@ -104,9 +111,22 @@ internal object Config {
         }
     }
 
+    val kafkaAvroConsumerProperties: Properties by lazy {
+        kafkaConfig.also {
+            it[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
+            it[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = StringDeserializer::class.java
+            it[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = KafkaAvroDeserializer::class.java
+            it[AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG] = properties[Key("KAFKA_SCHEMA_REGISTRY", stringType)]
+            it[SchemaRegistryClientConfig.BASIC_AUTH_CREDENTIALS_SOURCE] = "USER_INFO"
+            it[SchemaRegistryClientConfig.USER_INFO_CONFIG] = properties[Key("KAFKA_SCHEMA_REGISTRY_USER", stringType)] + ":" + properties[Key("KAFKA_SCHEMA_REGISTRY_PASSWORD", stringType)]
+        }
+    }
+
     val basicCredentials: Pair<String, String>? = properties.getOrNull(Key("BASIC_AUTH_USERNAME", stringType))?.let {
         Pair(it, properties[Key("BASIC_AUTH_PASSWORD", stringType)])
     }
+
+    val journalføringTopic: String = properties[Key("AAPEN_DOK_JOURNALFORING_TOPIC", stringType)]
 
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_URL", stringType)]
     fun Configuration.pdlApiUrl() = this[Key("PDL_API_URL", stringType)]

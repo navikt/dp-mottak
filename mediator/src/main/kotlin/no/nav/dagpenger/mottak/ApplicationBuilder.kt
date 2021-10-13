@@ -24,6 +24,7 @@ import no.nav.dagpenger.mottak.db.runMigration
 import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
 import no.nav.dagpenger.mottak.observers.InnsendingProbe
 import no.nav.dagpenger.mottak.observers.MetrikkObserver
+import no.nav.dagpenger.mottak.tjenester.JoarkHendelseMottak
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -39,7 +40,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val journalpostApiClient = JournalpostApiClient(Config.properties)
     private val gosysProxyClient = GosysProxyClient(Config.properties)
     private val minsteinntektVurderingRepository = MinsteinntektVurderingPostgresRepository(Config.dataSource)
-    private val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(Config.kafkaProducerProperties)
+    private val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(Config.kafkaConfig)
 
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
@@ -55,45 +56,54 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
                 )
             }
         }
-        .build().apply {
-            val mediator = InnsendingMediator(
-                innsendingRepository = innsendingRepository,
-                rapidsConnection = this,
-                observatører = listOf(
-                    ferdigstiltInnsendingObserver,
-                    MetrikkObserver(),
-                    InnsendingProbe
-                )
-            )
-            // Behovmottakere
-            MottakMediator(mediator, this)
-
-            // Behovløsere
-            JournalpostBehovLøser(safClient, this)
-            OppdaterJournalpostBehovLøser(journalpostApiClient, this)
-            FerdigstillJournalpostBehovLøser(journalpostApiClient, this)
-            PersondataBehovLøser(PdlPersondataOppslag(Config.properties), this)
-            SøknadsdataBehovLøser(safClient, this)
-            MinsteinntektVurderingLøser(
-                regelApiClient = regelApiClient,
-                repository = minsteinntektVurderingRepository,
-                rapidsConnection = this
-            )
-            ArenaBehovLøser(arenaApiClient, this)
-            OpprettGosysOppgaveLøser(gosysProxyClient, this)
-
-            // Eksterne behovløsere
-            SøknadFaktaQuizLøser(PostgresSøknadQuizOppslag(Config.dataSource), this)
-        }
+        .build()
+    private val mediator = InnsendingMediator(
+        innsendingRepository = innsendingRepository,
+        rapidsConnection = rapidsConnection,
+        observatører = listOf(
+            ferdigstiltInnsendingObserver,
+            MetrikkObserver(),
+            InnsendingProbe
+        )
+    )
+    private val joarkHendelseMottak =
+        JoarkHendelseMottak(Config.journalføringTopic, Config.kafkaAvroConsumerProperties, mediator)
 
     init {
+        // Behovmottakere
+        MottakMediator(mediator, rapidsConnection)
+
+        // Behovløsere
+        JournalpostBehovLøser(safClient, rapidsConnection)
+        OppdaterJournalpostBehovLøser(journalpostApiClient, rapidsConnection)
+        FerdigstillJournalpostBehovLøser(journalpostApiClient, rapidsConnection)
+        PersondataBehovLøser(PdlPersondataOppslag(Config.properties), rapidsConnection)
+        SøknadsdataBehovLøser(safClient, rapidsConnection)
+        MinsteinntektVurderingLøser(
+            regelApiClient = regelApiClient,
+            repository = minsteinntektVurderingRepository,
+            rapidsConnection = rapidsConnection
+        )
+        ArenaBehovLøser(arenaApiClient, rapidsConnection)
+        OpprettGosysOppgaveLøser(gosysProxyClient, rapidsConnection)
+
+        // Eksterne behovløsere
+        SøknadFaktaQuizLøser(PostgresSøknadQuizOppslag(Config.dataSource), rapidsConnection)
+
         rapidsConnection.register(this)
     }
 
-    fun start() = rapidsConnection.start()
+    fun start() {
+        rapidsConnection.start()
+        joarkHendelseMottak.start()
+    }
 
     override fun onStartup(rapidsConnection: RapidsConnection) {
         runMigration(Config.dataSource)
         logg.info { "Starter dp-mottak" }
+    }
+
+    override fun onShutdown(rapidsConnection: RapidsConnection) {
+        joarkHendelseMottak.stop()
     }
 }
