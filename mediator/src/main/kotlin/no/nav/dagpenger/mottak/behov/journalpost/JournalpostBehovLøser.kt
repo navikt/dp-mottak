@@ -31,11 +31,9 @@ internal class JournalpostBehovLøser(
         runBlocking { journalpostArkiv.hentJournalpost(packet["journalpostId"].asText()) }.also {
             packet["@løsning"] = mapOf("Journalpost" to it)
             context.publish(packet.toJson())
-            sikkerlogg.info {
-                if (it.harDokumentitlerLengreEnn(255)) {
-                    val dokumentTitler = it.dokumenter.joinToString { dokument -> "${dokument.tittel}\n" }
-                    "Mottok journalpost fra Joark. Dokumentene har tittlene:\n$dokumentTitler"
-                }
+            if (it.harDokumentitlerLengreEnn(255)) {
+                val dokumentTitler = it.dokumenter.joinToString { dokument -> "${dokument.tittel}\n" }
+                sikkerlogg.info { "Mottok journalpost fra Joark. Dokumentene har tittlene:\n$dokumentTitler" }
             }
             logger.info {
                 val tidSidenOpprettet = it.datoOpprettet?.let { datoOpprettet ->

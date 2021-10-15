@@ -111,7 +111,7 @@ internal object Config {
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_URL", stringType)]
     fun Configuration.pdlApiUrl() = this[Key("PDL_API_URL", stringType)]
     fun unleash() = DefaultUnleash(unleashConfig(), ByClusterStrategy(ByClusterStrategy.Cluster.current))
-    fun unleashConfig(): UnleashConfig =
+    private fun unleashConfig(): UnleashConfig =
         UnleashConfig.builder()
             .appName("dp-mottak")
             .instanceId(getHostname())
