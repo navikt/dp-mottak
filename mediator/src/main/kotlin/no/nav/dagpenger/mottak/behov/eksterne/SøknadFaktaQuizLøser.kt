@@ -80,8 +80,8 @@ internal class SøknadFaktaQuizLøser(
             logger.info("løste søknadfakta-behov for innsendt søknad med id ${packet["InnsendtSøknadsId"]["url"].asText()}")
         } catch (e: Exception) {
             // midlertig til vi klarer å nøste opp i det som faktisk får dette til å kræsje
-            logger.error { e }
-            sikkerlogg.error { "feil ved søknadfakta-behov, ${e.stackTraceToString()} \n packet: ${packet.toJson()}" }
+            logger.error(e) { "feil ved søknadfakta-behov" }
+            sikkerlogg.error(e) { "feil ved søknadfakta-behov. \n packet: ${packet.toJson()}" }
         }
     }
 }
