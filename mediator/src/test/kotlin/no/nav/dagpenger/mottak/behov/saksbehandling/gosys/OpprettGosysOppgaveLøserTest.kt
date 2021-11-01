@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -39,6 +40,9 @@ internal class OpprettGosysOppgaveLøserTest {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
             assertEquals("dfghjkl", field(0, "@løsning")["OpprettGosysoppgave"]["oppgaveId"].asText())
+        }
+        requireNotNull(expectedOppgave).also {
+            assertEquals(LocalDate.now(), it.fristFerdigstillelse)
         }
     }
 
