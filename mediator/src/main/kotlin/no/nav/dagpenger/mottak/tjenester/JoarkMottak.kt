@@ -46,6 +46,7 @@ internal class JoarkMottak(
               |hendelsesType: ${packet["hendelsesType"].asText()}, 
               |mottakskanal, ${packet["mottaksKanal"].asText()}, 
               |behandlingstema: ${packet["behandlingstema"].asText()}
+              |journalpostStatus: ${packet["journalpostStatus"].asText()}
               |""".trimMargin()
         )
 
