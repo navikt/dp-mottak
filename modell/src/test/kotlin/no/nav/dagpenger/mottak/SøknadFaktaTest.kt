@@ -45,6 +45,13 @@ internal class SøknadFaktaTest {
     }
 
     @Test
+    fun `Skal kunne hente lærling`() {
+        val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
+        val søknad = Søknadsdata.Søknad(data)
+        assertTrue(søknad.erLærling())
+    }
+
+    @Test
     fun `Skal sjekke om bostedsland ikke er et EØS land`() {
 
         //language=JSON

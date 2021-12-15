@@ -7,6 +7,7 @@ import io.mockk.mockkStatic
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.SøknadFakta
 import no.nav.dagpenger.mottak.erFornyetRettighet
+import no.nav.dagpenger.mottak.erLærling
 import no.nav.dagpenger.mottak.erPermittert
 import no.nav.dagpenger.mottak.erPermittertFraFiskeForedling
 import no.nav.dagpenger.mottak.harAvsluttetArbeidsforholdFraKonkurs
@@ -91,6 +92,17 @@ class OppgavebenkTest {
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
             assertEquals("Konkurs\n", oppgaveBenk.beskrivelse)
+            assertEquals("4401", oppgaveBenk.id)
+        }
+    }
+
+    @Test
+    fun `Finn riktig oppgavebenk og beskrivelse for lærlinger`() {
+        withSøknad(
+            erLærling = true
+        ) {
+            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
+            assertEquals("Lærling\n", oppgaveBenk.beskrivelse)
             assertEquals("4401", oppgaveBenk.id)
         }
     }
@@ -225,6 +237,7 @@ class OppgavebenkTest {
         erPermittertFraFiskeforedling: Boolean = false,
         erFornyetRettighet: Boolean = false,
         erPermittert: Boolean = false,
+        erLærling: Boolean = false,
         test: (søknadFakta: SøknadFakta) -> Unit
     ) {
 
@@ -240,6 +253,7 @@ class OppgavebenkTest {
                 every { it.erPermittertFraFiskeForedling() } returns erPermittertFraFiskeforedling
                 every { it.erPermittert() } returns erPermittert
                 every { it.erFornyetRettighet() } returns erFornyetRettighet
+                every { it.erLærling() } returns erLærling
             }
             test(søknad)
         }
