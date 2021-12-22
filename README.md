@@ -37,6 +37,31 @@ AND dokumenter.brevkode in ('NAV 04-01.03', 'NAV 04-01.04');
 ````
 ps- bytt ut datoene mellom BETWEEN med tidsperiode
 
+
+### Skalere ned dp-mottak
+
+Koble på riktig cluster
+
+```bash
+kubectx prod-gcp
+kubens teamdagpenger
+```
+
+Skalere ned: 
+
+```bash
+kubectl scale deployment/dp-mottak --replicas=0
+```
+
+NB! Her vi alarmene si at dp-mottak er ned i #team-dagpenger-alerts
+Du kan stoppe alerten (aka silence) i alertmanger
+
+For å skalere opp igjen:
+
+```bash
+kubectl scale deployment/dp-mottak --replicas=2
+```
+
 ### Replay av ferdigtilt_event i dev 
 
 
