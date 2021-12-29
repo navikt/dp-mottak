@@ -79,6 +79,7 @@ data class InnsendingData(
             InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerVurderHenvendelseArenaOppgave
             InnsendingTilstandTypeData.AvventerGosysType -> Innsending.AvventerGosysOppgave
             InnsendingTilstandTypeData.UkjentBrukerType -> Innsending.UkjentBruker
+            InnsendingTilstandTypeData.AlleredeBehandletType -> Innsending.AlleredeBehandlet
         }
 
         enum class InnsendingTilstandTypeData {
@@ -94,7 +95,8 @@ data class InnsendingData(
             InnsendingFerdigstiltType,
             AventerArenaOppgaveType,
             AvventerGosysType,
-            UkjentBrukerType
+            UkjentBrukerType,
+            AlleredeBehandletType
         }
     }
 

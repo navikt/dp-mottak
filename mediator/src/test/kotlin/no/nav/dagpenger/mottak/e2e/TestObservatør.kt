@@ -10,4 +10,8 @@ internal class TestObservatør : InnsendingObserver {
     override fun tilstandEndret(event: InnsendingObserver.InnsendingEndretTilstandEvent) {
         tilstander.add(event.gjeldendeTilstand)
     }
+
+    fun reset() {
+        tilstander.clear()
+    }
 }

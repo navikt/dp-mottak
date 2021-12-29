@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.db
 
+import io.ktor.utils.io.core.use
 import kotliquery.Query
 import kotliquery.Row
 import kotliquery.queryOf
@@ -174,7 +175,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             internId = using(sessionOf(datasource)) { session ->
                 session.transaction {
                     it.run(
-                        queryOf( //language=Postgresql
+                        queryOf( //language=PostgreSQL
                             "INSERT INTO innsending_v1(journalpostId,tilstand) VALUES(:jpId, :tilstand) RETURNING id",
                             mapOf(
                                 "jpId" to innsending.journalpostId().toLong(),

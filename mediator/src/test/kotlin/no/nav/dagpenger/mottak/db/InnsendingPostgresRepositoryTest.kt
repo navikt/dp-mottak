@@ -194,7 +194,7 @@ internal class InnsendingPostgresRepositoryTest {
         }
     }
 
-    private fun assertAntallRader(tabell: String, anntallRader: Int) {
+    private fun assertAntallRader(tabell: String, antallRader: Int) {
         val faktiskeRader = using(sessionOf(PostgresTestHelper.dataSource)) { session ->
             session.run(
                 queryOf("select count(1) from $tabell").map { row ->
@@ -202,6 +202,6 @@ internal class InnsendingPostgresRepositoryTest {
                 }.asSingle
             )
         }
-        assertEquals(anntallRader, faktiskeRader, "Feil antall rader for tabell: $tabell")
+        assertEquals(antallRader, faktiskeRader, "Feil antall rader for tabell: $tabell")
     }
 }

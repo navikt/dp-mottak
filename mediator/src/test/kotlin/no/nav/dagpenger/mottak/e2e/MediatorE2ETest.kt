@@ -1,7 +1,9 @@
 package no.nav.dagpenger.mottak.e2e
 
+import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.InnsendingTilstandType
+import no.nav.dagpenger.mottak.InnsendingVisitor
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresTestHelper
@@ -38,6 +40,7 @@ internal class MediatorE2ETest {
     @BeforeEach
     fun setup() {
         journalpostId = Random.nextLong()
+        testObservatør.reset()
     }
 
     @Test
@@ -120,6 +123,14 @@ internal class MediatorE2ETest {
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
     }
 
+    @Test
+    fun `Skal motta hendelser som allerede er behandlet`() {
+        håndterHendelse(joarkMelding())
+        assertBehov("Journalpost", 0)
+        håndterHendelse(journalpostMottattHendelse(brevkode = "ukjent", journalstatus = "JOURNALFOERT"))
+        assertEquals(InnsendingTilstandType.AlleredeBehandletType, testObservatør.tilstander.last())
+    }
+
     private fun assertBehov(expectedBehov: String, indexPåMelding: Int) {
         assertTrue(testRapid.inspektør.size == indexPåMelding + 1, "Ingen melding på index $indexPåMelding")
         testRapid.inspektør.message(indexPåMelding).also { jsonNode ->
@@ -132,8 +143,8 @@ internal class MediatorE2ETest {
         testRapid.sendTestMessage(melding)
     }
 
-    //language=JSON
-    private fun journalpostMottattHendelse(brevkode: String): String =
+    private fun journalpostMottattHendelse(brevkode: String, journalstatus: String = "MOTTATT"): String =
+        //language=JSON
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
@@ -145,7 +156,7 @@ internal class MediatorE2ETest {
           "@løsning": {
             "Journalpost": {
                 "id" : "$journalpostId",
-                "journalstatus" : "MOTTATT",
+                "journalstatus" : "$journalstatus",
                 "bruker" : {
                   "id": "12345678901",
                   "type": "FNR"
