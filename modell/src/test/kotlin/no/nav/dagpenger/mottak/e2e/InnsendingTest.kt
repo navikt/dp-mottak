@@ -10,6 +10,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettS
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettVurderhenvendelseOppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Søknadsdata
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AlleredeBehandletType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaOppgaveType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerFerdigstillJournalpostType
@@ -354,7 +355,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         assertTilstander(
             MottattType,
             AvventerJournalpostType,
-            InnsendingFerdigstiltType
+            AlleredeBehandletType
         )
 
         assertPuml("JournalpostStatus annen enn MOTTATT")

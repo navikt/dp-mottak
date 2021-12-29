@@ -13,5 +13,6 @@ enum class InnsendingTilstandType {
     InnsendingFerdigstiltType,
     AventerArenaOppgaveType,
     AvventerGosysType,
-    UkjentBrukerType
+    UkjentBrukerType,
+    AlleredeBehandletType
 }

@@ -224,7 +224,7 @@ class Innsending private constructor(
             innsending.journalpost = journalpost
             if (journalpost.status() != "MOTTATT") {
                 journalpost.warn("Journalpost har en annen status enn MOTTATT, var ${journalpost.status()}")
-                innsending.tilstand(journalpost, InnsendingFerdigStilt)
+                innsending.tilstand(journalpost, AlleredeBehandlet)
             } else {
                 when (requireNotNull(innsending.journalpost).kategorisertJournalpost()) {
                     is UtenBruker -> {
@@ -458,6 +458,13 @@ class Innsending private constructor(
         override fun entering(innsending: Innsending, hendelse: Hendelse) {
             innsending.emitFerdigstilt()
         }
+    }
+
+    internal object AlleredeBehandlet : Tilstand {
+        override val type: InnsendingTilstandType
+            get() = InnsendingTilstandType.AlleredeBehandletType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
     }
 
     private fun trengerSøknadsdata(hendelse: Hendelse) {
