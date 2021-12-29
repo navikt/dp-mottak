@@ -1,9 +1,7 @@
 package no.nav.dagpenger.mottak.e2e
 
-import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.InnsendingTilstandType
-import no.nav.dagpenger.mottak.InnsendingVisitor
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresTestHelper

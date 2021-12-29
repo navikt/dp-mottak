@@ -715,7 +715,8 @@ class Innsending private constructor(
 
     private fun erFerdigBehandlet() =
         this.tilstand.type in setOf(
-            InnsendingTilstandType.InnsendingFerdigstiltType
+            InnsendingTilstandType.InnsendingFerdigstiltType,
+            InnsendingTilstandType.AlleredeBehandletType
         )
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(
