@@ -13,7 +13,6 @@ import no.nav.dagpenger.mottak.harAvsluttetArbeidsforholdFraKonkurs
 import no.nav.dagpenger.mottak.harAvtjentVerneplikt
 import no.nav.dagpenger.mottak.harEøsArbeidsforhold
 import no.nav.dagpenger.mottak.harEøsBostedsland
-import no.nav.dagpenger.mottak.harInntektFraFangstOgFiske
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -35,7 +34,6 @@ class OppgavebenkTest {
         withSøknad(
             harEøsArbeidsforhold = true,
             harAvtjentVerneplikt = true,
-            harInntektFraFangstOgFiske = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = null, søknadFakta = it)
@@ -48,7 +46,6 @@ class OppgavebenkTest {
     fun `Bruk original benk når bruker har diskresjonskode`() {
         withSøknad(
             harAvtjentVerneplikt = true,
-            harInntektFraFangstOgFiske = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person.copy(diskresjonskode = true), søknadFakta = it)
@@ -61,7 +58,6 @@ class OppgavebenkTest {
     fun `Finn riktig oppgave beskrivelse og benk når søker har avtjent verneplikt `() {
         withSøknad(
             harAvtjentVerneplikt = true,
-            harInntektFraFangstOgFiske = true,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
@@ -71,22 +67,9 @@ class OppgavebenkTest {
     }
 
     @Test
-    fun `Finn riktig oppgave beskrivelse og benk når søker har inntekt fra fangst og fisk ordinær`() {
-        withSøknad(
-            harInntektFraFangstOgFiske = true,
-            harAvsluttetArbeidsforholdFraKonkurs = true
-        ) {
-            val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
-            assertEquals("FANGST OG FISKE\n", oppgaveBenk.beskrivelse)
-            assertEquals("4450", oppgaveBenk.id)
-        }
-    }
-
-    @Test
     fun `Finn riktig oppgave beskrivelse ved Konkurs `() {
         withSøknad(
             harEøsArbeidsforhold = false,
-            harInntektFraFangstOgFiske = false,
             harAvsluttetArbeidsforholdFraKonkurs = true
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, søknadFakta = it)
@@ -219,7 +202,6 @@ class OppgavebenkTest {
     private fun withSøknad(
         harEøsArbeidsforhold: Boolean = false,
         harAvtjentVerneplikt: Boolean = false,
-        harInntektFraFangstOgFiske: Boolean = false,
         harEøsBostedsland: Boolean = false,
         harAvsluttetArbeidsforholdFraKonkurs: Boolean = false,
         erPermittertFraFiskeforedling: Boolean = false,
@@ -234,7 +216,6 @@ class OppgavebenkTest {
             val søknad = mockk<SøknadFakta>(relaxed = false).also {
                 every { it.harEøsArbeidsforhold() } returns harEøsArbeidsforhold
                 every { it.harAvtjentVerneplikt() } returns harAvtjentVerneplikt
-                every { it.harInntektFraFangstOgFiske() } returns harInntektFraFangstOgFiske
                 every { it.harEøsBostedsland() } returns harEøsBostedsland
                 every { it.harAvsluttetArbeidsforholdFraKonkurs() } returns harAvsluttetArbeidsforholdFraKonkurs
                 every { it.erPermittertFraFiskeForedling() } returns erPermittertFraFiskeforedling

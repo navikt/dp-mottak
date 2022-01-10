@@ -63,9 +63,6 @@ private fun asÅrsak(type: String): AvsluttetArbeidsforhold.Sluttårsak = when (
     else -> throw Exception("Missing permitteringstype: $type")
 }
 
-internal fun SøknadFakta.harInntektFraFangstOgFiske(): Boolean =
-    this.getBooleanFaktum("egennaering.fangstogfiske", false).not()
-
 internal fun SøknadFakta.harEøsArbeidsforhold(): Boolean =
     this.getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
 

@@ -110,7 +110,6 @@ data class NySøknad(
         val kanAvslåsPåMinsteinntekt = oppfyllerMinsteArbeidsinntekt == false
         val eøsBostedsland = søknadFakta?.harEøsBostedsland() == true
         val eøsArbeidsforhold = søknadFakta?.harEøsArbeidsforhold() == true
-        val inntektFraFangstFisk = søknadFakta?.harInntektFraFangstOgFiske() == true
         val harAvtjentVerneplikt = søknadFakta?.harAvtjentVerneplikt() == true
         val erPermittertFraFiskeforedling = søknadFakta?.erPermittertFraFiskeForedling() == true
         val erPermittert = søknadFakta?.erPermittert() == true
@@ -127,12 +126,6 @@ data class NySøknad(
             harAvtjentVerneplikt -> OppgaveBenk(
                 behandlendeEnhet(person),
                 "VERNEPLIKT\n",
-                datoRegistrert,
-                tilleggsinformasjon()
-            )
-            inntektFraFangstFisk -> OppgaveBenk(
-                behandlendeEnhet(person),
-                "FANGST OG FISKE\n",
                 datoRegistrert,
                 tilleggsinformasjon()
             )
