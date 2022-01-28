@@ -11,6 +11,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.helse.rapids_rivers.asLocalDateTime
+import no.nav.helse.rapids_rivers.withMDC
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
@@ -48,40 +49,49 @@ internal class SøknadFaktaQuizLøser(
             validate { it.demandAllOrAny("@behov", løserBehov) }
             validate { it.rejectKey("@løsning") }
             validate { it.requireKey("InnsendtSøknadsId") }
+            validate { it.interestedIn("søknad_uuid", "@id") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        try {
-            val søknad = søknadQuizOppslag.hentSøknad(packet["InnsendtSøknadsId"]["url"].asText())
-            packet["@løsning"] = packet["@behov"].map { it.asText() }.filter { it in løserBehov }.map { behov ->
-                behov to when (behov) {
-                    "ØnskerDagpengerFraDato" ->
-                        søknad.ønskerDagpengerFraDato()
-                    "Søknadstidspunkt" -> søknad.søknadstidspunkt()
-                    "Verneplikt" -> søknad.verneplikt()
-                    "FangstOgFiske" -> søknad.fangstOgFisk()
-                    "EØSArbeid" -> søknad.harJobbetIeøsOmråde()
-                    "SisteDagMedArbeidsplikt" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
-                    "SisteDagMedLønn" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
-                    "Lærling" -> søknad.lærling()
-                    "Rettighetstype" -> søknad.rettighetstypeUtregning()
-                    "KanJobbeDeltid" -> søknad.kanJobbeDeltid()
-                    "KanJobbeHvorSomHelst" -> søknad.kanJobbeHvorSomHelst()
-                    "HelseTilAlleTyperJobb" -> søknad.helseTilAlleTyperJobb()
-                    "VilligTilÅBytteYrke" -> søknad.villigTilÅBytteYrke()
-                    "FortsattRettKorona" -> søknad.fortsattRettKorona()
-                    "JobbetUtenforNorge" -> søknad.jobbetUtenforNorge()
-                    else -> throw IllegalArgumentException("Ukjent behov $behov")
-                }
-            }.toMap()
 
-            context.publish(packet.toJson())
-            logger.info("løste søknadfakta-behov for innsendt søknad med id ${packet["InnsendtSøknadsId"]["url"].asText()}")
-        } catch (e: Exception) {
-            // midlertig til vi klarer å nøste opp i det som faktisk får dette til å kræsje
-            logger.error(e) { "feil ved søknadfakta-behov" }
-            sikkerlogg.error(e) { "feil ved søknadfakta-behov. \n packet: ${packet.toJson()}" }
+        withMDC(
+            mapOf(
+                "søknad_uuid" to packet["søknad_uuid"].asText(),
+                "behovId" to packet["@id"].asText()
+            )
+        ) {
+            try {
+                val søknad = søknadQuizOppslag.hentSøknad(packet["InnsendtSøknadsId"]["url"].asText())
+                packet["@løsning"] = packet["@behov"].map { it.asText() }.filter { it in løserBehov }.map { behov ->
+                    behov to when (behov) {
+                        "ØnskerDagpengerFraDato" ->
+                            søknad.ønskerDagpengerFraDato()
+                        "Søknadstidspunkt" -> søknad.søknadstidspunkt()
+                        "Verneplikt" -> søknad.verneplikt()
+                        "FangstOgFiske" -> søknad.fangstOgFisk()
+                        "EØSArbeid" -> søknad.harJobbetIeøsOmråde()
+                        "SisteDagMedArbeidsplikt" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
+                        "SisteDagMedLønn" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
+                        "Lærling" -> søknad.lærling()
+                        "Rettighetstype" -> søknad.rettighetstypeUtregning()
+                        "KanJobbeDeltid" -> søknad.kanJobbeDeltid()
+                        "KanJobbeHvorSomHelst" -> søknad.kanJobbeHvorSomHelst()
+                        "HelseTilAlleTyperJobb" -> søknad.helseTilAlleTyperJobb()
+                        "VilligTilÅBytteYrke" -> søknad.villigTilÅBytteYrke()
+                        "FortsattRettKorona" -> søknad.fortsattRettKorona()
+                        "JobbetUtenforNorge" -> søknad.jobbetUtenforNorge()
+                        else -> throw IllegalArgumentException("Ukjent behov $behov")
+                    }
+                }.toMap()
+
+                context.publish(packet.toJson())
+                logger.info("løste søknadfakta-behov for innsendt søknad med id ${packet["InnsendtSøknadsId"]["url"].asText()}")
+            } catch (e: Exception) {
+                // midlertig til vi klarer å nøste opp i det som faktisk får dette til å kræsje
+                logger.error(e) { "feil ved søknadfakta-behov" }
+                sikkerlogg.error(e) { "feil ved søknadfakta-behov. \n packet: ${packet.toJson()}" }
+            }
         }
     }
 }
