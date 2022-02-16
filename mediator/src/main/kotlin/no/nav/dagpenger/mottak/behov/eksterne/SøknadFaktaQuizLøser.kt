@@ -62,7 +62,7 @@ internal class SøknadFaktaQuizLøser(
             )
         ) {
             try {
-                val søknad = søknadQuizOppslag.hentSøknad(packet["InnsendtSøknadsId"]["url"].asText())
+                val søknad = søknadQuizOppslag.hentSøknad(packet["InnsendtSøknadsId"]["urn"].asText())
                 packet["@løsning"] = packet["@behov"].map { it.asText() }.filter { it in løserBehov }.map { behov ->
                     behov to when (behov) {
                         "ØnskerDagpengerFraDato" ->
@@ -86,7 +86,7 @@ internal class SøknadFaktaQuizLøser(
                 }.toMap()
 
                 context.publish(packet.toJson())
-                logger.info("løste søknadfakta-behov for innsendt søknad med id ${packet["InnsendtSøknadsId"]["url"].asText()}")
+                logger.info("løste søknadfakta-behov for innsendt søknad med id ${packet["InnsendtSøknadsId"]["urn"].asText()}")
             } catch (e: Exception) {
                 // midlertig til vi klarer å nøste opp i det som faktisk får dette til å kræsje
                 logger.error(e) { "feil ved søknadfakta-behov" }
