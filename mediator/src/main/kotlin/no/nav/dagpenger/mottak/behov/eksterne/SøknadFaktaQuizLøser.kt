@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.behov.eksterne
 
 import com.fasterxml.jackson.databind.JsonNode
+import de.slub.urn.URN
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.SøknadFakta
@@ -62,7 +63,8 @@ internal class SøknadFaktaQuizLøser(
             )
         ) {
             try {
-                val søknad = søknadQuizOppslag.hentSøknad(packet["InnsendtSøknadsId"]["urn"].asText())
+                val innsendtSøknadsId = packet.getInnsendtSøknadsId()
+                val søknad = søknadQuizOppslag.hentSøknad(innsendtSøknadsId)
                 packet["@løsning"] = packet["@behov"].map { it.asText() }.filter { it in løserBehov }.map { behov ->
                     behov to when (behov) {
                         "ØnskerDagpengerFraDato" ->
@@ -86,7 +88,7 @@ internal class SøknadFaktaQuizLøser(
                 }.toMap()
 
                 context.publish(packet.toJson())
-                logger.info("løste søknadfakta-behov for innsendt søknad med id ${packet["InnsendtSøknadsId"]["urn"].asText()}")
+                logger.info("løste søknadfakta-behov for innsendt søknad med id $innsendtSøknadsId")
             } catch (e: Exception) {
                 // midlertig til vi klarer å nøste opp i det som faktisk får dette til å kræsje
                 logger.error(e) { "feil ved søknadfakta-behov" }
@@ -94,6 +96,14 @@ internal class SøknadFaktaQuizLøser(
             }
         }
     }
+}
+
+private fun JsonMessage.getInnsendtSøknadsId(): String {
+    return this["InnsendtSøknadsId"]["urn"]
+        .asText()
+        .let { URN.rfc8141().parse(it) }
+        .namespaceSpecificString()
+        .toString()
 }
 
 private fun SøknadFakta.sisteDagMedLønnEllerArbeidsplikt(): LocalDate {

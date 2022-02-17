@@ -177,7 +177,7 @@ internal class SøknadFaktaLøserTest {
       "@behov": [
        "$behovNavn"
       ],
-      "InnsendtSøknadsId":{"lastOppTidsstempel":"2020-11-26T10:33:38.684844","urn":"321"}
+      "InnsendtSøknadsId":{"lastOppTidsstempel":"2020-11-26T10:33:38.684844","urn":"urn:soknadid:321"}
     }
         """.trimIndent()
 
@@ -194,7 +194,7 @@ internal class SøknadFaktaLøserTest {
        "SisteDagMedArbeidsplikt",
        "Lærling"
       ],
-      "InnsendtSøknadsId":{"lastOppTidsstempel":"2020-11-26T10:33:38.684844","urn":"321"}
+      "InnsendtSøknadsId":{"lastOppTidsstempel":"2020-11-26T10:33:38.684844","urn":"urn:soknadid:321"}
     }
         """.trimIndent()
 }

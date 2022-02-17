@@ -19,6 +19,7 @@ dependencies {
     implementation(Ktor.library("client-cio-jvm"))
     implementation(Ktor.library("client-jackson"))
     implementation(Ktor.auth)
+    implementation("de.slub-dresden:urnlib:2.0.1")
 
     // unleash
     implementation("no.finn.unleash:unleash-client-java:4.2.1") {
