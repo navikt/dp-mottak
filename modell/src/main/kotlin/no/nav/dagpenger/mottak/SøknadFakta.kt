@@ -32,8 +32,6 @@ fun SøknadFakta.erPermittertFraFiskeForedling(): Boolean =
 fun SøknadFakta.erPermittert(): Boolean =
     this.avsluttetArbeidsforhold().any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT }
 
-fun SøknadFakta.erFornyetRettighet(): Boolean = this.getBooleanFaktum("fornyetrett.onskerutvidelse", true).not()
-
 data class AvsluttetArbeidsforhold(
     val sluttårsak: Sluttårsak,
     val fiskeforedling: Boolean,
