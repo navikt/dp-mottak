@@ -89,10 +89,7 @@ sealed class KategorisertJournalpost(
         val beskrivelse: String,
         val datoRegistrert: LocalDateTime,
         val tilleggsinformasjon: String
-    ) {
-
-        fun toJson() = JsonMapper.jacksonJsonAdapter.writeValueAsString(this)
-    }
+    )
 }
 
 data class NySøknad(
