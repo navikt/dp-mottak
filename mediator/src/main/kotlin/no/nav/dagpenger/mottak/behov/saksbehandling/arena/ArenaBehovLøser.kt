@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak.behov.saksbehandling.arena
 
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -83,45 +84,50 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
         }
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
+            val behovId = packet["@id"].asText()
             val journalpostId = packet["journalpostId"].asText()
 
-            try {
-                runBlocking {
-                    val behovNavn = packet["@behov"].first().asText()
-                    if (journalpostId == "510535172" || journalpostId == "512787291" || journalpostId == "535187062") {
-                        packet["@feil"] = behovNavn
-                        logger.error { "Kunne ikke opprette arena sak med journalpostId $journalpostId" }
-                    } else {
-                        val oppgaveResponse = when (behovNavn) {
-                            "OpprettVurderhenvendelseOppgave" -> arenaOppslag.opprettVurderHenvendelsOppgave(
-                                journalpostId,
-                                packet.arenaOppgaveParametre()
-                            )
-                            "OpprettStartVedtakOppgave" -> arenaOppslag.opprettStartVedtakOppgave(
-                                journalpostId,
-                                packet.arenaOppgaveParametre()
-                            )
-                            else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
-                        }
-
-                        if (oppgaveResponse != null) {
-                            packet["@løsning"] = mapOf(
-                                behovNavn to mapOf(
-                                    "journalpostId" to journalpostId,
-                                    "fagsakId" to oppgaveResponse.fagsakId,
-                                    "oppgaveId" to oppgaveResponse.oppgaveId
-                                )
-                            )
-                        } else {
+            withLoggingContext("journalpostId" to journalpostId, "behovId" to behovId) {
+                try {
+                    runBlocking {
+                        val behovNavn = packet["@behov"].first().asText()
+                        if (journalpostId == "510535172" || journalpostId == "512787291" || journalpostId == "535187062") {
                             packet["@feil"] = behovNavn
-                        }
-                    }
+                            logger.error { "Kunne ikke opprette arena sak med journalpostId $journalpostId" }
+                        } else {
+                            val oppgaveResponse = when (behovNavn) {
+                                "OpprettVurderhenvendelseOppgave" -> arenaOppslag.opprettVurderHenvendelsOppgave(
+                                    journalpostId,
+                                    packet.arenaOppgaveParametre()
+                                )
+                                "OpprettStartVedtakOppgave" -> arenaOppslag.opprettStartVedtakOppgave(
+                                    journalpostId,
+                                    packet.arenaOppgaveParametre()
+                                )
+                                else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
+                            }
 
-                    context.publish(packet.toJson())
+                            if (oppgaveResponse != null) {
+                                packet["@løsning"] = mapOf(
+                                    behovNavn to mapOf(
+                                        "journalpostId" to journalpostId,
+                                        "fagsakId" to oppgaveResponse.fagsakId,
+                                        "oppgaveId" to oppgaveResponse.oppgaveId
+                                    )
+                                ).also {
+                                    logger.info { "Løste behov $behovNavn med løsning $it" }
+                                }
+                            } else {
+                                packet["@feil"] = behovNavn
+                            }
+                        }
+
+                        context.publish(packet.toJson())
+                    }
+                } catch (e: Exception) {
+                    logger.error(e) { "Kunne ikke opprette arena sak med journalpostId $journalpostId" }
+                    throw e
                 }
-            } catch (e: Exception) {
-                logger.error(e) { "Kunne ikke opprette arena sak med journalpostId $journalpostId" }
-                throw e
             }
         }
     }
