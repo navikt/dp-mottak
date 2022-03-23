@@ -41,7 +41,7 @@ class PersonInformasjon(
     ) {
 
         init {
-            require(FodselsnummerValidator.isValid(ident)) { "Ikke gyldig ident" }
+            require(FodselsnummerValidator.isValid(ident) || erSyntetiskTestIdent()) { "Ikke gyldig ident" }
         }
 
         fun erDnummer() = ident.substring(0, 1).toInt() in 4..7
@@ -49,6 +49,8 @@ class PersonInformasjon(
         fun accept(visitor: PersonVisitor) {
             visitor.visitPerson(navn, aktørId, ident, norskTilknytning, diskresjonskode)
         }
+
+        private fun erSyntetiskTestIdent() = ident[2].toString() == "8"
     }
 }
 
