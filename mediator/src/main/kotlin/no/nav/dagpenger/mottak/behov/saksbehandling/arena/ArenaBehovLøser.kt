@@ -20,7 +20,6 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
         private val arenaOppslag: ArenaOppslag,
         rapidsConnection: RapidsConnection
     ) : River.PacketListener {
-
         companion object {
             private val logger = KotlinLogging.logger { }
         }
@@ -54,7 +53,6 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
         private val arenaOppslag: ArenaOppslag,
         rapidsConnection: RapidsConnection
     ) : River.PacketListener {
-
         companion object {
             private val logger = KotlinLogging.logger { }
         }
@@ -119,6 +117,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                                 }
                             } else {
                                 packet["@feil"] = behovNavn
+                                logger.error { "Kunne ikke opprette oppgave i Arena for journalpostId $journalpostId" }
                             }
                         }
 
