@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak.behov.saksbehandling.gosys
 
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -10,7 +11,6 @@ import java.time.LocalDate
 
 internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag, rapidsConnection: RapidsConnection) :
     River.PacketListener {
-
     private companion object {
         val logger = KotlinLogging.logger { }
     }
@@ -27,24 +27,26 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val journalpostId = packet["journalpostId"].asText()
-        try {
-            runBlocking {
-                gosysOppslag.opprettOppgave(
-                    packet.gosysOppgave()
-                )
-            }.also {
 
-                packet["@løsning"] = mapOf(
-                    "OpprettGosysoppgave" to mapOf(
-                        "journalpostId" to journalpostId,
-                        "oppgaveId" to it
+        withLoggingContext("journalpostId" to journalpostId) {
+            try {
+                runBlocking {
+                    gosysOppslag.opprettOppgave(
+                        packet.gosysOppgave()
                     )
-                )
-                context.publish(packet.toJson())
+                }.also {
+                    packet["@løsning"] = mapOf(
+                        "OpprettGosysoppgave" to mapOf(
+                            "journalpostId" to journalpostId,
+                            "oppgaveId" to it
+                        )
+                    )
+                    context.publish(packet.toJson())
+                }
+            } catch (e: Exception) {
+                logger.info { "Kunne ikke opprette gosys oppgave for journalpost med id $journalpostId" }
+                throw e
             }
-        } catch (e: Exception) {
-            logger.info { "Kunne ikke opprette gosys oppgave for journalpost med id $journalpostId" }
-            throw e
         }
     }
 }
