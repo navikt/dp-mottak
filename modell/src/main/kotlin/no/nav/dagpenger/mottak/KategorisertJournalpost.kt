@@ -55,7 +55,7 @@ sealed class KategorisertJournalpost(
         )
 
     private val UTLAND_BREVKODER =
-        listOf("NAV 04-02.01", "NAVe 04-02.01", "NAV 04-02.03", "NAV 04-02.05", "NAVe 04-02.05")
+        listOf("NAV 04-02.01", "NAVe 04-02.01", "NAV 04-02.03", "NAV 04-02.05", "NAVe 04-02.05", "UTL")
 
     fun tilleggsinformasjon(): String {
 
