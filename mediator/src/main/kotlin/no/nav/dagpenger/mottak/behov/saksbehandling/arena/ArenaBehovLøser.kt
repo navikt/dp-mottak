@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling.arena
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -36,16 +37,19 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
         }
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
-            try {
-                runBlocking {
-                    arenaOppslag.harEksisterendeSaker(packet["fnr"].asText()).also {
-                        packet["@løsning"] = mapOf("EksisterendeSaker" to mapOf("harEksisterendeSak" to it))
-                        context.publish(packet.toJson())
+            val journalpostId = packet["journalpostId"].asText()
+            withLoggingContext("journalpostId" to journalpostId) {
+                try {
+                    runBlocking(MDCContext()) {
+                        arenaOppslag.harEksisterendeSaker(packet["fnr"].asText()).also {
+                            packet["@løsning"] = mapOf("EksisterendeSaker" to mapOf("harEksisterendeSak" to it))
+                            context.publish(packet.toJson())
+                        }
                     }
+                } catch (e: Exception) {
+                    logger.info { "Kunne ikke hente eksisterende saker for søknad med journalpostId $journalpostId" }
+                    throw e
                 }
-            } catch (e: Exception) {
-                logger.info { "Kunne ikke hente eksisterende saker for søknad med journalpostId ${packet["journalpostId"].asText()}" }
-                throw e
             }
         }
     }

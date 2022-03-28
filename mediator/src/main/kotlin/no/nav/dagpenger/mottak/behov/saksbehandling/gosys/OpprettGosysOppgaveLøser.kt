@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling.gosys
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -30,7 +31,7 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
 
         withLoggingContext("journalpostId" to journalpostId) {
             try {
-                runBlocking {
+                runBlocking(MDCContext()) {
                     gosysOppslag.opprettOppgave(
                         packet.gosysOppgave()
                     )
