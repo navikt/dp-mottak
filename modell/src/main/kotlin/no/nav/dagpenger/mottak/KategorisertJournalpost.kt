@@ -89,10 +89,7 @@ sealed class KategorisertJournalpost(
         val beskrivelse: String,
         val datoRegistrert: LocalDateTime,
         val tilleggsinformasjon: String
-    ) {
-
-        fun toJson() = JsonMapper.jacksonJsonAdapter.writeValueAsString(this)
-    }
+    )
 }
 
 data class NySøknad(
@@ -114,7 +111,7 @@ data class NySøknad(
         val erPermittertFraFiskeforedling = søknadFakta?.erPermittertFraFiskeForedling() == true
         val erPermittert = søknadFakta?.erPermittert() == true
         val datoRegistrert = journalpost.datoRegistrert()
-        val originalOppgavebenk = when {
+        return when {
             eøsArbeidsforhold -> {
                 OppgaveBenk(
                     "4470",
@@ -158,7 +155,6 @@ data class NySøknad(
                 tilleggsinformasjon()
             )
         }
-        return fornyetRettEllerOriginal(søknadFakta, originalOppgavebenk)
     }
 
     private fun finnEnhetForHurtigAvslag(person: Person?) = when (behandlendeEnhet(person)) {
@@ -177,7 +173,7 @@ data class Gjenopptak(
         søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
-    ) = fornyetRettEllerOriginal(søknadFakta, super.finnOppgaveBenk(søknadFakta, oppfyllerMinsteArbeidsinntekt, person))
+    ) = super.finnOppgaveBenk(søknadFakta, oppfyllerMinsteArbeidsinntekt, person)
 }
 
 data class Utdanning(
@@ -262,17 +258,4 @@ data class UtenBruker(
     override val journalpost: Journalpost
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "${journalpost.tittel()}\n"
-}
-
-private fun fornyetRettEllerOriginal(
-    søknadFakta: SøknadFakta?,
-    originalOppgavebenk: KategorisertJournalpost.OppgaveBenk
-): KategorisertJournalpost.OppgaveBenk {
-    return if (søknadFakta?.erFornyetRettighet() == true)
-        KategorisertJournalpost.OppgaveBenk(
-            "4451",
-            "Anmodningsvedtak 538",
-            originalOppgavebenk.datoRegistrert,
-            originalOppgavebenk.toJson()
-        ) else originalOppgavebenk
 }
