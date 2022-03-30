@@ -21,7 +21,6 @@ internal class JournalpostMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
-
     private val løsning = "@løsning.${Behov.Journalpost.name}"
 
     init {
@@ -35,8 +34,7 @@ internal class JournalpostMottak(
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val journalpostId = packet["journalpostId"].asText()
-        logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
-
+        logg.info { "Fått løsning for $løsning, journalpostId=$journalpostId" }
         val journalpostData = try {
             packet[løsning].let {
                 Journalpost(
@@ -61,7 +59,9 @@ internal class JournalpostMottak(
                         it["datotype"].asText() == "DATO_REGISTRERT"
                     }?.get("dato")?.asText().let { LocalDateTime.parse(it) } ?: LocalDateTime.now(),
                     behandlingstema = it["behandlingstema"].textValue()
-                )
+                ).also {
+                    logg.info { "Mottok ny journalpost. Antall dokumenter=${it.dokumenter().size}, brevkode=${it.hovedDokument().brevkode}, registrertDato=${it.datoRegistrert()}, behandlingstema=${packet[løsning]["behandlingstema"].textValue()}" }
+                }
             }
         } catch (e: Exception) {
             sikkerLogg.error { "Klarte ikke å lese $journalpostId, ${packet.toJson()}" }
