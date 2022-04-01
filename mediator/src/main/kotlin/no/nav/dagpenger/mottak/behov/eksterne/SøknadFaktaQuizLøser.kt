@@ -161,7 +161,7 @@ private fun SøknadFakta.harJobbetIeøsOmråde() = getBooleanFaktum("eosarbeidsf
 
 private fun SøknadFakta.jobbetUtenforNorge() = this.avsluttetArbeidsforhold().any { it.land != "NOR" }
 
-private fun SøknadFakta.fortsattRettKorona() = getBooleanFaktum("fornyetrett.bruktopp").not()
+private fun SøknadFakta.fortsattRettKorona() = false
 
 private fun SøknadFakta.rettighetstypeUtregning(): List<Map<String, Boolean>> =
     rettighetstypeUtregning(this.avsluttetArbeidsforhold())
