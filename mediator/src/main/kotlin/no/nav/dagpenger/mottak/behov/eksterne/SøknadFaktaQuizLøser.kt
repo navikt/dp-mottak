@@ -90,9 +90,9 @@ internal class SøknadFaktaQuizLøser(
                 context.publish(packet.toJson())
                 logger.info("løste søknadfakta-behov for innsendt søknad med id $innsendtSøknadsId")
             } catch (e: Exception) {
-                // midlertig til vi klarer å nøste opp i det som faktisk får dette til å kræsje
                 logger.error(e) { "feil ved søknadfakta-behov" }
                 sikkerlogg.error(e) { "feil ved søknadfakta-behov. \n packet: ${packet.toJson()}" }
+                throw e
             }
         }
     }
