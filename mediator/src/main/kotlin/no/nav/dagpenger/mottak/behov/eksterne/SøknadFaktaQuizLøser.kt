@@ -75,13 +75,11 @@ internal class SøknadFaktaQuizLøser(
                         "EØSArbeid" -> søknad.harJobbetIeøsOmråde()
                         "SisteDagMedArbeidsplikt" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
                         "SisteDagMedLønn" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
-                        "Lærling" -> søknad.lærling()
                         "Rettighetstype" -> søknad.rettighetstypeUtregning()
                         "KanJobbeDeltid" -> søknad.kanJobbeDeltid()
                         "KanJobbeHvorSomHelst" -> søknad.kanJobbeHvorSomHelst()
                         "HelseTilAlleTyperJobb" -> søknad.helseTilAlleTyperJobb()
                         "VilligTilÅBytteYrke" -> søknad.villigTilÅBytteYrke()
-                        "FortsattRettKorona" -> søknad.fortsattRettKorona()
                         "JobbetUtenforNorge" -> søknad.jobbetUtenforNorge()
                         else -> throw IllegalArgumentException("Ukjent behov $behov")
                     }
@@ -141,10 +139,6 @@ private fun localDateEllerNull(jsonNode: JsonNode?): LocalDate? = jsonNode?.let 
     }
 }
 
-private fun SøknadFakta.lærling() = getFakta("arbeidsforhold").any {
-    it["properties"]?.get("laerling")?.asBoolean() ?: false
-}
-
 private fun SøknadFakta.søknadstidspunkt() =
     getFakta("innsendtDato").first()["value"].asLocalDateTime().toLocalDate()
 
@@ -160,8 +154,6 @@ private fun SøknadFakta.fangstOgFisk() = getBooleanFaktum("egennaering.fangstog
 private fun SøknadFakta.harJobbetIeøsOmråde() = getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
 
 private fun SøknadFakta.jobbetUtenforNorge() = this.avsluttetArbeidsforhold().any { it.land != "NOR" }
-
-private fun SøknadFakta.fortsattRettKorona() = false
 
 private fun SøknadFakta.rettighetstypeUtregning(): List<Map<String, Boolean>> =
     rettighetstypeUtregning(this.avsluttetArbeidsforhold())

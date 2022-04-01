@@ -42,13 +42,11 @@ internal class SøknadFaktaLøserTest {
             "FangstOgFiske:true",
             "SisteDagMedArbeidsplikt:2020-03-23",
             "SisteDagMedLønn:2020-03-23",
-            "Lærling:true",
             "EØSArbeid:true",
             "KanJobbeDeltid:true",
             "KanJobbeHvorSomHelst:true",
             "HelseTilAlleTyperJobb:true",
             "VilligTilÅBytteYrke:true",
-            "FortsattRettKorona:false",
             "JobbetUtenforNorge:true"
         ],
         delimiter = ':'
@@ -67,7 +65,7 @@ internal class SøknadFaktaLøserTest {
         assertEquals(1, testRapid.inspektør.size)
 
         with(testRapid.inspektør) {
-            assertEquals("true", field(0, "@løsning")["Lærling"].asText())
+            assertEquals("false", field(0, "@løsning")["Verneplikt"].asText())
             assertEquals("2020-03-23", field(0, "@løsning")["SisteDagMedArbeidsplikt"].asText())
         }
     }
@@ -192,7 +190,7 @@ internal class SøknadFaktaLøserTest {
       "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
       "@behov": [
        "SisteDagMedArbeidsplikt",
-       "Lærling"
+       "Verneplikt"
       ],
       "InnsendtSøknadsId":{"lastOppTidsstempel":"2020-11-26T10:33:38.684844","urn":"urn:soknadid:321"}
     }
