@@ -23,7 +23,7 @@ class Søknadsdata(
     class GammelSøknad(
         val data: JsonNode
     ) : SøknadFaktum {
-        fun søknadsId(): String? = data["brukerBehandlingId"].textValue()
+        override fun søknadsId(): String? = data["brukerBehandlingId"].textValue()
 
         private fun getFakta(faktaNavn: String): List<JsonNode> =
             data.get("fakta")?.filter { it["key"].asText() == faktaNavn } ?: emptyList()
@@ -51,7 +51,7 @@ class Søknadsdata(
             visitor.visitSøknad(this)
         }
 
-        private fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
+        override fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
             return this.getFakta("arbeidsforhold")
                 .map {
                     AvsluttetArbeidsforhold(
@@ -61,6 +61,8 @@ class Søknadsdata(
                     )
                 }
         }
+
+        override fun jobbetUtenforNorge(): Boolean = this.avsluttetArbeidsforhold().any { it.land != "NOR" }
 
         override fun avsluttetArbeidsforholdFraKonkurs(): Boolean =
             this.avsluttetArbeidsforhold()
@@ -75,7 +77,9 @@ class Søknadsdata(
 
         override fun eøsArbeidsforhold(): Boolean = this.getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
 
-        override fun avtjentVerneplikt(): Boolean = this.getFakta("ikkeavtjentverneplikt").getOrNull(0)?.get("value")?.asBoolean()?.not() ?: false
+        override fun avtjentVerneplikt(): Boolean =
+            this.getFakta("ikkeavtjentverneplikt").getOrNull(0)?.get("value")?.asBoolean()?.not() ?: false
+
         override fun helseTilAlleTyperJobb(): Boolean = getBooleanFaktum("reellarbeidssoker.villighelse")
 
         override fun kanJobbeHvorSomHelst(): Boolean =
@@ -85,7 +89,8 @@ class Søknadsdata(
 
         override fun villigTilÅBytteYrke(): Boolean = getBooleanFaktum("reellarbeidssoker.villigjobb")
 
-        override fun rettighetstypeUtregning(): List<Map<String, Boolean>> = rettighetstypeUtregning(this.avsluttetArbeidsforhold())
+        override fun rettighetstypeUtregning(): List<Map<String, Boolean>> =
+            rettighetstypeUtregning(this.avsluttetArbeidsforhold())
 
         private fun rettighetstypeUtregning(avsluttedeArbeidsforhold: List<AvsluttetArbeidsforhold>) =
             avsluttedeArbeidsforhold.map {
@@ -108,9 +113,11 @@ class Søknadsdata(
 
         override fun verneplikt(): Boolean = getBooleanFaktum("ikkeavtjentverneplikt", true).not()
 
-        override fun ønskerDagpengerFraDato(): LocalDate = getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()
+        override fun ønskerDagpengerFraDato(): LocalDate =
+            getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()
 
-        override fun søknadstidspunkt(): LocalDate = getFakta("innsendtDato").first()["value"].asLocalDateTime().toLocalDate()
+        override fun søknadstidspunkt(): LocalDate =
+            getFakta("innsendtDato").first()["value"].asLocalDateTime().toLocalDate()
 
         override fun sisteDagMedLønnEllerArbeidsplikt(): LocalDate {
             if (getFakta("arbeidsforhold").isEmpty())
@@ -186,13 +193,10 @@ class Søknadsdata(
     }
 }
 
-private fun JsonNode.asLocalDateTime(): LocalDateTime {
-    TODO("Not yet implemented")
-}
+private fun JsonNode.asLocalDateTime(): LocalDateTime = this.asText().let { LocalDateTime.parse(it) }
 
-private fun JsonNode.asLocalDate(): LocalDate {
-    TODO("Not yet implemented")
-}
+private fun JsonNode.asLocalDate(): LocalDate = this.asText().let { LocalDate.parse(it) }
+
 private fun localDateEllerNull(jsonNode: JsonNode?): LocalDate? = jsonNode?.let {
     try {
         LocalDate.parse(jsonNode.asText())

@@ -82,6 +82,9 @@ interface SøknadFaktum {
     fun sisteDagMedLønnEllerArbeidsplikt(): LocalDate
     fun sisteDagMedLønnKonkurs(): LocalDate
     fun sisteDagMedLønnEllerArbeidspliktResten(): LocalDate
+    fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold
+    fun jobbetUtenforNorge(): Boolean
+    fun søknadsId(): String?
 }
 
 internal typealias AvsluttedeArbeidsforhold = List<AvsluttetArbeidsforhold>

@@ -41,7 +41,7 @@ internal class PostgresSøknadQuizOppslagTest {
 
             PostgresSøknadQuizOppslag(PostgresTestHelper.dataSource).also {
                 it.hentSøknad("1000S63MA").also { søknadFakta ->
-                    assertEquals("1000S63MA", søknadFakta.getField("brukerBehandlingId").asText())
+                    assertEquals("1000S63MA", søknadFakta.søknadsId())
                 }
                 assertThrows<IllegalArgumentException> { it.hentSøknad("Nehehehei") }
             }

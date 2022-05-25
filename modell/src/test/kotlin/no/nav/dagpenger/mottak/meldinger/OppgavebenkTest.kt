@@ -4,13 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
-import no.nav.dagpenger.mottak.SøknadFakta
-import no.nav.dagpenger.mottak.erPermittert
-import no.nav.dagpenger.mottak.erPermittertFraFiskeForedling
-import no.nav.dagpenger.mottak.harAvsluttetArbeidsforholdFraKonkurs
-import no.nav.dagpenger.mottak.harAvtjentVerneplikt
-import no.nav.dagpenger.mottak.harEøsArbeidsforhold
-import no.nav.dagpenger.mottak.harEøsBostedsland
+import no.nav.dagpenger.mottak.SøknadFaktum
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -191,19 +185,19 @@ class OppgavebenkTest {
         harAvsluttetArbeidsforholdFraKonkurs: Boolean = false,
         erPermittertFraFiskeforedling: Boolean = false,
         erPermittert: Boolean = false,
-        test: (søknadFakta: SøknadFakta) -> Unit
+        test: (søknadFakta: SøknadFaktum) -> Unit
     ) {
 
         mockkStatic(
             "no.nav.dagpenger.mottak.SøknadFaktaKt"
         ) {
-            val søknad = mockk<SøknadFakta>(relaxed = false).also {
-                every { it.harEøsArbeidsforhold() } returns harEøsArbeidsforhold
-                every { it.harAvtjentVerneplikt() } returns harAvtjentVerneplikt
-                every { it.harEøsBostedsland() } returns harEøsBostedsland
-                every { it.harAvsluttetArbeidsforholdFraKonkurs() } returns harAvsluttetArbeidsforholdFraKonkurs
-                every { it.erPermittertFraFiskeForedling() } returns erPermittertFraFiskeforedling
-                every { it.erPermittert() } returns erPermittert
+            val søknad = mockk<SøknadFaktum>(relaxed = false).also {
+                every { it.eøsArbeidsforhold() } returns harEøsArbeidsforhold
+                every { it.avtjentVerneplikt() } returns harAvtjentVerneplikt
+                every { it.eøsBostedsland() } returns harEøsBostedsland
+                every { it.avsluttetArbeidsforholdFraKonkurs() } returns harAvsluttetArbeidsforholdFraKonkurs
+                every { it.permittertFraFiskeForedling() } returns erPermittertFraFiskeforedling
+                every { it.permittert() } returns erPermittert
             }
             test(søknad)
         }

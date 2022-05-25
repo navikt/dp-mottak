@@ -52,8 +52,8 @@ internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
 internal class PdlPersondataOppslagException(s: String) : RuntimeException(s)
 
 internal fun hasError(json: String): Boolean {
-    val json = jacksonObjectMapper().readTree(json)
-    return (harGraphqlErrors(json) && !ukjentPersonIdent(json))
+    val j = jacksonObjectMapper().readTree(json)
+    return (harGraphqlErrors(j) && !ukjentPersonIdent(j))
 }
 
 private fun harGraphqlErrors(json: JsonNode) =
