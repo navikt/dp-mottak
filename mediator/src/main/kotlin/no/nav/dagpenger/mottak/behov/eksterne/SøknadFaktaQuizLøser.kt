@@ -1,20 +1,13 @@
 package no.nav.dagpenger.mottak.behov.eksterne
 
-import com.fasterxml.jackson.databind.JsonNode
 import de.slub.urn.URN
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
-import no.nav.dagpenger.mottak.SøknadFakta
-import no.nav.dagpenger.mottak.avsluttetArbeidsforhold
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.asLocalDate
-import no.nav.helse.rapids_rivers.asLocalDateTime
 import no.nav.helse.rapids_rivers.withMDC
-import java.time.LocalDate
-import java.time.format.DateTimeParseException
 
 internal class SøknadFaktaQuizLøser(
     private val søknadQuizOppslag: SøknadQuizOppslag,
@@ -103,65 +96,6 @@ private fun JsonMessage.getInnsendtSøknadsId(): String {
         .namespaceSpecificString()
         .toString()
 }
-
-private fun SøknadFakta.sisteDagMedLønnEllerArbeidsplikt(): LocalDate {
-    if (getFakta("arbeidsforhold").isEmpty())
-        return getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()
-    return when (avsluttetArbeidsforhold().first().sluttårsak) {
-        AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS -> sisteDagMedLønnKonkurs()
-        else -> sisteDagMedLønnEllerArbeidspliktResten()
-    }
-}
-
-private fun SøknadFakta.sisteDagMedLønnKonkurs(): LocalDate {
-    return getFakta("arbeidsforhold").first().let {
-        localDateEllerNull(it["properties"]["lonnkonkursmaaned_dato"])
-            ?: it["properties"]["konkursdato"].asLocalDate()
-    }
-}
-
-// Varighet på arbeidsforholdet (til dato) ?: Lønnspliktperiode for arbeidsgiver (til dato) ?: Arbeidstid redusert fra ?: Permitteringsperiode (fra dato)
-private fun SøknadFakta.sisteDagMedLønnEllerArbeidspliktResten(): LocalDate {
-    return getFakta("arbeidsforhold").first().let {
-        localDateEllerNull(it["properties"]["datotil"])
-            ?: localDateEllerNull(it["properties"]["lonnspliktigperiodedatotil"])
-            ?: localDateEllerNull(it["properties"]["redusertfra"])
-            ?: getFakta("arbeidsforhold.permitteringsperiode")
-                .first()["properties"]["permiteringsperiodedatofra"].asLocalDate()
-    }
-}
-
-private fun localDateEllerNull(jsonNode: JsonNode?): LocalDate? = jsonNode?.let {
-    try {
-        LocalDate.parse(jsonNode.asText())
-    } catch (e: DateTimeParseException) { // Optional datoer får noen ganger verdi “NaN-aN-aN”
-        null
-    }
-}
-
-private fun SøknadFakta.søknadstidspunkt() =
-    getFakta("innsendtDato").first()["value"].asLocalDateTime().toLocalDate()
-
-private fun SøknadFakta.ønskerDagpengerFraDato() =
-    getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()
-
-private fun SøknadFakta.verneplikt() = getBooleanFaktum("ikkeavtjentverneplikt", true).not()
-
-// omvendt logikk i søknad; verdi == true --> søker har ikke inntekt fra fangst og fisk
-private fun SøknadFakta.fangstOgFisk() = getBooleanFaktum("egennaering.fangstogfiske").not()
-
-// omvendt logikk i søknad; verdi == true --> søker har ikke jobbet i EØS området
-private fun SøknadFakta.harJobbetIeøsOmråde() = getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
-
-private fun SøknadFakta.jobbetUtenforNorge() = this.avsluttetArbeidsforhold().any { it.land != "NOR" }
-
-private fun SøknadFakta.rettighetstypeUtregning(): List<Map<String, Boolean>> =
-    rettighetstypeUtregning(this.avsluttetArbeidsforhold())
-
-private fun SøknadFakta.kanJobbeDeltid() = getBooleanFaktum("reellarbeidssoker.villigdeltid")
-private fun SøknadFakta.kanJobbeHvorSomHelst() = getBooleanFaktum("reellarbeidssoker.villigpendle")
-private fun SøknadFakta.helseTilAlleTyperJobb() = getBooleanFaktum("reellarbeidssoker.villighelse")
-private fun SøknadFakta.villigTilÅBytteYrke() = getBooleanFaktum("reellarbeidssoker.villigjobb")
 
 internal fun rettighetstypeUtregning(avsluttedeArbeidsforhold: List<AvsluttetArbeidsforhold>) =
     avsluttedeArbeidsforhold.map {

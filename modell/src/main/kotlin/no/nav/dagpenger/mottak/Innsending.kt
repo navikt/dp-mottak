@@ -21,7 +21,7 @@ class Innsending private constructor(
     private val journalpostId: String,
     private var tilstand: Tilstand,
     private var journalpost: Journalpost?,
-    private var søknad: Søknadsdata.Søknad?,
+    private var søknad: Søknadsdata.GammelSøknad?,
     private var oppfyllerMinsteArbeidsinntekt: Boolean?,
     private var eksisterendeSaker: Boolean?,
     private var person: Person?,

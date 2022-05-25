@@ -1,36 +1,90 @@
 package no.nav.dagpenger.mottak
 
-import com.fasterxml.jackson.databind.JsonNode
+import java.time.LocalDate
 
+/*
 interface SøknadFakta {
     fun getFakta(faktaNavn: String): List<JsonNode>
     fun getBooleanFaktum(faktaNavn: String): Boolean
     fun getBooleanFaktum(faktaNavn: String, defaultValue: Boolean): Boolean
     fun getChildFakta(faktumId: Int): List<JsonNode>
     fun getField(navn: String): JsonNode
+
+private fun SøknadFakta.søknadstidspunkt() =
+    getFakta("innsendtDato").first()["value"].asLocalDateTime().toLocalDate()
+
+private fun SøknadFakta.ønskerDagpengerFraDato() =
+    getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()
+
+private fun SøknadFakta.verneplikt() = getBooleanFaktum("ikkeavtjentverneplikt", true).not()
+
+// omvendt logikk i søknad; verdi == true --> søker har ikke inntekt fra fangst og fisk
+private fun SøknadFakta.fangstOgFisk() = getBooleanFaktum("egennaering.fangstogfiske").not()
+
+// omvendt logikk i søknad; verdi == true --> søker har ikke jobbet i EØS området
+private fun SøknadFakta.harJobbetIeøsOmråde() = getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
+
+private fun SøknadFakta.jobbetUtenforNorge() = this.avsluttetArbeidsforhold().any { it.land != "NOR" }
+
+private fun SøknadFakta.rettighetstypeUtregning(): List<Map<String, Boolean>> =
+    rettighetstypeUtregning(this.avsluttetArbeidsforhold())
+
+private fun SøknadFakta.kanJobbeDeltid() = getBooleanFaktum("reellarbeidssoker.villigdeltid")
+private fun SøknadFakta.kanJobbeHvorSomHelst() = getBooleanFaktum("reellarbeidssoker.villigpendle")
+private fun SøknadFakta.helseTilAlleTyperJobb() = getBooleanFaktum("reellarbeidssoker.villighelse")
+private fun SøknadFakta.villigTilÅBytteYrke() = getBooleanFaktum("reellarbeidssoker.villigjobb")
+
+
+private fun SøknadFakta.sisteDagMedLønnEllerArbeidsplikt(): LocalDate {
+    if (getFakta("arbeidsforhold").isEmpty())
+        return getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()
+    return when (avsluttetArbeidsforhold().first().sluttårsak) {
+        AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS -> sisteDagMedLønnKonkurs()
+        else -> sisteDagMedLønnEllerArbeidspliktResten()
+    }
+}
+
+private fun SøknadFakta.sisteDagMedLønnKonkurs(): LocalDate {
+    return getFakta("arbeidsforhold").first().let {
+        localDateEllerNull(it["properties"]["lonnkonkursmaaned_dato"])
+            ?: it["properties"]["konkursdato"].asLocalDate()
+    }
+}
+
+// Varighet på arbeidsforholdet (til dato) ?: Lønnspliktperiode for arbeidsgiver (til dato) ?: Arbeidstid redusert fra ?: Permitteringsperiode (fra dato)
+private fun SøknadFakta.sisteDagMedLønnEllerArbeidspliktResten(): LocalDate {
+    return getFakta("arbeidsforhold").first().let {
+        localDateEllerNull(it["properties"]["datotil"])
+            ?: localDateEllerNull(it["properties"]["lonnspliktigperiodedatotil"])
+            ?: localDateEllerNull(it["properties"]["redusertfra"])
+            ?: getFakta("arbeidsforhold.permitteringsperiode")
+                .first()["properties"]["permiteringsperiodedatofra"].asLocalDate()
+    }
+}
+*/
+interface SøknadFaktum {
+    fun avsluttetArbeidsforholdFraKonkurs(): Boolean
+    fun permittertFraFiskeForedling(): Boolean
+    fun permittert(): Boolean
+    fun eøsBostedsland(): Boolean
+    fun eøsArbeidsforhold(): Boolean
+    fun avtjentVerneplikt(): Boolean
+    fun helseTilAlleTyperJobb(): Boolean
+    fun kanJobbeHvorSomHelst(): Boolean
+    fun kanJobbeDeltid(): Boolean
+    fun villigTilÅBytteYrke(): Boolean
+    fun rettighetstypeUtregning(): List<Map<String, Boolean>>
+    fun harJobbetIeøsOmråde(): Boolean
+    fun fangstOgFisk(): Boolean
+    fun verneplikt(): Boolean
+    fun ønskerDagpengerFraDato(): LocalDate
+    fun søknadstidspunkt(): LocalDate
+    fun sisteDagMedLønnEllerArbeidsplikt(): LocalDate
+    fun sisteDagMedLønnKonkurs(): LocalDate
+    fun sisteDagMedLønnEllerArbeidspliktResten(): LocalDate
 }
 
 internal typealias AvsluttedeArbeidsforhold = List<AvsluttetArbeidsforhold>
-
-fun SøknadFakta.avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
-    return this.getFakta("arbeidsforhold")
-        .map {
-            AvsluttetArbeidsforhold(
-                sluttårsak = asÅrsak(it["properties"]["type"].asText()),
-                fiskeforedling = it["properties"]["fangstogfiske"]?.asBoolean() ?: false,
-                land = it["properties"]["land"].asText()
-            )
-        }
-}
-
-fun SøknadFakta.harAvsluttetArbeidsforholdFraKonkurs(): Boolean =
-    this.avsluttetArbeidsforhold().any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS }
-
-fun SøknadFakta.erPermittertFraFiskeForedling(): Boolean =
-    this.avsluttetArbeidsforhold().any { it.fiskeforedling }
-
-fun SøknadFakta.erPermittert(): Boolean =
-    this.avsluttetArbeidsforhold().any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT }
 
 data class AvsluttetArbeidsforhold(
     val sluttårsak: Sluttårsak,
@@ -48,26 +102,3 @@ data class AvsluttetArbeidsforhold(
         IKKE_ENDRET
     }
 }
-
-private fun asÅrsak(type: String): AvsluttetArbeidsforhold.Sluttårsak = when (type) {
-    "permittert" -> AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT
-    "avskjediget" -> AvsluttetArbeidsforhold.Sluttårsak.AVSKJEDIGET
-    "kontraktutgaatt" -> AvsluttetArbeidsforhold.Sluttårsak.KONTRAKT_UTGAATT
-    "redusertarbeidstid" -> AvsluttetArbeidsforhold.Sluttårsak.REDUSERT_ARBEIDSTID
-    "sagtoppavarbeidsgiver" -> AvsluttetArbeidsforhold.Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
-    "sagtoppselv" -> AvsluttetArbeidsforhold.Sluttårsak.SAGT_OPP_SELV
-    "arbeidsgivererkonkurs" -> AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS
-    "ikke-endret" -> AvsluttetArbeidsforhold.Sluttårsak.IKKE_ENDRET
-    else -> throw Exception("Missing permitteringstype: $type")
-}
-
-internal fun SøknadFakta.harEøsArbeidsforhold(): Boolean =
-    this.getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
-
-private val eøsLand = setOf("BEL", "BGR", "DNK", "EST", "FIN", "FRA", "GRC", "IRL", "ISL", "ITA", "HRV", "CYP", "LVA", "LIE", "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "GBR", "CHE", "SWE", "CZE", "DEU", "HUN", "AUT")
-
-internal fun SøknadFakta.harEøsBostedsland(): Boolean =
-    this.getFakta("bostedsland.land").any { it["value"].asText() in eøsLand }
-
-internal fun SøknadFakta.harAvtjentVerneplikt(): Boolean =
-    this.getFakta("ikkeavtjentverneplikt").getOrNull(0)?.get("value")?.asBoolean()?.not() ?: false

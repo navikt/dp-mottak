@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.CsvSource
 internal class SøknadFaktaLøserTest {
 
     val testRapid = TestRapid()
-    val testSøknad = Søknadsdata.Søknad(JsonMapper.jacksonJsonAdapter.readTree(this.javaClass.getResource("/testdata/soknadsdata.json")))
+    val testSøknad = Søknadsdata.GammelSøknad(JsonMapper.jacksonJsonAdapter.readTree(this.javaClass.getResource("/testdata/soknadsdata.json")))
 
     init {
         SøknadFaktaQuizLøser(

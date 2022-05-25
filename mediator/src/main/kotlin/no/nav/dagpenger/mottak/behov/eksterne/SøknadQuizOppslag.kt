@@ -25,7 +25,7 @@ internal class PostgresSøknadQuizOppslag(private val dataSource: DataSource) : 
             session.run(
                 query.map { row ->
                     row.binaryStreamOrNull("data")?.use {
-                        Søknadsdata.Søknad(JsonMapper.jacksonJsonAdapter.readTree(it))
+                        Søknadsdata.GammelSøknad(JsonMapper.jacksonJsonAdapter.readTree(it))
                     }
                 }.asSingle
             ) ?: throw IllegalArgumentException("Fant ikke søknad med innsendtId $innsendtSøknadsId")

@@ -45,7 +45,7 @@ data class InnsendingData(
                         }
                     )
                 },
-                søknadsData?.let { Søknadsdata.Søknad(it) },
+                søknadsData?.let { Søknadsdata.GammelSøknad(it) },
                 oppfyllerMinsteArbeidsinntekt,
                 eksisterendeSaker,
                 personData?.let {

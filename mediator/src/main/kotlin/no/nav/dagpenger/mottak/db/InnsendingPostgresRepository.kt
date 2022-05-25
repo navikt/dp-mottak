@@ -285,7 +285,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             }
         }
 
-        override fun visitSøknad(søknad: Søknadsdata.Søknad?) {
+        override fun visitSøknad(søknad: Søknadsdata.GammelSøknad?) {
             søknad?.let {
                 lagreQueries.add(
                     queryOf( //language=PostgreSQL

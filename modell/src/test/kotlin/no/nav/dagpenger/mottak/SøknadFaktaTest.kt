@@ -12,35 +12,35 @@ internal class SøknadFaktaTest {
     @Test
     fun `Skal kunne hente årsak til avsluttet arbeidsforhold`() {
         val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
-        val søknad = Søknadsdata.Søknad(data)
+        val søknad = Søknadsdata.GammelSøknad(data)
         assertTrue(søknad.harAvsluttetArbeidsforholdFraKonkurs())
     }
 
     @Test
     fun `Skal kunne hente om søker er permittert fra fiskeforedling`() {
         val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
-        val søknad = Søknadsdata.Søknad(data)
+        val søknad = Søknadsdata.GammelSøknad(data)
         assertTrue(søknad.erPermittertFraFiskeForedling())
     }
 
     @Test
     fun `Skal kun hente avsluttede arbeidsforhold`() {
         val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
-        val søknad = Søknadsdata.Søknad(data)
+        val søknad = Søknadsdata.GammelSøknad(data)
         assertEquals(3, søknad.avsluttetArbeidsforhold().size)
     }
 
     @Test
     fun `empty søknadsdata`() {
         val data = JsonMapper.jacksonJsonAdapter.readTree("{}")
-        val søknad = Søknadsdata.Søknad(data)
+        val søknad = Søknadsdata.GammelSøknad(data)
         assertFalse(søknad.harAvsluttetArbeidsforholdFraKonkurs())
     }
 
     @Test
     fun `Skal sjekke om bostedsland er et EØS land`() {
         val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
-        val søknad = Søknadsdata.Søknad(data)
+        val søknad = Søknadsdata.GammelSøknad(data)
         assertTrue(søknad.harEøsBostedsland())
     }
 
@@ -67,7 +67,7 @@ internal class SøknadFaktaTest {
             """.trimIndent()
         )
 
-        val søknad = Søknadsdata.Søknad(data)
+        val søknad = Søknadsdata.GammelSøknad(data)
         assertFalse(søknad.harEøsBostedsland())
     }
 }
