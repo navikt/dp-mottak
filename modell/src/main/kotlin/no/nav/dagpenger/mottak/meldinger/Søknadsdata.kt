@@ -61,6 +61,7 @@ class Søknadsdata(
         override fun eøsBostedsland(): Boolean =
             this.getFakta("bostedsland.land").any { it["value"].asText() in eøsLand }
 
+        // omvendt logikk i søknad; verdi == true --> søker har ikke inntekt fra fangst og fisk
         override fun eøsArbeidsforhold(): Boolean = this.getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
 
         override fun avtjentVerneplikt(): Boolean = getBooleanFaktum("ikkeavtjentverneplikt", true).not()
@@ -74,6 +75,7 @@ class Søknadsdata(
             )
         }
 
+        // omvendt logikk i søknad; verdi == true --> søker har ikke jobbet i EØS området
         override fun fangstOgFisk(): Boolean = getBooleanFaktum("egennaering.fangstogfiske").not()
 
         override fun ønskerDagpengerFraDato(): LocalDate =
