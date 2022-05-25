@@ -5,7 +5,7 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.mottak.SøknadFakta
 import no.nav.dagpenger.mottak.behov.JsonMapper
-import no.nav.dagpenger.mottak.meldinger.Søknadsdata
+import no.nav.dagpenger.mottak.meldinger.GammeltSøknadFormat
 import javax.sql.DataSource
 
 internal interface SøknadQuizOppslag {
@@ -25,7 +25,7 @@ internal class PostgresSøknadQuizOppslag(private val dataSource: DataSource) : 
             session.run(
                 query.map { row ->
                     row.binaryStreamOrNull("data")?.use {
-                        Søknadsdata.GammelSøknad(JsonMapper.jacksonJsonAdapter.readTree(it))
+                        GammeltSøknadFormat(JsonMapper.jacksonJsonAdapter.readTree(it))
                     }
                 }.asSingle
             ) ?: throw IllegalArgumentException("Fant ikke søknad med innsendtId $innsendtSøknadsId")

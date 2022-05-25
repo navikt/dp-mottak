@@ -1,6 +1,6 @@
 package no.nav.dagpenger.mottak
 
-import no.nav.dagpenger.mottak.meldinger.Søknadsdata
+import no.nav.dagpenger.mottak.meldinger.GammeltSøknadFormat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -12,35 +12,35 @@ internal class SøknadFaktaTest {
     @Test
     fun `Skal kunne hente årsak til avsluttet arbeidsforhold`() {
         val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
-        val søknad = Søknadsdata.GammelSøknad(data)
+        val søknad = GammeltSøknadFormat(data)
         assertTrue(søknad.avsluttetArbeidsforholdFraKonkurs())
     }
 
     @Test
     fun `Skal kunne hente om søker er permittert fra fiskeforedling`() {
         val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
-        val søknad = Søknadsdata.GammelSøknad(data)
+        val søknad = GammeltSøknadFormat(data)
         assertTrue(søknad.permittertFraFiskeForedling())
     }
 
     @Test
     fun `Skal kun hente avsluttede arbeidsforhold`() {
         val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
-        val søknad = Søknadsdata.GammelSøknad(data)
+        val søknad = GammeltSøknadFormat(data)
         assertEquals(3, søknad.avsluttetArbeidsforhold().size)
     }
 
     @Test
     fun `empty søknadsdata`() {
         val data = JsonMapper.jacksonJsonAdapter.readTree("{}")
-        val søknad = Søknadsdata.GammelSøknad(data)
+        val søknad = GammeltSøknadFormat(data)
         assertFalse(søknad.avsluttetArbeidsforholdFraKonkurs())
     }
 
     @Test
     fun `Skal sjekke om bostedsland er et EØS land`() {
         val data = JsonMapper.jacksonJsonAdapter.readTree(søknadWithArbeidsforhold())
-        val søknad = Søknadsdata.GammelSøknad(data)
+        val søknad = GammeltSøknadFormat(data)
         assertTrue(søknad.eøsBostedsland())
     }
 
@@ -67,7 +67,7 @@ internal class SøknadFaktaTest {
             """.trimIndent()
         )
 
-        val søknad = Søknadsdata.GammelSøknad(data)
+        val søknad = GammeltSøknadFormat(data)
         assertFalse(søknad.eøsBostedsland())
     }
 }

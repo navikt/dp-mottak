@@ -4,7 +4,7 @@ import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak
 import no.nav.dagpenger.mottak.SøknadFakta
 import no.nav.dagpenger.mottak.behov.JsonMapper
-import no.nav.dagpenger.mottak.meldinger.Søknadsdata
+import no.nav.dagpenger.mottak.meldinger.GammeltSøknadFormat
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -18,7 +18,7 @@ internal class SøknadFaktaLøserTest {
 
     val testRapid = TestRapid()
     val testSøknad =
-        Søknadsdata.GammelSøknad(JsonMapper.jacksonJsonAdapter.readTree(this.javaClass.getResource("/testdata/soknadsdata.json")))
+        GammeltSøknadFormat(JsonMapper.jacksonJsonAdapter.readTree(this.javaClass.getResource("/testdata/soknadsdata_gammelt_format.json")))
 
     init {
         SøknadFaktaQuizLøser(
