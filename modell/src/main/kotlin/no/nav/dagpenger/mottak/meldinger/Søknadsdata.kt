@@ -5,6 +5,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.AvsluttedeArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.Hendelse
+import no.nav.dagpenger.mottak.ReellArbeidsSøker
 import no.nav.dagpenger.mottak.SøknadFaktum
 import no.nav.dagpenger.mottak.SøknadVisitor
 import java.time.LocalDate
@@ -38,11 +39,6 @@ class Søknadsdata(
             ).asBoolean()
         }.getOrDefault(defaultValue)
 
-        private fun getChildFakta(faktumId: Int): List<JsonNode> =
-            data.get("fakta").filter { it["parrentFaktum"].asInt() == faktumId }
-
-        private fun getField(navn: String): JsonNode = data.get(navn)
-
         private fun getFaktumValue(fakta: List<JsonNode>): JsonNode = fakta
             .first()
             .get("value")
@@ -62,56 +58,23 @@ class Søknadsdata(
                 }
         }
 
-        override fun jobbetUtenforNorge(): Boolean = this.avsluttetArbeidsforhold().any { it.land != "NOR" }
-
-        override fun avsluttetArbeidsforholdFraKonkurs(): Boolean =
-            this.avsluttetArbeidsforhold()
-                .any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS }
-
-        override fun permittertFraFiskeForedling(): Boolean = this.avsluttetArbeidsforhold().any { it.fiskeforedling }
-        override fun permittert(): Boolean =
-            this.avsluttetArbeidsforhold().any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT }
-
         override fun eøsBostedsland(): Boolean =
             this.getFakta("bostedsland.land").any { it["value"].asText() in eøsLand }
 
         override fun eøsArbeidsforhold(): Boolean = this.getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
 
-        override fun avtjentVerneplikt(): Boolean =
-            this.getFakta("ikkeavtjentverneplikt").getOrNull(0)?.get("value")?.asBoolean()?.not() ?: false
+        override fun avtjentVerneplikt(): Boolean = getBooleanFaktum("ikkeavtjentverneplikt", true).not()
 
-        override fun helseTilAlleTyperJobb(): Boolean = getBooleanFaktum("reellarbeidssoker.villighelse")
-
-        override fun kanJobbeHvorSomHelst(): Boolean =
-            getBooleanFaktum("reellarbeidssoker.villigpendle")
-
-        override fun kanJobbeDeltid(): Boolean = getBooleanFaktum("reellarbeidssoker.villigdeltid")
-
-        override fun villigTilÅBytteYrke(): Boolean = getBooleanFaktum("reellarbeidssoker.villigjobb")
-
-        override fun rettighetstypeUtregning(): List<Map<String, Boolean>> =
-            rettighetstypeUtregning(this.avsluttetArbeidsforhold())
-
-        private fun rettighetstypeUtregning(avsluttedeArbeidsforhold: List<AvsluttetArbeidsforhold>) =
-            avsluttedeArbeidsforhold.map {
-                mapOf(
-                    "Lønnsgaranti" to (it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS),
-                    "PermittertFiskeforedling" to (it.fiskeforedling),
-                    "Permittert" to (it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT && !it.fiskeforedling),
-                    "Ordinær" to (
-                        it.sluttårsak != AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT &&
-                            it.sluttårsak != AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS &&
-                            !it.fiskeforedling
-                        )
-                )
-            }
-
-        override fun harJobbetIeøsOmråde(): Boolean =
-            getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
+        override fun reellArbeidsSøker(): ReellArbeidsSøker {
+            return ReellArbeidsSøker(
+                helse = getBooleanFaktum("reellarbeidssoker.villighelse"),
+                geografi = getBooleanFaktum("reellarbeidssoker.villigpendle"),
+                deltid = getBooleanFaktum("reellarbeidssoker.villigdeltid"),
+                yrke = getBooleanFaktum("reellarbeidssoker.villigjobb"),
+            )
+        }
 
         override fun fangstOgFisk(): Boolean = getBooleanFaktum("egennaering.fangstogfiske").not()
-
-        override fun verneplikt(): Boolean = getBooleanFaktum("ikkeavtjentverneplikt", true).not()
 
         override fun ønskerDagpengerFraDato(): LocalDate =
             getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()

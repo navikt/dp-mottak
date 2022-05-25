@@ -63,31 +63,38 @@ private fun SøknadFakta.sisteDagMedLønnEllerArbeidspliktResten(): LocalDate {
 }
 */
 interface SøknadFaktum {
-    fun avsluttetArbeidsforholdFraKonkurs(): Boolean
-    fun permittertFraFiskeForedling(): Boolean
-    fun permittert(): Boolean
     fun eøsBostedsland(): Boolean
     fun eøsArbeidsforhold(): Boolean
     fun avtjentVerneplikt(): Boolean
-    fun helseTilAlleTyperJobb(): Boolean
-    fun kanJobbeHvorSomHelst(): Boolean
-    fun kanJobbeDeltid(): Boolean
-    fun villigTilÅBytteYrke(): Boolean
-    fun rettighetstypeUtregning(): List<Map<String, Boolean>>
-    fun harJobbetIeøsOmråde(): Boolean
     fun fangstOgFisk(): Boolean
-    fun verneplikt(): Boolean
     fun ønskerDagpengerFraDato(): LocalDate
     fun søknadstidspunkt(): LocalDate
     fun sisteDagMedLønnEllerArbeidsplikt(): LocalDate
     fun sisteDagMedLønnKonkurs(): LocalDate
     fun sisteDagMedLønnEllerArbeidspliktResten(): LocalDate
     fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold
-    fun jobbetUtenforNorge(): Boolean
     fun søknadsId(): String?
+    fun reellArbeidsSøker(): ReellArbeidsSøker
 }
 
+internal fun SøknadFaktum.avsluttetArbeidsforholdFraKonkurs(): Boolean =
+    this.avsluttetArbeidsforhold()
+        .any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS }
+
+internal fun SøknadFaktum.permittertFraFiskeForedling(): Boolean =
+    this.avsluttetArbeidsforhold().any { it.fiskeforedling }
+
+internal fun SøknadFaktum.permittert(): Boolean =
+    this.avsluttetArbeidsforhold().any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT }
+
 internal typealias AvsluttedeArbeidsforhold = List<AvsluttetArbeidsforhold>
+
+data class ReellArbeidsSøker(
+    val helse: Boolean,
+    val geografi: Boolean,
+    val deltid: Boolean,
+    val yrke: Boolean
+)
 
 data class AvsluttetArbeidsforhold(
     val sluttårsak: Sluttårsak,

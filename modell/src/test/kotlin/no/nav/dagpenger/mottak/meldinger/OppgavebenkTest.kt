@@ -5,6 +5,9 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.SøknadFaktum
+import no.nav.dagpenger.mottak.avsluttetArbeidsforholdFraKonkurs
+import no.nav.dagpenger.mottak.permittert
+import no.nav.dagpenger.mottak.permittertFraFiskeForedling
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest

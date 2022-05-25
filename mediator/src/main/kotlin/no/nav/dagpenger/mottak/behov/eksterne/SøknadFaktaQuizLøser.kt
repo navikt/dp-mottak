@@ -59,21 +59,23 @@ internal class SøknadFaktaQuizLøser(
                 val innsendtSøknadsId = packet.getInnsendtSøknadsId()
                 val søknad = søknadQuizOppslag.hentSøknad(innsendtSøknadsId)
                 packet["@løsning"] = packet["@behov"].map { it.asText() }.filter { it in løserBehov }.map { behov ->
+                    val avsluttedeArbeidsforhold = søknad.avsluttetArbeidsforhold()
+                    val reellArbeidsSøker = søknad.reellArbeidsSøker()
                     behov to when (behov) {
                         "ØnskerDagpengerFraDato" ->
                             søknad.ønskerDagpengerFraDato()
                         "Søknadstidspunkt" -> søknad.søknadstidspunkt()
-                        "Verneplikt" -> søknad.verneplikt()
+                        "Verneplikt" -> søknad.avtjentVerneplikt()
                         "FangstOgFiske" -> søknad.fangstOgFisk()
-                        "EØSArbeid" -> søknad.harJobbetIeøsOmråde()
+                        "EØSArbeid" -> søknad.eøsArbeidsforhold()
                         "SisteDagMedArbeidsplikt" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
                         "SisteDagMedLønn" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
-                        "Rettighetstype" -> søknad.rettighetstypeUtregning()
-                        "KanJobbeDeltid" -> søknad.kanJobbeDeltid()
-                        "KanJobbeHvorSomHelst" -> søknad.kanJobbeHvorSomHelst()
-                        "HelseTilAlleTyperJobb" -> søknad.helseTilAlleTyperJobb()
-                        "VilligTilÅBytteYrke" -> søknad.villigTilÅBytteYrke()
-                        "JobbetUtenforNorge" -> søknad.jobbetUtenforNorge()
+                        "Rettighetstype" -> rettighetstypeUtregning(avsluttedeArbeidsforhold)
+                        "KanJobbeDeltid" -> reellArbeidsSøker.deltid
+                        "KanJobbeHvorSomHelst" -> reellArbeidsSøker.geografi
+                        "HelseTilAlleTyperJobb" -> reellArbeidsSøker.helse
+                        "VilligTilÅBytteYrke" -> reellArbeidsSøker.yrke
+                        "JobbetUtenforNorge" -> jobbetUtenforNorge(avsluttedeArbeidsforhold)
                         else -> throw IllegalArgumentException("Ukjent behov $behov")
                     }
                 }.toMap()
@@ -89,15 +91,10 @@ internal class SøknadFaktaQuizLøser(
     }
 }
 
-private fun JsonMessage.getInnsendtSøknadsId(): String {
-    return this["InnsendtSøknadsId"]["urn"]
-        .asText()
-        .let { URN.rfc8141().parse(it) }
-        .namespaceSpecificString()
-        .toString()
-}
+internal fun jobbetUtenforNorge(avsluttedeArbeidsforhold: List<AvsluttetArbeidsforhold>): Boolean =
+    avsluttedeArbeidsforhold.any { it.land != "NOR" }
 
-internal fun rettighetstypeUtregning(avsluttedeArbeidsforhold: List<AvsluttetArbeidsforhold>) =
+internal fun rettighetstypeUtregning(avsluttedeArbeidsforhold: List<AvsluttetArbeidsforhold>): List<Map<String, Boolean>> =
     avsluttedeArbeidsforhold.map {
         mapOf(
             "Lønnsgaranti" to (it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS),
@@ -110,3 +107,11 @@ internal fun rettighetstypeUtregning(avsluttedeArbeidsforhold: List<AvsluttetArb
                 )
         )
     }
+
+private fun JsonMessage.getInnsendtSøknadsId(): String {
+    return this["InnsendtSøknadsId"]["urn"]
+        .asText()
+        .let { URN.rfc8141().parse(it) }
+        .namespaceSpecificString()
+        .toString()
+}
