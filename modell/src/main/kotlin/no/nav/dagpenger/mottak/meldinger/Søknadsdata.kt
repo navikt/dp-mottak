@@ -6,7 +6,7 @@ import no.nav.dagpenger.mottak.AvsluttedeArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.ReellArbeidsSøker
-import no.nav.dagpenger.mottak.SøknadFaktum
+import no.nav.dagpenger.mottak.SøknadFakta
 import no.nav.dagpenger.mottak.SøknadVisitor
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -23,7 +23,7 @@ class Søknadsdata(
 
     class GammelSøknad(
         val data: JsonNode
-    ) : SøknadFaktum {
+    ) : SøknadFakta {
         override fun søknadsId(): String? = data["brukerBehandlingId"].textValue()
 
         private fun getFakta(faktaNavn: String): List<JsonNode> =

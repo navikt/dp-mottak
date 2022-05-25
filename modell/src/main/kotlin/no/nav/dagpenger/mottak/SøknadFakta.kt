@@ -2,67 +2,7 @@ package no.nav.dagpenger.mottak
 
 import java.time.LocalDate
 
-/*
 interface SøknadFakta {
-    fun getFakta(faktaNavn: String): List<JsonNode>
-    fun getBooleanFaktum(faktaNavn: String): Boolean
-    fun getBooleanFaktum(faktaNavn: String, defaultValue: Boolean): Boolean
-    fun getChildFakta(faktumId: Int): List<JsonNode>
-    fun getField(navn: String): JsonNode
-
-private fun SøknadFakta.søknadstidspunkt() =
-    getFakta("innsendtDato").first()["value"].asLocalDateTime().toLocalDate()
-
-private fun SøknadFakta.ønskerDagpengerFraDato() =
-    getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()
-
-private fun SøknadFakta.verneplikt() = getBooleanFaktum("ikkeavtjentverneplikt", true).not()
-
-// omvendt logikk i søknad; verdi == true --> søker har ikke inntekt fra fangst og fisk
-private fun SøknadFakta.fangstOgFisk() = getBooleanFaktum("egennaering.fangstogfiske").not()
-
-// omvendt logikk i søknad; verdi == true --> søker har ikke jobbet i EØS området
-private fun SøknadFakta.harJobbetIeøsOmråde() = getBooleanFaktum("eosarbeidsforhold.jobbetieos", true).not()
-
-private fun SøknadFakta.jobbetUtenforNorge() = this.avsluttetArbeidsforhold().any { it.land != "NOR" }
-
-private fun SøknadFakta.rettighetstypeUtregning(): List<Map<String, Boolean>> =
-    rettighetstypeUtregning(this.avsluttetArbeidsforhold())
-
-private fun SøknadFakta.kanJobbeDeltid() = getBooleanFaktum("reellarbeidssoker.villigdeltid")
-private fun SøknadFakta.kanJobbeHvorSomHelst() = getBooleanFaktum("reellarbeidssoker.villigpendle")
-private fun SøknadFakta.helseTilAlleTyperJobb() = getBooleanFaktum("reellarbeidssoker.villighelse")
-private fun SøknadFakta.villigTilÅBytteYrke() = getBooleanFaktum("reellarbeidssoker.villigjobb")
-
-
-private fun SøknadFakta.sisteDagMedLønnEllerArbeidsplikt(): LocalDate {
-    if (getFakta("arbeidsforhold").isEmpty())
-        return getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()
-    return when (avsluttetArbeidsforhold().first().sluttårsak) {
-        AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS -> sisteDagMedLønnKonkurs()
-        else -> sisteDagMedLønnEllerArbeidspliktResten()
-    }
-}
-
-private fun SøknadFakta.sisteDagMedLønnKonkurs(): LocalDate {
-    return getFakta("arbeidsforhold").first().let {
-        localDateEllerNull(it["properties"]["lonnkonkursmaaned_dato"])
-            ?: it["properties"]["konkursdato"].asLocalDate()
-    }
-}
-
-// Varighet på arbeidsforholdet (til dato) ?: Lønnspliktperiode for arbeidsgiver (til dato) ?: Arbeidstid redusert fra ?: Permitteringsperiode (fra dato)
-private fun SøknadFakta.sisteDagMedLønnEllerArbeidspliktResten(): LocalDate {
-    return getFakta("arbeidsforhold").first().let {
-        localDateEllerNull(it["properties"]["datotil"])
-            ?: localDateEllerNull(it["properties"]["lonnspliktigperiodedatotil"])
-            ?: localDateEllerNull(it["properties"]["redusertfra"])
-            ?: getFakta("arbeidsforhold.permitteringsperiode")
-                .first()["properties"]["permiteringsperiodedatofra"].asLocalDate()
-    }
-}
-*/
-interface SøknadFaktum {
     fun eøsBostedsland(): Boolean
     fun eøsArbeidsforhold(): Boolean
     fun avtjentVerneplikt(): Boolean
@@ -77,14 +17,14 @@ interface SøknadFaktum {
     fun reellArbeidsSøker(): ReellArbeidsSøker
 }
 
-internal fun SøknadFaktum.avsluttetArbeidsforholdFraKonkurs(): Boolean =
+internal fun SøknadFakta.avsluttetArbeidsforholdFraKonkurs(): Boolean =
     this.avsluttetArbeidsforhold()
         .any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS }
 
-internal fun SøknadFaktum.permittertFraFiskeForedling(): Boolean =
+internal fun SøknadFakta.permittertFraFiskeForedling(): Boolean =
     this.avsluttetArbeidsforhold().any { it.fiskeforedling }
 
-internal fun SøknadFaktum.permittert(): Boolean =
+internal fun SøknadFakta.permittert(): Boolean =
     this.avsluttetArbeidsforhold().any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT }
 
 internal typealias AvsluttedeArbeidsforhold = List<AvsluttetArbeidsforhold>

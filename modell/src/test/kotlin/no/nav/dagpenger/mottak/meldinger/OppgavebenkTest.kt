@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
-import no.nav.dagpenger.mottak.SøknadFaktum
+import no.nav.dagpenger.mottak.SøknadFakta
 import no.nav.dagpenger.mottak.avsluttetArbeidsforholdFraKonkurs
 import no.nav.dagpenger.mottak.permittert
 import no.nav.dagpenger.mottak.permittertFraFiskeForedling
@@ -188,13 +188,13 @@ class OppgavebenkTest {
         harAvsluttetArbeidsforholdFraKonkurs: Boolean = false,
         erPermittertFraFiskeforedling: Boolean = false,
         erPermittert: Boolean = false,
-        test: (søknadFakta: SøknadFaktum) -> Unit
+        test: (søknadFakta: SøknadFakta) -> Unit
     ) {
 
         mockkStatic(
             "no.nav.dagpenger.mottak.SøknadFaktaKt"
         ) {
-            val søknad = mockk<SøknadFaktum>(relaxed = false).also {
+            val søknad = mockk<SøknadFakta>(relaxed = false).also {
                 every { it.eøsArbeidsforhold() } returns harEøsArbeidsforhold
                 every { it.avtjentVerneplikt() } returns harAvtjentVerneplikt
                 every { it.eøsBostedsland() } returns harEøsBostedsland

@@ -2,7 +2,7 @@ package no.nav.dagpenger.mottak.behov.eksterne
 
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak
-import no.nav.dagpenger.mottak.SøknadFaktum
+import no.nav.dagpenger.mottak.SøknadFakta
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -23,7 +23,7 @@ internal class SøknadFaktaLøserTest {
     init {
         SøknadFaktaQuizLøser(
             søknadQuizOppslag = object : SøknadQuizOppslag {
-                override fun hentSøknad(innsendtSøknadsId: String): SøknadFaktum = testSøknad
+                override fun hentSøknad(innsendtSøknadsId: String): SøknadFakta = testSøknad
             },
             rapidsConnection = testRapid
         )

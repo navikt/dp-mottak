@@ -12,7 +12,7 @@ sealed class KategorisertJournalpost(
 ) {
     protected abstract fun henvendelseNavn(): String
     protected open fun finnOppgaveBenk(
-        søknadFakta: SøknadFaktum?,
+        søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ): OppgaveBenk =
@@ -30,7 +30,7 @@ sealed class KategorisertJournalpost(
 
     internal fun oppgaveBenk(
         person: Person?,
-        søknadFakta: SøknadFaktum? = null,
+        søknadFakta: SøknadFakta? = null,
         oppfyllerMinsteArbeidsinntekt: Boolean? = null
     ): OppgaveBenk {
         val oppgaveBenk = finnOppgaveBenk(søknadFakta, oppfyllerMinsteArbeidsinntekt, person)
@@ -99,7 +99,7 @@ data class NySøknad(
         "Start Vedtaksbehandling - automatisk journalført.\n"
 
     override fun finnOppgaveBenk(
-        søknadFakta: SøknadFaktum?,
+        søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ): OppgaveBenk {
@@ -170,7 +170,7 @@ data class Gjenopptak(
     override fun henvendelseNavn(): String = "Gjenopptak\n"
 
     override fun finnOppgaveBenk(
-        søknadFakta: SøknadFaktum?,
+        søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ) = super.finnOppgaveBenk(søknadFakta, oppfyllerMinsteArbeidsinntekt, person)
@@ -199,7 +199,7 @@ data class KlageOgAnkeLønnskompensasjon(
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage og anke - Lønnskompensasjon\n"
     override fun finnOppgaveBenk(
-        søknadFakta: SøknadFaktum?,
+        søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ) = OppgaveBenk(
@@ -215,7 +215,7 @@ data class KlageOgAnkeForskudd(
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage og anke - Forskudd\n"
     override fun finnOppgaveBenk(
-        søknadFakta: SøknadFaktum?,
+        søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ) = OppgaveBenk(
@@ -231,7 +231,7 @@ data class KlageOgAnkeFeriepenger(
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage og anke - Feriepenger\n"
     override fun finnOppgaveBenk(
-        søknadFakta: SøknadFaktum?,
+        søknadFakta: SøknadFakta?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ) = OppgaveBenk(
