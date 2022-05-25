@@ -19,7 +19,7 @@ class Søknadsdata(
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
 
-    fun søknad(): GammelSøknad = GammelSøknad(data)
+    fun søknad(): SøknadFakta = GammelSøknad(data)
 
     class GammelSøknad(
         val data: JsonNode
@@ -43,7 +43,7 @@ class Søknadsdata(
             .first()
             .get("value")
 
-        fun accept(visitor: SøknadVisitor) {
+        override fun accept(visitor: SøknadVisitor) {
             visitor.visitSøknad(this)
         }
 
@@ -73,6 +73,10 @@ class Søknadsdata(
                 deltid = getBooleanFaktum("reellarbeidssoker.villigdeltid"),
                 yrke = getBooleanFaktum("reellarbeidssoker.villigjobb"),
             )
+        }
+
+        override fun asJson(): JsonNode {
+            return this.data
         }
 
         // omvendt logikk i søknad; verdi == true --> søker har ikke jobbet i EØS området

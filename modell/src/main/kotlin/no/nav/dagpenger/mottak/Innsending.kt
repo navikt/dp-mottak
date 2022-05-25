@@ -21,7 +21,7 @@ class Innsending private constructor(
     private val journalpostId: String,
     private var tilstand: Tilstand,
     private var journalpost: Journalpost?,
-    private var søknad: Søknadsdata.GammelSøknad?,
+    private var søknad: SøknadFakta?,
     private var oppfyllerMinsteArbeidsinntekt: Boolean?,
     private var eksisterendeSaker: Boolean?,
     private var person: Person?,
@@ -652,7 +652,7 @@ class Innsending private constructor(
             fødselsnummer = person?.ident,
             fagsakId = arenaSak?.fagsakId,
             datoRegistrert = jp.datoRegistrert(),
-            søknadsData = søknad?.data,
+            søknadsData = søknad?.asJson(),
             behandlendeEnhet = jp.kategorisertJournalpost()
                 .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id,
             oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt,
@@ -672,7 +672,7 @@ class Innsending private constructor(
             fødselsnummer = person?.ident,
             fagsakId = null,
             datoRegistrert = jp.datoRegistrert(),
-            søknadsData = søknad?.data,
+            søknadsData = søknad?.asJson(),
             behandlendeEnhet = jp.kategorisertJournalpost()
                 .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id,
             oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt,
