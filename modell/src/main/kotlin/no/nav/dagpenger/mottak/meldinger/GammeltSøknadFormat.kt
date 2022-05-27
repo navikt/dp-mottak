@@ -3,8 +3,9 @@ package no.nav.dagpenger.mottak.meldinger
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.mottak.AvsluttedeArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
+import no.nav.dagpenger.mottak.QuizOppslag
 import no.nav.dagpenger.mottak.ReellArbeidsSøker
-import no.nav.dagpenger.mottak.SøknadFakta
+import no.nav.dagpenger.mottak.RutingOppslag
 import no.nav.dagpenger.mottak.SøknadVisitor
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -12,7 +13,7 @@ import java.time.format.DateTimeParseException
 
 class GammeltSøknadFormat(
     val data: JsonNode
-) : SøknadFakta {
+) : QuizOppslag, RutingOppslag {
     override fun søknadsId(): String? = data["brukerBehandlingId"].textValue()
 
     private fun getFakta(faktaNavn: String): List<JsonNode> =
@@ -64,7 +65,17 @@ class GammeltSøknadFormat(
         )
     }
 
-    override fun asJson(): JsonNode {
+    override fun avsluttetArbeidsforholdFraKonkurs(): Boolean =
+        this.avsluttetArbeidsforhold()
+            .any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS }
+
+    override fun permittertFraFiskeForedling(): Boolean =
+        this.avsluttetArbeidsforhold().any { it.fiskeforedling }
+
+    override fun permittert(): Boolean =
+        this.avsluttetArbeidsforhold().any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT }
+
+    override fun data(): JsonNode {
         return this.data
     }
 
@@ -78,8 +89,8 @@ class GammeltSøknadFormat(
         getFakta("innsendtDato").first()["value"].asLocalDateTime().toLocalDate()
 
     override fun sisteDagMedLønnEllerArbeidsplikt(): LocalDate {
-        if (getFakta("arbeidsforhold").isEmpty())
-            return getFakta("arbeidsforhold.datodagpenger").first()["value"].asLocalDate()
+        if (avsluttetArbeidsforhold().isEmpty())
+            ønskerDagpengerFraDato()
         return when (avsluttetArbeidsforhold().first().sluttårsak) {
             AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS -> sisteDagMedLønnKonkurs()
             else -> sisteDagMedLønnEllerArbeidspliktResten()

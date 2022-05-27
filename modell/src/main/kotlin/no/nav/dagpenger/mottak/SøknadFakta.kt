@@ -3,6 +3,7 @@ package no.nav.dagpenger.mottak
 import com.fasterxml.jackson.databind.JsonNode
 import java.time.LocalDate
 
+/*
 interface SøknadFakta {
     fun eøsBostedsland(): Boolean
     fun eøsArbeidsforhold(): Boolean
@@ -18,17 +19,32 @@ interface SøknadFakta {
     fun reellArbeidsSøker(): ReellArbeidsSøker
     fun asJson(): JsonNode
     fun accept(visitor: SøknadVisitor)
+}*/
+
+interface SøknadOppslag {
+    fun data(): JsonNode
+    fun accept(visitor: SøknadVisitor)
+    fun eøsBostedsland(): Boolean
+    fun eøsArbeidsforhold(): Boolean
+    fun avtjentVerneplikt(): Boolean
+    fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold
 }
 
-internal fun SøknadFakta.avsluttetArbeidsforholdFraKonkurs(): Boolean =
-    this.avsluttetArbeidsforhold()
-        .any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS }
-
-internal fun SøknadFakta.permittertFraFiskeForedling(): Boolean =
-    this.avsluttetArbeidsforhold().any { it.fiskeforedling }
-
-internal fun SøknadFakta.permittert(): Boolean =
-    this.avsluttetArbeidsforhold().any { it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT }
+interface QuizOppslag : SøknadOppslag {
+    fun fangstOgFisk(): Boolean
+    fun ønskerDagpengerFraDato(): LocalDate
+    fun søknadstidspunkt(): LocalDate
+    fun sisteDagMedLønnEllerArbeidsplikt(): LocalDate
+    fun sisteDagMedLønnKonkurs(): LocalDate
+    fun sisteDagMedLønnEllerArbeidspliktResten(): LocalDate
+    fun søknadsId(): String?
+    fun reellArbeidsSøker(): ReellArbeidsSøker
+}
+interface RutingOppslag : SøknadOppslag {
+    fun permittertFraFiskeForedling(): Boolean
+    fun avsluttetArbeidsforholdFraKonkurs(): Boolean
+    fun permittert(): Boolean
+}
 
 internal typealias AvsluttedeArbeidsforhold = List<AvsluttetArbeidsforhold>
 

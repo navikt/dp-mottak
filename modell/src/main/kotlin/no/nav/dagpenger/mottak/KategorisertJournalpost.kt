@@ -12,7 +12,7 @@ sealed class KategorisertJournalpost(
 ) {
     protected abstract fun henvendelseNavn(): String
     protected open fun finnOppgaveBenk(
-        søknadFakta: SøknadFakta?,
+        rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ): OppgaveBenk =
@@ -30,10 +30,10 @@ sealed class KategorisertJournalpost(
 
     internal fun oppgaveBenk(
         person: Person?,
-        søknadFakta: SøknadFakta? = null,
+        rutingOppslag: RutingOppslag? = null,
         oppfyllerMinsteArbeidsinntekt: Boolean? = null
     ): OppgaveBenk {
-        val oppgaveBenk = finnOppgaveBenk(søknadFakta, oppfyllerMinsteArbeidsinntekt, person)
+        val oppgaveBenk = finnOppgaveBenk(rutingOppslag, oppfyllerMinsteArbeidsinntekt, person)
 
         return when (person?.diskresjonskode) {
             true -> oppgaveBenk.copy(
@@ -99,17 +99,17 @@ data class NySøknad(
         "Start Vedtaksbehandling - automatisk journalført.\n"
 
     override fun finnOppgaveBenk(
-        søknadFakta: SøknadFakta?,
+        rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ): OppgaveBenk {
-        val konkurs = søknadFakta?.avsluttetArbeidsforholdFraKonkurs() == true
+        val konkurs = rutingOppslag?.avsluttetArbeidsforholdFraKonkurs() == true
         val kanAvslåsPåMinsteinntekt = oppfyllerMinsteArbeidsinntekt == false
-        val eøsBostedsland = søknadFakta?.eøsBostedsland() == true
-        val eøsArbeidsforhold = søknadFakta?.eøsArbeidsforhold() == true
-        val harAvtjentVerneplikt = søknadFakta?.avtjentVerneplikt() == true
-        val erPermittertFraFiskeforedling = søknadFakta?.permittertFraFiskeForedling() == true
-        val erPermittert = søknadFakta?.permittert() == true
+        val eøsBostedsland = rutingOppslag?.eøsBostedsland() == true
+        val eøsArbeidsforhold = rutingOppslag?.eøsArbeidsforhold() == true
+        val harAvtjentVerneplikt = rutingOppslag?.avtjentVerneplikt() == true
+        val erPermittertFraFiskeforedling = rutingOppslag?.permittertFraFiskeForedling() == true
+        val erPermittert = rutingOppslag?.permittert() == true
         val datoRegistrert = journalpost.datoRegistrert()
         return when {
             eøsArbeidsforhold -> {
@@ -170,10 +170,10 @@ data class Gjenopptak(
     override fun henvendelseNavn(): String = "Gjenopptak\n"
 
     override fun finnOppgaveBenk(
-        søknadFakta: SøknadFakta?,
+        rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
-    ) = super.finnOppgaveBenk(søknadFakta, oppfyllerMinsteArbeidsinntekt, person)
+    ) = super.finnOppgaveBenk(rutingOppslag, oppfyllerMinsteArbeidsinntekt, person)
 }
 
 data class Utdanning(
@@ -199,7 +199,7 @@ data class KlageOgAnkeLønnskompensasjon(
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage og anke - Lønnskompensasjon\n"
     override fun finnOppgaveBenk(
-        søknadFakta: SøknadFakta?,
+        rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ) = OppgaveBenk(
@@ -215,7 +215,7 @@ data class KlageOgAnkeForskudd(
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage og anke - Forskudd\n"
     override fun finnOppgaveBenk(
-        søknadFakta: SøknadFakta?,
+        rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ) = OppgaveBenk(
@@ -231,7 +231,7 @@ data class KlageOgAnkeFeriepenger(
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage og anke - Feriepenger\n"
     override fun finnOppgaveBenk(
-        søknadFakta: SøknadFakta?,
+        rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
     ) = OppgaveBenk(

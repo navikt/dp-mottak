@@ -10,7 +10,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingVisitor
-import no.nav.dagpenger.mottak.SøknadFakta
+import no.nav.dagpenger.mottak.SøknadOppslag
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.serder.InnsendingData
@@ -285,7 +285,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             }
         }
 
-        override fun visitSøknad(søknad: SøknadFakta?) {
+        override fun visitSøknad(søknad: SøknadOppslag?) {
             søknad?.let {
                 lagreQueries.add(
                     queryOf( //language=PostgreSQL
@@ -294,7 +294,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                             "id" to internId,
                             "data" to PGobject().apply {
                                 type = "jsonb"
-                                value = it.asJson().toString()
+                                value = it.data().toString()
                             }
                         )
                     )

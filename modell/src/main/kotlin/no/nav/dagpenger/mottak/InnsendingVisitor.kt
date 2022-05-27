@@ -16,7 +16,7 @@ interface JournalpostVisitor {
 }
 
 interface SøknadVisitor {
-    fun visitSøknad(søknad: SøknadFakta?) {}
+    fun visitSøknad(søknad: SøknadOppslag?) {}
 }
 
 interface PersonVisitor {
