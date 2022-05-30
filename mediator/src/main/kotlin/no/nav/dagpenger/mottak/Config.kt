@@ -11,7 +11,8 @@ import com.natpryce.konfig.stringType
 import com.zaxxer.hikari.HikariDataSource
 import no.finn.unleash.DefaultUnleash
 import no.finn.unleash.util.UnleashConfig
-import no.nav.dagpenger.aad.api.ClientCredentialsClient
+import no.nav.dagpenger.oauth2.CachedOauth2Client
+import no.nav.dagpenger.oauth2.OAuth2Config
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.security.auth.SecurityProtocol
@@ -58,20 +59,20 @@ internal object Config {
         }
     }
 
-    val Configuration.dpProxyTokenProvider by lazy {
-        ClientCredentialsClient(properties) {
-            scope {
-                add(properties[Key("DP_PROXY_SCOPE", stringType)])
-            }
-        }
+    private val cachedTokenProvider by lazy {
+        val azureAd = OAuth2Config.AzureAd(properties)
+        CachedOauth2Client(
+            tokenEndpointUrl = azureAd.tokenEndpointUrl,
+            authType = azureAd.clientSecret(),
+        )
     }
 
-    val Configuration.pdlApiTokenProvider by lazy {
-        ClientCredentialsClient(properties) {
-            scope {
-                add(properties[Key("PDL_API_SCOPE", stringType)])
-            }
-        }
+    val Configuration.dpProxyTokenProvider: () -> String by lazy {
+        { cachedTokenProvider.clientCredentials(properties[Key("DP_PROXY_SCOPE", stringType)]).accessToken }
+    }
+
+    val Configuration.pdlApiTokenProvider: () -> String by lazy {
+        { cachedTokenProvider.clientCredentials(properties[Key("PDL_API_SCOPE", stringType)]).accessToken }
     }
 
     val dataSource by lazy {

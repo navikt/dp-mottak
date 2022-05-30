@@ -8,11 +8,12 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
-import io.ktor.client.features.DefaultRequest
+import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.request.accept
 import io.ktor.client.request.header
 import io.ktor.client.request.request
-import io.ktor.client.request.url
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -29,17 +30,17 @@ internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
     private val pdlClient = HttpClient() {
         install(DefaultRequest) {
             this.url("${config.pdlApiUrl()}/graphql")
-            method = HttpMethod.Post
             header("Content-Type", "application/json")
             header("TEMA", "DAG")
             accept(ContentType.Application.Json)
         }
     }
 
-    override suspend fun hentPerson(id: String): Pdl.Person? = pdlClient.request<String> {
-        header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
-        body = PersonQuery(id).toJson().also { sikkerLogg.info { "Forsøker å hente person med id $id fra PDL" } }
-    }.let {
+    override suspend fun hentPerson(id: String): Pdl.Person? = pdlClient.request {
+        header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+        method = HttpMethod.Post
+        setBody(PersonQuery(id).toJson().also { sikkerLogg.info { "Forsøker å hente person med id $id fra PDL" } })
+    }.bodyAsText().let {
         if (hasError(it)) {
             sikkerLogg.error { "Feil i person oppslag for person med id $id: $it" }
             throw PdlPersondataOppslagException(it)

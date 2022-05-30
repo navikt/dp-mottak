@@ -2,20 +2,21 @@ package no.nav.dagpenger.mottak.behov.journalpost
 
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
-import io.ktor.client.features.ClientRequestException
-import io.ktor.client.features.DefaultRequest
-import io.ktor.client.features.json.JacksonSerializer
-import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.header
 import io.ktor.client.request.request
-import io.ktor.client.statement.readText
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.serialization.jackson.JacksonConverter
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.behov.JsonMapper
-import java.lang.RuntimeException
 
 internal interface JournalpostFeil {
 
@@ -85,6 +86,7 @@ internal class JournalpostApi {
             }
         }
     }
+
     internal data class Avsender(val navn: String, val id: String, val idType: String = "FNR")
 
     internal data class Bruker(val id: String, val idType: String = "FNR")
@@ -107,8 +109,8 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
 
         install(DefaultRequest) {
         }
-        install(JsonFeature) {
-            serializer = JacksonSerializer(jackson = JsonMapper.jacksonJsonAdapter)
+        install(ContentNegotiation) {
+            register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
         }
     }
 
@@ -117,38 +119,37 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
         journalpost: JournalpostApi.OppdaterJournalpostRequest
     ) {
         try {
-            proxyJournalpostApiClient.request<OppdaterJournalpostResponse>("$journalføringBaseUrl/$journalpostId") {
+            proxyJournalpostApiClient.request(urlString = "$journalføringBaseUrl/$journalpostId") {
                 method = HttpMethod.Put
-                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
                 header(HttpHeaders.ContentType, "application/json")
                 header(HttpHeaders.Accept, "application/json")
-                body = journalpost
+                setBody(journalpost)
             }
         } catch (e: ClientRequestException) {
             throw JournalpostFeil.JournalpostException(
                 e.response.status.value,
-                e.response.readText()
+                e.response.bodyAsText()
             )
         }
     }
 
     override suspend fun ferdigstill(journalpostId: String) {
         try {
-            proxyJournalpostApiClient.request<String>("$journalføringBaseUrl/$journalpostId/ferdigstill") {
+            proxyJournalpostApiClient.request("$journalføringBaseUrl/$journalpostId/ferdigstill") {
                 method = HttpMethod.Patch
-                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.getAccessToken()}")
+                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
                 header(HttpHeaders.ContentType, "application/json")
-                body = FerdigstillJournalpostRequest()
+                setBody(FerdigstillJournalpostRequest())
             }
         } catch (e: ClientRequestException) {
             logger.error(e) { "Kunne ikke ferdigstille journalpost" }
             throw JournalpostFeil.JournalpostException(
                 e.response.status.value,
-                e.response.readText()
+                e.response.bodyAsText()
             )
         }
     }
 
     private data class FerdigstillJournalpostRequest(val journalfoerendeEnhet: String = "9999")
-    private data class OppdaterJournalpostResponse(val journalpostId: String)
 }

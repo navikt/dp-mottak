@@ -1,11 +1,11 @@
 package no.nav.dagpenger.mottak.api
 
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.header
+import io.ktor.client.request.put
 import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.testing.TestApplicationRequest
-import io.ktor.server.testing.handleRequest
-import io.ktor.server.testing.withTestApplication
+import io.ktor.server.testing.testApplication
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -39,10 +39,12 @@ internal class InnsendingApiTest {
             every { it.hent(journalpostId) } returns innsending
         }
         val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(mockProducer)
-
-        withTestApplication(innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver, okCredential)) {
-            with(this.handleRequest(HttpMethod.Put, "/internal/replay/187689", withAuth())) {
-                assertEquals(HttpStatusCode.OK, response.status())
+        testApplication {
+            application(innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver, okCredential))
+            client.put("/internal/replay/187689") {
+                withAuth()
+            }.let { response ->
+                assertEquals(HttpStatusCode.OK, response.status)
                 verify(exactly = 1) { innsendingRepository.hent(journalpostId) }
                 assertEquals(1, mockProducer.history().size)
             }
@@ -61,18 +63,21 @@ internal class InnsendingApiTest {
         }
         val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(mockProducer)
 
-        withTestApplication(innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver, okCredential)) {
-            with(this.handleRequest(HttpMethod.Put, "/internal/replay/187689", withAuth())) {
-                assertEquals(HttpStatusCode.BadRequest, response.status())
+        testApplication {
+            application(innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver, okCredential))
+            client.put("/internal/replay/187689") {
+                withAuth()
+            }.let { response ->
+                assertEquals(HttpStatusCode.BadRequest, response.status)
                 verify(exactly = 1) { innsendingRepository.hent(journalpostId) }
                 assertEquals(0, mockProducer.history().size)
             }
         }
     }
 
-    private fun withAuth(): TestApplicationRequest.() -> Unit = {
+    private fun HttpRequestBuilder.withAuth() {
         val up = "${okCredential.first}:${okCredential.second}"
         val encoded = String(Base64.getEncoder().encode(up.toByteArray(Charsets.ISO_8859_1)))
-        addHeader(HttpHeaders.Authorization, "Basic $encoded")
+        header(HttpHeaders.Authorization, "Basic $encoded")
     }
 }
