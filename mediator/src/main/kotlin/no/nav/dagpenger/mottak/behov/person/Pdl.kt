@@ -28,6 +28,7 @@ private val sikkerLogg = KotlinLogging.logger("tjenestekall")
 internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
     private val tokenProvider = config.pdlApiTokenProvider
     private val pdlClient = HttpClient() {
+        expectSuccess = true
         install(DefaultRequest) {
             this.url("${config.pdlApiUrl()}/graphql")
             header("Content-Type", "application/json")

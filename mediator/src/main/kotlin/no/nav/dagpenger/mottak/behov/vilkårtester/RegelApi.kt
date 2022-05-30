@@ -29,6 +29,7 @@ internal class RegelApiProxy(config: Configuration) : RegelApiClient {
     private val tokenProvider = config.dpProxyTokenProvider
 
     private val proxyBehovClient = HttpClient {
+        expectSuccess = true
         install(DefaultRequest) {
             this.url("${config.dpProxyUrl()}/proxy/v1/regelapi/behov")
         }

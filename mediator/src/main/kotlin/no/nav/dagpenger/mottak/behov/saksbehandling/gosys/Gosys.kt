@@ -46,9 +46,9 @@ internal class GosysProxyClient(config: Configuration) : GosysOppslag {
     private val tokenProvider = config.dpProxyTokenProvider
 
     private val proxyGosysClient = HttpClient() {
+        expectSuccess = true
         install(DefaultRequest) {
             this.url("${config.dpProxyUrl()}/proxy/v1/gosys/oppgaver")
-//            method = HttpMethod.Post
         }
         install(ContentNegotiation) {
             register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))

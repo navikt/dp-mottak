@@ -106,7 +106,7 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
     private val journalføringBaseUrl = "${config.dpProxyUrl()}/proxy/v1/dokarkiv/rest/journalpostapi/v1/journalpost"
     private val tokenProvider = config.dpProxyTokenProvider
     private val proxyJournalpostApiClient = HttpClient() {
-
+        expectSuccess = true
         install(DefaultRequest) {
         }
         install(ContentNegotiation) {

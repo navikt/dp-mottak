@@ -65,9 +65,13 @@ internal class SafClient(config: Configuration) : JournalpostArkiv, SøknadsArki
     private val tokenProvider = config.dpProxyTokenProvider
     private val dpProxyUrl = config.dpProxyUrl()
 
-    private val proxyJoarkClient = HttpClient {}
+    private val proxyJoarkClient = HttpClient {
+        expectSuccess = true
+    }
 
-    private val proxySøknadsDataClient = HttpClient { }
+    private val proxySøknadsDataClient = HttpClient {
+        expectSuccess = true
+    }
 
     override suspend fun hentJournalpost(journalpostId: String): SafGraphQL.Journalpost =
         proxyJoarkClient.request("$dpProxyUrl//proxy/v1/saf/graphql") {

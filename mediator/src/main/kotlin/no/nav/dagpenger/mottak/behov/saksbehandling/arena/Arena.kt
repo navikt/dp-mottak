@@ -46,6 +46,7 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
 
     private val baseUrl = "${config.dpProxyUrl()}/proxy/v1/arena"
     private val proxyArenaClient = HttpClient(engine = CIO.create { requestTimeout = Long.MAX_VALUE }) {
+        expectSuccess = true
         install(HttpTimeout) {
             connectTimeoutMillis = Duration.ofSeconds(30).toMillis()
             requestTimeoutMillis = Duration.ofSeconds(30).toMillis()
