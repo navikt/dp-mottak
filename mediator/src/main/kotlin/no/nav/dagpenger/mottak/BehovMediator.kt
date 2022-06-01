@@ -4,7 +4,6 @@ import mu.KLogger
 import mu.KotlinLogging
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
-import java.time.LocalDateTime
 import java.util.UUID
 
 private val logg = KotlinLogging.logger {}
@@ -26,13 +25,7 @@ class BehovMediator(
             val behovsliste = mutableListOf<String>()
             val id = UUID.randomUUID()
 
-            mutableMapOf(
-                "@event_name" to "behov",
-                "@opprettet" to LocalDateTime.now(),
-                "@id" to id,
-                "@behov" to behovsliste
-            )
-                .apply {
+            mutableMapOf<String, Any>().apply {
                     putAll(kontekst)
                     behov.forEach { behov ->
                         require(behov.type.name !in behovsliste) { "Kan ikke produsere samme behov ${behov.type.name} på samme kontekst" }
@@ -44,7 +37,7 @@ class BehovMediator(
                         putAll(behov.detaljer())
                     }
                 }
-                .let { JsonMessage.newMessage(it) }
+                .let { JsonMessage.newNeed(behovsliste, it) }
                 .also { message ->
                     sikkerLogg.info { "Sender $id som ${message.toJson()}" }
                     rapidsConnection.publish(hendelse.journalpostId(), message.toJson())
