@@ -7,6 +7,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.withMDC
 
 internal class OppdaterJournalpostBehovLøser(
     private val journalpostDokarkiv: JournalpostDokarkiv,
@@ -22,23 +23,31 @@ internal class OppdaterJournalpostBehovLøser(
             validate { it.demandValue("@event_name", "behov") }
             validate { it.demandAllOrAny("@behov", listOf("OppdaterJournalpost")) }
             validate { it.rejectKey("@løsning") }
-            validate { it.requireKey("@id", "journalpostId") }
+            validate { it.requireKey("@behovId", "journalpostId") }
             validate { it.interestedIn("navn", "fødselsnummer", "tittel", "dokumenter", "fagsakId") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val journalpostId = packet["journalpostId"].asText()
-        runBlocking {
-            try {
-                journalpostDokarkiv.oppdaterJournalpost(journalpostId, packet.tilJournalføringOppdaterRequest())
-            } catch (e: JournalpostFeil.JournalpostException) {
-                ignorerKjenteTilstander(e)
+        val behovId = packet["@behovId"].asText()
+        withMDC(
+            mapOf(
+                "behovId" to behovId,
+                "journalpostId" to journalpostId
+            )
+        ) {
+            runBlocking {
+                try {
+                    journalpostDokarkiv.oppdaterJournalpost(journalpostId, packet.tilJournalføringOppdaterRequest())
+                } catch (e: JournalpostFeil.JournalpostException) {
+                    ignorerKjenteTilstander(e)
+                }
             }
+            packet["@løsning"] = mapOf("OppdaterJournalpost" to mapOf("journalpostId" to journalpostId))
+            logger.info("løser behov OppdaterJournalpost for journalpost med id $journalpostId")
+            context.publish(packet.toJson())
         }
-        packet["@løsning"] = mapOf("OppdaterJournalpost" to mapOf("journalpostId" to journalpostId))
-        logger.info("løser behov OppdaterJournalpost for journalpost med id $journalpostId")
-        context.publish(packet.toJson())
     }
 }
 

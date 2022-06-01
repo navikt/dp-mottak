@@ -88,6 +88,7 @@ internal class OppdaterJournalpostBehovLøserTest {
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
+          "@behovId": "${UUID.randomUUID()}",
           "@behov": [
             "OppdaterJournalpost"
           ],
@@ -106,6 +107,7 @@ internal class OppdaterJournalpostBehovLøserTest {
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
+          "@behovId": "${UUID.randomUUID()}",
           "@behov": [
             "OppdaterJournalpost"
           ],

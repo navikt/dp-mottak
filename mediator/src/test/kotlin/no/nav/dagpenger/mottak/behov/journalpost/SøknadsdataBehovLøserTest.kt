@@ -43,6 +43,7 @@ internal class SøknadsdataBehovLøserTest {
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
+          "@behovId": "${UUID.randomUUID()}",
           "@behov": [
             "Søknadsdata"
           ],

@@ -58,6 +58,7 @@ internal class FerdigstillJournalpostBehovLøserTest {
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
+          "@behovId": "${UUID.randomUUID()}",
           "@behov": [
             "FerdigstillJournalpost"
           ],

@@ -6,6 +6,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.withMDC
 import kotlin.concurrent.fixedRateTimer
 
 internal class MinsteinntektVurderingLøser(
@@ -42,26 +43,36 @@ internal class MinsteinntektVurderingLøser(
                 validate { it.demandValue("@event_name", "behov") }
                 validate { it.demandAllOrAny("@behov", listOf("MinsteinntektVurdering")) }
                 validate { it.rejectKey("@løsning") }
-                validate { it.requireKey("@id", "journalpostId") }
+                validate { it.requireKey("@behovId", "journalpostId") }
                 validate { it.requireKey("aktørId") }
             }.register(this)
         }
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
 
-            runBlocking {
-                val journalpostId = packet["journalpostId"].asText()
-                try {
-                    logger.info { "Forsøker å opprette minsteinntektvurderingsbehov i regel-api for journalpost med $journalpostId" }
-                    regelApiClient.startMinsteinntektVurdering(
-                        aktørId = packet["aktørId"].asText(),
-                        journalpostId = journalpostId
-                    )
-                    repository.lagre(journalpostId, packet)
-                } catch (e: Exception) {
-                    logger.warn(e) { "Feil ved start av minsteinntekts vurdering for journalpost med id $journalpostId" }
-                    packet["@løsning"] = ikkeFåttSvar()
-                    context.publish(packet.toJson())
+            val journalpostId = packet["journalpostId"].asText()
+            val behovId = packet["@behovId"].asText()
+
+            withMDC(
+                mapOf(
+                    "behovId" to behovId,
+                    "journalpostId" to journalpostId
+                )
+            ) {
+
+                runBlocking {
+                    try {
+                        logger.info { "Forsøker å opprette minsteinntektvurderingsbehov i regel-api for journalpost med $journalpostId" }
+                        regelApiClient.startMinsteinntektVurdering(
+                            aktørId = packet["aktørId"].asText(),
+                            journalpostId = journalpostId
+                        )
+                        repository.lagre(journalpostId, packet)
+                    } catch (e: Exception) {
+                        logger.warn(e) { "Feil ved start av minsteinntekts vurdering for journalpost med id $journalpostId" }
+                        packet["@løsning"] = ikkeFåttSvar()
+                        context.publish(packet.toJson())
+                    }
                 }
             }
         }

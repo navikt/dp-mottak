@@ -3,11 +3,11 @@ package no.nav.dagpenger.mottak.behov.saksbehandling.gosys
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
-import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.withMDC
 import java.time.LocalDate
 
 internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag, rapidsConnection: RapidsConnection) :
@@ -21,15 +21,22 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
             validate { it.demandValue("@event_name", "behov") }
             validate { it.demandAllOrAny("@behov", listOf("OpprettGosysoppgave")) }
             validate { it.rejectKey("@løsning") }
-            validate { it.requireKey("@id", "journalpostId", "behandlendeEnhetId", "registrertDato") }
+            validate { it.requireKey("@behovId", "journalpostId", "behandlendeEnhetId", "registrertDato") }
             validate { it.interestedIn("aktørId", "tilleggsinformasjon", "oppgavebeskrivelse") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        val journalpostId = packet["journalpostId"].asText()
 
-        withLoggingContext("journalpostId" to journalpostId) {
+        val journalpostId = packet["journalpostId"].asText()
+        val behovId = packet["@behovId"].asText()
+
+        withMDC(
+            mapOf(
+                "behovId" to behovId,
+                "journalpostId" to journalpostId
+            )
+        ) {
             try {
                 runBlocking(MDCContext()) {
                     gosysOppslag.opprettOppgave(

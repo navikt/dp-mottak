@@ -63,6 +63,7 @@ internal class PersondataBehovLøserTest {
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
+          "@behovId": "${UUID.randomUUID()}",
           "@behov": [
             "Persondata"
           ],

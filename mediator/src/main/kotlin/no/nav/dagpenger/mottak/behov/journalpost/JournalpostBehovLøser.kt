@@ -1,11 +1,13 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.withMDC
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -23,23 +25,33 @@ internal class JournalpostBehovLøser(
             validate { it.demandValue("@event_name", "behov") }
             validate { it.demandAllOrAny("@behov", listOf("Journalpost")) }
             validate { it.rejectKey("@løsning") }
-            validate { it.requireKey("@id", "journalpostId") }
+            validate { it.requireKey("@behovId", "journalpostId") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-        runBlocking { journalpostArkiv.hentJournalpost(packet["journalpostId"].asText()) }.also {
-            packet["@løsning"] = mapOf("Journalpost" to it)
-            context.publish(packet.toJson())
-            if (it.harDokumentitlerLengreEnn(255)) {
-                val dokumentTitler = it.dokumenter.joinToString { dokument -> "${dokument.tittel}\n" }
-                sikkerlogg.info { "Mottok journalpost fra Joark. Dokumentene har tittlene:\n$dokumentTitler" }
-            }
-            logger.info {
-                val tidSidenOpprettet = it.datoOpprettet?.let { datoOpprettet ->
-                    Duration.between(LocalDateTime.parse(datoOpprettet), LocalDateTime.now())
+
+        val journalpostId = packet["journalpostId"].asText()
+        val behovId = packet["@behovId"].asText()
+        withMDC(
+            mapOf(
+                "behovId" to behovId,
+                "journalpostId" to journalpostId
+            )
+        ) {
+            runBlocking(MDCContext()) { journalpostArkiv.hentJournalpost(journalpostId) }.also {
+                packet["@løsning"] = mapOf("Journalpost" to it)
+                context.publish(packet.toJson())
+                if (it.harDokumentitlerLengreEnn(255)) {
+                    val dokumentTitler = it.dokumenter.joinToString { dokument -> "${dokument.tittel}\n" }
+                    sikkerlogg.info { "Mottok journalpost fra Joark. Dokumentene har tittlene:\n$dokumentTitler" }
                 }
-                "Løst behov Journalpost for journalpost med id ${it.journalpostId}. Opprettet Joark for $tidSidenOpprettet siden."
+                logger.info {
+                    val tidSidenOpprettet = it.datoOpprettet?.let { datoOpprettet ->
+                        Duration.between(LocalDateTime.parse(datoOpprettet), LocalDateTime.now())
+                    }
+                    "Løst behov Journalpost for journalpost med id ${it.journalpostId}. Opprettet Joark for $tidSidenOpprettet siden."
+                }
             }
         }
     }

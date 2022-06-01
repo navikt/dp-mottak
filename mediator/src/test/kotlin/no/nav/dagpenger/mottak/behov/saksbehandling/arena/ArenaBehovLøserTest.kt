@@ -82,6 +82,7 @@ internal class ArenaBehovLøserTest {
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
+          "@behovId": "${UUID.randomUUID()}",
           "@behov": [
             "EksisterendeSaker"
           ],
@@ -96,6 +97,7 @@ internal class ArenaBehovLøserTest {
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
+          "@behovId": "${UUID.randomUUID()}",
           "@behov": [
             "OpprettStartVedtakOppgave"
           ],
@@ -114,6 +116,7 @@ internal class ArenaBehovLøserTest {
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
+          "@behovId": "${UUID.randomUUID()}",
           "@behov": [
             "OpprettVurderhenvendelseOppgave"
           ],

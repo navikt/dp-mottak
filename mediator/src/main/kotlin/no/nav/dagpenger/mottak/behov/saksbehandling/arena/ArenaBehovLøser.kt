@@ -3,12 +3,12 @@ package no.nav.dagpenger.mottak.behov.saksbehandling.arena
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
-import mu.withLoggingContext
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
+import no.nav.helse.rapids_rivers.withMDC
 
 internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: RapidsConnection) {
 
@@ -31,14 +31,21 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                 validate { it.demandValue("@event_name", "behov") }
                 validate { it.demandAllOrAny("@behov", listOf("EksisterendeSaker")) }
                 validate { it.rejectKey("@løsning") }
-                validate { it.requireKey("@id", "journalpostId") }
+                validate { it.requireKey("@behovId", "journalpostId") }
                 validate { it.requireKey("fnr") }
             }.register(this)
         }
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
             val journalpostId = packet["journalpostId"].asText()
-            withLoggingContext("journalpostId" to journalpostId) {
+            val behovId = packet["@behovId"].asText()
+
+            withMDC(
+                mapOf(
+                    "behovId" to behovId,
+                    "journalpostId" to journalpostId
+                )
+            ) {
                 try {
                     runBlocking(MDCContext()) {
                         arenaOppslag.harEksisterendeSaker(packet["fnr"].asText()).also {
@@ -74,7 +81,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                 }
                 validate { it.rejectKey("@løsning") }
                 validate { it.rejectKey("@feil") }
-                validate { it.requireKey("@id", "journalpostId") }
+                validate { it.requireKey("@behovId", "journalpostId") }
                 validate {
                     it.requireKey(
                         "fødselsnummer",
@@ -88,12 +95,18 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
         }
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
-            val behovId = packet["@id"].asText()
-            val journalpostId = packet["journalpostId"].asText()
 
-            withLoggingContext("journalpostId" to journalpostId, "behovId" to behovId) {
+            val journalpostId = packet["journalpostId"].asText()
+            val behovId = packet["@behovId"].asText()
+
+            withMDC(
+                mapOf(
+                    "behovId" to behovId,
+                    "journalpostId" to journalpostId
+                )
+            ) {
                 try {
-                    runBlocking {
+                    runBlocking(MDCContext()) {
                         val behovNavn = packet["@behov"].first().asText()
                         if (journalpostId == "510535172" || journalpostId == "512787291" || journalpostId == "535187062") {
                             packet["@feil"] = behovNavn

@@ -86,6 +86,7 @@ internal class JournalpostBehovLøserTest {
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
+          "@behovId": "${UUID.randomUUID()}",
           "@behov": [
             "Journalpost"
           ],

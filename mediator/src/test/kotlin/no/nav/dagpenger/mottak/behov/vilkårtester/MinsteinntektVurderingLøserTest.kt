@@ -140,6 +140,7 @@ internal class MinsteinntektVurderingLøserTest {
         """{
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
+          "@behovId": "${UUID.randomUUID()}",
           "@behov": [
             "MinsteinntektVurdering"
           ],

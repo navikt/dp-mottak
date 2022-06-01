@@ -6,6 +6,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.withMDC
 
 internal class FerdigstillJournalpostBehovLøser(
     private val journalpostDokarkiv: JournalpostDokarkiv,
@@ -21,27 +22,36 @@ internal class FerdigstillJournalpostBehovLøser(
             validate { it.demandValue("@event_name", "behov") }
             validate { it.demandAllOrAny("@behov", listOf("FerdigstillJournalpost")) }
             validate { it.rejectKey("@løsning") }
-            validate { it.requireKey("@id", "journalpostId") }
+            validate { it.requireKey("@behovId", "journalpostId") }
         }.register(this)
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
+
         val journalpostId = packet["journalpostId"].asText()
+        val behovId = packet["@behovId"].asText()
 
-        try {
-            runBlocking {
-                journalpostDokarkiv.ferdigstill(journalpostId)
-            }
-        } catch (e: JournalpostFeil.JournalpostException) {
-            ignorerKjenteTilstander(e)
-        }
-
-        packet["@løsning"] = mapOf(
-            "FerdigstillJournalpost" to mapOf(
+        withMDC(
+            mapOf(
+                "behovId" to behovId,
                 "journalpostId" to journalpostId
             )
-        )
-        context.publish(packet.toJson())
-        logger.info("løste behov FerdigstillJournalpost for journalpost med id $journalpostId")
+        ) {
+            try {
+                runBlocking {
+                    journalpostDokarkiv.ferdigstill(journalpostId)
+                }
+            } catch (e: JournalpostFeil.JournalpostException) {
+                ignorerKjenteTilstander(e)
+            }
+
+            packet["@løsning"] = mapOf(
+                "FerdigstillJournalpost" to mapOf(
+                    "journalpostId" to journalpostId
+                )
+            )
+            context.publish(packet.toJson())
+            logger.info("løste behov FerdigstillJournalpost for journalpost med id $journalpostId")
+        }
     }
 }
