@@ -3,24 +3,6 @@ package no.nav.dagpenger.mottak
 import com.fasterxml.jackson.databind.JsonNode
 import java.time.LocalDate
 
-/*
-interface SøknadFakta {
-    fun eøsBostedsland(): Boolean
-    fun eøsArbeidsforhold(): Boolean
-    fun avtjentVerneplikt(): Boolean
-    fun fangstOgFisk(): Boolean
-    fun ønskerDagpengerFraDato(): LocalDate
-    fun søknadstidspunkt(): LocalDate
-    fun sisteDagMedLønnEllerArbeidsplikt(): LocalDate
-    fun sisteDagMedLønnKonkurs(): LocalDate
-    fun sisteDagMedLønnEllerArbeidspliktResten(): LocalDate
-    fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold
-    fun søknadsId(): String?
-    fun reellArbeidsSøker(): ReellArbeidsSøker
-    fun asJson(): JsonNode
-    fun accept(visitor: SøknadVisitor)
-}*/
-
 interface SøknadOppslag {
     fun data(): JsonNode
     fun accept(visitor: SøknadVisitor)
