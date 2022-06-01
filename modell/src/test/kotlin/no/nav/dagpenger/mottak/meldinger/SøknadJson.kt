@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.meldinger
 
 import no.nav.dagpenger.mottak.toJsonNode
+import org.intellij.lang.annotations.Language
 
 fun vernepliktQuizJson(harAvtjentVerneplikt: Boolean) =
     //language=json
@@ -222,3 +223,109 @@ fun eøsArbeidsforholdQuizJson(harEøsarbeidsforhold: Boolean) =
     }
   ]
 }""".toJsonNode()
+
+@Language("JSON")
+internal fun avsluttedeArbeidsforholdQuizJson(
+    permitterterFraFiskeForedling: Boolean = false,
+    konkurs: Boolean = false,
+    permittert: Boolean = false
+) =
+    """
+{
+  "seksjoner": [
+    {
+      "beskrivendeId": "arbeidsforhold",
+      "fakta": [
+        {
+          "id": "8003",
+          "type": "generator",
+          "beskrivendeId": "faktum.arbeidsforhold",
+          "svar": [
+            [
+              {
+                "id": "8005.1",
+                "type": "land",
+                "beskrivendeId": "faktum.arbeidsforhold.land",
+                "svar": "NOR",
+                "roller": [
+                  "søker"
+                ]
+              },
+              {
+                "id": "8006.1",
+                "type": "envalg",
+                "beskrivendeId": "faktum.arbeidsforhold.endret",
+                "svar": "${årsak(permittert, konkurs)}",
+                "roller": [
+                  "søker"
+                ],
+                "gyldigeValg": [
+                  "faktum.arbeidsforhold.endret.svar.ikke-endret",
+                  "faktum.arbeidsforhold.endret.svar.avskjediget",
+                  "faktum.arbeidsforhold.endret.svar.sagt-opp-av-arbeidsgiver",
+                  "faktum.arbeidsforhold.endret.svar.arbeidsgiver-konkurs",
+                  "faktum.arbeidsforhold.endret.svar.kontrakt-utgaatt",
+                  "faktum.arbeidsforhold.endret.svar.sagt-opp-selv",
+                  "faktum.arbeidsforhold.endret.svar.redusert-arbeidstid",
+                  "faktum.arbeidsforhold.endret.svar.permittert"
+                ]
+              },
+              {
+                "id": "8015.1",
+                "type": "boolean",
+                "beskrivendeId": "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering",
+                "svar": $permitterterFraFiskeForedling,
+                "roller": [
+                  "søker"
+                ],
+                "gyldigeValg": [
+                  "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering.svar.ja",
+                  "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering.svar.nei"
+                ]
+              }
+            ],
+            [
+              {
+                "id": "8005.1",
+                "type": "land",
+                "beskrivendeId": "faktum.arbeidsforhold.land",
+                "svar": "NOR",
+                "roller": [
+                  "søker"
+                ]
+              },
+              {
+                "id": "8006.1",
+                "type": "envalg",
+                "beskrivendeId": "faktum.arbeidsforhold.endret",
+                "svar": "${årsak(konkurs, permittert)}",
+                "roller": [
+                  "søker"
+                ],
+                "gyldigeValg": [
+                  "faktum.arbeidsforhold.endret.svar.ikke-endret",
+                  "faktum.arbeidsforhold.endret.svar.avskjediget",
+                  "faktum.arbeidsforhold.endret.svar.sagt-opp-av-arbeidsgiver",
+                  "faktum.arbeidsforhold.endret.svar.arbeidsgiver-konkurs",
+                  "faktum.arbeidsforhold.endret.svar.kontrakt-utgaatt",
+                  "faktum.arbeidsforhold.endret.svar.sagt-opp-selv",
+                  "faktum.arbeidsforhold.endret.svar.redusert-arbeidstid",
+                  "faktum.arbeidsforhold.endret.svar.permittert"
+                ]
+              }
+            ]]
+        }
+      ]
+    }
+  ]
+}""".toJsonNode()
+
+private fun årsak(permittert: Boolean, konkurs: Boolean): String {
+    return if (permittert) {
+        "faktum.arbeidsforhold.endret.svar.permittert"
+    } else if (konkurs) {
+        "faktum.arbeidsforhold.endret.svar.arbeidsgiver-konkurs"
+    } else {
+        "faktum.arbeidsforhold.endret.svar.ikke-endret"
+    }
+}

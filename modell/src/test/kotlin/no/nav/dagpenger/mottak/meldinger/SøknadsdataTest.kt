@@ -20,7 +20,7 @@ internal class SøknadsdataTest {
         søknadsData(
             """ {"seksjoner": []} """.toJsonNode()
         ).also {
-            assertTrue(it.søknad() is NyttSøknadFormat)
+            assertTrue(it.søknad() is QuizSøknadFormat)
         }
 
         assertThrows<IllegalArgumentException> {
