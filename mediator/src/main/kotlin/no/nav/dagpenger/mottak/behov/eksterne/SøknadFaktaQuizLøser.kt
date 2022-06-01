@@ -43,7 +43,7 @@ internal class SøknadFaktaQuizLøser(
             validate { it.demandAllOrAny("@behov", løserBehov) }
             validate { it.rejectKey("@løsning") }
             validate { it.requireKey("InnsendtSøknadsId") }
-            validate { it.interestedIn("søknad_uuid", "@id") }
+            validate { it.interestedIn("søknad_uuid", "@behovId") }
         }.register(this)
     }
 
@@ -52,16 +52,16 @@ internal class SøknadFaktaQuizLøser(
         withMDC(
             mapOf(
                 "søknad_uuid" to packet["søknad_uuid"].asText(),
-                "behovId" to packet["@id"].asText()
+                "behovId" to packet["@behovId"].asText()
             )
         ) {
             try {
                 val innsendtSøknadsId = packet.getInnsendtSøknadsId()
                 val søknad = søknadQuizOppslag.hentSøknad(innsendtSøknadsId)
-                packet["@løsning"] = packet["@behov"].map { it.asText() }.filter { it in løserBehov }.map { behov ->
+                val løsning = packet["@behov"].map { it.asText() }.filter { it in løserBehov }.associateWith { behov ->
                     val avsluttedeArbeidsforhold = søknad.avsluttetArbeidsforhold()
                     val reellArbeidsSøker = søknad.reellArbeidsSøker()
-                    behov to when (behov) {
+                    when (behov) {
                         "ØnskerDagpengerFraDato" ->
                             søknad.ønskerDagpengerFraDato()
                         "Søknadstidspunkt" -> søknad.søknadstidspunkt()
@@ -78,8 +78,8 @@ internal class SøknadFaktaQuizLøser(
                         "JobbetUtenforNorge" -> jobbetUtenforNorge(avsluttedeArbeidsforhold)
                         else -> throw IllegalArgumentException("Ukjent behov $behov")
                     }
-                }.toMap()
-
+                }
+                packet["@løsning"] = løsning
                 context.publish(packet.toJson())
                 logger.info("løste søknadfakta-behov for innsendt søknad med id $innsendtSøknadsId")
             } catch (e: Exception) {

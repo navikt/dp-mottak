@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 
-internal class SøknadFaktaLøserTest {
+internal class SøknadFaktaQuizLøserTest {
 
     val testRapid = TestRapid()
     val testSøknad =
@@ -57,6 +57,15 @@ internal class SøknadFaktaLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertEquals(forventetVerdi, field(0, "@løsning")[behovNavn].asText())
+        }
+    }
+
+    @Test
+    fun `Bevarer @id i behov`() {
+        testRapid.sendTestMessage(behovMelding("Verneplikt"))
+        with(testRapid.inspektør) {
+            assertEquals(1, size)
+            assertEquals("930e2beb-d394-4024-b713-dbeb6ad3d4bf", field(0, "@behovId").asText())
         }
     }
 
@@ -171,6 +180,7 @@ internal class SøknadFaktaLøserTest {
       "@event_name": "faktum_svar",
       "@opprettet": "2020-11-18T11:04:32.867824",
       "@id": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
+      "@behovId": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
       "identer":[{"id":"12345678910","type":"folkeregisterident","historisk":false}],
       "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
       "@behov": [
@@ -187,6 +197,7 @@ internal class SøknadFaktaLøserTest {
       "@event_name": "faktum_svar",
       "@opprettet": "2020-11-18T11:04:32.867824",
       "@id": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
+      "@behovId": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
       "identer":[{"id":"12345678910","type":"folkeregisterident","historisk":false}],
       "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
       "@behov": [
