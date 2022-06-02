@@ -1,7 +1,6 @@
 package no.nav.dagpenger.mottak
 
 import no.nav.dagpenger.mottak.meldinger.Journalpost
-import no.nav.dagpenger.mottak.meldinger.Søknadsdata
 import java.time.LocalDateTime
 
 interface JournalpostVisitor {
@@ -17,7 +16,7 @@ interface JournalpostVisitor {
 }
 
 interface SøknadVisitor {
-    fun visitSøknad(søknad: Søknadsdata.GammelSøknad?) {}
+    fun visitSøknad(søknad: SøknadOppslag?) {}
 }
 
 interface PersonVisitor {

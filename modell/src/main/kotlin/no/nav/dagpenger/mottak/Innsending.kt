@@ -21,7 +21,7 @@ class Innsending private constructor(
     private val journalpostId: String,
     private var tilstand: Tilstand,
     private var journalpost: Journalpost?,
-    private var søknad: Søknadsdata.GammelSøknad?,
+    private var rutingOppslag: RutingOppslag?,
     private var oppfyllerMinsteArbeidsinntekt: Boolean?,
     private var eksisterendeSaker: Boolean?,
     private var person: Person?,
@@ -36,7 +36,7 @@ class Innsending private constructor(
         journalpostId = journalpostId,
         tilstand = Mottatt,
         journalpost = null,
-        søknad = null,
+        rutingOppslag = null,
         oppfyllerMinsteArbeidsinntekt = null,
         eksisterendeSaker = null,
         person = null,
@@ -303,7 +303,7 @@ class Innsending private constructor(
                     innsending.journalpost
                 ) { " Journalpost må være kategorisert på dette tidspunktet " }.kategorisertJournalpost()
             søknadsdata.info("Fikk Søknadsdata for ${kategorisertJournalpost.javaClass.simpleName}")
-            innsending.søknad = søknadsdata.søknad()
+            innsending.rutingOppslag = søknadsdata.søknad()
 
             when (kategorisertJournalpost) {
                 is NySøknad -> innsending.tilstand(søknadsdata, AventerMinsteinntektVurdering)
@@ -514,7 +514,7 @@ class Innsending private constructor(
 
     private fun oppretteArenaStartVedtakOppgave(hendelse: Hendelse) {
         val journalpost = requireNotNull(journalpost).kategorisertJournalpost()
-        val søknad = requireNotNull(søknad)
+        val søknad = requireNotNull(rutingOppslag)
         val person = requireNotNull(person)
         val oppgavebenk = journalpost.oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt)
         val parametre = mapOf(
@@ -652,9 +652,9 @@ class Innsending private constructor(
             fødselsnummer = person?.ident,
             fagsakId = arenaSak?.fagsakId,
             datoRegistrert = jp.datoRegistrert(),
-            søknadsData = søknad?.data,
+            søknadsData = rutingOppslag?.data(),
             behandlendeEnhet = jp.kategorisertJournalpost()
-                .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id,
+                .oppgaveBenk(person, rutingOppslag, oppfyllerMinsteArbeidsinntekt).id,
             oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt,
             tittel = jp.hovedDokument().tittel
         ).also { ferdig ->
@@ -672,9 +672,9 @@ class Innsending private constructor(
             fødselsnummer = person?.ident,
             fagsakId = null,
             datoRegistrert = jp.datoRegistrert(),
-            søknadsData = søknad?.data,
+            søknadsData = rutingOppslag?.data(),
             behandlendeEnhet = jp.kategorisertJournalpost()
-                .oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt).id,
+                .oppgaveBenk(person, rutingOppslag, oppfyllerMinsteArbeidsinntekt).id,
             oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt,
             tittel = jp.hovedDokument().tittel
         ).also { mottatt ->
@@ -703,7 +703,7 @@ class Innsending private constructor(
         journalpost?.accept(visitor)
         arenaSak?.accept(visitor)
         person?.accept(visitor)
-        søknad?.accept(visitor)
+        rutingOppslag?.accept(visitor)
         visitor.visitInnsendingAktivitetslogg(aktivitetslogg)
         aktivitetslogg.accept(visitor)
         visitor.postVisitInnsending(this, journalpostId)

@@ -235,7 +235,8 @@ internal class MediatorE2ETest {
           "@løsning": {
             "Søknadsdata": {
                  "brukerBehandlingId": "blabla",
-                 "masse": "masse data"
+                 "masse": "masse data",
+                 "fakta": "fakta"
               }
             }
           }

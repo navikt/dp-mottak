@@ -18,7 +18,7 @@ internal class PostgresSøknadQuizOppslagTest {
     @Test
     fun hentSøknad() {
         withMigratedDb {
-            val data = this.javaClass.getResource("/testdata/soknadsdata.json").readText(Charset.forName("UTF-8"))
+            val data = this.javaClass.getResource("/testdata/soknadsdata_gammelt_format.json").readText(Charset.forName("UTF-8"))
             using(sessionOf(PostgresTestHelper.dataSource)) { session ->
                 val id = session.run(
                     queryOf(
