@@ -13,7 +13,6 @@ class Søknadsdata(
     override fun journalpostId(): String = journalpostId
     fun søknad(): RutingOppslag = when {
         data["seksjoner"] != null -> QuizSøknadFormat(data)
-        data["fakta"] != null -> GammeltSøknadFormat(data)
-        else -> throw IllegalArgumentException("Kunne ikke avgjøre søknadsformat: $data")
+        else -> GammeltSøknadFormat(data)
     }
 }

@@ -5,7 +5,6 @@ import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.toJsonNode
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 internal class SøknadsdataTest {
 
@@ -23,8 +22,8 @@ internal class SøknadsdataTest {
             assertTrue(it.søknad() is QuizSøknadFormat)
         }
 
-        assertThrows<IllegalArgumentException> {
-            søknadsData(""" {"hubba": []} """.toJsonNode()).søknad()
+        søknadsData(""" {"hubba": []} """.toJsonNode()).søknad().also {
+            assertTrue(it is GammeltSøknadFormat)
         }
     }
 
