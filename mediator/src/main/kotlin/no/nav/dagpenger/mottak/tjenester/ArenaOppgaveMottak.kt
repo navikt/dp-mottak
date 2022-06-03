@@ -31,7 +31,12 @@ internal class OpprettArenaOppgaveMottak(
             River(rapidsConnection).apply {
                 validate { it.requireValue("@event_name", "behov") }
                 validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-                validate { it.demandAllOrAny("@behov", listOf(Behovtype.OpprettStartVedtakOppgave.name, Behovtype.OpprettVurderhenvendelseOppgave.name)) }
+                validate {
+                    it.demandAllOrAny(
+                        "@behov",
+                        listOf(Behovtype.OpprettStartVedtakOppgave.name, Behovtype.OpprettVurderhenvendelseOppgave.name)
+                    )
+                }
                 validate { it.requireKey("@løsning") }
                 validate { it.requireKey("journalpostId") }
             }.register(this)
@@ -41,16 +46,23 @@ internal class OpprettArenaOppgaveMottak(
             val arenaLøsning = packet["@løsning"].first()
             val journalpostId = packet["journalpostId"].asText()
             logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId" }
-            val oppgaveOpprettet = arenaLøsning.let {
-                ArenaOppgaveOpprettet(
-                    aktivitetslogg = Aktivitetslogg(),
-                    journalpostId = journalpostId,
-                    oppgaveId = it["oppgaveId"].asText(),
-                    fagsakId = it.getOrNull("fagsakId")?.asText()
+            if (arenaLøsning.has("@feil")) {
+                innsendingMediator.håndter(
+                    ArenaOppgaveFeilet(
+                        aktivitetslogg = Aktivitetslogg(),
+                        journalpostId = packet["journalpostId"].asText()
+                    )
+                )
+            } else {
+                innsendingMediator.håndter(
+                    ArenaOppgaveOpprettet(
+                        aktivitetslogg = Aktivitetslogg(),
+                        journalpostId = journalpostId,
+                        oppgaveId = arenaLøsning["oppgaveId"].asText(),
+                        fagsakId = arenaLøsning.getOrNull("fagsakId")?.asText()
+                    )
                 )
             }
-
-            innsendingMediator.håndter(oppgaveOpprettet)
         }
     }
 
@@ -59,7 +71,12 @@ internal class OpprettArenaOppgaveMottak(
             River(rapidsConnection).apply {
                 validate { it.requireValue("@event_name", "behov") }
                 validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-                validate { it.demandAllOrAny("@behov", listOf(Behovtype.OpprettStartVedtakOppgave.name, Behovtype.OpprettVurderhenvendelseOppgave.name)) }
+                validate {
+                    it.demandAllOrAny(
+                        "@behov",
+                        listOf(Behovtype.OpprettStartVedtakOppgave.name, Behovtype.OpprettVurderhenvendelseOppgave.name)
+                    )
+                }
                 validate { it.requireKey("@feil") }
                 validate { it.requireKey("journalpostId") }
             }.register(this)
