@@ -60,7 +60,10 @@ internal class MediatorE2ETest {
         håndterHendelse(oppdatertJournalpostMotattHendelse())
         assertBehov("FerdigstillJournalpost", 7)
         håndterHendelse(ferdigstiltJournalpostMotattHendelse())
-        assertTrue(testRapid.inspektør.size == 8, "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}")
+        assertTrue(
+            testRapid.inspektør.size == 8,
+            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}"
+        )
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
     }
 
@@ -79,7 +82,10 @@ internal class MediatorE2ETest {
         håndterHendelse(oppdatertJournalpostMotattHendelse())
         assertBehov("FerdigstillJournalpost", 5)
         håndterHendelse(ferdigstiltJournalpostMotattHendelse())
-        assertTrue(testRapid.inspektør.size == 6, "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}")
+        assertTrue(
+            testRapid.inspektør.size == 6,
+            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}"
+        )
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
     }
 
@@ -102,7 +108,10 @@ internal class MediatorE2ETest {
         håndterHendelse(gosysOppgaveOpprettetHendelse())
         assertBehov("OppdaterJournalpost", 7)
         håndterHendelse(oppdatertJournalpostMotattHendelse())
-        assertTrue(testRapid.inspektør.size == 8, "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}")
+        assertTrue(
+            testRapid.inspektør.size == 8,
+            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}"
+        )
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
     }
 
@@ -287,10 +296,14 @@ internal class MediatorE2ETest {
           "@behov": [
             "OpprettStartVedtakOppgave"
           ],
-          "@opprettet" : "${now()}",
+          "@opprettet": "${now()}",
           "journalpostId": "$journalpostId",
-          "@feil": "OpprettStartVedtakOppgave"
-        }
+          "@løsning": {
+            "OpprettStartVedtakOppgave": {
+              "@feil" : "Kunne ikke opprettet arenaoppgave"
+            }
+          }
+}
         """.trimIndent()
 
     //language=JSON
@@ -366,6 +379,7 @@ internal class MediatorE2ETest {
           }
         }
         """.trimIndent()
+
     //language=JSON
     private fun gosysOppgaveOpprettetHendelse(): String =
         """{

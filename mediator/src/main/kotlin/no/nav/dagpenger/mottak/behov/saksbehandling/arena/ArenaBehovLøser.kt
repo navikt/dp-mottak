@@ -132,7 +132,12 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                                 logger.info { "Løste behov $behovNavn med løsning $it" }
                             }
                         } else {
-                            packet["@feil"] = behovNavn
+                            packet["@løsning"] = mapOf(
+                                behovNavn to mapOf("@feil" to "Kunne ikke opprettet Arena oppgave")
+                            )
+                                .also {
+                                    logger.info { "Løste behov $behovNavn med feil $it" }
+                                }
                         }
 
                         context.publish(packet.toJson())

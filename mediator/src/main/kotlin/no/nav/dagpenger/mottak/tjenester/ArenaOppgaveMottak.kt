@@ -18,79 +18,44 @@ private val logg = KotlinLogging.logger {}
 
 internal class OpprettArenaOppgaveMottak(
     private val innsendingMediator: InnsendingMediator,
-    private val rapidsConnection: RapidsConnection
-) {
+    rapidsConnection: RapidsConnection
+) : River.PacketListener {
 
     init {
-        ArenaOppgaveOpprettet()
-        ArenaOppgaveFeil()
-    }
-
-    private inner class ArenaOppgaveOpprettet : River.PacketListener {
-        init {
-            River(rapidsConnection).apply {
-                validate { it.requireValue("@event_name", "behov") }
-                validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-                validate {
-                    it.demandAllOrAny(
-                        "@behov",
-                        listOf(Behovtype.OpprettStartVedtakOppgave.name, Behovtype.OpprettVurderhenvendelseOppgave.name)
-                    )
-                }
-                validate { it.requireKey("@løsning") }
-                validate { it.requireKey("journalpostId") }
-            }.register(this)
-        }
-
-        override fun onPacket(packet: JsonMessage, context: MessageContext) {
-            val arenaLøsning = packet["@løsning"].first()
-            val journalpostId = packet["journalpostId"].asText()
-            logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId" }
-            if (arenaLøsning.has("@feil")) {
-                innsendingMediator.håndter(
-                    ArenaOppgaveFeilet(
-                        aktivitetslogg = Aktivitetslogg(),
-                        journalpostId = packet["journalpostId"].asText()
-                    )
-                )
-            } else {
-                innsendingMediator.håndter(
-                    ArenaOppgaveOpprettet(
-                        aktivitetslogg = Aktivitetslogg(),
-                        journalpostId = journalpostId,
-                        oppgaveId = arenaLøsning["oppgaveId"].asText(),
-                        fagsakId = arenaLøsning.getOrNull("fagsakId")?.asText()
-                    )
+        River(rapidsConnection).apply {
+            validate { it.requireValue("@event_name", "behov") }
+            validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
+            validate {
+                it.demandAllOrAny(
+                    "@behov",
+                    listOf(Behovtype.OpprettStartVedtakOppgave.name, Behovtype.OpprettVurderhenvendelseOppgave.name)
                 )
             }
-        }
+            validate { it.requireKey("@løsning") }
+            validate { it.requireKey("journalpostId") }
+        }.register(this)
     }
 
-    private inner class ArenaOppgaveFeil : River.PacketListener {
-        init {
-            River(rapidsConnection).apply {
-                validate { it.requireValue("@event_name", "behov") }
-                validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-                validate {
-                    it.demandAllOrAny(
-                        "@behov",
-                        listOf(Behovtype.OpprettStartVedtakOppgave.name, Behovtype.OpprettVurderhenvendelseOppgave.name)
-                    )
-                }
-                validate { it.requireKey("@feil") }
-                validate { it.requireKey("journalpostId") }
-            }.register(this)
-        }
-
-        override fun onPacket(packet: JsonMessage, context: MessageContext) {
-            val journalpostId = packet["journalpostId"].asText()
-            logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId" }
-
-            val arenaOppgaveFeilet = ArenaOppgaveFeilet(
-                aktivitetslogg = Aktivitetslogg(),
-                journalpostId = packet["journalpostId"].asText()
+    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        val arenaLøsning = packet["@løsning"].first()
+        val journalpostId = packet["journalpostId"].asText()
+        logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId" }
+        if (arenaLøsning.has("@feil")) {
+            innsendingMediator.håndter(
+                ArenaOppgaveFeilet(
+                    aktivitetslogg = Aktivitetslogg(),
+                    journalpostId = packet["journalpostId"].asText()
+                )
             )
-            innsendingMediator.håndter(arenaOppgaveFeilet)
+        } else {
+            innsendingMediator.håndter(
+                ArenaOppgaveOpprettet(
+                    aktivitetslogg = Aktivitetslogg(),
+                    journalpostId = journalpostId,
+                    oppgaveId = arenaLøsning["oppgaveId"].asText(),
+                    fagsakId = arenaLøsning.getOrNull("fagsakId")?.asText()
+                )
+            )
         }
     }
 }

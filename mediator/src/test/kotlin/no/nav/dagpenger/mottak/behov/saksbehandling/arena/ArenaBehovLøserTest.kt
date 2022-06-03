@@ -1,5 +1,7 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling.arena
 
+import io.mockk.coEvery
+import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -15,25 +17,21 @@ internal class ArenaBehovLøserTest {
 
     private val testRapid = TestRapid()
 
+    private val arenaOppslagMock = mockk<ArenaOppslag>().also {
+        coEvery { it.harEksisterendeSaker(any()) } returns true
+        coEvery { it.opprettStartVedtakOppgave(any(), any()) } returns OpprettVedtakOppgaveResponse(
+            fagsakId = "123",
+            oppgaveId = "123"
+        )
+        coEvery { it.opprettVurderHenvendelsOppgave(any(), any()) } returns OpprettVedtakOppgaveResponse(
+            fagsakId = null,
+            oppgaveId = "123"
+        )
+    }
+
     init {
         ArenaBehovLøser(
-            arenaOppslag = object : ArenaOppslag {
-                override suspend fun harEksisterendeSaker(fnr: String): Boolean = true
-                override suspend fun opprettStartVedtakOppgave(
-                    journalpostId: String,
-                    parametere: OpprettArenaOppgaveParametere
-                ) = OpprettVedtakOppgaveResponse(
-                    fagsakId = "123",
-                    oppgaveId = "123"
-                )
-                override suspend fun opprettVurderHenvendelsOppgave(
-                    journalpostId: String,
-                    parametere: OpprettArenaOppgaveParametere
-                ) = OpprettVedtakOppgaveResponse(
-                    fagsakId = null,
-                    oppgaveId = "123"
-                )
-            },
+            arenaOppslag = arenaOppslagMock,
             rapidsConnection = testRapid
         )
     }
@@ -74,6 +72,28 @@ internal class ArenaBehovLøserTest {
             assertEquals(null, field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["fagsakId"].textValue())
             assertEquals("123", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["oppgaveId"].asText())
             assertEquals(JOURNALPOST_ID, field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["journalpostId"].asText())
+        }
+    }
+
+    @Test
+    fun `Løser OpprettStartVedtakOppgave ved feil (null response)`() {
+        coEvery { arenaOppslagMock.opprettStartVedtakOppgave(any(), any()) } returns null
+        testRapid.sendTestMessage(opprettStartVedtakBehov())
+        with(testRapid.inspektør) {
+            assertEquals(1, size)
+            assertDoesNotThrow { field(0, "@løsning") }
+            assertEquals("Kunne ikke opprettet Arena oppgave", field(0, "@løsning")["OpprettStartVedtakOppgave"]["@feil"].asText())
+        }
+    }
+
+    @Test
+    fun `Løser 0pprettVurderhenvendelseOppgave ved feil (null response)`() {
+        coEvery { arenaOppslagMock.opprettVurderHenvendelsOppgave(any(), any()) } returns null
+        testRapid.sendTestMessage(opprettVurderhenvendelseOppgaveBehov())
+        with(testRapid.inspektør) {
+            assertEquals(1, size)
+            assertDoesNotThrow { field(0, "@løsning") }
+            assertEquals("Kunne ikke opprettet Arena oppgave", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["@feil"].asText())
         }
     }
 
