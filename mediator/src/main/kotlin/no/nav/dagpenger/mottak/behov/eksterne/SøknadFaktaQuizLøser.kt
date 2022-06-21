@@ -85,7 +85,7 @@ internal class SøknadFaktaQuizLøser(
             } catch (e: Exception) {
                 logger.error(e) { "feil ved søknadfakta-behov" }
                 sikkerlogg.error(e) { "feil ved søknadfakta-behov. \n packet: ${packet.toJson()}" }
-                // throw e
+                throw e
             }
         }
     }
