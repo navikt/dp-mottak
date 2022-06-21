@@ -82,6 +82,7 @@ internal class ArenaBehovLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
+            println(message(0))
             assertEquals("Kunne ikke opprettet Arena oppgave", field(0, "@løsning")["OpprettStartVedtakOppgave"]["@feil"].asText())
         }
     }
