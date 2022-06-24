@@ -65,6 +65,42 @@ fun bostedsQuizJson(land: String) =
   ]
 }""".toJsonNode()
 
+fun utenArbeidsforholdQuizJson() =
+    //language=JSON
+    """{
+  "fødselsnummer": "12020052345",
+  "@event_name": "søker_oppgave",
+  "versjon_id": -1,
+  "versjon_navn": "Dagpenger",
+  "@opprettet": "2022-06-01T10:32:09.866832",
+  "@id": "24ab2cb0-5dc3-4f19-acf4-98547730706a",
+  "søknad_uuid": "c725ce65-cfd5-4242-932c-b3b50fe82e57",
+  "ferdig": false,
+  "seksjoner": [
+    {
+      "beskrivendeId": "arbeidsforhold",
+      "fakta": [
+        {
+          "id": "8002",
+          "svar": "faktum.type-arbeidstid.svar.ingen-passer",
+          "type": "envalg",
+          "roller": [
+            "søker"
+          ],
+          "readOnly": false,
+          "gyldigeValg": [
+            "faktum.type-arbeidstid.svar.fast",
+            "faktum.type-arbeidstid.svar.varierende",
+            "faktum.type-arbeidstid.svar.kombinasjon",
+            "faktum.type-arbeidstid.svar.ingen-passer"
+          ],
+          "beskrivendeId": "faktum.type-arbeidstid"
+        }
+      ]
+    }
+  ]
+}""".toJsonNode()
+
 fun eøsArbeidsforholdQuizJson(harEøsarbeidsforhold: Boolean) =
     //language=json
     """{

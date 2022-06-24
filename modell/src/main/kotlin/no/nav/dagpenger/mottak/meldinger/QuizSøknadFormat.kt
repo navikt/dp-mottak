@@ -23,7 +23,9 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
 
     override fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
         val faktaFraSeksjon = data.hentFaktaFraSeksjon("arbeidsforhold")
-        val arbeidsforhold = faktaFraSeksjon.single { it["beskrivendeId"].asText() == "faktum.arbeidsforhold" }["svar"]
+        val arbeidsforhold =
+            faktaFraSeksjon.singleOrNull { it["beskrivendeId"].asText() == "faktum.arbeidsforhold" }?.get("svar")
+                ?: emptyList()
         return arbeidsforhold.map {
             AvsluttetArbeidsforhold(
                 sluttårsak = it.sluttårsak(),
@@ -66,7 +68,10 @@ private fun JsonNode.sluttårsak(): Sluttårsak = this.faktaSvar("faktum.arbeids
 }
 
 private fun JsonNode.hentFaktaFraSeksjon(navn: String) =
-    this["seksjoner"].single { it["beskrivendeId"].asText() == navn }["fakta"]
+    this["seksjoner"].single { it["beskrivendeId"].asText() == navn }.get("fakta")
+
+private fun JsonNode.hentNullableFaktaFraSeksjon(navn: String) =
+    this["seksjoner"].singleOrNull { it["beskrivendeId"].asText() == navn }?.get("fakta")
 
 private fun JsonNode.faktaSvar(navn: String) =
     this.single { it["beskrivendeId"].asText() == navn }["svar"]

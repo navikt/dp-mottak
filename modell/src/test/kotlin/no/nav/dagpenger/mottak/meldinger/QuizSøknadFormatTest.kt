@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 
 internal class QuizSøknadFormatTest {
-
     @Test
     fun eøsBostedsland() {
         assertFalse(QuizSøknadFormat(bostedsQuizJson("NOR")).eøsBostedsland())
@@ -48,6 +48,12 @@ internal class QuizSøknadFormatTest {
 
     @Test
     fun avsluttetArbeidsforholdFraKonkurs() {
+        assertDoesNotThrow {
+            assertEquals(
+                false,
+                QuizSøknadFormat(utenArbeidsforholdQuizJson()).avsluttetArbeidsforholdFraKonkurs()
+            )
+        }
         assertEquals(
             true,
             QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(konkurs = true)).avsluttetArbeidsforholdFraKonkurs()
