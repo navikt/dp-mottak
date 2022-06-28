@@ -8,6 +8,7 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.withMDC
+import java.time.format.DateTimeParseException
 
 internal class SøknadFaktaQuizLøser(
     private val søknadQuizOppslag: SøknadQuizOppslag,
@@ -82,6 +83,9 @@ internal class SøknadFaktaQuizLøser(
                 packet["@løsning"] = løsning
                 context.publish(packet.toJson())
                 logger.info("løste søknadfakta-behov for innsendt søknad med id $innsendtSøknadsId")
+            } catch (e: DateTimeParseException) {
+                logger.info(e) { "feil ved parsing av dato i søknadfakta-behov. Hopper over behovet" }
+                sikkerlogg.info(e) { "feil ved parsing av dato i søknadfakta-behov. Hopper over behovet \n packet: ${packet.toJson()}" }
             } catch (e: Exception) {
                 logger.error(e) { "feil ved søknadfakta-behov" }
                 sikkerlogg.error(e) { "feil ved søknadfakta-behov. \n packet: ${packet.toJson()}" }
