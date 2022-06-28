@@ -53,25 +53,20 @@ sealed class KategorisertJournalpost(
             "NAVe 04-08.04",
             "NAV 04-08.04"
         )
-
     private val UTLAND_BREVKODER =
         listOf("NAV 04-02.01", "NAVe 04-02.01", "NAV 04-02.03", "NAV 04-02.05", "NAVe 04-02.05", "UTL")
 
     fun tilleggsinformasjon(): String {
-
         val hovedDokument = journalpost.tittel()
         val vedlegg = journalpost.vedlegg().map { it.tittel }
-
         val formatertVedlegg =
             if (vedlegg.isNotEmpty()) {
                 vedlegg.joinToString(prefix = "- ", separator = "\n- ", postfix = "\n")
             } else {
                 ""
             }
-
         val formatertDato = journalpost.datoRegistrert().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
         val datoBeskrivelse = "Registrert dato: ${formatertDato}\n"
-
         val informasjon = "Hoveddokument: ${hovedDokument}\n" +
             formatertVedlegg +
             datoBeskrivelse +
@@ -202,12 +197,15 @@ data class KlageOgAnkeLønnskompensasjon(
         rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
-    ) = OppgaveBenk(
-        beskrivelse = henvendelseNavn(),
-        id = "4486",
-        datoRegistrert = journalpost.datoRegistrert(),
-        tilleggsinformasjon = tilleggsinformasjon()
-    )
+    ): OppgaveBenk {
+        if (person == null) return super.finnOppgaveBenk(rutingOppslag, oppfyllerMinsteArbeidsinntekt, person)
+        return OppgaveBenk(
+            beskrivelse = henvendelseNavn(),
+            id = "4486",
+            datoRegistrert = journalpost.datoRegistrert(),
+            tilleggsinformasjon = tilleggsinformasjon()
+        )
+    }
 }
 
 data class KlageOgAnkeForskudd(
@@ -218,12 +216,15 @@ data class KlageOgAnkeForskudd(
         rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
-    ) = OppgaveBenk(
-        beskrivelse = henvendelseNavn(),
-        id = "4153",
-        datoRegistrert = journalpost.datoRegistrert(),
-        tilleggsinformasjon = tilleggsinformasjon()
-    )
+    ): OppgaveBenk {
+        if (person == null) return super.finnOppgaveBenk(rutingOppslag, oppfyllerMinsteArbeidsinntekt, person)
+        return OppgaveBenk(
+            beskrivelse = henvendelseNavn(),
+            id = "4153",
+            datoRegistrert = journalpost.datoRegistrert(),
+            tilleggsinformasjon = tilleggsinformasjon()
+        )
+    }
 }
 
 data class KlageOgAnkeFeriepenger(
@@ -234,12 +235,16 @@ data class KlageOgAnkeFeriepenger(
         rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?
-    ) = OppgaveBenk(
-        beskrivelse = henvendelseNavn(),
-        id = "4456",
-        datoRegistrert = journalpost.datoRegistrert(),
-        tilleggsinformasjon = tilleggsinformasjon()
-    )
+    ): OppgaveBenk {
+        if (person == null) return super.finnOppgaveBenk(rutingOppslag, oppfyllerMinsteArbeidsinntekt, person)
+
+        return OppgaveBenk(
+            beskrivelse = henvendelseNavn(),
+            id = "4456",
+            datoRegistrert = journalpost.datoRegistrert(),
+            tilleggsinformasjon = tilleggsinformasjon()
+        )
+    }
 }
 
 data class Ettersending(

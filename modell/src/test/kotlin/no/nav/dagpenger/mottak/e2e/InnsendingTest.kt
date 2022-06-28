@@ -585,6 +585,35 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     }
 
     @Test
+    fun `skal håndtere at informasjon om bruker ikke er funnet og skjema er klage og anke`() {
+
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0452")
+        håndterPersonInformasjonIkkeFunnet()
+        håndterGosysOppgaveOpprettet()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            UkjentBrukerType,
+            InnsendingFerdigstiltType
+        )
+
+        inspektør.also {
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+        }
+
+        assertFerdigstilt {
+            assertNotNull(it.datoRegistrert)
+            assertEquals("4450", it.behandlendeEnhet)
+        }
+
+        assertPuml("Ukjent bruker")
+    }
+    @Test
     fun `skal forhindre at ferdigstilte joarkhendelser skal behandles på nytt`() {
         håndterJoarkHendelse()
         håndterJournalpostData("ukjent")
