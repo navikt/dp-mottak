@@ -34,7 +34,6 @@ import org.junit.jupiter.params.provider.ValueSource
 import java.lang.IllegalArgumentException
 
 internal class InnsendingTest : AbstractEndeTilEndeTest() {
-
     @ParameterizedTest
     @ValueSource(strings = ["NAV 04-01.03", "NAV 04-01.04"])
     fun `skal håndtere joark hendelse der journalpost er ny søknad`(brevkode: String) {
@@ -522,7 +521,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         ]
     )
     fun `skal håndtere journalpost uten bruker`(brevkode: String) {
-
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode = brevkode, bruker = null)
         håndterGosysOppgaveOpprettet()
@@ -557,7 +555,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
     @Test
     fun `skal håndtere at informasjon om bruker ikke er funnet`() {
-
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode = "NAVe 04-16.03")
         håndterPersonInformasjonIkkeFunnet()
@@ -584,11 +581,17 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         assertPuml("Ukjent bruker")
     }
 
-    @Test
-    fun `skal håndtere at informasjon om bruker ikke er funnet og skjema er klage og anke`() {
-
+    @ValueSource(
+        strings = [
+            "ab0438",
+            "ab0451",
+            "ab0452",
+        ]
+    )
+    @ParameterizedTest
+    fun `skal håndtere at informasjon om bruker ikke er funnet og skjema er klage og anke`(behandlingstema: String) {
         håndterJoarkHendelse()
-        håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0452")
+        håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = behandlingstema)
         håndterPersonInformasjonIkkeFunnet()
         håndterGosysOppgaveOpprettet()
 
@@ -613,6 +616,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
         assertPuml("Ukjent bruker")
     }
+
     @Test
     fun `skal forhindre at ferdigstilte joarkhendelser skal behandles på nytt`() {
         håndterJoarkHendelse()
@@ -620,7 +624,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterPersonInformasjon()
         håndterGosysOppgaveOpprettet()
         håndterJournalpostOppdatert()
-
         // joark hendelse med samme journalpostId kommer
         håndterJoarkHendelse()
 
@@ -641,7 +644,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
     @Test
     fun `Skal ikke håndtere replay eventer for andre tilstander enn ferdigstilt`() {
-
         håndterJoarkHendelse()
         assertThrows<IllegalArgumentException> { hånderReplayFerdigstilt() }
     }
