@@ -95,7 +95,6 @@ internal class SøknadFaktaTest {
         val søknad = GammeltSøknadFormat(data)
         assertFalse(søknad.eøsArbeidsforhold())
 
-
         val harArbeidsforholdIEøs = JsonMapper.jacksonJsonAdapter.readTree(
             """
             {
@@ -103,7 +102,7 @@ internal class SøknadFaktaTest {
                  {
                   "key": "eosarbeidsforhold.jobbetieos",
                   "type": "BRUKERREGISTRERT",
-                  "value": false,
+                  "value": "false",
                   "faktumId": 385544417,
                   "soknadId": 5312874,
                   "properties": {},
@@ -115,6 +114,26 @@ internal class SøknadFaktaTest {
             """.trimIndent()
         )
         assertTrue(GammeltSøknadFormat(harArbeidsforholdIEøs).eøsArbeidsforhold())
+
+        val harIkkeArbeidsforholdIEøs = JsonMapper.jacksonJsonAdapter.readTree(
+            """
+            {
+              "fakta": [
+                 {
+                  "key": "eosarbeidsforhold.jobbetieos",
+                  "type": "BRUKERREGISTRERT",
+                  "value": "true",
+                  "faktumId": 385544417,
+                  "soknadId": 5312874,
+                  "properties": {},
+                  "parrentFaktum": null,
+                  "faktumEgenskaper": []
+                }
+              ]
+            }
+            """.trimIndent()
+        )
+        assertFalse(GammeltSøknadFormat(harIkkeArbeidsforholdIEøs).eøsArbeidsforhold())
     }
 }
 
