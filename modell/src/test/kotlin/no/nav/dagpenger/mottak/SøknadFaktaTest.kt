@@ -70,6 +70,52 @@ internal class SøknadFaktaTest {
         val søknad = GammeltSøknadFormat(data)
         assertFalse(søknad.eøsBostedsland())
     }
+
+    @Test
+    fun `arbeidsforhold i EØS der svaret er NULL`() {
+        //language=JSON
+        val data = JsonMapper.jacksonJsonAdapter.readTree(
+            """
+            {
+              "fakta": [
+                 {
+                  "key": "eosarbeidsforhold.jobbetieos",
+                  "type": "BRUKERREGISTRERT",
+                  "value": null,
+                  "faktumId": 385544417,
+                  "soknadId": 5312874,
+                  "properties": {},
+                  "parrentFaktum": null,
+                  "faktumEgenskaper": []
+                }
+              ]
+            }
+            """.trimIndent()
+        )
+        val søknad = GammeltSøknadFormat(data)
+        assertFalse(søknad.eøsArbeidsforhold())
+
+
+        val harArbeidsforholdIEøs = JsonMapper.jacksonJsonAdapter.readTree(
+            """
+            {
+              "fakta": [
+                 {
+                  "key": "eosarbeidsforhold.jobbetieos",
+                  "type": "BRUKERREGISTRERT",
+                  "value": false,
+                  "faktumId": 385544417,
+                  "soknadId": 5312874,
+                  "properties": {},
+                  "parrentFaktum": null,
+                  "faktumEgenskaper": []
+                }
+              ]
+            }
+            """.trimIndent()
+        )
+        assertTrue(GammeltSøknadFormat(harArbeidsforholdIEøs).eøsArbeidsforhold())
+    }
 }
 
 @Language("JSON")

@@ -23,11 +23,10 @@ class GammeltSøknadFormat(
         getFakta(faktaNavn)
     ).asBoolean()
 
-    private fun getBooleanFaktum(faktaNavn: String, defaultValue: Boolean) = kotlin.runCatching {
+    private fun getBooleanFaktum(faktaNavn: String, defaultValue: Boolean) =
         getFaktumValue(
             getFakta(faktaNavn)
-        ).asBoolean()
-    }.getOrDefault(defaultValue)
+        ).asBoolean(defaultValue)
 
     private fun getFaktumValue(fakta: List<JsonNode>): JsonNode = fakta
         .first()
