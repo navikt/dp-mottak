@@ -70,13 +70,13 @@ internal fun Application.innsendingApi(
                 call.respond("OK")
             }
         }
-        // authenticate(Config.AzureAd.name) {
-        get("/innsending/periode") {
-            val periode = Periode(this.call.parameters["fom"]!!, this.call.parameters["tom"]!!)
-            val innsendinger = innsendingRepository.forPeriode(periode)
-            call.respond(innsendinger)
+        authenticate(Config.AzureAd.name) {
+            get("/innsending/periode") {
+                val periode = Periode(this.call.parameters["fom"]!!, this.call.parameters["tom"]!!)
+                val innsendinger = innsendingRepository.forPeriode(periode)
+                call.respond(innsendinger)
+            }
         }
-        // }
     }
 }
 
