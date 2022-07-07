@@ -83,8 +83,8 @@ internal fun Application.innsendingApi(
 data class Periode(val fom: LocalDateTime, val tom: LocalDateTime) {
 
     init {
-        require(tom.isBefore(fom)) { " FOM kan ikke være etter TOM " }
+        require(fom.isBefore(tom)) { " FOM kan ikke være etter TOM " }
     }
 
-    constructor(fom: String, tom: String) : this(LocalDateTime.parse(tom), LocalDateTime.parse(fom))
+    constructor(fom: String, tom: String) : this(LocalDateTime.parse(fom), LocalDateTime.parse(tom))
 }

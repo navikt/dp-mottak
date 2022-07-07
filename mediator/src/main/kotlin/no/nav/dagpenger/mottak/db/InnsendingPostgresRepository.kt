@@ -165,8 +165,30 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         }
     }
 
-    override fun forPeriode(periode: Periode): List<InnsendingPeriode> {
-        TODO("not implemented")
+    override fun forPeriode(periode: Periode) = using(sessionOf(datasource)) { session ->
+        session.run(
+            queryOf( //language=PostgreSQL
+                """
+                    SELECT person.ident, journalpost.registrertdato, journalpostid FROM innsending_v1 AS innsending
+                    LEFT JOIN person_innsending_v1 person_innsending on innsending.id = person_innsending.id
+                    LEFT JOIN person_v1 person on person_innsending.personid = person.id
+                    LEFT JOIN journalpost_v1 journalpost on innsending.id = journalpost.id
+                    LEFT JOIN journalpost_dokumenter_v1 dokumenter on journalpost.id = dokumenter.id
+                    WHERE journalpost.registrertdato BETWEEN :fom::timestamp AND :tom::timestamp 
+                    AND dokumenter.brevkode in ('NAV 04-01.03', 'NAV 04-01.04');
+                """.trimIndent(),
+                mapOf(
+                    "fom" to periode.fom,
+                    "tom" to periode.tom
+                )
+            ).map { row ->
+                InnsendingPeriode(
+                    ident = row.string("ident"),
+                    registrertDato = row.localDate("registrertDato"),
+                    journalpostId = row.string("journalpostId")
+                )
+            }.asList
+        )
     }
 
     class NyInnsendingQueryVisiotor(private val innsending: Innsending, private val datasource: DataSource) :

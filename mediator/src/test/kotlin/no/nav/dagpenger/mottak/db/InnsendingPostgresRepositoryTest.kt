@@ -8,6 +8,7 @@ import no.nav.dagpenger.innsendingData
 import no.nav.dagpenger.journalpostId
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingVisitor
+import no.nav.dagpenger.mottak.api.Periode
 import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
 import no.nav.dagpenger.mottak.helpers.assertDeepEquals
 import no.nav.dagpenger.mottak.meldinger.Journalpost
@@ -15,6 +16,7 @@ import no.nav.dagpenger.mottak.meldinger.Journalpost.DokumentInfo.Companion.hove
 import no.nav.dagpenger.mottak.serder.InnsendingData
 import org.junit.Ignore
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -190,6 +192,19 @@ internal class InnsendingPostgresRepositoryTest {
                 hent(innsending.journalpostId()).also {
                     assertDeepEquals(innsending, it)
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `Skal kunne hente innsedninger for en gitt periode`() {
+        val innsending = innsendingData.createInnsending()
+
+        withMigratedDb {
+            with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
+                lagre(innsending)
+                val innsendinger = forPeriode(Periode(LocalDateTime.now().minusDays(1), LocalDateTime.now().plusMinutes(1)))
+                assertFalse(innsendinger.isEmpty())
             }
         }
     }
