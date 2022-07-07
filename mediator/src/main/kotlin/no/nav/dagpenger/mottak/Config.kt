@@ -109,6 +109,13 @@ internal object Config {
         Pair(it, properties[Key("BASIC_AUTH_PASSWORD", stringType)])
     }
 
+    object AzureAd {
+        const val name = "azureAd"
+        val audience = properties[Key("AZURE_APP_CLIENT_ID", stringType)]
+        val issuer = properties[Key("AZURE_OPENID_CONFIG_ISSUER", stringType)]
+        val jwksURI = properties[Key("AZURE_APP_OPENID_CONFIG_JWKS_URI", stringType)]
+    }
+
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_URL", stringType)]
     fun Configuration.pdlApiUrl() = this[Key("PDL_API_URL", stringType)]
     fun unleash() = DefaultUnleash(unleashConfig(), ByClusterStrategy(ByClusterStrategy.Cluster.current))

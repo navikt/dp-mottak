@@ -9,8 +9,10 @@ import kotliquery.using
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.Innsending
+import no.nav.dagpenger.mottak.InnsendingPeriode
 import no.nav.dagpenger.mottak.InnsendingVisitor
 import no.nav.dagpenger.mottak.SøknadOppslag
+import no.nav.dagpenger.mottak.api.Periode
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.serder.InnsendingData
@@ -161,6 +163,10 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         return using(sessionOf(datasource)) { session ->
             session.transaction { tx -> visitor.lagreQueries.sumOf { tx.run(it.asUpdate) } }
         }
+    }
+
+    override fun forPeriode(periode: Periode): List<InnsendingPeriode> {
+        TODO("not implemented")
     }
 
     class NyInnsendingQueryVisiotor(private val innsending: Innsending, private val datasource: DataSource) :

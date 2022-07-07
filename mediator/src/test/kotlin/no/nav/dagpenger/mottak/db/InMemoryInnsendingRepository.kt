@@ -1,6 +1,8 @@
 package no.nav.dagpenger.mottak.db
 
 import no.nav.dagpenger.mottak.Innsending
+import no.nav.dagpenger.mottak.InnsendingPeriode
+import no.nav.dagpenger.mottak.api.Periode
 
 class InMemoryInnsendingRepository : InnsendingRepository {
 
@@ -11,6 +13,10 @@ class InMemoryInnsendingRepository : InnsendingRepository {
     override fun lagre(innsending: Innsending): Int = with(innsendinger) {
         this[innsending.journalpostId()] = innsending
         this.size
+    }
+
+    override fun forPeriode(periode: Periode): List<InnsendingPeriode> {
+        TODO("not implemented")
     }
 
     fun reset() = innsendinger.clear()

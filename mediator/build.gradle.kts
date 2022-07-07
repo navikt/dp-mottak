@@ -21,6 +21,7 @@ dependencies {
     implementation(Ktor2.Client.library("content-negotiation"))
     implementation("io.ktor:ktor-serialization-jackson:${Ktor2.version}")
     implementation(Ktor2.Server.library("auth"))
+    implementation(Ktor2.Server.library("auth-jwt"))
     implementation(Ktor2.Server.library("status-pages"))
     implementation(Ktor2.Server.library("content-negotiation"))
     implementation("de.slub-dresden:urnlib:2.0.1")
