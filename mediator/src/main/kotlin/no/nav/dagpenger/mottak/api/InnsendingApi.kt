@@ -23,61 +23,60 @@ import no.nav.dagpenger.mottak.ReplayFerdigstillEvent
 import no.nav.dagpenger.mottak.db.InnsendingRepository
 import java.time.LocalDateTime
 
-internal fun innsendingApi(
+internal fun Application.innsendingApi(
     innsendingRepository: InnsendingRepository,
     observer: InnsendingObserver,
     credential: Pair<String, String>
-): Application.() -> Unit {
+) {
     val (username, password) = credential
-    return {
-        install(StatusPages) {
-            exception<Throwable> { call, cause ->
-                when (cause) {
-                    is IllegalArgumentException -> call.respond(HttpStatusCode.BadRequest, cause.message ?: "Feil!")
-                }
-            }
-        }
-        install(ContentNegotiation) {
-            jackson {
-                disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-                registerModule(JavaTimeModule())
-            }
-        }
 
-        install(Authentication) {
-            basic("basic") {
-                realm = "teamdagpenger-access-to-replay"
+    install(StatusPages) {
+        exception<Throwable> { call, cause ->
+            when (cause) {
+                is IllegalArgumentException -> call.respond(HttpStatusCode.BadRequest, cause.message ?: "Feil!")
+            }
+        }
+    }
+    install(ContentNegotiation) {
+        jackson {
+            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+            registerModule(JavaTimeModule())
+        }
+    }
 
-                validate { credential ->
-                    if (credential.name == username && credential.password == password) {
-                        UserIdPrincipal(credential.name)
-                    } else null
-                }
-            }
-            jwt(Config.AzureAd.name) {
-                withAudience(Config.AzureAd.audience)
-            }
-        }
-        routing {
-            authenticate("basic") {
-                put("/internal/replay/{journalpostId}") {
-                    val journalpostId = this.call.parameters["journalpostId"]
-                        ?: throw IllegalArgumentException("Må sette parameter til journalpostid")
-                    val innsending = innsendingRepository.hent(journalpostId)?.also {
-                        it.addObserver(observer)
-                    } ?: throw IllegalArgumentException("Fant ikke journalpostId med id $journalpostId")
-                    innsending.håndter(ReplayFerdigstillEvent(journalpostId))
-                    call.respond("OK")
-                }
-            }
-            authenticate(Config.AzureAd.name) {
-                get("/innsending/periode") {
-                    val periode = Periode(this.call.parameters["fom"]!!, this.call.parameters["tom"]!!)
-                    val innsendinger = innsendingRepository.forPeriode(periode)
-                    call.respond(innsendinger)
-                }
+    install(Authentication) {
+        basic("basic") {
+            realm = "teamdagpenger-access-to-replay"
+
+            validate { credential ->
+                if (credential.name == username && credential.password == password) {
+                    UserIdPrincipal(credential.name)
+                } else null
             }
         }
+        jwt(Config.AzureAd.name) {
+            withAudience(Config.AzureAd.audience)
+        }
+    }
+    routing {
+        authenticate("basic") {
+            put("/internal/replay/{journalpostId}") {
+                val journalpostId = this.call.parameters["journalpostId"]
+                    ?: throw IllegalArgumentException("Må sette parameter til journalpostid")
+                val innsending = innsendingRepository.hent(journalpostId)?.also {
+                    it.addObserver(observer)
+                } ?: throw IllegalArgumentException("Fant ikke journalpostId med id $journalpostId")
+                innsending.håndter(ReplayFerdigstillEvent(journalpostId))
+                call.respond("OK")
+            }
+        }
+        // authenticate(Config.AzureAd.name) {
+        get("/innsending/periode") {
+            val periode = Periode(this.call.parameters["fom"]!!, this.call.parameters["tom"]!!)
+            val innsendinger = innsendingRepository.forPeriode(periode)
+            call.respond(innsendinger)
+        }
+        // }
     }
 }
 

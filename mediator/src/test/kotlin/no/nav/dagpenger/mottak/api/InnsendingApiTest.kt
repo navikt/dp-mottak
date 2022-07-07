@@ -15,6 +15,8 @@ import io.mockk.verify
 import no.nav.dagpenger.innsendingData
 import no.nav.dagpenger.journalpostId
 import no.nav.dagpenger.mottak.InnsendingPeriode
+import no.nav.dagpenger.mottak.api.TestApplication.autentisert
+import no.nav.dagpenger.mottak.api.TestApplication.withMockAuthServerAndTestApplication
 import no.nav.dagpenger.mottak.db.InnsendingRepository
 import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
 import no.nav.dagpenger.mottak.serder.InnsendingData
@@ -51,7 +53,7 @@ internal class InnsendingApiTest {
         }
         val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(mockProducer)
         testApplication {
-            application(innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver, okCredential))
+            application { innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver, okCredential) }
             client.put("/internal/replay/187689") {
                 withAuth()
             }.let { response ->
@@ -75,7 +77,7 @@ internal class InnsendingApiTest {
         val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(mockProducer)
 
         testApplication {
-            application(innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver, okCredential))
+            application { innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver, okCredential) }
             client.put("/internal/replay/187689") {
                 withAuth()
             }.let { response ->
@@ -99,20 +101,21 @@ internal class InnsendingApiTest {
             )
         }
 
-        testApplication {
-            application(innsendingApi(innsendingRepository, mockk(), okCredential))
+        withMockAuthServerAndTestApplication({
+            innsendingApi(innsendingRepository, mockk(), okCredential)
+        }) {
+
             client.get("/innsending/periode?fom=2020-01-01T21:10&tom=2020-01-01T23:10") {
-                withAuth()
+                autentisert()
             }.let { response ->
                 assertEquals(HttpStatusCode.OK, response.status)
                 verify(exactly = 1) { innsendingRepository.forPeriode(any()) }
-                val bodyAsText = response.bodyAsText().also { println(it) }
+                val bodyAsText = response.bodyAsText()
                 val innsendinger = objectMapper.readTree(bodyAsText)
                 assertEquals(1, innsendinger.size())
                 assertEquals("1234556777", innsendinger[0]["ident"].asText())
                 assertEquals(idag, innsendinger[0]["registrertDato"].asLocalDate())
                 assertEquals("124433", innsendinger[0]["journalpostId"].asText())
-
             }
         }
     }

@@ -1,12 +1,9 @@
 package no.nav.dagpenger.mottak.api
 
-
 import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.DeserializationFeature
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.serialization.jackson.jackson
@@ -15,7 +12,6 @@ import io.ktor.server.auth.AuthenticationContext
 import io.ktor.server.auth.jwt.JWTConfigureFunction
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
-import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.mottak.Config
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -43,7 +39,6 @@ internal fun AuthenticationConfig.jwt(
         }
     }
 }
-
 
 private fun cachedJwkProvider(jwksUri: String): JwkProvider {
     return JwkProviderBuilder(URL(jwksUri))

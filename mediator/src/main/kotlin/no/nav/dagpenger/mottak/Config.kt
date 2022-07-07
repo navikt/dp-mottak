@@ -38,7 +38,10 @@ internal object Config {
             "KAFKA_RESET_POLICY" to "latest",
             "PDL_API_SCOPE" to "api://dev-fss.pdl.pdl-api/.default",
             "PDL_API_URL" to "https://pdl-api.dev-fss-pub.nais.io",
-            "UNLEASH_URL" to "https://unleash.nais.io/api/"
+            "UNLEASH_URL" to "https://unleash.nais.io/api/",
+            "AZURE_OPENID_CONFIG_ISSUER" to "azureAd",
+            "AZURE_APP_CLIENT_ID" to "azureClientId",
+            "AZURE_APP_OPENID_CONFIG_JWKS_URI" to "http://localhost:4443",
 
         )
     )
