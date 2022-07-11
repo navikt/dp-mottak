@@ -17,11 +17,14 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.put
 import io.ktor.server.routing.routing
+import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.ReplayFerdigstillEvent
 import no.nav.dagpenger.mottak.db.InnsendingRepository
 import java.time.LocalDateTime
+
+private val logger = KotlinLogging.logger { }
 
 internal fun Application.innsendingApi(
     innsendingRepository: InnsendingRepository,
@@ -32,6 +35,13 @@ internal fun Application.innsendingApi(
         exception<Throwable> { call, cause ->
             when (cause) {
                 is IllegalArgumentException -> call.respond(HttpStatusCode.BadRequest, cause.message ?: "Feil!")
+                else -> {
+                    logger.error(cause) { "Kunne ikke håndtere API kall" }
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+
+                    )
+                }
             }
         }
     }
@@ -70,6 +80,7 @@ internal fun Application.innsendingApi(
                 call.respond("OK")
             }
             get("/innsending/periode") {
+                logger.info { "Skal hente innsendingsperiode med:\n ${this.call.parameters}" }
                 val periode = Periode(this.call.parameters["fom"]!!, this.call.parameters["tom"]!!)
                 val innsendinger = innsendingRepository.forPeriode(periode)
                 call.respond(innsendinger)
