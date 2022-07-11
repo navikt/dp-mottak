@@ -34,7 +34,6 @@ spec:
   azure:
     application:
       enabled: true
-      tenant: nav.no
   accessPolicy:
     outbound:
       external:
