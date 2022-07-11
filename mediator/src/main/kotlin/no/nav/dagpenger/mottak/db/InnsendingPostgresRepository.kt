@@ -175,7 +175,8 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                     LEFT JOIN journalpost_v1 journalpost on innsending.id = journalpost.id
                     LEFT JOIN journalpost_dokumenter_v1 dokumenter on journalpost.id = dokumenter.id
                     WHERE journalpost.registrertdato BETWEEN :fom::timestamp AND :tom::timestamp 
-                    AND dokumenter.brevkode in ('NAV 04-01.03', 'NAV 04-01.04');
+                    AND dokumenter.brevkode in ('NAV 04-01.03', 'NAV 04-01.04')
+                    ORDER BY registrertdato 
                 """.trimIndent(),
                 mapOf(
                     "fom" to periode.fom,
