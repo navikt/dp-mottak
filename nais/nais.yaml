@@ -47,10 +47,6 @@ spec:
      - {{url}}
   {{/each}}
   {{/if}}
-  {{#if secrets }}
-  envFrom:
-    - {{secrets}}
-  {{/if}}
   gcp:
     sqlInstances:
       - name: dp-mottak
