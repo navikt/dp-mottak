@@ -12,6 +12,7 @@ import io.ktor.server.auth.AuthenticationContext
 import io.ktor.server.auth.jwt.JWTConfigureFunction
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
+import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config
 import java.net.URL
 import java.util.concurrent.TimeUnit
@@ -19,6 +20,9 @@ import java.util.concurrent.TimeUnit
 internal fun AuthenticationContext.fnr(): String =
     principal<JWTPrincipal>()?.subject ?: throw IllegalArgumentException("Fant ikke subject(fødselsnummer) i JWT")
 
+
+
+private val sikkerLogger = KotlinLogging.logger("tjenestekall")
 internal fun AuthenticationConfig.jwt(
     name: String,
     configure: JWTConfigureFunction = {}
@@ -31,9 +35,8 @@ internal fun AuthenticationConfig.jwt(
             configure
         )
         validate {
-            val subject = it.payload.claims["pid"]?.asString() ?: it.payload.claims["sub"]?.asString()
-            requireNotNull(subject) {
-                "Token må inneholde pid eller sub"
+            sikkerLogger.info {
+                "Claims ${it.payload.claims}"
             }
             JWTPrincipal(it.payload)
         }
