@@ -183,7 +183,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                 )
             ).map { row ->
                 InnsendingPeriode(
-                    ident = row.string("ident"),
+                    ident = row.stringOrNull("ident") ?: "Ident mangler",
                     registrertDato = row.localDateTime("registrertDato"),
                     journalpostId = row.string("journalpostId")
                 )
