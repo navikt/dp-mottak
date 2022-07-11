@@ -21,12 +21,12 @@ import no.nav.dagpenger.mottak.db.InnsendingRepository
 import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
 import no.nav.dagpenger.mottak.serder.InnsendingData
 import no.nav.dagpenger.mottak.serder.InnsendingData.TilstandData.InnsendingTilstandTypeData.InnsendingFerdigstiltType
-import no.nav.helse.rapids_rivers.asLocalDate
+import no.nav.helse.rapids_rivers.asLocalDateTime
 import org.apache.kafka.clients.producer.MockProducer
 import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.Base64
 
 internal class InnsendingApiTest {
@@ -90,7 +90,7 @@ internal class InnsendingApiTest {
 
     @Test
     fun `skal kunne hente innsendinger i en gitt periode`() {
-        val idag = LocalDate.now()
+        val idag = LocalDateTime.now()
         val innsendingRepository = mockk<InnsendingRepository>().also {
             every { it.forPeriode(any()) } returns listOf(
                 InnsendingPeriode(
@@ -114,7 +114,7 @@ internal class InnsendingApiTest {
                 val innsendinger = objectMapper.readTree(bodyAsText)
                 assertEquals(1, innsendinger.size())
                 assertEquals("1234556777", innsendinger[0]["ident"].asText())
-                assertEquals(idag, innsendinger[0]["registrertDato"].asLocalDate())
+                assertEquals(idag, innsendinger[0]["registrertDato"].asLocalDateTime())
                 assertEquals("124433", innsendinger[0]["journalpostId"].asText())
             }
         }
