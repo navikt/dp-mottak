@@ -41,7 +41,7 @@ internal object Config {
             "UNLEASH_URL" to "https://unleash.nais.io/api/",
             "AZURE_OPENID_CONFIG_ISSUER" to "azureAd",
             "AZURE_APP_CLIENT_ID" to "azureClientId",
-            "AZURE_APP_OPENID_CONFIG_JWKS_URI" to "http://localhost:4443",
+            "AZURE_OPENID_CONFIG_JWKS_URI" to "http://localhost:4443",
 
         )
     )
@@ -111,7 +111,7 @@ internal object Config {
         const val name = "azureAd"
         val audience = properties[Key("AZURE_APP_CLIENT_ID", stringType)]
         val issuer = properties[Key("AZURE_OPENID_CONFIG_ISSUER", stringType)]
-        val jwksURI = properties[Key("AZURE_APP_OPENID_CONFIG_JWKS_URI", stringType)]
+        val jwksURI = properties[Key("AZURE_OPENID_CONFIG_JWKS_URI", stringType)]
     }
 
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_URL", stringType)]
