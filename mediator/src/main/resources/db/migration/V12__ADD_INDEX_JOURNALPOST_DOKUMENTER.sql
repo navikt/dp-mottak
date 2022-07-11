@@ -1,0 +1,1 @@
+CREATE INDEX journalpost_dokumenter_id ON journalpost_dokumenter_v1 (id)
