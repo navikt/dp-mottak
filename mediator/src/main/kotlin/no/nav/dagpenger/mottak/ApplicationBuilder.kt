@@ -45,14 +45,12 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
         RapidApplication.RapidApplicationConfig.fromEnv(env)
     )
         .also { builder ->
-            Config.basicCredentials?.let {
-                builder.withKtorModule {
-                    innsendingApi(
-                        innsendingRepository,
-                        ferdigstiltInnsendingObserver,
-                        it
-                    )
-                }
+            builder.withKtorModule {
+                innsendingApi(
+                    innsendingRepository,
+                    ferdigstiltInnsendingObserver,
+
+                )
             }
         }
         .build().apply {

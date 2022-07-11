@@ -1,14 +1,10 @@
 package no.nav.dagpenger.mottak.api
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.client.request.put
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.testing.testApplication
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -27,11 +23,8 @@ import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
-import java.util.Base64
 
 internal class InnsendingApiTest {
-
-    val okCredential = Pair("super", "secret")
 
     companion object {
         val objectMapper = jacksonObjectMapper()
@@ -52,10 +45,9 @@ internal class InnsendingApiTest {
             every { it.hent(journalpostId) } returns innsending
         }
         val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(mockProducer)
-        testApplication {
-            application { innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver, okCredential) }
+        withMockAuthServerAndTestApplication({ innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver) }) {
             client.put("/internal/replay/187689") {
-                withAuth()
+                autentisert()
             }.let { response ->
                 assertEquals(HttpStatusCode.OK, response.status)
                 verify(exactly = 1) { innsendingRepository.hent(journalpostId) }
@@ -76,10 +68,9 @@ internal class InnsendingApiTest {
         }
         val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(mockProducer)
 
-        testApplication {
-            application { innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver, okCredential) }
+        withMockAuthServerAndTestApplication({ innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver) }) {
             client.put("/internal/replay/187689") {
-                withAuth()
+                autentisert()
             }.let { response ->
                 assertEquals(HttpStatusCode.BadRequest, response.status)
                 verify(exactly = 1) { innsendingRepository.hent(journalpostId) }
@@ -102,7 +93,7 @@ internal class InnsendingApiTest {
         }
 
         withMockAuthServerAndTestApplication({
-            innsendingApi(innsendingRepository, mockk(), okCredential)
+            innsendingApi(innsendingRepository, mockk())
         }) {
 
             client.get("/innsending/periode?fom=2020-01-01T21:10&tom=2020-01-01T23:10") {
@@ -118,11 +109,5 @@ internal class InnsendingApiTest {
                 assertEquals("124433", innsendinger[0]["journalpostId"].asText())
             }
         }
-    }
-
-    private fun HttpRequestBuilder.withAuth() {
-        val up = "${okCredential.first}:${okCredential.second}"
-        val encoded = String(Base64.getEncoder().encode(up.toByteArray(Charsets.ISO_8859_1)))
-        header(HttpHeaders.Authorization, "Basic $encoded")
     }
 }

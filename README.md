@@ -62,40 +62,6 @@ For å skalere opp igjen:
 kubectl scale deployment/dp-mottak --replicas=2
 ```
 
-### Replay av ferdigtilt_event i dev 
-
-
-[Produserer ferdigstilt event.](https://github.com/navikt/dp-mottak/blob/main/mediator/src/main/kotlin/no/nav/dagpenger/mottak/observers/FerdigstiltInnsendingObserver.kt#L35) 
-
-
-Forutsetninger:
-- Du må være koblet på naisdevice
-- Funker kun i dev-gcp
-- Du må være i teamdagpenger namespace
-- Innsendingen må finnes, curl kallet feiler hvis ikke
-- Innsendingen må være ferdigstilt, curl kallet feiler hvis ikke
-
-
-```shell
-curl -X PUT -u <bruker>:<passord> https://dp-mottak.dev.intern.nav.no/internal/replay/<journalpostId>
-```
-
-hente bruker:
-```shell
-kubectl get secret dp-mottak-basic-auth-secret -o yaml | grep BASIC_AUTH_USERNAME | awk '{print $2}' | base64 -d
-```
-
-hente passord:
-```shell
-kubectl get secret dp-mottak-basic-auth-secret -o yaml | grep BASIC_AUTH_PASSWORD | awk '{print $2}' | base64 -d
-```
-
-Eventuelt kan en installere pluginen [view-secret](https://github.com/elsesiy/kubectl-view-secret)
-
-```shell
-kubectl view-secret dp-mottak-basic-auth-secret -a
-```
-
 # Henvendelser
 
 Spørsmål knyttet til koden eller prosjektet kan rettes mot:

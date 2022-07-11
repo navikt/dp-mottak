@@ -107,11 +107,6 @@ internal object Config {
             put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, properties[Key("KAFKA_CREDSTORE_PASSWORD", stringType)])
         }
     }
-
-    val basicCredentials: Pair<String, String>? = properties.getOrNull(Key("BASIC_AUTH_USERNAME", stringType))?.let {
-        Pair(it, properties[Key("BASIC_AUTH_PASSWORD", stringType)])
-    }
-
     object AzureAd {
         const val name = "azureAd"
         val audience = properties[Key("AZURE_APP_CLIENT_ID", stringType)]

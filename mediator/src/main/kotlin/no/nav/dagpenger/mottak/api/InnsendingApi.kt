@@ -8,9 +8,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
-import io.ktor.server.auth.UserIdPrincipal
 import io.ktor.server.auth.authenticate
-import io.ktor.server.auth.basic
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.statuspages.StatusPages
@@ -28,10 +26,8 @@ import java.time.LocalDateTime
 
 internal fun Application.innsendingApi(
     innsendingRepository: InnsendingRepository,
-    observer: InnsendingObserver,
-    credential: Pair<String, String>
+    observer: InnsendingObserver
 ) {
-    val (username, password) = credential
 
     install(StatusPages) {
         exception<Throwable> { call, cause ->
@@ -60,21 +56,12 @@ internal fun Application.innsendingApi(
     }
 
     install(Authentication) {
-        basic("basic") {
-            realm = "teamdagpenger-access-to-replay"
-
-            validate { credential ->
-                if (credential.name == username && credential.password == password) {
-                    UserIdPrincipal(credential.name)
-                } else null
-            }
-        }
         jwt(Config.AzureAd.name) {
             withAudience(Config.AzureAd.audience)
         }
     }
     routing {
-        authenticate("basic") {
+        authenticate(Config.AzureAd.name) {
             put("/internal/replay/{journalpostId}") {
                 val journalpostId = this.call.parameters["journalpostId"]
                     ?: throw IllegalArgumentException("Må sette parameter til journalpostid")
@@ -84,8 +71,6 @@ internal fun Application.innsendingApi(
                 innsending.håndter(ReplayFerdigstillEvent(journalpostId))
                 call.respond("OK")
             }
-        }
-        authenticate(Config.AzureAd.name) {
             get("/innsending/periode") {
                 val periode = Periode(this.call.parameters["fom"]!!, this.call.parameters["tom"]!!)
                 val innsendinger = innsendingRepository.forPeriode(periode)
