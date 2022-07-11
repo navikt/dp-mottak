@@ -21,7 +21,6 @@ import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.ReplayFerdigstillEvent
 import no.nav.dagpenger.mottak.db.InnsendingRepository
-import org.slf4j.event.Level
 import java.time.LocalDateTime
 
 internal fun Application.innsendingApi(
@@ -44,7 +43,6 @@ internal fun Application.innsendingApi(
     }
 
     install(CallLogging) {
-        level = Level.DEBUG
         disableDefaultColors()
         filter { call ->
             !setOf(
