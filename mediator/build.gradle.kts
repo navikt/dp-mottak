@@ -24,6 +24,7 @@ dependencies {
     implementation(Ktor2.Server.library("auth-jwt"))
     implementation(Ktor2.Server.library("status-pages"))
     implementation(Ktor2.Server.library("content-negotiation"))
+    implementation(Ktor2.Server.library("call-logging"))
     implementation("de.slub-dresden:urnlib:2.0.1")
 
     // unleash

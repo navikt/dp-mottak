@@ -11,8 +11,10 @@ import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.UserIdPrincipal
 import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.basic
+import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.statuspages.StatusPages
+import io.ktor.server.request.document
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.put
@@ -21,6 +23,7 @@ import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.ReplayFerdigstillEvent
 import no.nav.dagpenger.mottak.db.InnsendingRepository
+import org.slf4j.event.Level
 import java.time.LocalDateTime
 
 internal fun Application.innsendingApi(
@@ -41,6 +44,18 @@ internal fun Application.innsendingApi(
         jackson {
             disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             registerModule(JavaTimeModule())
+        }
+    }
+
+    install(CallLogging) {
+        level = Level.DEBUG
+        disableDefaultColors()
+        filter { call ->
+            !setOf(
+                "isalive",
+                "isready",
+                "metrics"
+            ).contains(call.request.document())
         }
     }
 
