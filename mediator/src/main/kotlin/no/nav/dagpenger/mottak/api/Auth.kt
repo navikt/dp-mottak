@@ -12,7 +12,6 @@ import io.ktor.server.auth.AuthenticationContext
 import io.ktor.server.auth.jwt.JWTConfigureFunction
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
-import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config
 import java.net.URL
 import java.util.concurrent.TimeUnit

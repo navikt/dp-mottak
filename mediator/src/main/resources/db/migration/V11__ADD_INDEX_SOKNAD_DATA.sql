@@ -1,0 +1,1 @@
+CREATE INDEX soknad_data_id ON soknad_v1 USING gin (data)
