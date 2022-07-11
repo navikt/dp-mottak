@@ -38,6 +38,9 @@ spec:
     outbound:
       external:
         - host: {{ DP_PROXY_HOST }}
+    inbound:
+      rules:
+        - application: dp-quiz-retting
   {{#if ingresses }}
   ingresses:
   {{#each ingresses as |url|}}
