@@ -20,8 +20,6 @@ import java.util.concurrent.TimeUnit
 internal fun AuthenticationContext.fnr(): String =
     principal<JWTPrincipal>()?.subject ?: throw IllegalArgumentException("Fant ikke subject(fødselsnummer) i JWT")
 
-
-
 private val sikkerLogger = KotlinLogging.logger("tjenestekall")
 internal fun AuthenticationConfig.jwt(
     name: String,

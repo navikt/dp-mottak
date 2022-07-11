@@ -36,7 +36,7 @@ internal object TestApplication {
         test: suspend ApplicationTestBuilder.() -> Unit
     ) {
         try {
-            System.setProperty("AZURE_APP_OPENID_CONFIG_JWKS_URI", "${mockOAuth2Server.jwksUrl(Config.AzureAd.name)}")
+            System.setProperty("AZURE_OPENID_CONFIG_JWKS_URI", "${mockOAuth2Server.jwksUrl(Config.AzureAd.name)}")
             System.setProperty("AZURE_OPENID_CONFIG_ISSUER", "${mockOAuth2Server.issuerUrl(Config.AzureAd.name)}")
             testApplication {
                 application(moduleFunction)
