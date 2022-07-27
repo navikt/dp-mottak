@@ -133,7 +133,7 @@ data class NySøknad(
                 tilleggsinformasjon()
             )
             erPermittertFraFiskeforedling -> OppgaveBenk(
-                "4454", "FISK\n",
+                "4455", "FISK\n",
                 datoRegistrert,
                 tilleggsinformasjon()
             )

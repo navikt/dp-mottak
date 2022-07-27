@@ -111,12 +111,12 @@ class OppgavebenkTest {
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, rutingOppslag = it)
             assertEquals("FISK\n", oppgaveBenk.beskrivelse)
-            assertEquals("4454", oppgaveBenk.id)
+            assertEquals("4455", oppgaveBenk.id)
         }
     }
 
     @Test
-    fun `Finn riktig oppgave beskrivelse og benk ved når en IKKE oppfyller minsteinntekt ved ordninær`() {
+    fun `Finn riktig oppgave beskrivelse og benk ved når en IKKE oppfyller minsteinntekt ved ordinær`() {
         withSøknad {
             val oppgaveBenk = jp.oppgaveBenk(person = person, rutingOppslag = it, oppfyllerMinsteArbeidsinntekt = false)
             assertEquals("Minsteinntekt - mulig avslag\n", oppgaveBenk.beskrivelse)
