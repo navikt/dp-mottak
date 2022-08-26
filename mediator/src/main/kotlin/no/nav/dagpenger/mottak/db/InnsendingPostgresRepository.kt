@@ -7,7 +7,6 @@ import kotliquery.TransactionalSession
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
-import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.Innsending
@@ -26,8 +25,6 @@ import org.intellij.lang.annotations.Language
 import org.postgresql.util.PGobject
 import java.time.LocalDateTime
 import javax.sql.DataSource
-
-private val logger = KotlinLogging.logger { }
 
 internal class InnsendingPostgresRepository(private val datasource: DataSource = Config.dataSource) :
     InnsendingRepository {
@@ -69,85 +66,82 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
 
     fun Row.booleanOrNull(columnLabel: String) = this.stringOrNull(columnLabel)?.let { it == "t" }
 
-    override fun hent(journalpostId: String): Innsending? {
-        logger.info { "Henter $journalpostId" }
-        return using(sessionOf(datasource)) { session ->
-            session.run(
-                queryOf(
-                    hentDataSql,
-                    mapOf("jpId" to journalpostId.toLong())
-                ).map { row ->
-                    InnsendingData(
-                        id = row.long("internId"),
-                        journalpostId = row.long("journalpostId").toString(),
-                        tilstand = TilstandData(TilstandData.InnsendingTilstandTypeData.valueOf(row.string("tilstand"))),
-                        journalpostData = row.localDateTimeOrNull("registrertDato")?.let {
-                            InnsendingData.JournalpostData(
-                                journalpostId = row.long("journalpostId").toString(),
-                                bruker = row.stringOrNull("brukerType")?.let { type ->
-                                    BrukerData(BrukerTypeData.valueOf(type), row.string("brukerId"))
-                                },
-                                journalpostStatus = row.string("status"),
-                                behandlingstema = row.stringOrNull("behandlingstema"),
-                                registertDato = it,
-                                dokumenter = listOf()
-                            )
-                        },
-                        oppfyllerMinsteArbeidsinntekt = row.booleanOrNull("oppfyllerMinsteArbeidsinntekt"),
-                        eksisterendeSaker = row.booleanOrNull("harEksisterendeSaker"),
-                        personData = row.stringOrNull("ident")?.let {
-                            InnsendingData.PersonData(
-                                navn = row.string("navn"),
-                                aktørId = row.string("aktørId"),
-                                fødselsnummer = row.string("ident"),
-                                norskTilknytning = row.boolean("norsktilknytning"),
-                                diskresjonskode = row.boolean("diskresjonskode")
-                            )
-                        },
-                        arenaSakData = row.stringOrNull("fagsakId")?.let {
-                            InnsendingData.ArenaSakData(
-                                oppgaveId = row.string("oppgaveId"),
-                                fagsakId = it
-                            )
-                        },
-                        søknadsData = row.binaryStreamOrNull("søknadsData")?.use {
-                            JsonMapper.jacksonJsonAdapter.readTree(it)
-                        },
-                        aktivitetslogg = row.binaryStream("aktivitetslogg").use {
-                            JsonMapper.jacksonJsonAdapter.readValue(
-                                it,
-                                InnsendingData.AktivitetsloggData::class.java
-                            )
-                        }
-                    )
-                }.asSingle
-            )?.let {
-                val dokumenter = session.run(
-                    queryOf( //language=PostgreSQL
-                        """
-                            SELECT 
-                            brevkode,
-                            tittel,
-                            dokumentinfoid,
-                            hovedDokument
-                            FROM journalpost_dokumenter_v1 WHERE id = :internId
-                        """.trimIndent(),
-                        mapOf(
-                            "internId" to it.id
+    override fun hent(journalpostId: String): Innsending? = using(sessionOf(datasource)) { session ->
+        session.run(
+            queryOf(
+                hentDataSql,
+                mapOf("jpId" to journalpostId.toLong())
+            ).map { row ->
+                InnsendingData(
+                    id = row.long("internId"),
+                    journalpostId = row.long("journalpostId").toString(),
+                    tilstand = TilstandData(TilstandData.InnsendingTilstandTypeData.valueOf(row.string("tilstand"))),
+                    journalpostData = row.localDateTimeOrNull("registrertDato")?.let {
+                        InnsendingData.JournalpostData(
+                            journalpostId = row.long("journalpostId").toString(),
+                            bruker = row.stringOrNull("brukerType")?.let { type ->
+                                BrukerData(BrukerTypeData.valueOf(type), row.string("brukerId"))
+                            },
+                            journalpostStatus = row.string("status"),
+                            behandlingstema = row.stringOrNull("behandlingstema"),
+                            registertDato = it,
+                            dokumenter = listOf()
                         )
-
-                    ).map { row ->
-                        InnsendingData.JournalpostData.DokumentInfoData(
-                            brevkode = row.string("brevkode"),
-                            tittel = row.string("tittel"),
-                            dokumentInfoId = row.string("dokumentInfoId"),
-                            hovedDokument = row.boolean("hovedDokument")
+                    },
+                    oppfyllerMinsteArbeidsinntekt = row.booleanOrNull("oppfyllerMinsteArbeidsinntekt"),
+                    eksisterendeSaker = row.booleanOrNull("harEksisterendeSaker"),
+                    personData = row.stringOrNull("ident")?.let {
+                        InnsendingData.PersonData(
+                            navn = row.string("navn"),
+                            aktørId = row.string("aktørId"),
+                            fødselsnummer = row.string("ident"),
+                            norskTilknytning = row.boolean("norsktilknytning"),
+                            diskresjonskode = row.boolean("diskresjonskode")
                         )
-                    }.asList
+                    },
+                    arenaSakData = row.stringOrNull("fagsakId")?.let {
+                        InnsendingData.ArenaSakData(
+                            oppgaveId = row.string("oppgaveId"),
+                            fagsakId = it
+                        )
+                    },
+                    søknadsData = row.binaryStreamOrNull("søknadsData")?.use {
+                        JsonMapper.jacksonJsonAdapter.readTree(it)
+                    },
+                    aktivitetslogg = row.binaryStream("aktivitetslogg").use {
+                        JsonMapper.jacksonJsonAdapter.readValue(
+                            it,
+                            InnsendingData.AktivitetsloggData::class.java
+                        )
+                    }
                 )
+            }.asSingle
+        )?.let {
+            val dokumenter = session.run(
+                queryOf( //language=PostgreSQL
+                    """
+                        SELECT 
+                        brevkode,
+                        tittel,
+                        dokumentinfoid,
+                        hovedDokument
+                        FROM journalpost_dokumenter_v1 WHERE id = :internId
+                    """.trimIndent(),
+                    mapOf(
+                        "internId" to it.id
+                    )
 
-                it.copy(journalpostData = it.journalpostData?.copy(dokumenter = dokumenter)).createInnsending()
-            }
+                ).map { row ->
+                    InnsendingData.JournalpostData.DokumentInfoData(
+                        brevkode = row.string("brevkode"),
+                        tittel = row.string("tittel"),
+                        dokumentInfoId = row.string("dokumentInfoId"),
+                        hovedDokument = row.boolean("hovedDokument")
+                    )
+                }.asList
+            )
+
+            it.copy(journalpostData = it.journalpostData?.copy(dokumenter = dokumenter)).createInnsending()
         }
     }
 
