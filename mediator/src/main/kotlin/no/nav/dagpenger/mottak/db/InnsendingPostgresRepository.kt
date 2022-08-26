@@ -3,6 +3,7 @@ package no.nav.dagpenger.mottak.db
 import io.ktor.utils.io.core.use
 import kotliquery.Query
 import kotliquery.Row
+import kotliquery.TransactionalSession
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
@@ -27,6 +28,7 @@ import java.time.LocalDateTime
 import javax.sql.DataSource
 
 private val logger = KotlinLogging.logger { }
+
 internal class InnsendingPostgresRepository(private val datasource: DataSource = Config.dataSource) :
     InnsendingRepository {
     @Language("PostgreSQL")
@@ -150,22 +152,21 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
     }
 
     override fun lagre(innsending: Innsending): Int {
-
-        val internId: Long = using(sessionOf(datasource)) { session ->
-            session.run(
-                queryOf( //language=PostgreSQL
-                    """ 
-                        SELECT id from innsending_v1 where journalpostid = :journalpostId
-                    """.trimIndent(),
-                    mapOf("journalpostId" to innsending.journalpostId().toLong())
-                ).map {
-                    it.longOrNull("id")
-                }.asSingle
-            ) ?: NyInnsendingQueryVisiotor(innsending, datasource).internId
-        }
-        val visitor = InnsendingQueryVisitor(innsending, internId)
         return using(sessionOf(datasource)) { session ->
-            session.transaction { tx -> visitor.lagreQueries.sumOf { tx.run(it.asUpdate) } }
+            return@using session.transaction { transactionalSession ->
+                val internId = transactionalSession.run(
+                    queryOf( //language=PostgreSQL
+                        """ 
+                        SELECT id from innsending_v1 where journalpostid = :journalpostId
+                        """.trimIndent(),
+                        mapOf("journalpostId" to innsending.journalpostId().toLong())
+                    ).map {
+                        it.longOrNull("id")
+                    }.asSingle
+                ) ?: NyInnsendingQueryVisiotor(innsending, transactionalSession).internId
+                val visitor = InnsendingQueryVisitor(innsending, internId)
+                visitor.lagreQueries.sumOf { transactionalSession.run(it.asUpdate) }
+            }
         }
     }
 
@@ -196,7 +197,10 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         )
     }
 
-    class NyInnsendingQueryVisiotor(private val innsending: Innsending, private val datasource: DataSource) :
+    class NyInnsendingQueryVisiotor(
+        private val innsending: Innsending,
+        private val transactionalSession: TransactionalSession
+    ) :
         InnsendingVisitor {
         var internId: Long = 0
 
@@ -205,21 +209,17 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         }
 
         override fun visitTilstand(tilstandType: Innsending.Tilstand) {
-            internId = using(sessionOf(datasource)) { session ->
-                session.transaction {
-                    it.run(
-                        queryOf( //language=PostgreSQL
-                            "INSERT INTO innsending_v1(journalpostId,tilstand) VALUES(:jpId, :tilstand) RETURNING id",
-                            mapOf(
-                                "jpId" to innsending.journalpostId().toLong(),
-                                "tilstand" to tilstandType.type.name
-                            )
-                        ).map { row ->
-                            row.long("id")
-                        }.asSingle
+            internId = transactionalSession.run(
+                queryOf( //language=PostgreSQL
+                    "INSERT INTO innsending_v1(journalpostId,tilstand) VALUES(:jpId, :tilstand) RETURNING id",
+                    mapOf(
+                        "jpId" to innsending.journalpostId().toLong(),
+                        "tilstand" to tilstandType.type.name
                     )
-                }
-            } ?: throw IllegalArgumentException("Feil ved opprettelse av Innsending! Noe er galt")
+                ).map { row ->
+                    row.long("id")
+                }.asSingle
+            ) ?: throw IllegalArgumentException("Feil ved opprettelse av Innsending! Noe er galt")
         }
     }
 
