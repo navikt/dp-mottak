@@ -6,6 +6,7 @@ import kotliquery.Row
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
+import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.Innsending
@@ -25,6 +26,7 @@ import org.postgresql.util.PGobject
 import java.time.LocalDateTime
 import javax.sql.DataSource
 
+private val logger = KotlinLogging.logger { }
 internal class InnsendingPostgresRepository(private val datasource: DataSource = Config.dataSource) :
     InnsendingRepository {
     @Language("PostgreSQL")
@@ -65,8 +67,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
 
     fun Row.booleanOrNull(columnLabel: String) = this.stringOrNull(columnLabel)?.let { it == "t" }
 
-    override fun hent(journalpostId: String): Innsending? =
-        using(sessionOf(datasource)) { session ->
+    override fun hent(journalpostId: String): Innsending? {
+        logger.info { "Henter $journalpostId" }
+        return using(sessionOf(datasource)) { session ->
             session.run(
                 queryOf(
                     hentDataSql,
@@ -144,6 +147,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                 it.copy(journalpostData = it.journalpostData?.copy(dokumenter = dokumenter)).createInnsending()
             }
         }
+    }
 
     override fun lagre(innsending: Innsending): Int {
 
