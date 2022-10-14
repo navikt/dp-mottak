@@ -68,13 +68,21 @@ private fun JsonNode.sluttårsak(): Sluttårsak = this.faktaSvar("faktum.arbeids
 }
 
 private fun JsonNode.hentFaktaFraSeksjon(navn: String) =
-    this["seksjoner"].single { it["beskrivendeId"].asText() == navn }.get("fakta")
+    try {
+        this["seksjoner"].single { it["beskrivendeId"].asText() == navn }.get("fakta")
+    } catch (e: NoSuchElementException) {
+        throw NoSuchElementException("Fant ikke seksjon med navn=$navn", e)
+    }
 
 private fun JsonNode.hentNullableFaktaFraSeksjon(navn: String) =
     this["seksjoner"].singleOrNull { it["beskrivendeId"].asText() == navn }?.get("fakta")
 
 private fun JsonNode.faktaSvar(navn: String) =
-    this.single { it["beskrivendeId"].asText() == navn }["svar"]
+    try {
+        this.single { it["beskrivendeId"].asText() == navn }["svar"]
+    } catch (e: NoSuchElementException) {
+        throw NoSuchElementException("Fant ikke fakta med navn=$navn", e)
+    }
 
 private fun String.erEøsLand(): Boolean = eøsLandOgSveits.contains(this)
 
