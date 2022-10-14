@@ -17,7 +17,7 @@ internal class SøknadsdataTest {
         }
 
         søknadsData(
-            """ {"seksjoner": []} """.toJsonNode()
+            """ {"versjon_navn": "Dagpenger", "seksjoner": []} """.toJsonNode()
         ).also {
             assertTrue(it.søknad() is QuizSøknadFormat)
         }

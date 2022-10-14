@@ -11,8 +11,14 @@ class Søknadsdata(
     private val data: JsonNode
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
-    fun søknad(): RutingOppslag = when {
-        data["seksjoner"] != null -> QuizSøknadFormat(data)
-        else -> GammeltSøknadFormat(data)
+    fun søknad(): RutingOppslag {
+        return when (erQuizSøknad(data)) {
+            true -> QuizSøknadFormat(data)
+            else -> GammeltSøknadFormat(data)
+        }
+    }
+
+    private fun erQuizSøknad(data: JsonNode) = data["versjon_navn"]?.let {
+        !it.isNull && it.asText() == "Dagpenger"
     }
 }
