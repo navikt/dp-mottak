@@ -71,7 +71,8 @@ private fun JsonNode.hentFaktaFraSeksjon(navn: String) =
     try {
         this["seksjoner"].single { it["beskrivendeId"].asText() == navn }.get("fakta")
     } catch (e: NoSuchElementException) {
-        throw NoSuchElementException("Fant ikke seksjon med navn=$navn", e)
+        val seksjoner = this["seksjoner"].map { it["beskrivendeId"].asText() }
+        throw NoSuchElementException("Fant ikke seksjon med navn=$navn, seksjoner=$seksjoner", e)
     }
 
 private fun JsonNode.hentNullableFaktaFraSeksjon(navn: String) =
@@ -81,7 +82,8 @@ private fun JsonNode.faktaSvar(navn: String) =
     try {
         this.single { it["beskrivendeId"].asText() == navn }["svar"]
     } catch (e: NoSuchElementException) {
-        throw NoSuchElementException("Fant ikke fakta med navn=$navn", e)
+        val fakta = this.map { it["beskrivendeId"].asText() }
+        throw NoSuchElementException("Fant ikke fakta med navn=$navn, fakta=$fakta", e)
     }
 
 private fun String.erEøsLand(): Boolean = eøsLandOgSveits.contains(this)
