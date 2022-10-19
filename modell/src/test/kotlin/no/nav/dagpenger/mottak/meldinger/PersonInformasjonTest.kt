@@ -6,6 +6,7 @@ import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -68,5 +69,18 @@ internal class PersonInformasjonTest {
 
         assertTrue(person.erDnummer(), "Skal være dnummer")
         assertFalse(person.copy(ident = GENERERT_FØDSELSNUMMER).erDnummer(), "Skal være fødselsnummer")
+    }
+
+    @Test
+    fun `skal validere identer fra syntetiske testpersoner`() {
+        assertDoesNotThrow {
+            PersonInformasjon.Person(
+                aktørId = "12345678",
+                ident = "13907198019",
+                norskTilknytning = true,
+                navn = "Test Testen",
+                diskresjonskode = false
+            )
+        }
     }
 }
