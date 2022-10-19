@@ -37,11 +37,15 @@ class PersonInformasjon(
         val aktørId: String,
         val ident: String,
         val norskTilknytning: Boolean,
-        val diskresjonskode: Boolean
+        val diskresjonskode: Boolean,
     ) {
 
         init {
             require(FodselsnummerValidator.isValid(ident) || erSyntetiskTestIdent()) { "Ikke gyldig ident" }
+        }
+
+        private companion object {
+            const val SYNTETISK_MÅNED_OFFSET = 80
         }
 
         fun erDnummer() = ident.substring(0, 1).toInt() in 4..7
@@ -50,7 +54,13 @@ class PersonInformasjon(
             visitor.visitPerson(navn, aktørId, ident, norskTilknytning, diskresjonskode)
         }
 
-        private fun erSyntetiskTestIdent() = ident[2].toString() == "8"
+        private fun erSyntetiskTestIdent(): Boolean =
+            try {
+                val måned = ident.substring(2, 4).toInt()
+                (måned - SYNTETISK_MÅNED_OFFSET) in 1..12
+            } catch (err: NumberFormatException) {
+                false
+            }
     }
 }
 
