@@ -68,9 +68,3 @@ class PersonInformasjonIkkeFunnet(aktivitetslogg: Aktivitetslogg, private val jo
     Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
 }
-
-fun main() {
-    PersonInformasjon.Person(
-        "", "13907198019", "13907198019", true, false
-    )
-}
