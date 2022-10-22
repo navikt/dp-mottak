@@ -8,7 +8,7 @@ application {
 
 dependencies {
     implementation(project(":modell"))
-    implementation("com.github.navikt.dp-biblioteker:oauth2-klient:2022.05.30-09.37.623ee13a49dd")
+    implementation("com.github.navikt.dp-biblioteker:oauth2-klient:2022.10.22-09.05.6fcf3395aa4f")
     implementation(Database.Flyway)
     implementation(Database.HikariCP)
     implementation(Database.Kotlinquery)
