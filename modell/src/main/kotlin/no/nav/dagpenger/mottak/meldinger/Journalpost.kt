@@ -93,7 +93,14 @@ class Journalpost constructor(
     fun datoRegistrert(): LocalDateTime = registrertDato
 
     class DokumentInfo(tittelHvisTilgjengelig: String?, val dokumentInfoId: String, val brevkode: String, val hovedDokument: Boolean) {
-        val tittel = tittelHvisTilgjengelig ?: allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
+        val tittel = finnTittel(tittelHvisTilgjengelig)
+
+        private fun finnTittel(tittelHvisTilgjengelig: String?): String =
+            if (tittelHvisTilgjengelig != null && tittelHvisTilgjengelig != "null") {
+                tittelHvisTilgjengelig
+            } else {
+                allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
+            }
 
         companion object {
             fun List<DokumentInfo>.vedlegg() = this.filter { it.hovedDokument == false }
