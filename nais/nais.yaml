@@ -63,3 +63,4 @@ spec:
             users:
               - name: bqconn_dataanalyse
         cascadingDelete: false
+        pointInTimeRecovery: true
