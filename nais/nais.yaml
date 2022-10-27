@@ -64,3 +64,4 @@ spec:
               - name: bqconn_dataanalyse
         cascadingDelete: false
         pointInTimeRecovery: true
+        retainedBackups: {{ point_in_time_recovery_days }}

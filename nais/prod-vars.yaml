@@ -5,3 +5,4 @@ db_tier: db-custom-4-15360
 db_size: 1000
 replicas_min: 2
 replicas_max: 4
+point_in_time_recovery_days: 14
