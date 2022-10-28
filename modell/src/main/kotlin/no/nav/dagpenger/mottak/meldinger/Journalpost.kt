@@ -3,6 +3,7 @@ package no.nav.dagpenger.mottak.meldinger
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Etablering
 import no.nav.dagpenger.mottak.Ettersending
+import no.nav.dagpenger.mottak.Generell
 import no.nav.dagpenger.mottak.Gjenopptak
 import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.JournalpostVisitor
@@ -78,7 +79,8 @@ class Journalpost constructor(
             "NAVe 04-01.03" to "Ettersendelse til søknad om dagpenger ved arbeidsledighet (ikke permittert)",
             "NAV 04-01.04" to "Søknad om dagpenger ved permittering",
             "NAVe 04-01.04" to "Ettersendelse til søknad om dagpenger ved permittering",
-            "NAV 90-00.08" to "Klage og anke"
+            "NAV 90-00.08" to "Klage og anke",
+            "GENERELL_INNSENDING" to "Generell innsending"
         )
     }
 
@@ -135,6 +137,7 @@ class Journalpost constructor(
             in setOf("NAV 04-06.08") -> Etablering(this)
             in setOf("NAV 90-00.08") -> klageOgAnkeType(this)
             in setOf("NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04") -> Ettersending(this)
+            in setOf("GENERELL_INNSENDING") -> Generell(this)
             else -> UkjentSkjemaKode(this)
         }
     }

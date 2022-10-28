@@ -314,6 +314,66 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         assertPuml(brevkode)
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = ["GENERELL_INNSENDING"])
+    fun `skal håndtere joark hendelsene generell innsending`(brevkode: String) {
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode)
+        håndterPersonInformasjon()
+        håndterSøknadsdata()
+        håndterArenaOppgaveOpprettet()
+        assertBehovDetaljer(
+            OpprettVurderhenvendelseOppgave,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "behandlendeEnhetId",
+                "oppgavebeskrivelse",
+                "registrertDato",
+                "tilleggsinformasjon"
+            )
+        )
+        håndterJournalpostOppdatert()
+        assertBehovDetaljer(
+            OppdaterJournalpost,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "fagsakId",
+                "navn",
+                "tittel",
+                "dokumenter"
+            )
+        )
+        håndterJournalpostFerdigstilt()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            AventerArenaOppgaveType,
+            AvventerFerdigstillJournalpostType,
+            InnsendingFerdigstiltType
+        )
+
+        inspektør.also {
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+        }
+
+        assertFerdigstilt {
+            assertEquals("Generell", it.type.name)
+            assertNotNull(it.fagsakId)
+            assertNotNull(it.aktørId)
+            assertNotNull(it.fødselsnummer)
+            assertNotNull(it.datoRegistrert)
+        }
+
+        assertPuml(brevkode)
+    }
+
     @Test
     fun `skal håndtere ukjente brevkoder`() {
         håndterJoarkHendelse()
@@ -517,6 +577,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             "NAVe 04-01.03",
             "NAVe 04-01.04",
             "NAV 04-06.05",
+            "GENERELL_INNSENDING",
             "ukjent"
         ]
     )

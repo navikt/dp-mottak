@@ -138,6 +138,27 @@ internal class MediatorE2ETest {
         assertEquals(InnsendingTilstandType.AlleredeBehandletType, testObservatør.tilstander.last())
     }
 
+    @Test
+    fun `Skal motta generell henvendelse`() {
+        håndterHendelse(joarkMelding())
+        assertBehov("Journalpost", 0)
+        håndterHendelse(journalpostMottattHendelse(brevkode = "GENERELL_INNSENDING"))
+        assertBehov("Persondata", 1)
+        håndterHendelse(persondataMottattHendelse())
+
+        assertBehov("OpprettVurderhenvendelseOppgave", 2)
+        håndterHendelse(opprettOpprettVurderhenvendelseHendelse())
+        assertBehov("OppdaterJournalpost", 3)
+        håndterHendelse(oppdatertJournalpostMotattHendelse())
+        assertBehov("FerdigstillJournalpost", 4)
+        håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+        assertTrue(
+            testRapid.inspektør.size == 5,
+            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}"
+        )
+        assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+    }
+
     private fun assertBehov(expectedBehov: String, indexPåMelding: Int) {
         assertTrue(testRapid.inspektør.size == indexPåMelding + 1, "Ingen melding på index $indexPåMelding")
         testRapid.inspektør.message(indexPåMelding).also { jsonNode ->
