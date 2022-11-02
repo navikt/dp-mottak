@@ -171,6 +171,12 @@ data class Gjenopptak(
     ) = super.finnOppgaveBenk(rutingOppslag, oppfyllerMinsteArbeidsinntekt, person)
 }
 
+data class Generell(
+    override val journalpost: Journalpost
+) : KategorisertJournalpost(journalpost) {
+    override fun henvendelseNavn(): String = "Generell\n"
+}
+
 data class Utdanning(
     override val journalpost: Journalpost
 ) : KategorisertJournalpost(journalpost) {
