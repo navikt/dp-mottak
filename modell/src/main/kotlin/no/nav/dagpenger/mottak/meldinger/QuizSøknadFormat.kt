@@ -22,9 +22,9 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
             .faktaSvar("faktum.avtjent-militaer-sivilforsvar-tjeneste-siste-12-mnd").asBoolean()
 
     override fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
-        val faktaFraSeksjon = data.hentFaktaFraSeksjon("arbeidsforhold")
+        val faktaFraSeksjon = data.hentNullableFaktaFraSeksjon("arbeidsforhold")
         val arbeidsforhold =
-            faktaFraSeksjon.singleOrNull { it["beskrivendeId"].asText() == "faktum.arbeidsforhold" }?.get("svar")
+            faktaFraSeksjon?.singleOrNull { it["beskrivendeId"].asText() == "faktum.arbeidsforhold" }?.get("svar")
                 ?: emptyList()
         return arbeidsforhold.map {
             AvsluttetArbeidsforhold(
