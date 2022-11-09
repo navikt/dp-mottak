@@ -270,7 +270,7 @@ internal fun avsluttedeArbeidsforholdQuizJson(
 {
   "seksjoner": [
     {
-      "beskrivendeId": "arbeidsforhold",
+      "beskrivendeId": "din-situasjon",
       "fakta": [
         {
           "id": "8003",
