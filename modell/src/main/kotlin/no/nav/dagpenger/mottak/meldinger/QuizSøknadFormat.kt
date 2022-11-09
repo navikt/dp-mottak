@@ -14,8 +14,8 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
             .faktaSvar("faktum.hvilket-land-bor-du-i").asText().erEøsLand()
 
     override fun eøsArbeidsforhold(): Boolean =
-        data.hentFaktaFraSeksjon("eos-arbeidsforhold")
-            .faktaSvar("faktum.eos-arbeid-siste-36-mnd").asBoolean()
+        data.hentNullableFaktaFraSeksjon("eos-arbeidsforhold")
+            ?.faktaSvar("faktum.eos-arbeid-siste-36-mnd").asBoolean()
 
     override fun avtjentVerneplikt(): Boolean =
         data.hentFaktaFraSeksjon("verneplikt")
@@ -75,7 +75,7 @@ private fun JsonNode.hentFaktaFraSeksjon(navn: String) =
         throw NoSuchElementException("Fant ikke seksjon med navn=$navn, seksjoner=$seksjoner", e)
     }
 
-private fun JsonNode.hentNullableFaktaFraSeksjon(navn: String) =
+private fun JsonNode.hentNullableFaktaFraSeksjon(navn: String): JsonNode? =
     this["seksjoner"].singleOrNull { it["beskrivendeId"].asText() == navn }?.get("fakta")
 
 private fun JsonNode.faktaSvar(navn: String) =
