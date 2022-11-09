@@ -15,7 +15,7 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
 
     override fun eøsArbeidsforhold(): Boolean =
         data.hentNullableFaktaFraSeksjon("eos-arbeidsforhold")
-            ?.faktaSvar("faktum.eos-arbeid-siste-36-mnd").asBoolean()
+            ?.faktaSvar("faktum.eos-arbeid-siste-36-mnd")?.asBoolean() ?: false
 
     override fun avtjentVerneplikt(): Boolean =
         data.hentFaktaFraSeksjon("verneplikt")
