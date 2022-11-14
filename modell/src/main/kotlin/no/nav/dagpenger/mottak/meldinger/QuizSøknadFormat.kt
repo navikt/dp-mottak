@@ -18,8 +18,8 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
             ?.faktaSvar("faktum.eos-arbeid-siste-36-mnd")?.asBoolean() ?: false
 
     override fun avtjentVerneplikt(): Boolean =
-        data.hentFaktaFraSeksjon("verneplikt")
-            .faktaSvar("faktum.avtjent-militaer-sivilforsvar-tjeneste-siste-12-mnd").asBoolean()
+        data.hentNullableFaktaFraSeksjon("verneplikt")
+            ?.faktaSvar("faktum.avtjent-militaer-sivilforsvar-tjeneste-siste-12-mnd")?.asBoolean() ?: false
 
     override fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
         val faktaFraSeksjon = data.hentNullableFaktaFraSeksjon("din-situasjon")
