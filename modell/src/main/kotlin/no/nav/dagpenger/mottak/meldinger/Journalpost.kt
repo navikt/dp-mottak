@@ -56,7 +56,7 @@ class Journalpost constructor(
             "NAV 04-13.01" to "Egenerklæringsskjema for fastsettelse av grensearbeiderstatus",
             "NAV 04-16.03" to "Søknad om gjenopptak av dagpenger",
             "NAV 04-16.04" to "Søknad om gjenopptak av dagpenger ved permittering",
-            "NAV 90-00.08" to "Klage og aBnke",
+            "NAV 90-00.08" to "Klage og anke",
             "NAVe 04-01.03" to "Ettersendelse til søknad om dagpenger ved arbeidsledighet (ikke permittert)",
             "NAVe 04-01.04" to "Ettersendelse til søknad om dagpenger ved permittering",
             "NAVe 04-02.01" to "Ettersendelse til søknad om attest PD U2",
