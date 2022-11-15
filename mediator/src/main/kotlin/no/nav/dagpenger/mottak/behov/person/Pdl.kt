@@ -23,7 +23,7 @@ import no.nav.dagpenger.mottak.Config.pdlApiUrl
 import no.nav.dagpenger.mottak.behov.GraphqlQuery
 import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 
-private val sikkerLogg = KotlinLogging.logger("tjenestekall")
+private val sikkerlogg = KotlinLogging.logger("tjenestekall.Pdl")
 
 internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
     private val tokenProvider = config.pdlApiTokenProvider
@@ -40,10 +40,10 @@ internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
     override suspend fun hentPerson(id: String): Pdl.Person? = pdlClient.request {
         header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
         method = HttpMethod.Post
-        setBody(PersonQuery(id).toJson().also { sikkerLogg.info { "Forsøker å hente person med id $id fra PDL" } })
+        setBody(PersonQuery(id).toJson().also { sikkerlogg.info { "Forsøker å hente person med id $id fra PDL" } })
     }.bodyAsText().let {
         if (hasError(it)) {
-            sikkerLogg.error { "Feil i person oppslag for person med id $id: $it" }
+            sikkerlogg.error { "Feil i person oppslag for person med id $id: $it" }
             throw PdlPersondataOppslagException(it)
         } else {
             Pdl.Person.fromGraphQlJson(it)
@@ -151,7 +151,7 @@ internal class Pdl {
                 onFailure = {
                     if (ukjentPersonIdent(node)) return null
                     else {
-                        sikkerLogg.info(node.toString())
+                        sikkerlogg.info(node.toString())
                         throw it
                     }
                 }
