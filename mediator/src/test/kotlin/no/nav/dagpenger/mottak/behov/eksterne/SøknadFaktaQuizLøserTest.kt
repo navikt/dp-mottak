@@ -4,7 +4,7 @@ import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak
 import no.nav.dagpenger.mottak.QuizOppslag
 import no.nav.dagpenger.mottak.behov.JsonMapper
-import no.nav.dagpenger.mottak.meldinger.GammeltSøknadFormat
+import no.nav.dagpenger.mottak.meldinger.søknadsdata.GammeltSøknadFormat
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals

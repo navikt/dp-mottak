@@ -2,6 +2,9 @@ package no.nav.dagpenger.mottak.meldinger
 
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.mottak.Aktivitetslogg
+import no.nav.dagpenger.mottak.meldinger.søknadsdata.GammeltSøknadFormat
+import no.nav.dagpenger.mottak.meldinger.søknadsdata.QuizSøknadFormat
+import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
 import no.nav.dagpenger.mottak.toJsonNode
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

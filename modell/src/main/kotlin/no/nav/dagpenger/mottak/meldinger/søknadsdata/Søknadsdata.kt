@@ -1,4 +1,4 @@
-package no.nav.dagpenger.mottak.meldinger
+package no.nav.dagpenger.mottak.meldinger.søknadsdata
 
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.mottak.Aktivitetslogg

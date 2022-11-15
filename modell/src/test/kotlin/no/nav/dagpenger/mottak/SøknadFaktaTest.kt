@@ -1,6 +1,6 @@
 package no.nav.dagpenger.mottak
 
-import no.nav.dagpenger.mottak.meldinger.GammeltSøknadFormat
+import no.nav.dagpenger.mottak.meldinger.søknadsdata.GammeltSøknadFormat
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse

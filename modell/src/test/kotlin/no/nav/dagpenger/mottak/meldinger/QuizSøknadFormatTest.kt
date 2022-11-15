@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.meldinger
 
+import no.nav.dagpenger.mottak.meldinger.søknadsdata.QuizSøknadFormat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue

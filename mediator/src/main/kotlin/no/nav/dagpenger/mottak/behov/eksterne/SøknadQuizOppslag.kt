@@ -5,7 +5,7 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.mottak.QuizOppslag
 import no.nav.dagpenger.mottak.behov.JsonMapper
-import no.nav.dagpenger.mottak.meldinger.GammeltSøknadFormat
+import no.nav.dagpenger.mottak.meldinger.søknadsdata.GammeltSøknadFormat
 import javax.sql.DataSource
 
 internal interface SøknadQuizOppslag {
