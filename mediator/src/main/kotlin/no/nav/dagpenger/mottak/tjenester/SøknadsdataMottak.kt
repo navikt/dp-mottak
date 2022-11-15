@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak.tjenester
 
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
+import mu.withLoggingContext
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.InnsendingMediator
@@ -31,29 +32,32 @@ internal class SøknadsdataMottak(
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val journalpostId = packet["journalpostId"].asText()
-        logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
-        val søknadsdata = packet["@løsning.${Behovtype.Søknadsdata.name}"].let {
-            Søknadsdata(
-                aktivitetslogg = Aktivitetslogg(),
-                journalpostId = journalpostId,
-                data = it
-            ).also { søknadsdata ->
-                with(søknadsdata.søknad()) {
-                    logg.info {
-                        """Søknadsdata sier:
-                        |  konkurs=${avsluttetArbeidsforholdFraKonkurs()}
-                        |  eøsBostedsland=${eøsBostedsland()}
-                        |  eøsArbeidsforhold=${eøsArbeidsforhold()}
-                        |  harAvtjentVerneplikt=${avtjentVerneplikt()}
-                        |  erPermittertFraFiskeforedling=${permittertFraFiskeForedling()}
-                        |  erPermittert=${permittert()}
-                        |  rutingoppslag=${søknadsdata.søknad()::javaClass.name}
-                        """.trimMargin()
+
+        withLoggingContext("journalpostId" to journalpostId) {
+            logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
+            val søknadsdata = packet["@løsning.${Behovtype.Søknadsdata.name}"].let {
+                Søknadsdata(
+                    aktivitetslogg = Aktivitetslogg(),
+                    journalpostId = journalpostId,
+                    data = it
+                ).also { søknadsdata ->
+                    with(søknadsdata.søknad()) {
+                        logg.info {
+                            """Søknadsdata sier:
+                            |  konkurs=${avsluttetArbeidsforholdFraKonkurs()}
+                            |  eøsBostedsland=${eøsBostedsland()}
+                            |  eøsArbeidsforhold=${eøsArbeidsforhold()}
+                            |  harAvtjentVerneplikt=${avtjentVerneplikt()}
+                            |  erPermittertFraFiskeforedling=${permittertFraFiskeForedling()}
+                            |  erPermittert=${permittert()}
+                            |  rutingoppslag=${søknadsdata.søknad()::javaClass.name}
+                            """.trimMargin()
+                        }
                     }
                 }
             }
-        }
 
-        innsendingMediator.håndter(søknadsdata)
+            innsendingMediator.håndter(søknadsdata)
+        }
     }
 }
