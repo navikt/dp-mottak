@@ -5,7 +5,7 @@ import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
-import no.nav.dagpenger.mottak.meldinger.søknadsdata.GammeltSøknadFormat
+import no.nav.dagpenger.mottak.meldinger.søknadsdata.rutingOppslag
 import java.time.LocalDateTime
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
@@ -45,7 +45,7 @@ data class InnsendingData(
                         }
                     )
                 },
-                søknadsData?.let { GammeltSøknadFormat(it) },
+                søknadsData?.let { rutingOppslag(it) },
                 oppfyllerMinsteArbeidsinntekt,
                 eksisterendeSaker,
                 personData?.let {

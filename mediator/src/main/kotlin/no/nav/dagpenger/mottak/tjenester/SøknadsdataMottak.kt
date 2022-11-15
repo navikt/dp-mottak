@@ -50,7 +50,7 @@ internal class SøknadsdataMottak(
                             |  harAvtjentVerneplikt=${avtjentVerneplikt()}
                             |  erPermittertFraFiskeforedling=${permittertFraFiskeForedling()}
                             |  erPermittert=${permittert()}
-                            |  rutingoppslag=${søknadsdata.søknad().javaClass.simpleName}
+                            |  rutingoppslag=${this.javaClass.simpleName}
                             """.trimMargin()
                         }
                     }

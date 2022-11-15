@@ -12,13 +12,17 @@ class Søknadsdata(
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
     fun søknad(): RutingOppslag {
-        return when (erQuizSøknad(data)) {
-            true -> QuizSøknadFormat(data)
-            else -> GammeltSøknadFormat(data)
-        }
+        return rutingOppslag(data)
     }
+}
 
-    private fun erQuizSøknad(data: JsonNode) = data["versjon_navn"]?.let {
-        !it.isNull && it.asText() == "Dagpenger"
+internal fun rutingOppslag(data: JsonNode): RutingOppslag {
+    return when (erQuizSøknad(data)) {
+        true -> QuizSøknadFormat(data)
+        else -> GammeltSøknadFormat(data)
     }
+}
+
+private fun erQuizSøknad(data: JsonNode) = data["versjon_navn"]?.let {
+    !it.isNull && it.asText() == "Dagpenger"
 }
