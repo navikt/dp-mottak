@@ -40,13 +40,13 @@ internal class SøknadsdataMottak(
             ).also { søknadsdata ->
                 with(søknadsdata.søknad()) {
                     logg.info {
-                        """Søknadsdata sier,
-                        | konkurs=${avsluttetArbeidsforholdFraKonkurs()}
-                        | eøsBostedsland=${eøsBostedsland()}
-                        | eøsArbeidsforhold=${eøsArbeidsforhold()}
-                        | harAvtjentVerneplikt=${avtjentVerneplikt()}
-                        | erPermittertFraFiskeforedling=${permittertFraFiskeForedling()}
-                        | erPermittert=${permittert()}
+                        """Søknadsdata sier:
+                        |  konkurs=${avsluttetArbeidsforholdFraKonkurs()}
+                        |  eøsBostedsland=${eøsBostedsland()}
+                        |  eøsArbeidsforhold=${eøsArbeidsforhold()}
+                        |  harAvtjentVerneplikt=${avtjentVerneplikt()}
+                        |  erPermittertFraFiskeforedling=${permittertFraFiskeForedling()}
+                        |  erPermittert=${permittert()}
                         """.trimMargin()
                     }
                 }
