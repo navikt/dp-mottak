@@ -40,6 +40,7 @@ sealed class KategorisertJournalpost(
                 id = "2103",
                 beskrivelse = henvendelseNavn()
             )
+
             else -> oppgaveBenk
         }
     }
@@ -106,6 +107,17 @@ data class NySøknad(
         val erPermittertFraFiskeforedling = rutingOppslag?.permittertFraFiskeForedling() == true
         val erPermittert = rutingOppslag?.permittert() == true
         val datoRegistrert = journalpost.datoRegistrert()
+        journalpost.aktivitetslogg.info(
+            """Har funnet følgende attributer til ruting;
+            konkurs=$konkurs, 
+            kanAvslåsPåMinsteinntekt=$kanAvslåsPåMinsteinntekt,
+            eøsBostedsland=$eøsBostedsland,
+            eøsArbeidsforhold=$eøsArbeidsforhold,
+            harAvtjentVerneplikt=$harAvtjentVerneplikt
+            erPermittertFraFiskeforedling=$erPermittertFraFiskeforedling
+            erPermittert=$erPermittert
+            """.trimIndent()
+        )
         return when {
             eøsArbeidsforhold -> {
                 OppgaveBenk(
@@ -115,34 +127,42 @@ data class NySøknad(
                     tilleggsinformasjon()
                 )
             }
+
             harAvtjentVerneplikt -> OppgaveBenk(
                 behandlendeEnhet(person),
                 "VERNEPLIKT\n",
                 datoRegistrert,
                 tilleggsinformasjon()
             )
+
             eøsBostedsland && erPermittert -> OppgaveBenk(
                 "4465",
                 "EØS\n",
                 datoRegistrert,
                 tilleggsinformasjon()
             )
+
             konkurs -> OppgaveBenk(
-                "4401", "Konkurs\n",
+                "4401",
+                "Konkurs\n",
                 datoRegistrert,
                 tilleggsinformasjon()
             )
+
             erPermittertFraFiskeforedling -> OppgaveBenk(
-                "4455", "FISK\n",
+                "4455",
+                "FISK\n",
                 datoRegistrert,
                 tilleggsinformasjon()
             )
+
             kanAvslåsPåMinsteinntekt -> OppgaveBenk(
                 finnEnhetForHurtigAvslag(person),
                 "Minsteinntekt - mulig avslag\n",
                 datoRegistrert,
                 tilleggsinformasjon()
             )
+
             else -> OppgaveBenk(
                 behandlendeEnhet(person),
                 henvendelseNavn(),
