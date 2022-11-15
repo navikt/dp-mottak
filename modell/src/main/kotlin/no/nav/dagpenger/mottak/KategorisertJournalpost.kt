@@ -34,6 +34,7 @@ sealed class KategorisertJournalpost(
         oppfyllerMinsteArbeidsinntekt: Boolean? = null
     ): OppgaveBenk {
         val oppgaveBenk = finnOppgaveBenk(rutingOppslag, oppfyllerMinsteArbeidsinntekt, person)
+        journalpost.aktivitetslogg.info("Har konkludert med oppgaveBenk=${oppgaveBenk.id}")
 
         return when (person?.diskresjonskode) {
             true -> oppgaveBenk.copy(
