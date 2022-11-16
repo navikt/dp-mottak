@@ -26,7 +26,7 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
         val arbeidsforhold =
             faktaFraSeksjon?.singleOrNull { it["beskrivendeId"].asText() == "faktum.arbeidsforhold" }?.get("svar")
                 ?: emptyList()
-        return arbeidsforhold.map {
+        return arbeidsforhold.filterNot { it.isEmpty }.map {
             AvsluttetArbeidsforhold(
                 sluttårsak = it.sluttårsak(),
                 fiskeforedling = it.fiskForedling(),

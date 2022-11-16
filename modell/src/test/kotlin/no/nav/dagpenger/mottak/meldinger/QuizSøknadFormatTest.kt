@@ -36,6 +36,14 @@ internal class QuizSøknadFormatTest {
     }
 
     @Test
+    fun `kan parse tom arbeidsforhold`() {
+        assertEquals(
+            0,
+            QuizSøknadFormat(tomAvsluttedeArbeidsforhold()).avsluttetArbeidsforhold().size
+        )
+    }
+
+    @Test
     fun permittertFraFiskeForedling() {
         assertEquals(
             true,

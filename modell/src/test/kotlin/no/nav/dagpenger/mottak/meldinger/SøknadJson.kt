@@ -261,6 +261,28 @@ fun eøsArbeidsforholdQuizJson(harEøsarbeidsforhold: Boolean) =
 }""".toJsonNode()
 
 @Language("JSON")
+internal fun tomAvsluttedeArbeidsforhold() = """
+    {
+      "seksjoner": [
+        {
+          "beskrivendeId": "din-situasjon",
+          "fakta": [
+            {
+              "id": "8003",
+              "type": "generator",
+              "beskrivendeId": "faktum.arbeidsforhold",
+              "svar": [
+               []
+              ]
+            }
+          ]
+        }
+      ]
+    }
+    
+""".trimIndent().toJsonNode()
+
+@Language("JSON")
 internal fun avsluttedeArbeidsforholdQuizJson(
     permitterterFraFiskeForedling: Boolean = false,
     konkurs: Boolean = false,
