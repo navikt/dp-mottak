@@ -145,15 +145,16 @@ internal class MediatorE2ETest {
         håndterHendelse(journalpostMottattHendelse(brevkode = "GENERELL_INNSENDING"))
         assertBehov("Persondata", 1)
         håndterHendelse(persondataMottattHendelse())
-
-        assertBehov("OpprettVurderhenvendelseOppgave", 2)
+        assertBehov("Søknadsdata", 2)
+        håndterHendelse(søknadsdataMottakHendelse())
+        assertBehov("OpprettVurderhenvendelseOppgave", 3)
         håndterHendelse(opprettOpprettVurderhenvendelseHendelse())
-        assertBehov("OppdaterJournalpost", 3)
+        assertBehov("OppdaterJournalpost", 4)
         håndterHendelse(oppdatertJournalpostMotattHendelse())
-        assertBehov("FerdigstillJournalpost", 4)
+        assertBehov("FerdigstillJournalpost", 5)
         håndterHendelse(ferdigstiltJournalpostMotattHendelse())
         assertTrue(
-            testRapid.inspektør.size == 5,
+            testRapid.inspektør.size == 6,
             "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}"
         )
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())

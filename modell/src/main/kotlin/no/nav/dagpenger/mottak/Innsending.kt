@@ -279,7 +279,7 @@ class Innsending private constructor(
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
                 is KlageOgAnkeForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is KlageOgAnkeFeriepenger -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
-                is Generell -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
+                is Generell -> innsending.tilstand(hendelse, AvventerSøknadsdata)
             }
         }
     }
@@ -310,6 +310,7 @@ class Innsending private constructor(
                 is NySøknad -> innsending.tilstand(søknadsdata, AventerMinsteinntektVurdering)
                 is Gjenopptak -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
                 is Ettersending -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
+                is Generell -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
                 else -> søknadsdata.severe("Forventet kun søknadsdata for NySøknad og Gjenopptak")
             }
         }
@@ -537,7 +538,8 @@ class Innsending private constructor(
         hendelse: Hendelse
     ) {
         val journalpost = requireNotNull(journalpost).kategorisertJournalpost()
-        val person = requireNotNull(person) { "Krever at person er satt her. Mangler for journalpostId ${journalpostId()}" }
+        val person =
+            requireNotNull(person) { "Krever at person er satt her. Mangler for journalpostId ${journalpostId()}" }
         val oppgavebenk = journalpost.oppgaveBenk(person)
         val parametre = mapOf(
             "fødselsnummer" to person.ident,

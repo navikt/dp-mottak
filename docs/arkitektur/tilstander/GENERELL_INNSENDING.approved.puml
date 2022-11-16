@@ -6,7 +6,8 @@ end title
 MottattType --> AvventerJournalpostType
 AvventerJournalpostType --> AvventerPersondataType
 AvventerPersondataType --> KategoriseringType
-KategoriseringType --> AventerArenaOppgaveType
+KategoriseringType --> AvventerSøknadsdataType
+AvventerSøknadsdataType --> AventerArenaOppgaveType
 AventerArenaOppgaveType --> AvventerFerdigstillJournalpostType
 AvventerFerdigstillJournalpostType --> InnsendingFerdigstiltType
 InnsendingFerdigstiltType--> [*]
