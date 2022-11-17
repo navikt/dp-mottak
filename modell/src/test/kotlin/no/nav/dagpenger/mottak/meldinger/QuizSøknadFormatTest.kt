@@ -44,6 +44,14 @@ internal class QuizSøknadFormatTest {
     }
 
     @Test
+    fun `skal kunne parse delvise utfylt arbeidsforhold`() {
+        assertEquals(
+            2,
+            QuizSøknadFormat(delvisutfyltArbeidsforhold()).avsluttetArbeidsforhold().size
+        )
+    }
+
+    @Test
     fun permittertFraFiskeForedling() {
         assertEquals(
             true,

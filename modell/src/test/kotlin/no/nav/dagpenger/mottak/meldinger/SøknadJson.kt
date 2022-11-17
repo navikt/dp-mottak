@@ -283,6 +283,227 @@ internal fun tomAvsluttedeArbeidsforhold() = """
 """.trimIndent().toJsonNode()
 
 @Language("JSON")
+internal fun delvisutfyltArbeidsforhold() = """
+    {
+      "seksjoner": [
+        {
+          "beskrivendeId": "din-situasjon",
+          "fakta": [
+             {
+          "id": "109",
+          "svar": [
+            [
+              {
+                "id": "110.1",
+                "svar": "Arbeidsforhold 1",
+                "type": "tekst",
+                "roller": [
+                  "søker"
+                ],
+                "readOnly": false,
+                "beskrivendeId": "faktum.arbeidsforhold.navn-bedrift",
+                "sannsynliggjoresAv": []
+              },
+              {
+                "id": "111.1",
+                "svar": "NOR",
+                "type": "land",
+                "roller": [
+                  "søker"
+                ],
+                "grupper": [],
+                "readOnly": false,
+                "beskrivendeId": "faktum.arbeidsforhold.land",
+                "sannsynliggjoresAv": []
+              },
+              {
+                "id": "112.1",
+                "svar": "faktum.arbeidsforhold.endret.svar.ikke-endret",
+                "type": "envalg",
+                "roller": [
+                  "søker"
+                ],
+                "readOnly": false,
+                "gyldigeValg": [
+                  "faktum.arbeidsforhold.endret.svar.ikke-endret",
+                  "faktum.arbeidsforhold.endret.svar.avskjediget",
+                  "faktum.arbeidsforhold.endret.svar.sagt-opp-av-arbeidsgiver",
+                  "faktum.arbeidsforhold.endret.svar.arbeidsgiver-konkurs",
+                  "faktum.arbeidsforhold.endret.svar.kontrakt-utgaatt",
+                  "faktum.arbeidsforhold.endret.svar.sagt-opp-selv",
+                  "faktum.arbeidsforhold.endret.svar.redusert-arbeidstid",
+                  "faktum.arbeidsforhold.endret.svar.permittert"
+                ],
+                "beskrivendeId": "faktum.arbeidsforhold.endret",
+                "sannsynliggjoresAv": []
+              },
+              {
+                "id": "113.1",
+                "svar": true,
+                "type": "boolean",
+                "roller": [
+                  "søker"
+                ],
+                "readOnly": false,
+                "gyldigeValg": [
+                  "faktum.arbeidsforhold.kjent-antall-timer-jobbet.svar.ja",
+                  "faktum.arbeidsforhold.kjent-antall-timer-jobbet.svar.nei"
+                ],
+                "beskrivendeId": "faktum.arbeidsforhold.kjent-antall-timer-jobbet",
+                "sannsynliggjoresAv": []
+              },
+              {
+                "id": "114.1",
+                "svar": 40.0,
+                "type": "double",
+                "roller": [
+                  "søker"
+                ],
+                "readOnly": false,
+                "beskrivendeId": "faktum.arbeidsforhold.antall-timer-jobbet",
+                "sannsynliggjoresAv": []
+              },
+              {
+                "id": "115.1",
+                "svar": false,
+                "type": "boolean",
+                "roller": [
+                  "søker"
+                ],
+                "readOnly": false,
+                "gyldigeValg": [
+                  "faktum.arbeidsforhold.har-tilleggsopplysninger.svar.ja",
+                  "faktum.arbeidsforhold.har-tilleggsopplysninger.svar.nei"
+                ],
+                "beskrivendeId": "faktum.arbeidsforhold.har-tilleggsopplysninger",
+                "sannsynliggjoresAv": []
+              }
+            ],
+            [
+              {
+                "id": "110.2",
+                "svar": "Arbeidsforhold 2",
+                "type": "tekst",
+                "roller": [
+                  "søker"
+                ],
+                "readOnly": false,
+                "beskrivendeId": "faktum.arbeidsforhold.navn-bedrift",
+                "sannsynliggjoresAv": []
+              },
+              {
+                "id": "111.2",
+                "svar": "NOR",
+                "type": "land",
+                "roller": [
+                  "søker"
+                ],
+                "grupper": [],
+                "readOnly": false,
+                "beskrivendeId": "faktum.arbeidsforhold.land",
+                "sannsynliggjoresAv": []
+              },
+              {
+                "id": "112.2",
+                "svar": "faktum.arbeidsforhold.endret.svar.ikke-endret",
+                "type": "envalg",
+                "roller": [
+                  "søker"
+                ],
+                "readOnly": false,
+                "gyldigeValg": [
+                  "faktum.arbeidsforhold.endret.svar.ikke-endret",
+                  "faktum.arbeidsforhold.endret.svar.avskjediget",
+                  "faktum.arbeidsforhold.endret.svar.sagt-opp-av-arbeidsgiver",
+                  "faktum.arbeidsforhold.endret.svar.arbeidsgiver-konkurs",
+                  "faktum.arbeidsforhold.endret.svar.kontrakt-utgaatt",
+                  "faktum.arbeidsforhold.endret.svar.sagt-opp-selv",
+                  "faktum.arbeidsforhold.endret.svar.redusert-arbeidstid",
+                  "faktum.arbeidsforhold.endret.svar.permittert"
+                ],
+                "beskrivendeId": "faktum.arbeidsforhold.endret",
+                "sannsynliggjoresAv": []
+              },
+              {
+                "id": "113.2",
+                "svar": true,
+                "type": "boolean",
+                "roller": [
+                  "søker"
+                ],
+                "readOnly": false,
+                "gyldigeValg": [
+                  "faktum.arbeidsforhold.kjent-antall-timer-jobbet.svar.ja",
+                  "faktum.arbeidsforhold.kjent-antall-timer-jobbet.svar.nei"
+                ],
+                "beskrivendeId": "faktum.arbeidsforhold.kjent-antall-timer-jobbet",
+                "sannsynliggjoresAv": []
+              },
+              {
+                "id": "114.2",
+                "svar": 18.0,
+                "type": "double",
+                "roller": [
+                  "søker"
+                ],
+                "readOnly": false,
+                "beskrivendeId": "faktum.arbeidsforhold.antall-timer-jobbet",
+                "sannsynliggjoresAv": []
+              },
+              {
+                "id": "115.2",
+                "svar": true,
+                "type": "boolean",
+                "roller": [
+                  "søker"
+                ],
+                "readOnly": false,
+                "gyldigeValg": [
+                  "faktum.arbeidsforhold.har-tilleggsopplysninger.svar.ja",
+                  "faktum.arbeidsforhold.har-tilleggsopplysninger.svar.nei"
+                ],
+                "beskrivendeId": "faktum.arbeidsforhold.har-tilleggsopplysninger",
+                "sannsynliggjoresAv": []
+              },
+              {
+                "id": "116.2",
+                "svar": "Arbeidsforhold 3",
+                "type": "tekst",
+                "roller": [
+                  "søker"
+                ],
+                "readOnly": false,
+                "beskrivendeId": "faktum.arbeidsforhold.tilleggsopplysninger",
+                "sannsynliggjoresAv": []
+              }
+            ],
+            [
+              {
+                "id": "110.3",
+                "type": "tekst",
+                "roller": [
+                  "søker"
+                ],
+                "readOnly": false,
+                "beskrivendeId": "faktum.arbeidsforhold.navn-bedrift",
+                "sannsynliggjoresAv": []
+              }
+            ]
+          ],
+          "type": "generator",
+          "roller": [
+            "søker"
+          ],
+          "readOnly": false,
+          "beskrivendeId": "faktum.arbeidsforhold"
+        }
+          ]
+        }
+      ]
+    }
+    
+""".trimIndent().toJsonNode()
+@Language("JSON")
 internal fun avsluttedeArbeidsforholdQuizJson(
     permitterterFraFiskeForedling: Boolean = false,
     konkurs: Boolean = false,

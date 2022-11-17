@@ -1,11 +1,15 @@
 package no.nav.dagpenger.mottak.meldinger.søknadsdata
 
 import com.fasterxml.jackson.databind.JsonNode
+import mu.KotlinLogging
 import no.nav.dagpenger.mottak.AvsluttedeArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak
 import no.nav.dagpenger.mottak.RutingOppslag
 import no.nav.dagpenger.mottak.SøknadVisitor
+
+private val logger = KotlinLogging.logger { }
+private val sikkerlogg = KotlinLogging.logger("tjenestekall.QuizSøknadFormat")
 
 class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
     override fun eøsBostedsland(): Boolean =
@@ -26,12 +30,17 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
         val arbeidsforhold =
             faktaFraSeksjon?.singleOrNull { it["beskrivendeId"].asText() == "faktum.arbeidsforhold" }?.get("svar")
                 ?: emptyList()
-        return arbeidsforhold.filterNot { it.isEmpty }.map {
-            AvsluttetArbeidsforhold(
-                sluttårsak = it.sluttårsak(),
-                fiskeforedling = it.fiskForedling(),
-                land = it.faktaSvar("faktum.arbeidsforhold.land").asText()
-            )
+        return arbeidsforhold.filterNot { it.isEmpty }.mapNotNull {
+            kotlin.runCatching {
+                AvsluttetArbeidsforhold(
+                    sluttårsak = it.sluttårsak(),
+                    fiskeforedling = it.fiskForedling(),
+                    land = it.faktaSvar("faktum.arbeidsforhold.land").asText()
+                )
+            }.onFailure { exception ->
+                logger.error { "Klarte ikke å finne AvsluttetArbeidsforhold (se sikkerlogg)" }
+                sikkerlogg.error(exception) { "Klarte ikke å finne AvsluttetArbeidsforhold" }
+            }.getOrNull()
         }
     }
 
