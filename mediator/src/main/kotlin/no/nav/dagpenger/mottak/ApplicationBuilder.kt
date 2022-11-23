@@ -20,7 +20,7 @@ import no.nav.dagpenger.mottak.behov.vilkårtester.MinsteinntektVurderingLøser
 import no.nav.dagpenger.mottak.behov.vilkårtester.RegelApiProxy
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.MinsteinntektVurderingPostgresRepository
-import no.nav.dagpenger.mottak.db.runMigration
+import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
 import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
 import no.nav.dagpenger.mottak.observers.InnsendingProbe
 import no.nav.dagpenger.mottak.observers.MetrikkObserver
@@ -32,13 +32,13 @@ private val logg = KotlinLogging.logger {}
 
 internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.StatusListener {
 
-    private val innsendingRepository = InnsendingPostgresRepository(Config.dataSource)
+    private val innsendingRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
     private val safClient = SafClient(Config.properties)
     private val regelApiClient = RegelApiProxy(Config.properties)
     private val arenaApiClient = ArenaApiClient(Config.properties)
     private val journalpostApiClient = JournalpostApiClient(Config.properties)
     private val gosysProxyClient = GosysProxyClient(Config.properties)
-    private val minsteinntektVurderingRepository = MinsteinntektVurderingPostgresRepository(Config.dataSource)
+    private val minsteinntektVurderingRepository = MinsteinntektVurderingPostgresRepository(PostgresDataSourceBuilder.dataSource)
     private val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(Config.kafkaProducerProperties)
 
     private val rapidsConnection = RapidApplication.Builder(
@@ -81,7 +81,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             OpprettGosysOppgaveLøser(gosysProxyClient, this)
 
             // Eksterne behovløsere
-            SøknadFaktaQuizLøser(PostgresSøknadQuizOppslag(Config.dataSource), this)
+            SøknadFaktaQuizLøser(PostgresSøknadQuizOppslag(PostgresDataSourceBuilder.dataSource), this)
         }
 
     init {
@@ -91,7 +91,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     fun start() = rapidsConnection.start()
 
     override fun onStartup(rapidsConnection: RapidsConnection) {
-        runMigration(Config.dataSource)
+        PostgresDataSourceBuilder.runMigration()
         logg.info { "Starter dp-mottak" }
     }
 }

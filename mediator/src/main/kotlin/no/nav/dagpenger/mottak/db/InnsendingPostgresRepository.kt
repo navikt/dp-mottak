@@ -8,7 +8,6 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.mottak.Aktivitetslogg
-import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingPeriode
 import no.nav.dagpenger.mottak.InnsendingVisitor
@@ -26,7 +25,7 @@ import org.postgresql.util.PGobject
 import java.time.LocalDateTime
 import javax.sql.DataSource
 
-internal class InnsendingPostgresRepository(private val datasource: DataSource = Config.dataSource) :
+internal class InnsendingPostgresRepository(private val datasource: DataSource = PostgresDataSourceBuilder.dataSource) :
     InnsendingRepository {
     @Language("PostgreSQL")
     val hentDataSql = """

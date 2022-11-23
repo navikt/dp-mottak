@@ -10,8 +10,7 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.mottak.db.MinsteinntektVurderingPostgresRepository
-import no.nav.dagpenger.mottak.db.PostgresTestHelper
-import no.nav.dagpenger.mottak.db.runMigration
+import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -29,8 +28,8 @@ internal class MinsteinntektVurderingLøserTest {
     val testRapid = TestRapid()
     val regelApiClientMock = mockk<RegelApiClient>(relaxed = true)
     private val minsteinntektVurderingRepository =
-        MinsteinntektVurderingPostgresRepository(dataSource = PostgresTestHelper.dataSource).also {
-            runMigration(PostgresTestHelper.dataSource)
+        MinsteinntektVurderingPostgresRepository(dataSource = PostgresDataSourceBuilder.dataSource).also {
+            PostgresDataSourceBuilder.runMigration()
         }
 
     init {
@@ -95,7 +94,7 @@ internal class MinsteinntektVurderingLøserTest {
     @Test
     fun `Kun en minsteinntekt opprydder skal kunne kjøre samtidig`() {
         runBlocking {
-            using(sessionOf(PostgresTestHelper.dataSource)) { session ->
+            using(sessionOf(PostgresDataSourceBuilder.dataSource)) { session ->
                 session.run(
                     queryOf(
                         "INSERT INTO  minsteinntekt_vurdering_v1(journalpostId,packet, opprettet) VALUES(:journalpostId,:packet, :opprettet) ON CONFLICT DO NOTHING",

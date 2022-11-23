@@ -1,6 +1,6 @@
 package no.nav.dagpenger.mottak.db
 
-import com.zaxxer.hikari.HikariDataSource
+import org.flywaydb.core.internal.configuration.ConfigUtils
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.containers.PostgreSQLContainer.POSTGRESQL_PORT
 import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy
@@ -14,32 +14,40 @@ internal object PostgresTestHelper {
         }
     }
 
-    val dataSource by lazy {
-        HikariDataSource().apply {
-            dataSourceClassName = "org.postgresql.ds.PGSimpleDataSource"
-            addDataSourceProperty("serverName", instance.host)
-            addDataSourceProperty("portNumber", instance.getMappedPort(POSTGRESQL_PORT))
-            addDataSourceProperty("databaseName", instance.databaseName)
-            addDataSourceProperty("user", instance.username)
-            addDataSourceProperty("password", instance.password)
-            maximumPoolSize = 10
-            minimumIdle = 1
-            idleTimeout = 10001
-            connectionTimeout = 1000
-            maxLifetime = 30001
-        }
-    }
-
     fun withMigratedDb(block: () -> Unit) {
         withCleanDb {
-            runMigration(dataSource)
+            PostgresDataSourceBuilder.runMigration()
             block()
         }
     }
 
     fun withCleanDb(block: () -> Unit) {
-        clean(dataSource).run {
+        setup()
+        PostgresDataSourceBuilder.clean().run {
             block()
+        }.also {
+            tearDown()
         }
+    }
+
+    fun setup() {
+        System.setProperty(ConfigUtils.CLEAN_DISABLED, "false")
+        System.setProperty(PostgresDataSourceBuilder.DB_HOST_KEY, instance.host)
+        System.setProperty(
+            PostgresDataSourceBuilder.DB_PORT_KEY,
+            instance.getMappedPort(POSTGRESQL_PORT).toString()
+        )
+        System.setProperty(PostgresDataSourceBuilder.DB_DATABASE_KEY, instance.databaseName)
+        System.setProperty(PostgresDataSourceBuilder.DB_PASSWORD_KEY, instance.password)
+        System.setProperty(PostgresDataSourceBuilder.DB_USERNAME_KEY, instance.username)
+    }
+
+    fun tearDown() {
+        System.clearProperty(PostgresDataSourceBuilder.DB_PASSWORD_KEY)
+        System.clearProperty(PostgresDataSourceBuilder.DB_USERNAME_KEY)
+        System.clearProperty(PostgresDataSourceBuilder.DB_HOST_KEY)
+        System.clearProperty(PostgresDataSourceBuilder.DB_PORT_KEY)
+        System.clearProperty(PostgresDataSourceBuilder.DB_DATABASE_KEY)
+        System.clearProperty(ConfigUtils.CLEAN_DISABLED)
     }
 }

@@ -45,7 +45,7 @@ internal class InnsendingPostgresRepositoryTest {
     fun `hent skal kunne hente innsending`() {
         val innsending = innsendingData.createInnsending()
         withMigratedDb {
-            with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
+            with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending).also {
                     assertTrue(it > 0, "lagring av innsending feilet")
                 }
@@ -86,7 +86,7 @@ internal class InnsendingPostgresRepositoryTest {
             )
         ).createInnsending()
         withMigratedDb {
-            with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
+            with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending).also {
                     assertTrue(it > 0, "lagring av innsending feilet")
                 }
@@ -106,7 +106,7 @@ internal class InnsendingPostgresRepositoryTest {
     fun `Dobbelagrer ikke verdier som skal være unike`() {
         val innsending = innsendingData.createInnsending()
         withMigratedDb {
-            with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
+            with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending)
                 lagre(innsending).also {
                     assertAntallRader("soknad_v1", 1)
@@ -129,7 +129,7 @@ internal class InnsendingPostgresRepositoryTest {
         val innsending = innsendingData.createInnsending()
         val innsending2 = innsendingData.copy(journalpostId = "287689").createInnsending()
         withMigratedDb {
-            with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
+            with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending).also {
                     assertTrue(it > 0, "lagring av innsending feilet")
                 }
@@ -158,7 +158,7 @@ internal class InnsendingPostgresRepositoryTest {
             )
         ).createInnsending()
         withMigratedDb {
-            with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
+            with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending).also {
                     assertTrue(it > 0, "lagring av innsending feilet")
                 }
@@ -184,7 +184,7 @@ internal class InnsendingPostgresRepositoryTest {
             )
         ).createInnsending()
         withMigratedDb {
-            with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
+            with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending).also {
                     assertTrue(it > 0, "lagring av innsending feilet")
                 }
@@ -201,7 +201,7 @@ internal class InnsendingPostgresRepositoryTest {
         val innsending = innsendingData.createInnsending()
 
         withMigratedDb {
-            with(InnsendingPostgresRepository(PostgresTestHelper.dataSource)) {
+            with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending)
                 val innsendinger = forPeriode(Periode(LocalDateTime.now().minusDays(1), LocalDateTime.now().plusMinutes(1)))
                 assertFalse(innsendinger.isEmpty())
@@ -210,7 +210,7 @@ internal class InnsendingPostgresRepositoryTest {
     }
 
     private fun assertAntallRader(tabell: String, antallRader: Int) {
-        val faktiskeRader = using(sessionOf(PostgresTestHelper.dataSource)) { session ->
+        val faktiskeRader = using(sessionOf(PostgresDataSourceBuilder.dataSource)) { session ->
             session.run(
                 queryOf("select count(1) from $tabell").map { row ->
                     row.int(1)

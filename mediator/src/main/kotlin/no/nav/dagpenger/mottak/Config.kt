@@ -5,10 +5,8 @@ import com.natpryce.konfig.ConfigurationMap
 import com.natpryce.konfig.ConfigurationProperties
 import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
-import com.natpryce.konfig.intType
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
-import com.zaxxer.hikari.HikariDataSource
 import no.finn.unleash.DefaultUnleash
 import no.finn.unleash.util.UnleashConfig
 import no.nav.dagpenger.oauth2.CachedOauth2Client
@@ -76,22 +74,6 @@ internal object Config {
 
     val Configuration.pdlApiTokenProvider: () -> String by lazy {
         { cachedTokenProvider.clientCredentials(properties[Key("PDL_API_SCOPE", stringType)]).accessToken }
-    }
-
-    val dataSource by lazy {
-        HikariDataSource().apply {
-            dataSourceClassName = "org.postgresql.ds.PGSimpleDataSource"
-            addDataSourceProperty("serverName", properties[Key("DB_HOST", stringType)])
-            addDataSourceProperty("portNumber", properties[Key("DB_PORT", intType)])
-            addDataSourceProperty("databaseName", properties[Key("DB_DATABASE", stringType)])
-            addDataSourceProperty("user", properties[Key("DB_USERNAME", stringType)])
-            addDataSourceProperty("password", properties[Key("DB_PASSWORD", stringType)])
-            maximumPoolSize = 10
-            minimumIdle = 1
-            idleTimeout = 10001
-            connectionTimeout = 1000
-            maxLifetime = 30001
-        }
     }
 
     val kafkaProducerProperties: Properties by lazy {

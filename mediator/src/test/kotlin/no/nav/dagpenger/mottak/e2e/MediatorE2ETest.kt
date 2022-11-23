@@ -4,8 +4,7 @@ import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
-import no.nav.dagpenger.mottak.db.PostgresTestHelper
-import no.nav.dagpenger.mottak.db.runMigration
+import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -21,8 +20,8 @@ internal class MediatorE2ETest {
     var journalpostId: Long = 0L
 
     private val testRapid = TestRapid()
-    private val innsendingRepository = InnsendingPostgresRepository(datasource = PostgresTestHelper.dataSource).also {
-        runMigration(PostgresTestHelper.dataSource)
+    private val innsendingRepository = InnsendingPostgresRepository(datasource = PostgresDataSourceBuilder.dataSource).also {
+        PostgresDataSourceBuilder.runMigration()
     }
     private val testObservatør = TestObservatør()
     private val innsendingMediator = InnsendingMediator(
