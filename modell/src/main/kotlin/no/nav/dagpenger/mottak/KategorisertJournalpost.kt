@@ -22,7 +22,7 @@ sealed class KategorisertJournalpost(
         val brevkode = journalpost.hovedskjema()
         return when {
             brevkode in PERMITTERING_BREVKODER && person?.norskTilknytning == false -> "4465"
-            brevkode in PERMITTERING_BREVKODER -> "4455"
+            brevkode in PERMITTERING_BREVKODER -> "4450"
             brevkode in UTLAND_BREVKODER -> "4470"
             else -> "4450"
         }
@@ -140,7 +140,7 @@ data class NySøknad(
             )
 
             erPermittertFraFiskeforedling -> OppgaveBenk(
-                "4455",
+                "4450",
                 "FISK\n",
                 datoRegistrert,
                 tilleggsinformasjon()
@@ -164,7 +164,6 @@ data class NySøknad(
 
     private fun finnEnhetForHurtigAvslag(person: Person?) = when (behandlendeEnhet(person)) {
         "4450" -> "4451"
-        "4455" -> "4456"
         else -> behandlendeEnhet(person)
     }
 }
