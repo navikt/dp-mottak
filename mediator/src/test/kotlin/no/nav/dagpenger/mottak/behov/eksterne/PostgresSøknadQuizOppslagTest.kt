@@ -18,7 +18,7 @@ internal class PostgresSøknadQuizOppslagTest {
     @Test
     fun hentSøknad() {
         withMigratedDb {
-            val data = this.javaClass.getResource("/testdata/soknadsdata_gammelt_format.json").readText(Charset.forName("UTF-8"))
+            val data = this.javaClass.getResource("/testdata/soknadsdata.json").readText(Charset.forName("UTF-8"))
             using(sessionOf(PostgresDataSourceBuilder.dataSource)) { session ->
                 val id = session.run(
                     queryOf(
@@ -40,8 +40,8 @@ internal class PostgresSøknadQuizOppslagTest {
             }
 
             PostgresSøknadQuizOppslag(PostgresDataSourceBuilder.dataSource).also {
-                it.hentSøknad("1000S63MA").also { søknadFakta ->
-                    assertEquals("1000S63MA", søknadFakta.søknadsId())
+                it.hentSøknad("0e7b27f5-5773-489b-a7f1-eaeb91da7761").also { søknadFakta ->
+                    assertEquals("0e7b27f5-5773-489b-a7f1-eaeb91da7761", søknadFakta.søknadsId())
                 }
                 assertThrows<IllegalArgumentException> { it.hentSøknad("Nehehehei") }
             }

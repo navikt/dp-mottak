@@ -14,7 +14,7 @@ import java.time.format.DateTimeParseException
 class GammeltSøknadFormat(
     val data: JsonNode
 ) : QuizOppslag, RutingOppslag {
-    override fun søknadsId(): String? = data["brukerBehandlingId"].textValue()
+    override fun søknadsId(): String? = data["søknad_uuid"].textValue()
 
     private fun getFakta(faktaNavn: String): List<JsonNode> =
         data.get("fakta")?.filter { it["key"].asText() == faktaNavn } ?: emptyList()

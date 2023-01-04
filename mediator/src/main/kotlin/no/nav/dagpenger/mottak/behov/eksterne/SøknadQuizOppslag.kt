@@ -17,8 +17,8 @@ internal class PostgresSøknadQuizOppslag(private val dataSource: DataSource) : 
         // TODO: bruke fnr? (brukerbehandligId skal være unik, vil evt være et safety measure for å være helt sikker på at bruker ikke får feil søknad)
         val query = queryOf(
             //language=PostgreSQL
-            """SELECT * FROM soknad_v1 WHERE :brukerBehandlingId::jsonb <@ data""",
-            mapOf("brukerBehandlingId" to """{ "brukerBehandlingId": "$innsendtSøknadsId" }""")
+            """SELECT * FROM soknad_v1 WHERE :jsonFragment::jsonb <@ data""",
+            mapOf("jsonFragment" to """{ "søknad_uuid": "$innsendtSøknadsId" }""")
         )
 
         return using(sessionOf(dataSource)) { session ->
