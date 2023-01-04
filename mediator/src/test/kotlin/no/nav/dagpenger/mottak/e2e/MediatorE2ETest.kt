@@ -264,9 +264,8 @@ internal class MediatorE2ETest {
           "journalpostId": "$journalpostId",
           "@løsning": {
             "Søknadsdata": {
-                 "brukerBehandlingId": "blabla",
-                 "masse": "masse data",
-                 "fakta": "fakta"
+        "søknad_uuid": "cfd84357-cdd9-4811-ada5-63d77625e91e",
+        "seksjoner": [ ]
               }
             }
           }

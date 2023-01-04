@@ -17,12 +17,5 @@ class Søknadsdata(
 }
 
 internal fun rutingOppslag(data: JsonNode): RutingOppslag {
-    return when (erQuizSøknad(data)) {
-        true -> QuizSøknadFormat(data)
-        else -> GammeltSøknadFormat(data)
-    }
-}
-
-private fun erQuizSøknad(data: JsonNode) = data["versjon_navn"]?.let {
-    !it.isNull && it.asText() == "Dagpenger"
+    return QuizSøknadFormat(data)
 }

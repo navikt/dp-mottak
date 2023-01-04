@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
+import java.time.LocalDate
+import java.util.UUID
 
 internal class QuizSøknadFormatTest {
     @Test
@@ -91,5 +94,38 @@ internal class QuizSøknadFormatTest {
             false,
             QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(permittert = false)).permittert()
         )
+    }
+
+    @Test
+    fun fangstOgFiske() {
+        assertEquals(
+            false,
+            QuizSøknadFormat(utenSeksjoner()).fangstOgFisk()
+        )
+    }
+
+    @Test
+    fun ønskerDagpengerFraDato() {
+        val now = LocalDate.now()
+        assertEquals(
+            now,
+            QuizSøknadFormat(ønskerDagpengerFraDatoJson(now.toString())).ønskerDagpengerFraDato()
+        )
+    }
+
+    @Test
+    fun søknadsId() {
+        val uuid = UUID.randomUUID()
+        assertEquals(
+            uuid.toString(),
+            QuizSøknadFormat(utenSeksjoner(uuid)).søknadsId()
+        )
+    }
+
+    @Test
+    fun søknadsTidspunkt() {
+        assertThrows<NotImplementedError> {
+            QuizSøknadFormat(utenSeksjoner()).søknadstidspunkt()
+        }
     }
 }

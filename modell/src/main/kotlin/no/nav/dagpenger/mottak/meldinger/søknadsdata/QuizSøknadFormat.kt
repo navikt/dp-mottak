@@ -5,17 +5,20 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.AvsluttedeArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak
+import no.nav.dagpenger.mottak.QuizOppslag
+import no.nav.dagpenger.mottak.ReellArbeidsSøker
 import no.nav.dagpenger.mottak.RutingOppslag
 import no.nav.dagpenger.mottak.SøknadVisitor
+import java.time.LocalDate
 
 private val logger = KotlinLogging.logger { }
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.QuizSøknadFormat")
 
-class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
+class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag {
     override fun eøsBostedsland(): Boolean =
         data
-            .hentFaktaFraSeksjon("bostedsland")
-            .faktaSvar("faktum.hvilket-land-bor-du-i").asText().erEøsLand()
+            .hentNullableFaktaFraSeksjon("bostedsland")
+            ?.faktaSvar("faktum.hvilket-land-bor-du-i")?.asText()?.erEøsLand() ?: false
 
     override fun eøsArbeidsforhold(): Boolean =
         data.hentNullableFaktaFraSeksjon("eos-arbeidsforhold")
@@ -50,6 +53,32 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
         avsluttetArbeidsforhold().any { it.sluttårsak == Sluttårsak.ARBEIDSGIVER_KONKURS }
 
     override fun permittert(): Boolean = avsluttetArbeidsforhold().any { it.sluttårsak == Sluttårsak.PERMITTERT }
+    override fun fangstOgFisk(): Boolean {
+        // todo remove behov from quiz
+        return false
+    }
+
+    override fun ønskerDagpengerFraDato(): LocalDate =
+        data.hentFaktaFraSeksjon("din-situasjon")
+            .faktaSvar("faktum.dagpenger-soknadsdato")
+            .asLocalDate()
+
+    override fun søknadsId(): String? = data["søknad_uuid"].textValue()
+
+    override fun søknadstidspunkt(): LocalDate {
+        TODO("Not yet implemented")
+    }
+
+    override fun reellArbeidsSøker(): ReellArbeidsSøker =
+        data.hentFaktaFraSeksjon("reell-arbeidssoker").let { node ->
+            ReellArbeidsSøker(
+                helse = node.faktaSvar("faktum.alle-typer-arbeid").asBoolean(),
+                geografi = node.faktaSvar("faktum.jobbe-hele-norge").asBoolean(),
+                deltid = node.faktaSvar("faktum.jobbe-hel-deltid").asBoolean(),
+                yrke = node.faktaSvar("faktum.bytte-yrke-ned-i-lonn").asBoolean()
+
+            )
+        }
 
     override fun data(): JsonNode = data
 
@@ -95,6 +124,7 @@ private fun JsonNode.faktaSvar(navn: String) =
         throw NoSuchElementException("Fant ikke fakta med navn=$navn, fakta=$fakta", e)
     }
 
+private fun JsonNode.asLocalDate(): LocalDate = this.asText().let { LocalDate.parse(it) }
 private fun String.erEøsLand(): Boolean = eøsLandOgSveits.contains(this)
 
 private val eøsLandOgSveits = listOf(

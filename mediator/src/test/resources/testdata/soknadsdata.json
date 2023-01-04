@@ -412,7 +412,7 @@
       "fakta": [
         {
           "id": "7001",
-          "svar": true,
+          "svar": false,
           "type": "boolean",
           "roller": [
             "søker"
@@ -2000,7 +2000,7 @@
   "@event_name": "søker_oppgave",
   "søknad_uuid": "0e7b27f5-5773-489b-a7f1-eaeb91da7761",
   "versjon_navn": "Dagpenger",
-  "fødselsnummer": "29838099503",
+  "fødselsnummer": "123456789",
   "@forårsaket_av": {
     "id": "fca16f10-3108-4cfb-9c5e-786163988dac",
     "opprettet": "2023-01-04T10:33:55.017044775",

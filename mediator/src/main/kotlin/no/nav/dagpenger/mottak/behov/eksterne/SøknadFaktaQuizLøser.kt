@@ -25,8 +25,6 @@ internal class SøknadFaktaQuizLøser(
         "Søknadstidspunkt",
         "Verneplikt",
         "FangstOgFiske",
-        "SisteDagMedArbeidsplikt",
-        "SisteDagMedLønn",
         "Lærling",
         "EØSArbeid",
         "Rettighetstype",
@@ -69,8 +67,6 @@ internal class SøknadFaktaQuizLøser(
                         "Verneplikt" -> søknad.avtjentVerneplikt()
                         "FangstOgFiske" -> søknad.fangstOgFisk()
                         "EØSArbeid" -> søknad.eøsArbeidsforhold()
-                        "SisteDagMedArbeidsplikt" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
-                        "SisteDagMedLønn" -> søknad.sisteDagMedLønnEllerArbeidsplikt()
                         "Rettighetstype" -> rettighetstypeUtregning(avsluttedeArbeidsforhold)
                         "KanJobbeDeltid" -> reellArbeidsSøker.deltid
                         "KanJobbeHvorSomHelst" -> reellArbeidsSøker.geografi

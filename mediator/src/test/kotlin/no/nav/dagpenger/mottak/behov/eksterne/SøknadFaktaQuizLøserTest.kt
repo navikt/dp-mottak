@@ -4,7 +4,7 @@ import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak
 import no.nav.dagpenger.mottak.QuizOppslag
 import no.nav.dagpenger.mottak.behov.JsonMapper
-import no.nav.dagpenger.mottak.meldinger.søknadsdata.GammeltSøknadFormat
+import no.nav.dagpenger.mottak.meldinger.søknadsdata.QuizSøknadFormat
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -18,7 +18,7 @@ internal class SøknadFaktaQuizLøserTest {
 
     val testRapid = TestRapid()
     val testSøknad =
-        GammeltSøknadFormat(JsonMapper.jacksonJsonAdapter.readTree(this.javaClass.getResource("/testdata/soknadsdata_gammelt_format.json")))
+        QuizSøknadFormat(JsonMapper.jacksonJsonAdapter.readTree(this.javaClass.getResource("/testdata/soknadsdata.json")))
 
     init {
         SøknadFaktaQuizLøser(
@@ -37,18 +37,16 @@ internal class SøknadFaktaQuizLøserTest {
     @ParameterizedTest
     @CsvSource(
         value = [
-            "ØnskerDagpengerFraDato:2020-03-19",
+            "ØnskerDagpengerFraDato:2023-01-09",
             "Søknadstidspunkt:2021-08-25",
             "Verneplikt:false",
-            "FangstOgFiske:true",
-            "SisteDagMedArbeidsplikt:2020-03-23",
-            "SisteDagMedLønn:2020-03-23",
-            "EØSArbeid:true",
+            "FangstOgFiske:false",
+            "EØSArbeid:false",
             "KanJobbeDeltid:true",
             "KanJobbeHvorSomHelst:true",
             "HelseTilAlleTyperJobb:true",
             "VilligTilÅBytteYrke:true",
-            "JobbetUtenforNorge:true"
+            "JobbetUtenforNorge:false"
         ],
         delimiter = ':'
     )
@@ -76,7 +74,7 @@ internal class SøknadFaktaQuizLøserTest {
 
         with(testRapid.inspektør) {
             assertEquals("false", field(0, "@løsning")["Verneplikt"].asText())
-            assertEquals("2020-03-23", field(0, "@løsning")["SisteDagMedArbeidsplikt"].asText())
+            assertEquals("false", field(0, "@løsning")["JobbetUtenforNorge"].asText())
         }
     }
 
@@ -201,7 +199,7 @@ internal class SøknadFaktaQuizLøserTest {
       "identer":[{"id":"12345678910","type":"folkeregisterident","historisk":false}],
       "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
       "@behov": [
-       "SisteDagMedArbeidsplikt",
+       "JobbetUtenforNorge",
        "Verneplikt"
       ],
       "InnsendtSøknadsId":{"lastOppTidsstempel":"2020-11-26T10:33:38.684844","urn":"urn:soknadid:321"}
