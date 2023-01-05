@@ -76,6 +76,7 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
 
     private fun shutdownHook() {
         logger.info("received shutdown signal, stopping app")
+        producer.flush()
         producer.close()
     }
 }
