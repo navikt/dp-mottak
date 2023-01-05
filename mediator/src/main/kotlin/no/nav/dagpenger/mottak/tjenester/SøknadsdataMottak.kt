@@ -14,6 +14,7 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
 
 private val logg = KotlinLogging.logger {}
+private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadsdataMottak")
 
 internal class SøknadsdataMottak(
     private val innsendingMediator: InnsendingMediator,
@@ -35,15 +36,16 @@ internal class SøknadsdataMottak(
 
         withLoggingContext("journalpostId" to journalpostId) {
             logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
-            val søknadsdata = packet["@løsning.${Behovtype.Søknadsdata.name}"].let {
-                Søknadsdata(
-                    aktivitetslogg = Aktivitetslogg(),
-                    journalpostId = journalpostId,
-                    data = it
-                ).also { søknadsdata ->
-                    with(søknadsdata.søknad()) {
-                        logg.info {
-                            """Søknadsdata sier:
+            val søknadsdata = packet["@løsning.${Behovtype.Søknadsdata.name}"].let { data ->
+                try {
+                    Søknadsdata(
+                        aktivitetslogg = Aktivitetslogg(),
+                        journalpostId = journalpostId,
+                        data = data
+                    ).also { søknadsdata ->
+                        with(søknadsdata.søknad()) {
+                            logg.info {
+                                """Søknadsdata sier:
                             |  konkurs=${avsluttetArbeidsforholdFraKonkurs()}
                             |  eøsBostedsland=${eøsBostedsland()}
                             |  eøsArbeidsforhold=${eøsArbeidsforhold()}
@@ -51,9 +53,13 @@ internal class SøknadsdataMottak(
                             |  erPermittertFraFiskeforedling=${permittertFraFiskeForedling()}
                             |  erPermittert=${permittert()}
                             |  rutingoppslag=${this.javaClass.simpleName}
-                            """.trimMargin()
+                                """.trimMargin()
+                            }
                         }
                     }
+                } catch (e: NullPointerException) {
+                    sikkerlogg.error(e) { data }
+                    throw e
                 }
             }
 
