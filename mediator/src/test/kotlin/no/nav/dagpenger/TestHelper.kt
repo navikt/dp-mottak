@@ -57,6 +57,7 @@ private val aktivitetsloggData = InnsendingData.AktivitetsloggData(
 private val søknadsjson = jacksonObjectMapper().readTree(
     """
             {
+            "versjon_navn": "Dagpenger",
             "seksjoner":[]
             }
     """.trimIndent()

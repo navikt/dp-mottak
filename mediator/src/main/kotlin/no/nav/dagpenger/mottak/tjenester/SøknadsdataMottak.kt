@@ -38,15 +38,14 @@ internal class SøknadsdataMottak(
             logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
             val søknadsdata: Søknadsdata = packet["@løsning.${Behovtype.Søknadsdata.name}"].let { data ->
                 sikkerlogg.info { packet }
-                try {
-                    Søknadsdata(
-                        aktivitetslogg = Aktivitetslogg(),
-                        journalpostId = journalpostId,
-                        data = data
-                    ).also { søknadsdata ->
-                        with(søknadsdata.søknad()) {
-                            logg.info {
-                                """Søknadsdata sier:
+                Søknadsdata(
+                    aktivitetslogg = Aktivitetslogg(),
+                    journalpostId = journalpostId,
+                    data = data
+                ).also { søknadsdata ->
+                    with(søknadsdata.søknad()) {
+                        logg.info {
+                            """Søknadsdata sier:
                                 |  konkurs=${avsluttetArbeidsforholdFraKonkurs()}
                                 |  eøsBostedsland=${eøsBostedsland()}
                                 |  eøsArbeidsforhold=${eøsArbeidsforhold()}
@@ -55,12 +54,8 @@ internal class SøknadsdataMottak(
                                 |  erPermittert=${permittert()}
                                 |  rutingoppslag=${this.javaClass.simpleName}
                                 """.trimMargin()
-                            }
                         }
                     }
-                } catch (e: NullPointerException) {
-                    sikkerlogg.error(e) { data }
-                    throw e
                 }
             }
 

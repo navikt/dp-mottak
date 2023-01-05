@@ -265,6 +265,7 @@ internal class MediatorE2ETest {
           "@løsning": {
             "Søknadsdata": {
         "søknad_uuid": "cfd84357-cdd9-4811-ada5-63d77625e91e",
+        "versjon_navn": "Dagpenger",
         "seksjoner": [ ]
               }
             }

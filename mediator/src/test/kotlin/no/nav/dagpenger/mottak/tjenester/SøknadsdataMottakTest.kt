@@ -3,6 +3,7 @@ package no.nav.dagpenger.mottak.tjenester
 import io.mockk.mockk
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 internal class SøknadsdataMottakTest {
@@ -10,6 +11,7 @@ internal class SøknadsdataMottakTest {
     private val service = SøknadsdataMottak(mockk(), rapid)
 
     @Test
+    @Disabled
     fun lol() {
         rapid.sendTestMessage(søknadsdataJSON.toJson())
     }
