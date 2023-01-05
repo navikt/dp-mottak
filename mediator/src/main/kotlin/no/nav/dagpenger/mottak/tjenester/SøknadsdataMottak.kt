@@ -37,7 +37,7 @@ internal class SøknadsdataMottak(
         withLoggingContext("journalpostId" to journalpostId) {
             logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
             val søknadsdata: Søknadsdata = packet["@løsning.${Behovtype.Søknadsdata.name}"].let { data ->
-                sikkerlogg.info { data }
+                sikkerlogg.info { packet }
                 try {
                     Søknadsdata(
                         aktivitetslogg = Aktivitetslogg(),

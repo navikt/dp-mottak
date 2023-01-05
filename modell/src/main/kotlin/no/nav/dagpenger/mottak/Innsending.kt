@@ -270,16 +270,17 @@ class Innsending private constructor(
             when (hendelseType) {
                 is NySøknad -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Gjenopptak -> innsending.tilstand(hendelse, AvventerSøknadsdata)
+                is Ettersending -> innsending.tilstand(hendelse, AvventerSøknadsdata)
+                is Generell -> innsending.tilstand(hendelse, AvventerSøknadsdata)
+
                 is Utdanning -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is Etablering -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is KlageOgAnke -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is KlageOgAnkeLønnskompensasjon -> innsending.tilstand(hendelse, AvventerGosysOppgave)
-                is Ettersending -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
                 is KlageOgAnkeForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is KlageOgAnkeFeriepenger -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
-                is Generell -> innsending.tilstand(hendelse, AvventerSøknadsdata)
             }
         }
     }
