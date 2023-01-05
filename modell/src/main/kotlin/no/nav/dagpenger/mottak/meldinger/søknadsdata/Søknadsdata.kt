@@ -1,7 +1,6 @@
 package no.nav.dagpenger.mottak.meldinger.søknadsdata
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.JsonNodeFactory
 import com.fasterxml.jackson.databind.node.NullNode
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
@@ -23,7 +22,7 @@ class Søknadsdata(
 internal fun rutingOppslag(data: JsonNode): RutingOppslag {
     return when (erQuizSøknad(data)) {
         true -> QuizSøknadFormat(data)
-        else -> NullSøknadData
+        else -> NullSøknadData(data)
     }
 }
 
@@ -31,11 +30,12 @@ private fun erQuizSøknad(data: JsonNode) = data["versjon_navn"]?.let {
     !it.isNull && it.asText() == "Dagpenger"
 }
 
-object NullSøknadData : RutingOppslag {
-    override fun data(): JsonNode = JsonNodeFactory.instance.objectNode()
+class NullSøknadData(private val data: JsonNode) : RutingOppslag {
+    override fun data() = data
     override fun accept(visitor: SøknadVisitor) {
         visitor.visitSøknad(this)
     }
+
     override fun eøsBostedsland() = false
     override fun eøsArbeidsforhold() = false
     override fun avtjentVerneplikt() = false
@@ -43,9 +43,4 @@ object NullSøknadData : RutingOppslag {
     override fun permittertFraFiskeForedling() = false
     override fun avsluttetArbeidsforholdFraKonkurs() = false
     override fun permittert() = false
-}
-
-fun main() {
-    println("${NullNode.instance}")
-    NullSøknadData.data().toString().let { println(it) }
 }
