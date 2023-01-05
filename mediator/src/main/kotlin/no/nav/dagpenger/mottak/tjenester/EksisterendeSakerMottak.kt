@@ -44,6 +44,7 @@ internal class EksisterendeSakerMottak(
             innsendingMediator.håndter(eksisterendeSaker)
         } catch (e: Exception) {
             sikkerlogg.error(e) { "Feil på mottak: $packet" }
+            throw e
         }
     }
 }
