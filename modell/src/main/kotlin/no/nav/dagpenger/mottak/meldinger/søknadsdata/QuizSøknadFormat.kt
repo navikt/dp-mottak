@@ -50,8 +50,10 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag
 
     override fun permittertFraFiskeForedling(): Boolean = avsluttetArbeidsforhold().any { it.fiskeforedling }
 
-    override fun avsluttetArbeidsforholdFraKonkurs(): Boolean =
-        avsluttetArbeidsforhold().any { it.sluttårsak == Sluttårsak.ARBEIDSGIVER_KONKURS }
+    override fun avsluttetArbeidsforholdFraKonkurs(): Boolean {
+        sikkerlogg.info { "Har JSON: $data" }
+        return avsluttetArbeidsforhold().any { it.sluttårsak == Sluttårsak.ARBEIDSGIVER_KONKURS }
+    }
 
     override fun permittert(): Boolean = avsluttetArbeidsforhold().any { it.sluttårsak == Sluttårsak.PERMITTERT }
     override fun fangstOgFisk(): Boolean {
@@ -75,7 +77,6 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag
                 geografi = node.faktaSvar("faktum.jobbe-hele-norge").asBoolean(),
                 deltid = node.faktaSvar("faktum.jobbe-hel-deltid").asBoolean(),
                 yrke = node.faktaSvar("faktum.bytte-yrke-ned-i-lonn").asBoolean()
-
             )
         }
 
