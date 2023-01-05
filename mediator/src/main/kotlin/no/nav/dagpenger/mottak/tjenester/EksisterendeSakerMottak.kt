@@ -12,13 +12,16 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
 
+private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 private val logg = KotlinLogging.logger {}
+
 internal class EksisterendeSakerMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection
 ) : River.PacketListener {
 
     private val løsning = "@løsning.${Behovtype.EksisterendeSaker.name}"
+
     init {
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
@@ -37,6 +40,10 @@ internal class EksisterendeSakerMottak(
             harEksisterendeSak = packet[løsning]["harEksisterendeSak"].asBoolean()
         )
 
-        innsendingMediator.håndter(eksisterendeSaker)
+        try {
+            innsendingMediator.håndter(eksisterendeSaker)
+        } catch (e: Exception) {
+            sikkerlogg.error(e) { "Feil på mottak: $packet" }
+        }
     }
 }
