@@ -43,7 +43,7 @@ internal class EksisterendeSakerMottak(
         try {
             innsendingMediator.håndter(eksisterendeSaker)
         } catch (e: Exception) {
-            sikkerlogg.error(e) { "Feil på mottak: $packet" }
+            sikkerlogg.error(e) { "Feil på mottak(jp:$journalpostId): ${packet.toJson()}" }
             throw e
         }
     }
