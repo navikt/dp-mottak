@@ -41,8 +41,7 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
             key = event.journalpostId,
             message = JsonMessage.newMessage(
                 payload
-            ),
-            eventName = "innsending_ferdigstilt"
+            )
         )
     }
 
@@ -56,15 +55,14 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
             message = JsonMessage.newMessage(
                 payload
             ),
-            eventName = "innsending_mottatt",
         )
     }
 
     private fun publish(
         key: String,
-        message: JsonMessage,
-        eventName: String
+        message: JsonMessage
     ) {
+        message.requireKey("@event_name")
         producer.send(
             ProducerRecord(
                 "teamdagpenger.journalforing.v1",
@@ -73,7 +71,7 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
             )
         ).get(500, TimeUnit.MILLISECONDS)
 
-        logger.info { "Send $eventName til kafka for journalpostId $key" }
+        logger.info { "Send ${message["@event_name"].asText()} til Kafka for journalpostId=$key" }
         sikkerLogger.info { message.toJson() }
     }
 
