@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
-import org.junit.jupiter.api.assertThrows
 import java.time.LocalDate
 import java.util.UUID
 
@@ -124,8 +123,9 @@ internal class QuizSøknadFormatTest {
 
     @Test
     fun søknadsTidspunkt() {
-        assertThrows<NotImplementedError> {
+        assertEquals(
+            LocalDate.of(2022, 6, 1),
             QuizSøknadFormat(utenSeksjoner()).søknadstidspunkt()
-        }
+        )
     }
 }

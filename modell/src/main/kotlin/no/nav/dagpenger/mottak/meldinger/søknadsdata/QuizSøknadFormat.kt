@@ -10,6 +10,7 @@ import no.nav.dagpenger.mottak.ReellArbeidsSøker
 import no.nav.dagpenger.mottak.RutingOppslag
 import no.nav.dagpenger.mottak.SøknadVisitor
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 private val logger = KotlinLogging.logger { }
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.QuizSøknadFormat")
@@ -65,9 +66,7 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag
 
     override fun søknadsId(): String? = data["søknad_uuid"].textValue()
 
-    override fun søknadstidspunkt(): LocalDate {
-        TODO("Not yet implemented")
-    }
+    override fun søknadstidspunkt(): LocalDate = data["@opprettet"].asLocalDateTime().toLocalDate()
 
     override fun reellArbeidsSøker(): ReellArbeidsSøker =
         data.hentFaktaFraSeksjon("reell-arbeidssoker").let { node ->
@@ -124,6 +123,7 @@ private fun JsonNode.faktaSvar(navn: String) =
         throw NoSuchElementException("Fant ikke fakta med navn=$navn, fakta=$fakta", e)
     }
 
+private fun JsonNode.asLocalDateTime(): LocalDateTime = this.asText().let { LocalDateTime.parse(it) }
 private fun JsonNode.asLocalDate(): LocalDate = this.asText().let { LocalDate.parse(it) }
 private fun String.erEøsLand(): Boolean = eøsLandOgSveits.contains(this)
 
