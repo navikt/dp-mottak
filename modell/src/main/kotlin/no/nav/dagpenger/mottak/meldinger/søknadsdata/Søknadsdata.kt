@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak.meldinger.søknadsdata
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
+import com.fasterxml.jackson.databind.node.NullNode
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.Hendelse
@@ -32,7 +33,9 @@ private fun erQuizSøknad(data: JsonNode) = data["versjon_navn"]?.let {
 
 object NullSøknadData : RutingOppslag {
     override fun data(): JsonNode = JsonNodeFactory.instance.objectNode()
-    override fun accept(visitor: SøknadVisitor) {}
+    override fun accept(visitor: SøknadVisitor) {
+        visitor.visitSøknad(this)
+    }
     override fun eøsBostedsland() = false
     override fun eøsArbeidsforhold() = false
     override fun avtjentVerneplikt() = false
@@ -40,4 +43,9 @@ object NullSøknadData : RutingOppslag {
     override fun permittertFraFiskeForedling() = false
     override fun avsluttetArbeidsforholdFraKonkurs() = false
     override fun permittert() = false
+}
+
+fun main() {
+    println("${NullNode.instance}")
+    NullSøknadData.data().toString().let { println(it) }
 }
