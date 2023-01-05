@@ -36,7 +36,8 @@ internal class SøknadsdataMottak(
 
         withLoggingContext("journalpostId" to journalpostId) {
             logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
-            val søknadsdata = packet["@løsning.${Behovtype.Søknadsdata.name}"].let { data ->
+            val søknadsdata: Søknadsdata = packet["@løsning.${Behovtype.Søknadsdata.name}"].let { data ->
+                sikkerlogg.info { data }
                 try {
                     Søknadsdata(
                         aktivitetslogg = Aktivitetslogg(),
@@ -46,13 +47,13 @@ internal class SøknadsdataMottak(
                         with(søknadsdata.søknad()) {
                             logg.info {
                                 """Søknadsdata sier:
-                            |  konkurs=${avsluttetArbeidsforholdFraKonkurs()}
-                            |  eøsBostedsland=${eøsBostedsland()}
-                            |  eøsArbeidsforhold=${eøsArbeidsforhold()}
-                            |  harAvtjentVerneplikt=${avtjentVerneplikt()}
-                            |  erPermittertFraFiskeforedling=${permittertFraFiskeForedling()}
-                            |  erPermittert=${permittert()}
-                            |  rutingoppslag=${this.javaClass.simpleName}
+                                |  konkurs=${avsluttetArbeidsforholdFraKonkurs()}
+                                |  eøsBostedsland=${eøsBostedsland()}
+                                |  eøsArbeidsforhold=${eøsArbeidsforhold()}
+                                |  harAvtjentVerneplikt=${avtjentVerneplikt()}
+                                |  erPermittertFraFiskeforedling=${permittertFraFiskeForedling()}
+                                |  erPermittert=${permittert()}
+                                |  rutingoppslag=${this.javaClass.simpleName}
                                 """.trimMargin()
                             }
                         }
