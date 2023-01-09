@@ -1,7 +1,6 @@
 package no.nav.dagpenger.mottak.meldinger.søknadsdata
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.NullNode
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.Hendelse
