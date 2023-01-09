@@ -6,5 +6,3 @@ db_size: 1000
 replicas_min: 2
 replicas_max: 4
 point_in_time_recovery_days: 14
-ingresses:
-  - "https://dp-mottak.intern.nav.no/"
