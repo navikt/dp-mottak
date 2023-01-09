@@ -19,6 +19,14 @@ internal class SøknadsDataVaktmester(
     private val ds: DataSource = PostgresDataSourceBuilder.dataSource
 ) {
 
+    companion object {
+        fun SøknadsDataVaktmester.fixManglendeSøknadsData() {
+            listOf(598735164).forEach { jp ->
+                this.fixSoknadsData(jp)
+            }
+        }
+    }
+
     fun fixSoknadsData(jp: Int) {
         using(sessionOf(ds)) { session ->
             try {

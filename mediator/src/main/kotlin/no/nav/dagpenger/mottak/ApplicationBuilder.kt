@@ -25,6 +25,8 @@ import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
 import no.nav.dagpenger.mottak.observers.InnsendingProbe
 import no.nav.dagpenger.mottak.observers.MetrikkObserver
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
+import no.nav.dagpenger.mottak.tjenester.SøknadsDataVaktmester
+import no.nav.dagpenger.mottak.tjenester.SøknadsDataVaktmester.Companion.fixManglendeSøknadsData
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 
@@ -38,8 +40,10 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val arenaApiClient = ArenaApiClient(Config.properties)
     private val journalpostApiClient = JournalpostApiClient(Config.properties)
     private val gosysProxyClient = GosysProxyClient(Config.properties)
-    private val minsteinntektVurderingRepository = MinsteinntektVurderingPostgresRepository(PostgresDataSourceBuilder.dataSource)
+    private val minsteinntektVurderingRepository =
+        MinsteinntektVurderingPostgresRepository(PostgresDataSourceBuilder.dataSource)
     private val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(Config.kafkaProducerProperties)
+    private val søknadsDataVaktmester = SøknadsDataVaktmester(safClient)
 
     private val rapidsConnection = RapidApplication.Builder(
         RapidApplication.RapidApplicationConfig.fromEnv(env)
@@ -92,6 +96,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
 
     override fun onStartup(rapidsConnection: RapidsConnection) {
         PostgresDataSourceBuilder.runMigration()
+        søknadsDataVaktmester.fixManglendeSøknadsData()
         logg.info { "Starter dp-mottak" }
     }
 }
