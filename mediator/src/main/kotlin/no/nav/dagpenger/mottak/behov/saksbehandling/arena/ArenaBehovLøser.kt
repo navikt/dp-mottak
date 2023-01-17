@@ -99,6 +99,11 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
             val journalpostId = packet["journalpostId"].asText()
             val behovId = packet["@behovId"].asText()
 
+            if (listOf("598112907").contains(journalpostId)) {
+                logger.warn { "SKipper $journalpostId" }
+                return
+            }
+
             withMDC(
                 mapOf(
                     "behovId" to behovId,
@@ -114,10 +119,12 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                                 journalpostId,
                                 packet.arenaOppgaveParametre()
                             )
+
                             "OpprettStartVedtakOppgave" -> arenaOppslag.opprettStartVedtakOppgave(
                                 journalpostId,
                                 packet.arenaOppgaveParametre()
                             )
+
                             else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
                         }
 
