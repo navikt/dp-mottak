@@ -22,7 +22,6 @@ internal class SøknadFaktaQuizLøser(
 
     private val løserBehov = listOf(
         "ØnskerDagpengerFraDato",
-        "Søknadstidspunkt",
         "Verneplikt",
         "FangstOgFiske",
         "Lærling",
@@ -63,7 +62,6 @@ internal class SøknadFaktaQuizLøser(
                     when (behov) {
                         "ØnskerDagpengerFraDato" ->
                             søknad.ønskerDagpengerFraDato()
-                        "Søknadstidspunkt" -> søknad.søknadstidspunkt()
                         "Verneplikt" -> søknad.avtjentVerneplikt()
                         "FangstOgFiske" -> søknad.fangstOgFisk()
                         "EØSArbeid" -> søknad.eøsArbeidsforhold()
