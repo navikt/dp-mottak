@@ -38,7 +38,6 @@ internal class SøknadFaktaQuizLøserTest {
     @CsvSource(
         value = [
             "ØnskerDagpengerFraDato:2023-01-09",
-            "Søknadstidspunkt:2023-01-04",
             "Verneplikt:false",
             "FangstOgFiske:false",
             "EØSArbeid:false",

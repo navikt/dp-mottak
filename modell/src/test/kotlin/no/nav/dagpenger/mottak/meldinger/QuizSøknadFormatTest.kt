@@ -120,12 +120,4 @@ internal class QuizSøknadFormatTest {
             QuizSøknadFormat(utenSeksjoner(uuid)).søknadsId()
         )
     }
-
-    @Test
-    fun søknadsTidspunkt() {
-        assertEquals(
-            LocalDate.of(2022, 6, 1),
-            QuizSøknadFormat(utenSeksjoner()).søknadstidspunkt()
-        )
-    }
 }

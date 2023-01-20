@@ -15,7 +15,6 @@ interface SøknadOppslag {
 interface QuizOppslag : SøknadOppslag {
     fun fangstOgFisk(): Boolean
     fun ønskerDagpengerFraDato(): LocalDate
-    fun søknadstidspunkt(): LocalDate
     fun søknadsId(): String?
     fun reellArbeidsSøker(): ReellArbeidsSøker
 }
