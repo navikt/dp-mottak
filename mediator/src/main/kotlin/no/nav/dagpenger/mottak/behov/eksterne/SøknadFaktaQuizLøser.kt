@@ -56,7 +56,7 @@ internal class SøknadFaktaQuizLøser(
             try {
                 val innsendtSøknadsId = packet.getInnsendtSøknadsId()
                 val søknad = søknadQuizOppslag.hentSøknad(innsendtSøknadsId)
-                val løsning = packet["@behov"].map { it.asText() }.filter { it in løserBehov }.associateWith { behov ->
+                val løsning: Map<String, Any> = packet["@behov"].map { it.asText() }.filter { it in løserBehov }.associateWith { behov ->
                     val avsluttedeArbeidsforhold = søknad.avsluttetArbeidsforhold()
                     val reellArbeidsSøker = søknad.reellArbeidsSøker()
                     when (behov) {
@@ -76,7 +76,7 @@ internal class SøknadFaktaQuizLøser(
                 }
                 packet["@løsning"] = løsning
                 context.publish(packet.toJson())
-                logger.info("løste søknadfakta-behov for innsendt søknad med id $innsendtSøknadsId")
+                logger.info("løste ${løsning.keys} behov for innsendt søknad med id $innsendtSøknadsId")
             } catch (e: DateTimeParseException) {
                 logger.info(e) { "feil ved parsing av dato i søknadfakta-behov. Hopper over behovet" }
                 sikkerlogg.info(e) { "feil ved parsing av dato i søknadfakta-behov. Hopper over behovet \n packet: ${packet.toJson()}" }
