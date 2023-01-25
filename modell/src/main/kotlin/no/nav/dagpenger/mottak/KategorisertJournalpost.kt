@@ -147,7 +147,7 @@ data class NySøknad(
             )
 
             kanAvslåsPåMinsteinntekt -> OppgaveBenk(
-                finnEnhetForHurtigAvslag(person),
+                "4450",
                 "Minsteinntekt - mulig avslag\n",
                 datoRegistrert,
                 tilleggsinformasjon()
@@ -160,11 +160,6 @@ data class NySøknad(
                 tilleggsinformasjon()
             )
         }
-    }
-
-    private fun finnEnhetForHurtigAvslag(person: Person?) = when (behandlendeEnhet(person)) {
-        "4450" -> "4451"
-        else -> behandlendeEnhet(person)
     }
 }
 

@@ -120,7 +120,7 @@ class OppgavebenkTest {
         withSøknad {
             val oppgaveBenk = jp.oppgaveBenk(person = person, rutingOppslag = it, oppfyllerMinsteArbeidsinntekt = false)
             assertEquals("Minsteinntekt - mulig avslag\n", oppgaveBenk.beskrivelse)
-            assertEquals("4451", oppgaveBenk.id)
+            assertEquals("4450", oppgaveBenk.id)
         }
     }
 
@@ -130,7 +130,7 @@ class OppgavebenkTest {
             val oppgaveBenk = lagjournalpostData("NAV 04-01.04").kategorisertJournalpost()
                 .oppgaveBenk(person = person, rutingOppslag = it, oppfyllerMinsteArbeidsinntekt = false)
             assertEquals("Minsteinntekt - mulig avslag\n", oppgaveBenk.beskrivelse)
-            assertEquals("4451", oppgaveBenk.id)
+            assertEquals("4450", oppgaveBenk.id)
         }
     }
 
