@@ -36,6 +36,9 @@ spec:
       enabled: true
   accessPolicy:
     outbound:
+      rules:
+       - application: nom
+         namespace: skjermede-personer-pip
       external:
         - host: {{ DP_PROXY_HOST }}
     inbound:
