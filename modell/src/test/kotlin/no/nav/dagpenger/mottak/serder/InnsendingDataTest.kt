@@ -51,7 +51,8 @@ internal class InnsendingDataTest {
                 fødselsnummer = fnr,
                 aktørId = "345678",
                 norskTilknytning = true,
-                diskresjonskode = false
+                diskresjonskode = false,
+                egenAnsatt = false
             ),
             arenaSakData = ArenaSakData(
                 oppgaveId = "123487",

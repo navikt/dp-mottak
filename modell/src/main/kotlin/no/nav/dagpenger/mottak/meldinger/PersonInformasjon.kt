@@ -12,7 +12,8 @@ class PersonInformasjon(
     private val ident: String,
     private val norskTilknytning: Boolean,
     private val navn: String,
-    private val diskresjonskode: String? = null
+    private val diskresjonskode: String? = null,
+    private val egenAnsatt: Boolean = false
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
 
@@ -21,7 +22,9 @@ class PersonInformasjon(
         aktørId = aktørId,
         ident = ident,
         norskTilknytning = norskTilknytning,
-        diskresjonskode = harDiskresjonkode(diskresjonskode)
+        diskresjonskode = harDiskresjonkode(diskresjonskode),
+        egenAnsatt = egenAnsatt
+
     )
 
     fun validate() = kotlin.runCatching { person() }.isSuccess
@@ -38,6 +41,7 @@ class PersonInformasjon(
         val ident: String,
         val norskTilknytning: Boolean,
         val diskresjonskode: Boolean,
+        val egenAnsatt: Boolean
     ) {
 
         init {
@@ -51,7 +55,7 @@ class PersonInformasjon(
         fun erDnummer() = ident.substring(0, 1).toInt() in 4..7
 
         fun accept(visitor: PersonVisitor) {
-            visitor.visitPerson(navn, aktørId, ident, norskTilknytning, diskresjonskode)
+            visitor.visitPerson(navn, aktørId, ident, norskTilknytning, diskresjonskode, egenAnsatt)
         }
 
         private fun erSyntetiskTestIdent(): Boolean =

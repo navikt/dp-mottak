@@ -64,7 +64,8 @@ internal class PersonInformasjonTest {
             ident = GENERERT_DNUMMER,
             norskTilknytning = true,
             navn = "Test Testen",
-            diskresjonskode = false
+            diskresjonskode = false,
+            egenAnsatt = false
         )
 
         assertTrue(person.erDnummer(), "Skal være dnummer")
@@ -79,7 +80,8 @@ internal class PersonInformasjonTest {
                 ident = "13907198019",
                 norskTilknytning = true,
                 navn = "Test Testen",
-                diskresjonskode = false
+                diskresjonskode = false,
+                egenAnsatt = false
             )
         }
     }
