@@ -14,6 +14,7 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
 
 private val logg = KotlinLogging.logger {}
+
 internal class PersondataMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection
@@ -25,7 +26,7 @@ internal class PersondataMottak(
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-            validate { it.requireKey(løsning) }
+            validate { it.require(key = løsning, parser = {}) }
             validate { it.requireKey("journalpostId") }
         }.register(this)
     }
