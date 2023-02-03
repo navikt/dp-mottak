@@ -9,6 +9,7 @@ import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
+import no.nav.helse.rapids_rivers.MessageProblems
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
@@ -31,6 +32,10 @@ internal class PersondataMottak(
         }.register(this)
     }
 
+    override fun onError(problems: MessageProblems, context: MessageContext) {
+        logg.error { "$problems" }
+    }
+
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
         val journalpostId = packet["journalpostId"].asText()
         logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
@@ -45,7 +50,8 @@ internal class PersondataMottak(
                 ident = persondata["fødselsnummer"].asText(),
                 diskresjonskode = persondata["diskresjonskode"].textValue(),
                 navn = persondata["navn"].asText(),
-                norskTilknytning = persondata["norskTilknytning"].asBoolean()
+                norskTilknytning = persondata["norskTilknytning"].asBoolean(),
+                egenAnsatt = persondata.get("egenAnsatt")?.asBoolean() ?: false,
             ).also { innsendingMediator.håndter(it) }
         }
     }
