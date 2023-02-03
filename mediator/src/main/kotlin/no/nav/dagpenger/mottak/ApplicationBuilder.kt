@@ -12,6 +12,8 @@ import no.nav.dagpenger.mottak.behov.journalpost.SafClient
 import no.nav.dagpenger.mottak.behov.journalpost.SøknadsdataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.PdlPersondataOppslag
 import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
+import no.nav.dagpenger.mottak.behov.person.SkjermingOppslag
+import no.nav.dagpenger.mottak.behov.person.createPersonOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaApiClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysProxyClient
@@ -71,7 +73,10 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             JournalpostBehovLøser(safClient, this)
             OppdaterJournalpostBehovLøser(journalpostApiClient, this)
             FerdigstillJournalpostBehovLøser(journalpostApiClient, this)
-            PersondataBehovLøser(PdlPersondataOppslag(Config.properties), this)
+            PersondataBehovLøser(
+                createPersonOppslag(PdlPersondataOppslag(Config.properties), SkjermingOppslag(Config.properties)),
+                this
+            )
             SøknadsdataBehovLøser(safClient, this)
             MinsteinntektVurderingLøser(
                 regelApiClient = regelApiClient,
