@@ -36,6 +36,8 @@ internal object Config {
             "KAFKA_RESET_POLICY" to "latest",
             "PDL_API_SCOPE" to "api://dev-fss.pdl.pdl-api/.default",
             "PDL_API_URL" to "https://pdl-api.dev-fss-pub.nais.io",
+            "SKJERMING_API_SCOPE" to "api://dev-gcp.nom.skjermede-personer-pip/.default",
+            "SKJERMING_API_URL" to "http://skjermede-personer-pip.nom/skjermet",
             "UNLEASH_URL" to "https://unleash.nais.io/api/",
             "AZURE_OPENID_CONFIG_ISSUER" to "azureAd",
             "AZURE_APP_CLIENT_ID" to "azureClientId",
@@ -49,6 +51,7 @@ internal object Config {
             "DP_PROXY_URL" to "https://dp-proxy.prod-fss-pub.nais.io",
             "PDL_API_SCOPE" to "api://prod-fss.pdl.pdl-api/.default",
             "PDL_API_URL" to "https://pdl-api.prod-fss-pub.nais.io",
+            "SKJERMING_API_SCOPE" to "api://prod-gcp.nom.skjermede-personer-pip/.default",
         )
     )
 
@@ -75,6 +78,9 @@ internal object Config {
     val Configuration.pdlApiTokenProvider: () -> String by lazy {
         { cachedTokenProvider.clientCredentials(properties[Key("PDL_API_SCOPE", stringType)]).accessToken }
     }
+    val Configuration.skjermingApiTokenProvider: () -> String by lazy {
+        { cachedTokenProvider.clientCredentials(properties[Key("SKJERMING_API_SCOPE", stringType)]).accessToken }
+    }
 
     val kafkaProducerProperties: Properties by lazy {
         Properties().apply {
@@ -89,6 +95,7 @@ internal object Config {
             put(SslConfigs.SSL_KEYSTORE_PASSWORD_CONFIG, properties[Key("KAFKA_CREDSTORE_PASSWORD", stringType)])
         }
     }
+
     object AzureAd {
         const val name = "azureAd"
         val audience = properties[Key("AZURE_APP_CLIENT_ID", stringType)]
@@ -96,6 +103,7 @@ internal object Config {
         val jwksURI = properties[Key("AZURE_OPENID_CONFIG_JWKS_URI", stringType)]
     }
 
+    fun Configuration.skjermingApiUrl() = this[Key("SKJERMING_API_URL", stringType)]
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_URL", stringType)]
     fun Configuration.pdlApiUrl() = this[Key("PDL_API_URL", stringType)]
     fun unleash() = DefaultUnleash(unleashConfig(), ByClusterStrategy(ByClusterStrategy.Cluster.current))

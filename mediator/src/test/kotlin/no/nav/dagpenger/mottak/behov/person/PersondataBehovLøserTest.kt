@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.behov.person
 
+import no.nav.dagpenger.mottak.behov.person.PersonOppslag.Person
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -25,12 +26,13 @@ internal class PersondataBehovLøserTest {
         PersondataBehovLøser(
             rapidsConnection = testRapid,
             personOppslag = object : PersonOppslag {
-                override suspend fun hentPerson(id: String): Pdl.Person = Pdl.Person(
+                override suspend fun hentPerson(id: String): Person = Person(
                     navn = "Hubba bubba",
                     aktørId = "12345678",
                     fødselsnummer = "1234567891",
                     norskTilknytning = true,
-                    diskresjonskode = "diskresjonskode"
+                    diskresjonskode = "diskresjonskode",
+                    egenAnsatt = false
                 )
             }
         )
@@ -41,6 +43,7 @@ internal class PersondataBehovLøserTest {
             assertEquals("1234567891", field(0, "@løsning")["Persondata"]["fødselsnummer"].asText())
             assertEquals("true", field(0, "@løsning")["Persondata"]["norskTilknytning"].asText())
             assertEquals("diskresjonskode", field(0, "@løsning")["Persondata"]["diskresjonskode"].asText())
+            assertEquals(false, field(0, "@løsning")["Persondata"]["egenAnsatt"].asBoolean())
         }
     }
 
@@ -49,7 +52,7 @@ internal class PersondataBehovLøserTest {
         PersondataBehovLøser(
             rapidsConnection = testRapid,
             personOppslag = object : PersonOppslag {
-                override suspend fun hentPerson(id: String): Pdl.Person? = null
+                override suspend fun hentPerson(id: String): Person? = null
             }
         )
         testRapid.sendTestMessage(persondataBehov())

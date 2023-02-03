@@ -25,7 +25,7 @@ import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.Pdl")
 
-internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
+internal class PdlPersondataOppslag(config: Configuration) {
     private val tokenProvider = config.pdlApiTokenProvider
     private val pdlClient = HttpClient() {
         expectSuccess = true
@@ -37,7 +37,7 @@ internal class PdlPersondataOppslag(config: Configuration) : PersonOppslag {
         }
     }
 
-    override suspend fun hentPerson(id: String): Pdl.Person? = pdlClient.request {
+    suspend fun hentPerson(id: String): Pdl.Person? = pdlClient.request {
         header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
         method = HttpMethod.Post
         setBody(PersonQuery(id).toJson().also { sikkerlogg.info { "Forsøker å hente person med id $id fra PDL" } })
