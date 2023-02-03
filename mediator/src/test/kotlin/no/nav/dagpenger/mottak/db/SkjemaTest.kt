@@ -9,7 +9,7 @@ internal class SkjemaTest {
     @Test
     fun `riktig anntall migreringer`() {
         withCleanDb {
-            assertEquals(13, PostgresDataSourceBuilder.runMigration())
+            assertEquals(14, PostgresDataSourceBuilder.runMigration())
         }
     }
 }
