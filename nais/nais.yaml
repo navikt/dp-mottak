@@ -37,8 +37,8 @@ spec:
   accessPolicy:
     outbound:
       rules:
-       - application: nom
-         namespace: skjermede-personer-pip
+       - application: skjermede-personer-pip
+         namespace: nom
       external:
         - host: {{ DP_PROXY_HOST }}
     inbound:
