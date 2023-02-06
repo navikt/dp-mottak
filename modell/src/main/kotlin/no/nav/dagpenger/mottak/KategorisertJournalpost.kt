@@ -33,6 +33,7 @@ sealed class KategorisertJournalpost(
         rutingOppslag: RutingOppslag? = null,
         oppfyllerMinsteArbeidsinntekt: Boolean? = null
     ): OppgaveBenk {
+
         val oppgaveBenk = finnOppgaveBenk(rutingOppslag, oppfyllerMinsteArbeidsinntekt, person)
 
         return when (person?.diskresjonskode) {
@@ -41,7 +42,16 @@ sealed class KategorisertJournalpost(
                 beskrivelse = henvendelseNavn()
             )
 
-            else -> oppgaveBenk
+            else -> {
+                when (person?.egenAnsatt) {
+                    true -> oppgaveBenk.copy(
+                        id = "4483",
+                        beskrivelse = henvendelseNavn()
+                    )
+
+                    else -> oppgaveBenk
+                }
+            }
         }
     }
 
