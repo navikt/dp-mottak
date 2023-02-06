@@ -54,10 +54,12 @@ data class InnsendingData(
                         it.aktørId,
                         it.fødselsnummer,
                         it.norskTilknytning,
-                        it.diskresjonskode
+                        it.diskresjonskode,
+                        it.egenAnsatt
                     )
                 },
-                arenaSakData?.takeIf { it.fagsakId != null }?.let { ArenaOppgaveOpprettet.ArenaSak(it.oppgaveId, it.fagsakId) },
+                arenaSakData?.takeIf { it.fagsakId != null }
+                    ?.let { ArenaOppgaveOpprettet.ArenaSak(it.oppgaveId, it.fagsakId) },
                 aktivitetslogg.let(::konverterTilAktivitetslogg)
             )
     }
@@ -137,7 +139,8 @@ data class InnsendingData(
         val aktørId: String,
         val fødselsnummer: String,
         val norskTilknytning: Boolean,
-        val diskresjonskode: Boolean
+        val diskresjonskode: Boolean,
+        val egenAnsatt: Boolean
     )
 
     data class JournalpostData(
@@ -148,9 +151,6 @@ data class InnsendingData(
         val registertDato: LocalDateTime,
         val dokumenter: List<DokumentInfoData>
     ) {
-        fun createJournalPost() {
-            return
-        }
 
         enum class BrukerTypeData {
             ORGNR, AKTOERID, FNR;

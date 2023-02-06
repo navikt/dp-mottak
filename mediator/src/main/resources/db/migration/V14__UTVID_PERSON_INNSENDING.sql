@@ -1,0 +1,2 @@
+ALTER TABLE person_innsending_v1
+    ADD COLUMN egenansatt BOOLEAN NOT NULL DEFAULT FALSE;

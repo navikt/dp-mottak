@@ -45,7 +45,8 @@ internal class PersondataMottak(
                 ident = persondata["fødselsnummer"].asText(),
                 diskresjonskode = persondata["diskresjonskode"].textValue(),
                 navn = persondata["navn"].asText(),
-                norskTilknytning = persondata["norskTilknytning"].asBoolean()
+                norskTilknytning = persondata["norskTilknytning"].asBoolean(),
+                egenAnsatt = persondata.get("egenAnsatt")?.asBoolean() ?: false,
             ).also { innsendingMediator.håndter(it) }
         }
     }

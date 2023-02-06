@@ -46,6 +46,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             person_innsending.navn                    as "navn",
             person_innsending.diskresjonskode         as "diskresjonsKode",
             person_innsending.norsktilknytning        as "norsktilknytning",
+            person_innsending.egenansatt              as "egenansatt",
             person.ident                              as "ident",
             person.aktørid                            as "aktørid",
             aktivitetslogg.data                       as "aktivitetslogg"
@@ -95,7 +96,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                             aktørId = row.string("aktørId"),
                             fødselsnummer = row.string("ident"),
                             norskTilknytning = row.boolean("norsktilknytning"),
-                            diskresjonskode = row.boolean("diskresjonskode")
+                            diskresjonskode = row.boolean("diskresjonskode"),
+                            egenAnsatt = row.boolean("egenansatt")
+
                         )
                     },
                     arenaSakData = row.stringOrNull("fagsakId")?.let {
@@ -333,7 +336,8 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             aktørId: String,
             ident: String,
             norskTilknytning: Boolean,
-            diskresjonskode: Boolean
+            diskresjonskode: Boolean,
+            egenAnsatt: Boolean
         ) {
 
             lagreQueries.add(
@@ -354,8 +358,8 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
                     """
-                        INSERT INTO person_innsending_v1(id,navn,personId,norsktilknytning,diskresjonskode) 
-                        SELECT :id, :navn, id, :norskTilknytning, :diskresjonskode
+                        INSERT INTO person_innsending_v1(id,navn,personId,norsktilknytning,diskresjonskode,egenansatt) 
+                        SELECT :id, :navn, id, :norskTilknytning, :diskresjonskode,:egenansatt
                         FROM public.person_v1 WHERE ident = :ident 
                         AND aktørid = :aktoerId ON CONFLICT DO NOTHING 
                         """.trimMargin(),
@@ -365,7 +369,8 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         "navn" to navn,
                         "aktoerId" to aktørId,
                         "norskTilknytning" to norskTilknytning,
-                        "diskresjonskode" to diskresjonskode
+                        "diskresjonskode" to diskresjonskode,
+                        "egenansatt" to egenAnsatt
                     )
                 )
             )

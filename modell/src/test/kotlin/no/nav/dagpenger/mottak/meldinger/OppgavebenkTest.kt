@@ -17,7 +17,8 @@ class OppgavebenkTest {
         "12344",
         GENERERT_FØDSELSNUMMER,
         norskTilknytning = true,
-        diskresjonskode = false
+        diskresjonskode = false,
+        egenAnsatt = false
     )
 
     @Test
