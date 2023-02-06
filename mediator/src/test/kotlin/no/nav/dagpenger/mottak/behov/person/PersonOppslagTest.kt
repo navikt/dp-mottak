@@ -4,6 +4,7 @@ import io.mockk.coEvery
 import io.mockk.mockkClass
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 
 class PersonOppslagTest {
@@ -41,12 +42,12 @@ class PersonOppslagTest {
     }
 
     @Test
-    fun `Håndterer at kall mot skjermings oppslag feiler`() {
-        createPersonOppslag(pdl = pdlMock, skjerming = skjermingMock).let { personOppslag ->
-            runBlocking {
-                personOppslag.hentPerson(id2).let { person ->
-                    requireNotNull(person)
-                    assertEquals(null, person.egenAnsatt)
+    fun `Feiler dersom skjermingsoppslag feiler`() {
+
+        assertThrows<Throwable> {
+            createPersonOppslag(pdl = pdlMock, skjerming = skjermingMock).let { personOppslag ->
+                runBlocking {
+                    personOppslag.hentPerson(id2)
                 }
             }
         }

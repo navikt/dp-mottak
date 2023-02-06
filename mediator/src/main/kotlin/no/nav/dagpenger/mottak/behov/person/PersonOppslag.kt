@@ -25,10 +25,11 @@ internal fun createPersonOppslag(pdl: PdlPersondataOppslag, skjerming: Skjerming
         override suspend fun hentPerson(id: String): PersonOppslag.Person? {
             return withContext(Dispatchers.IO) {
                 val pdlPerson = async { pdl.hentPerson(id) }
-                val egenAnsatt = async { skjerming.egenAnsatt(id) }.await().onFailure {
-                    logg.error(it) { "Feil ved oppslag mot skjerming" }
-                    sikkerlogg.error { "Feil ved oppslag mot skjerming for fødsenummer: $id" }
-                }.getOrNull()
+                val egenAnsatt = async { skjerming.egenAnsatt(id) }.await()
+                    .onFailure {
+                        logg.error(it) { "Feil ved oppslag mot skjerming(uthenting av egen ansatt info)" }
+                        sikkerlogg.error { "Feil ved oppslag mot skjerming for fødsenummer: $id" }
+                    }.getOrThrow()
 
                 pdlPerson.await()?.let {
                     PersonOppslag.Person(
