@@ -99,7 +99,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
             val journalpostId = packet["journalpostId"].asText()
             val behovId = packet["@behovId"].asText()
 
-            if (listOf("598119732").contains(journalpostId)) {
+            if (listOf("598112907").contains(journalpostId)) {
                 logger.warn { "SKipper $journalpostId" }
                 return
             }

@@ -14,13 +14,12 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
     River.PacketListener {
     private companion object {
         val logger = KotlinLogging.logger { }
-        private val BEHOV = "OpprettGosysoppgave"
     }
 
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
-            validate { it.demandAllOrAny("@behov", listOf(BEHOV)) }
+            validate { it.demandAllOrAny("@behov", listOf("OpprettGosysoppgave")) }
             validate { it.rejectKey("@løsning") }
             validate { it.requireKey("@behovId", "journalpostId", "behandlendeEnhetId", "registrertDato") }
             validate { it.interestedIn("aktørId", "tilleggsinformasjon", "oppgavebeskrivelse") }
@@ -50,10 +49,9 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
                         )
                     )
                     context.publish(packet.toJson())
-                    logger.info { "Løste behov $BEHOV med løsning $it" }
                 }
             } catch (e: Exception) {
-                logger.error { "Kunne ikke opprette gosys oppgave for journalpost med id $journalpostId" }
+                logger.info { "Kunne ikke opprette gosys oppgave for journalpost med id $journalpostId" }
                 throw e
             }
         }
