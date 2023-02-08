@@ -45,6 +45,41 @@ class OppgavebenkTest {
             assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
         }
     }
+    @Test
+    fun `Egne ansatte skal rutes til 4483 dersom original benk er 4450`() {
+        withSøknad(
+            harAvtjentVerneplikt = true,
+            harAvsluttetArbeidsforholdFraKonkurs = true
+        ) {
+            val oppgaveBenk = jp.oppgaveBenk(person = person.copy(egenAnsatt = true), rutingOppslag = it)
+            assertEquals("4483", oppgaveBenk.id)
+            assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
+        }
+    }
+
+    @Test
+    fun `Egne ansatte skal rutes til original benk dersom original benk ikke er 4450`() {
+        withSøknad(
+            harEøsArbeidsforhold = true,
+        ) {
+            val oppgaveBenk = jp.oppgaveBenk(person = person.copy(egenAnsatt = true), rutingOppslag = it)
+            assertEquals("4470", oppgaveBenk.id)
+            assertEquals("MULIG SAMMENLEGGING - EØS\n", oppgaveBenk.beskrivelse)
+        }
+    }
+
+    @Test
+    fun `Diskresjonskode skal prioriteres fremfor egen ansatt`() {
+        withSøknad(
+            harAvtjentVerneplikt = true,
+            harAvsluttetArbeidsforholdFraKonkurs = true
+        ) {
+            val oppgaveBenk =
+                jp.oppgaveBenk(person = person.copy(diskresjonskode = true, egenAnsatt = true), rutingOppslag = it)
+            assertEquals("2103", oppgaveBenk.id)
+            assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
+        }
+    }
 
     @Test
     fun `Finn riktig oppgave beskrivelse og benk når søker har avtjent verneplikt `() {

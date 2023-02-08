@@ -41,7 +41,12 @@ sealed class KategorisertJournalpost(
                 beskrivelse = henvendelseNavn()
             )
 
-            else -> oppgaveBenk
+            else -> {
+                when (person?.egenAnsatt == true && oppgaveBenk.id == "4450") {
+                    true -> oppgaveBenk.copy(id = "4483", beskrivelse = henvendelseNavn())
+                    else -> oppgaveBenk
+                }
+            }
         }
     }
 
