@@ -14,8 +14,6 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
 
 private val logg = KotlinLogging.logger {}
-private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadsdataMottak")
-
 internal class SøknadsdataMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection
@@ -37,7 +35,6 @@ internal class SøknadsdataMottak(
         withLoggingContext("journalpostId" to journalpostId) {
             logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
             val søknadsdata: Søknadsdata = packet["@løsning.${Behovtype.Søknadsdata.name}"].let { data ->
-                sikkerlogg.info { packet }
                 Søknadsdata(
                     aktivitetslogg = Aktivitetslogg(),
                     journalpostId = journalpostId,
