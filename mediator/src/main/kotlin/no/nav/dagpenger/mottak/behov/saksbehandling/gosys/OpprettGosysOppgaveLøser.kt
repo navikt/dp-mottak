@@ -37,6 +37,11 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
             )
         ) {
             try {
+                if (listOf("598125943").contains(journalpostId) && System.getenv()["NAIS_CLUSTER_NAME"] == "dev-gcp") {
+                    logger.warn { "Skipper journalpost" }
+                    return@withMDC
+                }
+
                 runBlocking(MDCContext()) {
                     gosysOppslag.opprettOppgave(
                         packet.gosysOppgave()
