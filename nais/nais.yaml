@@ -34,17 +34,20 @@ spec:
   azure:
     application:
       enabled: true
+      claims:
+        groups:
+          - id: "4edb2ce5-4f0e-4f6f-9b82-b8e75e9dd09e"
   accessPolicy:
     outbound:
       rules:
        - application: skjermede-personer-pip
          namespace: nom
       external:
-        - host: {{ DP_PROXY_HOST }}
+        - host: {{DP_PROXY_HOST}}
     inbound:
       rules:
         - application: dp-quiz-retting
-  {{#if ingresses }}
+  {{#if ingresses}}
   ingresses:
   {{#each ingresses as |url|}}
      - {{url}}
@@ -54,10 +57,10 @@ spec:
     sqlInstances:
       - name: dp-mottak
         type: POSTGRES_12
-        tier:  {{ db_tier }}
+        tier:  {{db_tier}}
         diskType: SSD
         highAvailability: false
-        diskSize: {{ db_size }}
+        diskSize: {{db_size}}
         diskAutoresize: true
         autoBackupTime: "03:00"
         databases:
@@ -67,4 +70,4 @@ spec:
               - name: bqconn_dataanalyse
         cascadingDelete: false
         pointInTimeRecovery: true
-        retainedBackups: {{ point_in_time_recovery_days }}
+        retainedBackups: {{point_in_time_recovery_days}}
