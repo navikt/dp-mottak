@@ -49,6 +49,7 @@ spec:
          namespace: nom
       external:
         - host: {{DP_PROXY_HOST}}
+        - host: {{PDL_API_HOST}}
     inbound:
       rules:
         - application: dp-quiz-retting
