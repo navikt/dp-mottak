@@ -37,6 +37,11 @@ spec:
       claims:
         groups:
           - id: "4edb2ce5-4f0e-4f6f-9b82-b8e75e9dd09e"
+  env:
+    - name: DP_PROXY_HOST
+      value: {{DP_PROXY_HOST}}
+    - name: PDL_API_HOST
+      value: {{PDL_API_HOST}}
   accessPolicy:
     outbound:
       rules:
