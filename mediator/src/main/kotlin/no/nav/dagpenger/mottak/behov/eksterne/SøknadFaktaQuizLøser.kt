@@ -49,7 +49,7 @@ internal class SøknadFaktaQuizLøser(
 
         withMDC(
             mapOf(
-                "søknad_uuid" to packet["søknad_uuid"].asText(),
+                "søknadId" to packet["søknad_uuid"].asText(),
                 "behovId" to packet["@behovId"].asText()
             )
         ) {

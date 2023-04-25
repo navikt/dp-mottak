@@ -147,7 +147,7 @@ class Journalpost constructor(
             in setOf("NAV 04-16.03", "NAV 04-16.04") -> Gjenopptak(this)
             in setOf("NAV 04-06.05") -> Utdanning(this)
             in setOf("NAV 04-06.08") -> Etablering(this)
-            in setOf("NAV 90-00.08") -> klageOgAnkeType(this)
+            in setOf("NAV 90-00.08", "NAV 90-00.08 K", "NAV 90-00.08 A") -> klageOgAnkeType(this)
             in setOf("NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04") -> Ettersending(this)
             in setOf("GENERELL_INNSENDING") -> Generell(this)
             else -> UkjentSkjemaKode(this)
