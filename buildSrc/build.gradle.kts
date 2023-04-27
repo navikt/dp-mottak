@@ -12,6 +12,7 @@ dependencies {
     implementation("com.diffplug.spotless:spotless-plugin-gradle:5.11.0")
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+kotlin {
+    jvmToolchain(17)
 }
+
