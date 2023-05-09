@@ -10,7 +10,7 @@ interface InnsendingObserver {
         val gjeldendeTilstand: InnsendingTilstandType,
         val forrigeTilstand: InnsendingTilstandType,
         val aktivitetslogg: Aktivitetslogg,
-        val timeout: Duration
+        val timeout: Duration,
     )
 
     enum class Type {
@@ -19,13 +19,13 @@ interface InnsendingObserver {
         Utdanning,
         Etablering,
         KlageOgAnke,
-        KlageOgAnkeLønnskompensasjon,
+        Klage,
+        Anke,
         Ettersending,
         UkjentSkjemaKode,
         UtenBruker,
         KlageOgAnkeForskudd,
-        KlageOgAnkeFeriepenger,
-        Generell
+        Generell,
     }
 
     data class InnsendingEvent(

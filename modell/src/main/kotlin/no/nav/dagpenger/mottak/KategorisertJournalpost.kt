@@ -203,11 +203,21 @@ data class KlageOgAnke(
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage og anke\n"
 }
-
-data class KlageOgAnkeForskudd(
+data class Klage(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String = "Klage og anke - Forskudd\n"
+    override fun henvendelseNavn(): String = "Klage\n"
+}
+data class Anke(
+    override val journalpost: Journalpost,
+) : KategorisertJournalpost(journalpost) {
+    override fun henvendelseNavn(): String = "Anke\n"
+}
+
+data class klageForskudd(
+    override val journalpost: Journalpost,
+) : KategorisertJournalpost(journalpost) {
+    override fun henvendelseNavn(): String = "Klage - Forskudd\n"
     override fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
