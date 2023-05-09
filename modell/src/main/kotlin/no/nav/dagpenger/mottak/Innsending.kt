@@ -276,11 +276,9 @@ class Innsending private constructor(
                 is Utdanning -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is Etablering -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is KlageOgAnke -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
-                is KlageOgAnkeLønnskompensasjon -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
                 is KlageOgAnkeForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
-                is KlageOgAnkeFeriepenger -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
             }
         }
     }
@@ -691,13 +689,11 @@ class Innsending private constructor(
         is Ettersending -> InnsendingObserver.Type.Ettersending
         is Gjenopptak -> InnsendingObserver.Type.Gjenopptak
         is KlageOgAnke -> InnsendingObserver.Type.KlageOgAnke
-        is KlageOgAnkeLønnskompensasjon -> InnsendingObserver.Type.KlageOgAnkeLønnskompensasjon
         is NySøknad -> InnsendingObserver.Type.NySøknad
         is UkjentSkjemaKode -> InnsendingObserver.Type.UkjentSkjemaKode
         is Utdanning -> InnsendingObserver.Type.Utdanning
         is UtenBruker -> InnsendingObserver.Type.UtenBruker
         is KlageOgAnkeForskudd -> InnsendingObserver.Type.KlageOgAnkeForskudd
-        is KlageOgAnkeFeriepenger -> InnsendingObserver.Type.KlageOgAnkeFeriepenger
         is Generell -> InnsendingObserver.Type.Generell
     }
 

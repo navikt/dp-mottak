@@ -422,60 +422,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     }
 
     @Test
-    fun `skal håndtere klage og anke for lønnskompensasjon`() {
-        val brevkode = "NAV 90-00.08"
-        håndterJoarkHendelse()
-        håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0438")
-        håndterPersonInformasjon()
-        håndterGosysOppgaveOpprettet()
-        håndterJournalpostOppdatert()
-        assertBehovDetaljer(
-            OpprettGosysoppgave,
-            setOf(
-                "aktørId",
-                "fødselsnummer",
-                "behandlendeEnhetId",
-                "oppgavebeskrivelse",
-                "registrertDato",
-                "tilleggsinformasjon"
-            )
-        )
-        assertBehovDetaljer(
-            OpprettGosysoppgave,
-            setOf(
-                "aktørId",
-                "fødselsnummer",
-                "behandlendeEnhetId",
-                "oppgavebeskrivelse",
-                "registrertDato",
-                "tilleggsinformasjon"
-            )
-        )
-        assertTilstander(
-            MottattType,
-            AvventerJournalpostType,
-            AvventerPersondataType,
-            KategoriseringType,
-            AvventerGosysType,
-            InnsendingFerdigstiltType
-        )
-        inspektør.also { it ->
-            assertNoErrors(it)
-            assertMessages(it)
-            println(it.innsendingLogg.toString())
-        }
-
-        assertFerdigstilt {
-            assertEquals("KlageOgAnkeLønnskompensasjon", it.type.name)
-            assertNotNull(it.aktørId)
-            assertNotNull(it.fødselsnummer)
-            assertNotNull(it.datoRegistrert)
-        }
-
-        assertPuml("$brevkode-lønnskompensasjon")
-    }
-
-    @Test
     fun `skal håndtere klage og anke for forskudd`() {
         val brevkode = "NAV 90-00.08"
         håndterJoarkHendelse()
@@ -527,41 +473,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         }
 
         assertPuml("$brevkode-forskudd")
-    }
-
-    @Test
-    fun `skal håndtere klage og anke for feriepenger dagpenger`() {
-        val brevkode = "NAV 90-00.08"
-        håndterJoarkHendelse()
-        håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0452")
-        håndterPersonInformasjon()
-        håndterArenaOppgaveOpprettet()
-        håndterJournalpostOppdatert()
-        håndterJournalpostFerdigstilt()
-
-        assertTilstander(
-            MottattType,
-            AvventerJournalpostType,
-            AvventerPersondataType,
-            KategoriseringType,
-            AventerArenaOppgaveType,
-            AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType
-        )
-        inspektør.also { it ->
-            assertNoErrors(it)
-            assertMessages(it)
-            println(it.innsendingLogg.toString())
-        }
-
-        assertFerdigstilt {
-            assertEquals("KlageOgAnkeFeriepenger", it.type.name)
-            assertNotNull(it.aktørId)
-            assertNotNull(it.fødselsnummer)
-            assertNotNull(it.datoRegistrert)
-        }
-
-        assertPuml("$brevkode-feriepenger")
     }
 
     @ParameterizedTest

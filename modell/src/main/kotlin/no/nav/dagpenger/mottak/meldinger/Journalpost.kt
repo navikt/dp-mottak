@@ -9,9 +9,7 @@ import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.JournalpostVisitor
 import no.nav.dagpenger.mottak.KategorisertJournalpost
 import no.nav.dagpenger.mottak.KlageOgAnke
-import no.nav.dagpenger.mottak.KlageOgAnkeFeriepenger
 import no.nav.dagpenger.mottak.KlageOgAnkeForskudd
-import no.nav.dagpenger.mottak.KlageOgAnkeLønnskompensasjon
 import no.nav.dagpenger.mottak.NySøknad
 import no.nav.dagpenger.mottak.SpesifikkKontekst
 import no.nav.dagpenger.mottak.UkjentSkjemaKode
@@ -158,9 +156,7 @@ class Journalpost constructor(
         journalpost: Journalpost
     ): KategorisertJournalpost {
         return when (journalpost.behandlingstema) {
-            "ab0438" -> KlageOgAnkeLønnskompensasjon(journalpost)
             "ab0451" -> KlageOgAnkeForskudd(journalpost)
-            "ab0452" -> KlageOgAnkeFeriepenger(journalpost)
             else -> KlageOgAnke(journalpost)
         }
     }
