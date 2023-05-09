@@ -241,7 +241,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         }
 
         assertFerdigstilt {
-            val expected = setOf("Etablering", "KlageOgAnke", "Utdanning")
+            val expected = setOf("Etablering", "Klage", "Utdanning")
             assertTrue(it.type.name in expected, "Forventet at ${it.type.name} var en av $expected")
             assertNotNull(it.fagsakId)
             assertNotNull(it.aktørId)
