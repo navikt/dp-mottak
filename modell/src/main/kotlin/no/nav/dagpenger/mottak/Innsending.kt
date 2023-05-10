@@ -26,12 +26,12 @@ class Innsending private constructor(
     private var eksisterendeSaker: Boolean?,
     private var person: Person?,
     private var arenaSak: ArenaSak?,
-    internal val aktivitetslogg: Aktivitetslogg
+    internal val aktivitetslogg: Aktivitetslogg,
 ) : Aktivitetskontekst {
     private val observers = mutableSetOf<InnsendingObserver>()
 
     constructor(
-        journalpostId: String
+        journalpostId: String,
     ) : this(
         journalpostId = journalpostId,
         tilstand = Mottatt,
@@ -41,7 +41,7 @@ class Innsending private constructor(
         eksisterendeSaker = null,
         person = null,
         arenaSak = null,
-        aktivitetslogg = Aktivitetslogg()
+        aktivitetslogg = Aktivitetslogg(),
     )
 
     fun journalpostId(): String = journalpostId
@@ -184,7 +184,7 @@ class Innsending private constructor(
 
         fun håndter(
             innsending: Innsending,
-            journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
+            journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt,
         ) {
             journalpostferdigstilt.warn("Forventet ikke FerdigStilt i %s", type.name)
         }
@@ -196,8 +196,8 @@ class Innsending private constructor(
             return SpesifikkKontekst(
                 "Tilstand",
                 mapOf(
-                    "tilstand" to type.name
-                )
+                    "tilstand" to type.name,
+                ),
             )
         }
     }
@@ -231,6 +231,7 @@ class Innsending private constructor(
                         journalpost.warn("Journalpost uten registrert bruker")
                         innsending.tilstand(journalpost, Kategorisering)
                     }
+
                     else -> innsending.tilstand(journalpost, AvventerPersondata)
                 }
             }
@@ -272,15 +273,14 @@ class Innsending private constructor(
                 is Gjenopptak -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Ettersending -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Generell -> innsending.tilstand(hendelse, AvventerSøknadsdata)
-
                 is Utdanning -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is Etablering -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
+                is Klage -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
+                is Anke -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is KlageOgAnke -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
-                is KlageOgAnkeLønnskompensasjon -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
-                is KlageOgAnkeForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
-                is KlageOgAnkeFeriepenger -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
+                is klageForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
             }
         }
     }
@@ -302,7 +302,7 @@ class Innsending private constructor(
         override fun håndter(innsending: Innsending, søknadsdata: Søknadsdata) {
             val kategorisertJournalpost =
                 requireNotNull(
-                    innsending.journalpost
+                    innsending.journalpost,
                 ) { " Journalpost må være kategorisert på dette tidspunktet " }.kategorisertJournalpost()
             søknadsdata.info("Fikk Søknadsdata for ${kategorisertJournalpost.javaClass.simpleName}")
             innsending.rutingOppslag = søknadsdata.søknad()
@@ -445,7 +445,7 @@ class Innsending private constructor(
 
         override fun håndter(
             innsending: Innsending,
-            journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
+            journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt,
         ) {
             journalpostferdigstilt.info("Ferdigstilte journalpost ${innsending.journalpostId}")
             innsending.tilstand(journalpostferdigstilt, InnsendingFerdigStilt)
@@ -473,10 +473,11 @@ class Innsending private constructor(
     private fun trengerSøknadsdata(hendelse: Hendelse) {
         val jp = requireNotNull(journalpost) { " Journalpost må være satt i ${tilstand.type} " }
         hendelse.behov(
-            Behovtype.Søknadsdata, "Trenger søknadsdata",
+            Behovtype.Søknadsdata,
+            "Trenger søknadsdata",
             mapOf(
-                "dokumentInfoId" to jp.hovedDokument().dokumentInfoId
-            )
+                "dokumentInfoId" to jp.hovedDokument().dokumentInfoId,
+            ),
         )
     }
 
@@ -488,10 +489,11 @@ class Innsending private constructor(
         val brukerId =
             requireNotNull(journalpost?.bruker()?.id) { "Bruker må eksistere på journalpost ved behov ${Behovtype.Persondata.name}" }
         hendelse.behov(
-            Behovtype.Persondata, "Trenger persondata",
+            Behovtype.Persondata,
+            "Trenger persondata",
             mapOf(
-                "brukerId" to brukerId
-            )
+                "brukerId" to brukerId,
+            ),
         )
     }
 
@@ -499,10 +501,11 @@ class Innsending private constructor(
         val person =
             requireNotNull(person) { "Person må eksistere på innsending ved behov ${Behovtype.MinsteinntektVurdering.name}, journalpostId: ${journalpostId()}" }
         hendelse.behov(
-            Behovtype.MinsteinntektVurdering, "Trenger vurdering av minste arbeidsinntekt",
+            Behovtype.MinsteinntektVurdering,
+            "Trenger vurdering av minste arbeidsinntekt",
             mapOf(
-                "aktørId" to person.aktørId
-            )
+                "aktørId" to person.aktørId,
+            ),
         )
     }
 
@@ -510,8 +513,9 @@ class Innsending private constructor(
         val person =
             requireNotNull(person) { "Person må eksistere på innsending ved behov ${Behovtype.EksisterendeSaker.name}" }
         hendelse.behov(
-            Behovtype.EksisterendeSaker, "Trenger opplysninger om eksisterende saker",
-            mapOf("fnr" to person.ident)
+            Behovtype.EksisterendeSaker,
+            "Trenger opplysninger om eksisterende saker",
+            mapOf("fnr" to person.ident),
         )
     }
 
@@ -526,17 +530,17 @@ class Innsending private constructor(
             "behandlendeEnhetId" to oppgavebenk.id,
             "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
             "registrertDato" to oppgavebenk.datoRegistrert,
-            "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon
+            "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon,
         )
         hendelse.behov(
             Behovtype.OpprettStartVedtakOppgave,
             "Oppretter oppgave og sak for journalpost $journalpostId",
-            parametre
+            parametre,
         )
     }
 
     private fun oppretteArenaVurderHenvendelseOppgave(
-        hendelse: Hendelse
+        hendelse: Hendelse,
     ) {
         val journalpost = requireNotNull(journalpost).kategorisertJournalpost()
         val person =
@@ -548,13 +552,13 @@ class Innsending private constructor(
             "behandlendeEnhetId" to oppgavebenk.id,
             "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
             "registrertDato" to oppgavebenk.datoRegistrert,
-            "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon
+            "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon,
         )
 
         hendelse.behov(
             Behovtype.OpprettVurderhenvendelseOppgave,
             "Oppretter oppgave og sak for journalpost $journalpostId",
-            parametre
+            parametre,
         )
     }
 
@@ -570,21 +574,22 @@ class Innsending private constructor(
             "dokumenter" to journalpost.dokumenter().map {
                 mapOf(
                     "tittel" to it.tittel,
-                    "dokumentInfoId" to it.dokumentInfoId
+                    "dokumentInfoId" to it.dokumentInfoId,
                 )
-            }
+            },
         ) + arenaSakId
 
         hendelse.behov(
             Behovtype.OppdaterJournalpost,
             "Oppdatere journalpost for $journalpostId",
-            parametre
+            parametre,
         )
     }
 
     private fun ferdigstillJournalpost(hendelse: Hendelse) {
         hendelse.behov(
-            Behovtype.FerdigstillJournalpost, "Ferdigstiller journalpost $journalpostId"
+            Behovtype.FerdigstillJournalpost,
+            "Ferdigstiller journalpost $journalpostId",
         )
     }
 
@@ -594,26 +599,27 @@ class Innsending private constructor(
         val person = person?.let {
             mapOf(
                 "fødselsnummer" to it.ident,
-                "aktørId" to it.aktørId
+                "aktørId" to it.aktørId,
             )
         } ?: emptyMap()
         val parametre = mapOf(
             "behandlendeEnhetId" to oppgavebenk.id,
             "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
             "registrertDato" to oppgavebenk.datoRegistrert,
-            "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon
+            "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon,
         ) + person
 
         hendelse.behov(
-            Behovtype.OpprettGosysoppgave, "Oppretter gosysoppgave for journalpost $journalpostId",
-            parametre
+            Behovtype.OpprettGosysoppgave,
+            "Oppretter gosysoppgave for journalpost $journalpostId",
+            parametre,
         )
     }
 
     private fun tilstand(
         event: Hendelse,
         nyTilstand: Tilstand,
-        block: () -> Unit = {}
+        block: () -> Unit = {},
     ) {
         if (tilstand == nyTilstand) {
             return // Already in this state => ignore
@@ -631,7 +637,7 @@ class Innsending private constructor(
         gjeldendeTilstand: InnsendingTilstandType,
         aktivitetslogg: Aktivitetslogg,
         forrigeTilstand: InnsendingTilstandType,
-        timeout: Duration
+        timeout: Duration,
     ) {
         observers.forEach {
             it.tilstandEndret(
@@ -640,8 +646,8 @@ class Innsending private constructor(
                     gjeldendeTilstand = gjeldendeTilstand,
                     forrigeTilstand = forrigeTilstand,
                     aktivitetslogg = aktivitetslogg,
-                    timeout = timeout
-                )
+                    timeout = timeout,
+                ),
             )
         }
     }
@@ -660,7 +666,7 @@ class Innsending private constructor(
             behandlendeEnhet = jp.kategorisertJournalpost()
                 .oppgaveBenk(person, rutingOppslag, oppfyllerMinsteArbeidsinntekt).id,
             oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt,
-            tittel = jp.hovedDokument().tittel
+            tittel = jp.hovedDokument().tittel,
         ).also { ferdig ->
             observers.forEach { it.innsendingFerdigstilt(ferdig) }
         }
@@ -680,7 +686,7 @@ class Innsending private constructor(
             behandlendeEnhet = jp.kategorisertJournalpost()
                 .oppgaveBenk(person, rutingOppslag, oppfyllerMinsteArbeidsinntekt).id,
             oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt,
-            tittel = jp.hovedDokument().tittel
+            tittel = jp.hovedDokument().tittel,
         ).also { mottatt ->
             observers.forEach { it.innsendingMottatt(mottatt) }
         }
@@ -691,13 +697,13 @@ class Innsending private constructor(
         is Ettersending -> InnsendingObserver.Type.Ettersending
         is Gjenopptak -> InnsendingObserver.Type.Gjenopptak
         is KlageOgAnke -> InnsendingObserver.Type.KlageOgAnke
-        is KlageOgAnkeLønnskompensasjon -> InnsendingObserver.Type.KlageOgAnkeLønnskompensasjon
+        is Klage -> InnsendingObserver.Type.Klage
+        is Anke -> InnsendingObserver.Type.Anke
         is NySøknad -> InnsendingObserver.Type.NySøknad
         is UkjentSkjemaKode -> InnsendingObserver.Type.UkjentSkjemaKode
         is Utdanning -> InnsendingObserver.Type.Utdanning
         is UtenBruker -> InnsendingObserver.Type.UtenBruker
-        is KlageOgAnkeForskudd -> InnsendingObserver.Type.KlageOgAnkeForskudd
-        is KlageOgAnkeFeriepenger -> InnsendingObserver.Type.KlageOgAnkeFeriepenger
+        is klageForskudd -> InnsendingObserver.Type.KlageOgAnkeForskudd
         is Generell -> InnsendingObserver.Type.Generell
     }
 
@@ -721,20 +727,22 @@ class Innsending private constructor(
     private fun erFerdigBehandlet() =
         this.tilstand.type in setOf(
             InnsendingTilstandType.InnsendingFerdigstiltType,
-            InnsendingTilstandType.AlleredeBehandletType
+            InnsendingTilstandType.AlleredeBehandletType,
         )
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(
         "Innsending",
         mapOf(
-            "journalpostId" to journalpostId
-        )
+            "journalpostId" to journalpostId,
+        ),
     )
 
     fun håndter(replayFerdigstillEvent: ReplayFerdigstillEvent) {
         if (journalpostId != replayFerdigstillEvent.journalpostId) throw IllegalArgumentException("Innsending matcher ikke journalpostId ${journalpostId()}")
         if (erFerdigBehandlet()) {
             emitFerdigstilt()
-        } else throw IllegalArgumentException("Innsending er ikke i tilstand ferdigstilt, er ${tilstand.type}")
+        } else {
+            throw IllegalArgumentException("Innsending er ikke i tilstand ferdigstilt, er ${tilstand.type}")
+        }
     }
 }

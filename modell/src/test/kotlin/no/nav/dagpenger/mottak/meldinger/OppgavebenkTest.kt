@@ -181,29 +181,20 @@ class OppgavebenkTest {
     }
 
     @Test
-    fun `Finner riktig benk for klage og anke når behandligstema er lønnskompensasjon`() {
-        val jp = lagjournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0438").kategorisertJournalpost()
-        jp.oppgaveBenk(person = person, rutingOppslag = null, oppfyllerMinsteArbeidsinntekt = null).also {
-            assertEquals("Klage og anke - Lønnskompensasjon\n", it.beskrivelse)
-            assertEquals("4486", it.id)
-        }
-    }
-
-    @Test
-    fun `Finner riktig benk for klage og anke når behandligstema er forskudd`() {
+    fun `Finner riktig benk for klage når behandligstema er forskudd`() {
         val jp = lagjournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0451").kategorisertJournalpost()
         jp.oppgaveBenk(person = person, rutingOppslag = null, oppfyllerMinsteArbeidsinntekt = null).also {
-            assertEquals("Klage og anke - Forskudd\n", it.beskrivelse)
+            assertEquals("Klage - Forskudd\n", it.beskrivelse)
             assertEquals("4153", it.id)
         }
     }
 
     @Test
-    fun `Finner riktig benk for klage og anke når behandligstema er feripenger dangper`() {
-        val jp = lagjournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0452").kategorisertJournalpost()
+    fun `Finner riktig benk for anke når brevkode er anke `() {
+        val jp = lagjournalpostData(brevkode = "NAV 90-00.08 A").kategorisertJournalpost()
         jp.oppgaveBenk(person = person, rutingOppslag = null, oppfyllerMinsteArbeidsinntekt = null).also {
-            assertEquals("Klage og anke - Feriepenger\n", it.beskrivelse)
-            assertEquals("4456", it.id)
+            assertEquals("Anke\n", it.beskrivelse)
+            assertEquals("4450", it.id)
         }
     }
 

@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.meldinger
 
 import no.nav.dagpenger.mottak.Aktivitetslogg
+import no.nav.dagpenger.mottak.Anke
 import no.nav.dagpenger.mottak.Etablering
 import no.nav.dagpenger.mottak.Ettersending
 import no.nav.dagpenger.mottak.Generell
@@ -8,15 +9,14 @@ import no.nav.dagpenger.mottak.Gjenopptak
 import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.JournalpostVisitor
 import no.nav.dagpenger.mottak.KategorisertJournalpost
+import no.nav.dagpenger.mottak.Klage
 import no.nav.dagpenger.mottak.KlageOgAnke
-import no.nav.dagpenger.mottak.KlageOgAnkeFeriepenger
-import no.nav.dagpenger.mottak.KlageOgAnkeForskudd
-import no.nav.dagpenger.mottak.KlageOgAnkeLønnskompensasjon
 import no.nav.dagpenger.mottak.NySøknad
 import no.nav.dagpenger.mottak.SpesifikkKontekst
 import no.nav.dagpenger.mottak.UkjentSkjemaKode
 import no.nav.dagpenger.mottak.Utdanning
 import no.nav.dagpenger.mottak.UtenBruker
+import no.nav.dagpenger.mottak.klageForskudd
 import no.nav.dagpenger.mottak.meldinger.Journalpost.DokumentInfo.Companion.hovedDokument
 import no.nav.dagpenger.mottak.meldinger.Journalpost.DokumentInfo.Companion.vedlegg
 import java.time.LocalDateTime
@@ -29,9 +29,8 @@ class Journalpost constructor(
     private val bruker: Bruker?,
     private val behandlingstema: String?,
     registrertDato: LocalDateTime,
-    private val dokumenter: List<DokumentInfo>
+    private val dokumenter: List<DokumentInfo>,
 ) : Hendelse(aktivitetslogg) {
-
     private val registrertDato: LocalDateTime = registrertDato.truncatedTo(ChronoUnit.MILLIS)
 
     internal companion object {
@@ -99,7 +98,12 @@ class Journalpost constructor(
     fun vedlegg(): List<DokumentInfo> = dokumenter.vedlegg()
     fun datoRegistrert(): LocalDateTime = registrertDato
 
-    class DokumentInfo(tittelHvisTilgjengelig: String?, val dokumentInfoId: String, val brevkode: String, val hovedDokument: Boolean) {
+    class DokumentInfo(
+        tittelHvisTilgjengelig: String?,
+        val dokumentInfoId: String,
+        val brevkode: String,
+        val hovedDokument: Boolean,
+    ) {
         val tittel = finnTittel(tittelHvisTilgjengelig)
 
         private fun finnTittel(tittelHvisTilgjengelig: String?): String =
@@ -117,7 +121,7 @@ class Journalpost constructor(
 
     data class RelevantDato(
         val dato: String,
-        val datotype: Datotype
+        val datotype: Datotype,
     )
 
     enum class Datotype {
@@ -127,7 +131,7 @@ class Journalpost constructor(
 
     data class Bruker(
         val type: BrukerType,
-        val id: String
+        val id: String,
     ) {
         override fun toString(): String {
             return "Bruker(type=$type, id='<REDACTED>')"
@@ -147,7 +151,8 @@ class Journalpost constructor(
             in setOf("NAV 04-16.03", "NAV 04-16.04") -> Gjenopptak(this)
             in setOf("NAV 04-06.05") -> Utdanning(this)
             in setOf("NAV 04-06.08") -> Etablering(this)
-            in setOf("NAV 90-00.08", "NAV 90-00.08 K", "NAV 90-00.08 A") -> klageOgAnkeType(this)
+            in setOf("NAV 90-00.08", "NAV 90-00.08 K") -> klageType(this)
+            in setOf("NAV 90-00.08 A") -> ankeType(this)
             in setOf("NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04") -> Ettersending(this)
             in setOf("GENERELL_INNSENDING") -> Generell(this)
             else -> UkjentSkjemaKode(this)
@@ -155,20 +160,31 @@ class Journalpost constructor(
     }
 
     private fun klageOgAnkeType(
-        journalpost: Journalpost
+        journalpost: Journalpost,
+    ): KategorisertJournalpost {
+        // Klage og anke på papir (hvor det ikke skilles)
+        return KlageOgAnke(journalpost)
+    }
+    private fun klageType(
+        journalpost: Journalpost,
     ): KategorisertJournalpost {
         return when (journalpost.behandlingstema) {
-            "ab0438" -> KlageOgAnkeLønnskompensasjon(journalpost)
-            "ab0451" -> KlageOgAnkeForskudd(journalpost)
-            "ab0452" -> KlageOgAnkeFeriepenger(journalpost)
-            else -> KlageOgAnke(journalpost)
+            "ab0451" -> klageForskudd(journalpost)
+            else -> Klage(journalpost)
         }
     }
+
+    private fun ankeType(
+        journalpost: Journalpost,
+    ): KategorisertJournalpost {
+        return Anke(journalpost)
+    }
+
     override fun toSpesifikkKontekst(): SpesifikkKontekst = SpesifikkKontekst(
         "JournalpostData",
         mapOf(
-            "journalpostId" to journalpostId()
-        )
+            "journalpostId" to journalpostId(),
+        ),
     )
 
     fun accept(visitor: JournalpostVisitor) {
