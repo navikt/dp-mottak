@@ -133,17 +133,11 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
                 e.response.status.value,
                 e.response.bodyAsText()
             )
-        } catch (e: Throwable) {
-            logger.error(e) { feilmelding }
-            throw JournalpostFeil.JournalpostException(
-                statusCode = 500,
-                feilmelding
-            )
         }
     }
 
     override suspend fun ferdigstill(journalpostId: String) {
-        val feilmelding = "fKunne ikke ferdigstille journalpost"
+        val feilmelding = "Kunne ikke ferdigstille journalpost"
         try {
             proxyJournalpostApiClient.request("$journalføringBaseUrl/$journalpostId/ferdigstill") {
                 method = HttpMethod.Patch
@@ -156,12 +150,6 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
             throw JournalpostFeil.JournalpostException(
                 e.response.status.value,
                 e.response.bodyAsText()
-            )
-        } catch (e: Throwable) {
-            logger.error(e) { feilmelding }
-            throw JournalpostFeil.JournalpostException(
-                statusCode = 500,
-                feilmelding
             )
         }
     }
