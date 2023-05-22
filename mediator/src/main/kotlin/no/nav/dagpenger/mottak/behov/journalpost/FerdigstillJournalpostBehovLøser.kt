@@ -37,6 +37,10 @@ internal class FerdigstillJournalpostBehovLøser(
                 "journalpostId" to journalpostId
             )
         ) {
+            if(journalpostId == "615474849") {
+                logger.warn { "Skipper $journalpostId - er i dårlig tilstand" }
+                return@withMDC
+            }
             try {
                 runBlocking {
                     journalpostDokarkiv.ferdigstill(journalpostId)
