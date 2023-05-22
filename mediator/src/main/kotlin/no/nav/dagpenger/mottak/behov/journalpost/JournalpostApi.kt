@@ -127,9 +127,16 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
                 setBody(journalpost)
             }
         } catch (e: ClientRequestException) {
+            logger.error(e) { "Kunne ikke oppdatere journalpost" }
             throw JournalpostFeil.JournalpostException(
                 e.response.status.value,
                 e.response.bodyAsText()
+            )
+        } catch (e: Throwable) {
+            logger.error(e) { "Kunne ikke oppdatere journalpost" }
+            throw JournalpostFeil.JournalpostException(
+                statusCode = 500,
+                "Kunne ikke oppdatere journalpost"
             )
         }
     }
@@ -147,6 +154,12 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
             throw JournalpostFeil.JournalpostException(
                 e.response.status.value,
                 e.response.bodyAsText()
+            )
+        } catch (e: Throwable) {
+            logger.error(e) { "Kunne ikke oppdatere journalpost" }
+            throw JournalpostFeil.JournalpostException(
+                statusCode = 500,
+                "Kunne ikke oppdatere journalpost"
             )
         }
     }
