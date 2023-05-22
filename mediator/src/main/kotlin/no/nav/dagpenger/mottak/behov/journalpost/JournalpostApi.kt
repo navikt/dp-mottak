@@ -118,6 +118,7 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
         journalpostId: String,
         journalpost: JournalpostApi.OppdaterJournalpostRequest
     ) {
+        val feilmelding = "Kunne ikke oppdatere journalpost"
         try {
             proxyJournalpostApiClient.request(urlString = "$journalføringBaseUrl/$journalpostId") {
                 method = HttpMethod.Put
@@ -127,21 +128,22 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
                 setBody(journalpost)
             }
         } catch (e: ClientRequestException) {
-            logger.error(e) { "Kunne ikke oppdatere journalpost" }
+            logger.error(e) { feilmelding }
             throw JournalpostFeil.JournalpostException(
                 e.response.status.value,
                 e.response.bodyAsText()
             )
         } catch (e: Throwable) {
-            logger.error(e) { "Kunne ikke oppdatere journalpost" }
+            logger.error(e) { feilmelding }
             throw JournalpostFeil.JournalpostException(
                 statusCode = 500,
-                "Kunne ikke oppdatere journalpost"
+                feilmelding
             )
         }
     }
 
     override suspend fun ferdigstill(journalpostId: String) {
+        val feilmelding = "fKunne ikke ferdigstille journalpost"
         try {
             proxyJournalpostApiClient.request("$journalføringBaseUrl/$journalpostId/ferdigstill") {
                 method = HttpMethod.Patch
@@ -150,16 +152,16 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
                 setBody(FerdigstillJournalpostRequest())
             }
         } catch (e: ClientRequestException) {
-            logger.error(e) { "Kunne ikke ferdigstille journalpost" }
+            logger.error(e) { feilmelding }
             throw JournalpostFeil.JournalpostException(
                 e.response.status.value,
                 e.response.bodyAsText()
             )
         } catch (e: Throwable) {
-            logger.error(e) { "Kunne ikke oppdatere journalpost" }
+            logger.error(e) { feilmelding }
             throw JournalpostFeil.JournalpostException(
                 statusCode = 500,
-                "Kunne ikke oppdatere journalpost"
+                feilmelding
             )
         }
     }
