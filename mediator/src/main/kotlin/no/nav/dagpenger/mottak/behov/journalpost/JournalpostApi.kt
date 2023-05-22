@@ -133,6 +133,9 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
                 e.response.status.value,
                 e.response.bodyAsText()
             )
+        } catch (e: Throwable) {
+            logger.error(e) { feilmelding }
+            throw e
         }
     }
 
@@ -151,6 +154,9 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
                 e.response.status.value,
                 e.response.bodyAsText()
             )
+        } catch (e: Throwable) {
+            logger.error(e) { feilmelding }
+            throw e
         }
     }
 
