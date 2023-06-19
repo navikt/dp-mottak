@@ -62,7 +62,6 @@ private fun JsonMessage.tilJournalføringOppdaterRequest(): OppdaterJournalpostR
 
 private fun JsonMessage.avsender(): JournalpostApi.Avsender =
     JournalpostApi.Avsender(
-        navn = this["navn"].asText(),
         id = this["fødselsnummer"].asText()
     )
 

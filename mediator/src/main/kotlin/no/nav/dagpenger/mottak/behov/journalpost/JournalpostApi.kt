@@ -87,7 +87,7 @@ internal class JournalpostApi {
         }
     }
 
-    internal data class Avsender(val navn: String, val id: String, val idType: String = "FNR")
+    internal data class Avsender(val id: String, val idType: String = "FNR")
 
     internal data class Bruker(val id: String, val idType: String = "FNR")
     internal data class Dokument(val dokumentInfoId: String, val tittel: String)
