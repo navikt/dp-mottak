@@ -52,7 +52,7 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag
         val barnetillegg = data.hentFaktaFraSeksjon("barnetillegg")
 
         val harRegister =
-            barnetillegg.single { it["beskrivendeId"].asText() == "faktum.register.barn-liste" }.get("svar").isEmpty
+            !barnetillegg.single { it["beskrivendeId"].asText() == "faktum.register.barn-liste" }.get("svar").isEmpty
         val harEgne =
             barnetillegg.single { it["beskrivendeId"].asText() == "faktum.legge-til-egne-barn" }.get("svar").asBoolean()
 
