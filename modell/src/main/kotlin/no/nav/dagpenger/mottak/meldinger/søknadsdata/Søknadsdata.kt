@@ -10,7 +10,7 @@ import no.nav.dagpenger.mottak.SøknadVisitor
 class Søknadsdata(
     aktivitetslogg: Aktivitetslogg,
     private val journalpostId: String,
-    private val data: JsonNode
+    private val data: JsonNode,
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
     fun søknad(): RutingOppslag {
@@ -39,6 +39,9 @@ class NullSøknadData(private val data: JsonNode) : RutingOppslag {
     override fun eøsArbeidsforhold() = false
     override fun avtjentVerneplikt() = false
     override fun avsluttetArbeidsforhold() = emptyList<AvsluttetArbeidsforhold>()
+    override fun harBarn() = false
+    override fun harAndreYtelser() = false
+
     override fun permittertFraFiskeForedling() = false
     override fun avsluttetArbeidsforholdFraKonkurs() = false
     override fun permittert() = false

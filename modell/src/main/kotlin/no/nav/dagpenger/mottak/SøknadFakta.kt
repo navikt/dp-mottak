@@ -10,6 +10,8 @@ interface SøknadOppslag {
     fun eøsArbeidsforhold(): Boolean
     fun avtjentVerneplikt(): Boolean
     fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold
+    fun harBarn(): Boolean
+    fun harAndreYtelser(): Boolean
 }
 
 interface QuizOppslag : SøknadOppslag {
@@ -18,6 +20,7 @@ interface QuizOppslag : SøknadOppslag {
     fun søknadsId(): String?
     fun reellArbeidsSøker(): ReellArbeidsSøker
 }
+
 interface RutingOppslag : SøknadOppslag {
     fun permittertFraFiskeForedling(): Boolean
     fun avsluttetArbeidsforholdFraKonkurs(): Boolean
@@ -30,13 +33,13 @@ data class ReellArbeidsSøker(
     val helse: Boolean,
     val geografi: Boolean,
     val deltid: Boolean,
-    val yrke: Boolean
+    val yrke: Boolean,
 )
 
 data class AvsluttetArbeidsforhold(
     val sluttårsak: Sluttårsak,
     val fiskeforedling: Boolean,
-    val land: String
+    val land: String,
 ) {
     enum class Sluttårsak {
         AVSKJEDIGET,
@@ -46,6 +49,6 @@ data class AvsluttetArbeidsforhold(
         REDUSERT_ARBEIDSTID,
         SAGT_OPP_AV_ARBEIDSGIVER,
         SAGT_OPP_SELV,
-        IKKE_ENDRET
+        IKKE_ENDRET,
     }
 }

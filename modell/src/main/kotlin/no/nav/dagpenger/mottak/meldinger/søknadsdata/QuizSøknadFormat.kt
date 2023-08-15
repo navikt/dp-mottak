@@ -39,13 +39,36 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag
                 AvsluttetArbeidsforhold(
                     sluttårsak = it.sluttårsak(),
                     fiskeforedling = it.fiskForedling(),
-                    land = it.faktaSvar("faktum.arbeidsforhold.land").asText()
+                    land = it.faktaSvar("faktum.arbeidsforhold.land").asText(),
                 )
             }.onFailure { exception ->
                 logger.error { "Klarte ikke å finne AvsluttetArbeidsforhold (se sikkerlogg)" }
                 sikkerlogg.error(exception) { "Klarte ikke å finne AvsluttetArbeidsforhold" }
             }.getOrNull()
         }
+    }
+
+    override fun harBarn(): Boolean {
+        val barnetillegg = data.hentFaktaFraSeksjon("barnetillegg")
+
+        val harRegister =
+            barnetillegg.single { it["beskrivendeId"].asText() == "faktum.register.barn-liste" }.get("svar").isEmpty
+        val harEgne =
+            barnetillegg.single { it["beskrivendeId"].asText() == "faktum.legge-til-egne-barn" }.get("svar").asBoolean()
+
+        return harRegister || harEgne
+    }
+
+    override fun harAndreYtelser(): Boolean {
+        val andreYtelser = data.hentFaktaFraSeksjon("andre-ytelser")
+        val harMottatt =
+            andreYtelser.single { it["beskrivendeId"].asText() == "faktum.andre-ytelser-mottatt-eller-sokt" }
+                .get("svar").asBoolean()
+        val harTidligereArbeidsgiver =
+            andreYtelser.single { it["beskrivendeId"].asText() == "faktum.utbetaling-eller-okonomisk-gode-tidligere-arbeidsgiver" }
+                .get("svar").asBoolean()
+
+        return harMottatt || harTidligereArbeidsgiver
     }
 
     override fun permittertFraFiskeForedling(): Boolean = avsluttetArbeidsforhold().any { it.fiskeforedling }
@@ -74,7 +97,7 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag
                 helse = node.faktaSvar("faktum.alle-typer-arbeid").asBoolean(),
                 geografi = node.faktaSvar("faktum.jobbe-hele-norge").asBoolean(),
                 deltid = node.faktaSvar("faktum.jobbe-hel-deltid").asBoolean(),
-                yrke = node.faktaSvar("faktum.bytte-yrke-ned-i-lonn").asBoolean()
+                yrke = node.faktaSvar("faktum.bytte-yrke-ned-i-lonn").asBoolean(),
             )
         }
 
@@ -156,5 +179,5 @@ private val eøsLandOgSveits = listOf(
     "CZE",
     "DEU",
     "HUN",
-    "AUT"
+    "AUT",
 )

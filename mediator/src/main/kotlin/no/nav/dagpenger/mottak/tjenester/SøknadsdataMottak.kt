@@ -14,9 +14,10 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
 
 private val logg = KotlinLogging.logger {}
+
 internal class SøknadsdataMottak(
     private val innsendingMediator: InnsendingMediator,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
     private val løsning = "@løsning.${Behovtype.Søknadsdata.name}"
 
@@ -38,7 +39,7 @@ internal class SøknadsdataMottak(
                 Søknadsdata(
                     aktivitetslogg = Aktivitetslogg(),
                     journalpostId = journalpostId,
-                    data = data
+                    data = data,
                 ).also { søknadsdata ->
                     with(søknadsdata.søknad()) {
                         logg.info {
@@ -50,7 +51,11 @@ internal class SøknadsdataMottak(
                                 |  erPermittertFraFiskeforedling=${permittertFraFiskeForedling()}
                                 |  erPermittert=${permittert()}
                                 |  rutingoppslag=${this.javaClass.simpleName}
-                                """.trimMargin()
+                            """.trimMargin()
+                        }
+
+                        if (avtjentVerneplikt() && avsluttetArbeidsforhold().isEmpty() && !harBarn() && !harAndreYtelser()) {
+                            logg.info { "Søknad er en mulig Viggo." }
                         }
                     }
                 }
