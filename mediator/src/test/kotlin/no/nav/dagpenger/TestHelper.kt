@@ -16,21 +16,21 @@ private val dokumenter = listOf(
         tittel = "Fin tittel",
         brevkode = "NAV 04-01.03",
         dokumentInfoId = "12345678",
-        hovedDokument = true
+        hovedDokument = true,
     ),
     InnsendingData.JournalpostData.DokumentInfoData(
         tittel = "Annen Fin tittel",
         brevkode = "O2",
         dokumentInfoId = "123456567",
-        hovedDokument = false
+        hovedDokument = false,
     ),
 
     InnsendingData.JournalpostData.DokumentInfoData(
         tittel = "Permitteringsvarsel: Koko's AS",
         brevkode = "T6",
         dokumentInfoId = "12366732",
-        hovedDokument = false
-    )
+        hovedDokument = false,
+    ),
 )
 
 private val aktivitetsloggData = InnsendingData.AktivitetsloggData(
@@ -44,12 +44,12 @@ private val aktivitetsloggData = InnsendingData.AktivitetsloggData(
             kontekster = listOf(
                 InnsendingData.AktivitetsloggData.SpesifikkKontekstData(
                     kontekstType = "TEST",
-                    kontekstMap = mapOf("kontekstVariabel" to "foo")
-                )
+                    kontekstMap = mapOf("kontekstVariabel" to "foo"),
+                ),
             ),
-            behovtype = null
-        )
-    )
+            behovtype = null,
+        ),
+    ),
 
 )
 
@@ -60,7 +60,7 @@ private val søknadsjson = jacksonObjectMapper().readTree(
             "versjon_navn": "Dagpenger",
             "seksjoner":[]
             }
-    """.trimIndent()
+    """.trimIndent(),
 )
 
 val innsendingData = InnsendingData(
@@ -75,7 +75,7 @@ val innsendingData = InnsendingData(
         bruker = InnsendingData.JournalpostData.BrukerData(InnsendingData.JournalpostData.BrukerTypeData.FNR, fnr),
         behandlingstema = "DAG",
         registertDato = registrertdato,
-        dokumenter = dokumenter
+        dokumenter = dokumenter,
     ),
     oppfyllerMinsteArbeidsinntekt = true,
     eksisterendeSaker = false,
@@ -85,12 +85,12 @@ val innsendingData = InnsendingData(
         aktørId = "345678",
         norskTilknytning = true,
         diskresjonskode = false,
-        egenAnsatt = false
+        egenAnsatt = false,
     ),
     arenaSakData = InnsendingData.ArenaSakData(
         oppgaveId = "123487",
-        fagsakId = "129678"
+        fagsakId = "129678",
     ),
     søknadsData = søknadsjson,
-    aktivitetslogg = aktivitetsloggData
+    aktivitetslogg = aktivitetsloggData,
 )

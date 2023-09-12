@@ -12,7 +12,7 @@ internal fun konverterTilAktivitetslogg(aktivitetsloggData: InnsendingData.Aktiv
         val kontekster = it.kontekster.map { spesifikkKontekstData ->
             SpesifikkKontekst(
                 spesifikkKontekstData.kontekstType,
-                spesifikkKontekstData.kontekstMap
+                spesifikkKontekstData.kontekstMap,
             )
         }
         aktiviteter.add(
@@ -20,31 +20,31 @@ internal fun konverterTilAktivitetslogg(aktivitetsloggData: InnsendingData.Aktiv
                 InnsendingData.AktivitetsloggData.Alvorlighetsgrad.INFO -> Aktivitetslogg.Aktivitet.Info(
                     kontekster,
                     it.melding,
-                    it.tidsstempel
+                    it.tidsstempel,
                 )
                 InnsendingData.AktivitetsloggData.Alvorlighetsgrad.WARN -> Aktivitetslogg.Aktivitet.Warn(
                     kontekster,
                     it.melding,
-                    it.tidsstempel
+                    it.tidsstempel,
                 )
                 InnsendingData.AktivitetsloggData.Alvorlighetsgrad.BEHOV -> Aktivitetslogg.Aktivitet.Behov(
                     Aktivitetslogg.Aktivitet.Behov.Behovtype.valueOf(it.behovtype!!),
                     kontekster,
                     it.melding,
                     it.detaljer,
-                    it.tidsstempel
+                    it.tidsstempel,
                 )
                 InnsendingData.AktivitetsloggData.Alvorlighetsgrad.ERROR -> Aktivitetslogg.Aktivitet.Error(
                     kontekster,
                     it.melding,
-                    it.tidsstempel
+                    it.tidsstempel,
                 )
                 InnsendingData.AktivitetsloggData.Alvorlighetsgrad.SEVERE -> Aktivitetslogg.Aktivitet.Severe(
                     kontekster,
                     it.melding,
-                    it.tidsstempel
+                    it.tidsstempel,
                 )
-            }
+            },
         )
     }
 

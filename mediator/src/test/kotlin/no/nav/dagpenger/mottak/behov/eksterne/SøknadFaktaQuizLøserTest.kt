@@ -25,7 +25,7 @@ internal class SøknadFaktaQuizLøserTest {
             søknadQuizOppslag = object : SøknadQuizOppslag {
                 override fun hentSøknad(innsendtSøknadsId: String): QuizOppslag = testSøknad
             },
-            rapidsConnection = testRapid
+            rapidsConnection = testRapid,
         )
     }
 
@@ -45,9 +45,9 @@ internal class SøknadFaktaQuizLøserTest {
             "KanJobbeHvorSomHelst:true",
             "HelseTilAlleTyperJobb:true",
             "VilligTilÅBytteYrke:true",
-            "JobbetUtenforNorge:false"
+            "JobbetUtenforNorge:false",
         ],
-        delimiter = ':'
+        delimiter = ':',
     )
     fun `besvarer fakta behov`(behovNavn: String, forventetVerdi: String) {
         testRapid.sendTestMessage(behovMelding(behovNavn))
@@ -84,9 +84,9 @@ internal class SøknadFaktaQuizLøserTest {
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.ARBEIDSGIVER_KONKURS,
                     fiskeforedling = false,
-                    land = "NOR"
-                )
-            )
+                    land = "NOR",
+                ),
+            ),
         ).also {
             assertEquals(1, it.size)
             it[0].assertRettighetstype("Lønnsgaranti")
@@ -100,9 +100,9 @@ internal class SøknadFaktaQuizLøserTest {
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.PERMITTERT,
                     fiskeforedling = true,
-                    land = "NOR"
-                )
-            )
+                    land = "NOR",
+                ),
+            ),
         ).also {
             assertEquals(1, it.size)
             it[0].assertRettighetstype("PermittertFiskeforedling")
@@ -116,9 +116,9 @@ internal class SøknadFaktaQuizLøserTest {
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.PERMITTERT,
                     fiskeforedling = false,
-                    land = "NOR"
-                )
-            )
+                    land = "NOR",
+                ),
+            ),
         ).also {
             assertEquals(1, it.size)
             it[0].assertRettighetstype("Permittert")
@@ -132,9 +132,9 @@ internal class SøknadFaktaQuizLøserTest {
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER,
                     fiskeforedling = false,
-                    land = "NOR"
-                )
-            )
+                    land = "NOR",
+                ),
+            ),
         ).also {
             assertEquals(1, it.size)
             it[0].assertRettighetstype("Ordinær")
@@ -148,14 +148,14 @@ internal class SøknadFaktaQuizLøserTest {
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER,
                     fiskeforedling = false,
-                    land = "NOR"
+                    land = "NOR",
                 ),
                 AvsluttetArbeidsforhold(
                     sluttårsak = Sluttårsak.PERMITTERT,
                     fiskeforedling = false,
-                    land = "NOR"
-                )
-            )
+                    land = "NOR",
+                ),
+            ),
         ).also {
             assertEquals(2, it.size)
             it[0].assertRettighetstype("Ordinær")

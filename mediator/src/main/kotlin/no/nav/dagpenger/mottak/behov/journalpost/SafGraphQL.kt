@@ -12,7 +12,7 @@ import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 internal class SafGraphQL {
     data class Bruker(
         val type: BrukerType,
-        val id: String
+        val id: String,
     ) {
         override fun toString(): String {
             return "Bruker(type=$type, id='<REDACTED>')"
@@ -25,7 +25,7 @@ internal class SafGraphQL {
 
     data class RelevantDato(
         val dato: String,
-        val datotype: Datotype
+        val datotype: Datotype,
     )
 
     class DokumentInfo(val tittel: String?, val dokumentInfoId: String, val brevkode: String?, val hovedDokument: Boolean) {
@@ -44,7 +44,7 @@ internal class SafGraphQL {
         val relevanteDatoer: List<RelevantDato>,
         @JsonDeserialize(using = DokumentInfoDeserializer::class)
         val dokumenter: List<DokumentInfo>,
-        val behandlingstema: String? = null
+        val behandlingstema: String? = null,
     ) {
 
         internal companion object {
@@ -81,7 +81,7 @@ internal class SafGraphQL {
         MOTTATT, JOURNALFOERT, FERDIGSTILT, EKSPEDERT,
         UNDER_ARBEID, FEILREGISTRERT, UTGAAR, AVBRUTT,
         UKJENT_BRUKER, RESERVERT, OPPLASTING_DOKUMENT,
-        UKJENT
+        UKJENT,
     }
 }
 
@@ -93,7 +93,7 @@ internal class DokumentInfoDeserializer : JsonDeserializer<List<SafGraphQL.Dokum
                 tittel = dokument["tittel"].textValue(),
                 brevkode = dokument["brevkode"].textValue(),
                 dokumentInfoId = dokument["dokumentInfoId"].asText(),
-                hovedDokument = index == 0
+                hovedDokument = index == 0,
             )
         }
     }

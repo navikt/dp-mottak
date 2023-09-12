@@ -11,7 +11,7 @@ import no.nav.helse.rapids_rivers.withMDC
 
 internal class SøknadsdataBehovLøser(
     private val søknadsArkiv: SøknadsArkiv,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
 
     companion object {
@@ -34,8 +34,8 @@ internal class SøknadsdataBehovLøser(
         withMDC(
             mapOf(
                 "behovId" to behovId,
-                "journalpostId" to journalpostId
-            )
+                "journalpostId" to journalpostId,
+            ),
         ) {
             runBlocking(MDCContext()) {
                 søknadsArkiv.hentSøknadsData(packet["journalpostId"].asText(), packet["dokumentInfoId"].asText()).also {

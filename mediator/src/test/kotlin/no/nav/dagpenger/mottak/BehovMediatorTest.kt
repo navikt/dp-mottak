@@ -29,14 +29,13 @@ internal class BehovMediatorTest {
         aktivitetslogg = Aktivitetslogg()
         behovMediator = BehovMediator(
             rapidsConnection = testRapid,
-            sikkerLogg = mockk(relaxed = true)
+            sikkerLogg = mockk(relaxed = true),
         )
         testRapid.reset()
     }
 
     @Test
     internal fun `grupperer behov`() {
-
         val hendelse = TestHendelse("Hendelse1", aktivitetslogg.barn())
         hendelse.kontekst(innsending)
 
@@ -44,8 +43,8 @@ internal class BehovMediatorTest {
             Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata,
             "Trenger personopplysninger",
             mapOf(
-                "aktørId" to "12344"
-            )
+                "aktørId" to "12344",
+            ),
         )
         hendelse.behov(Aktivitetslogg.Aktivitet.Behov.Behovtype.Søknadsdata, "Trenger Søknadsdata")
         hendelse.behov(EksisterendeSaker, "Trenger EksisterendeSaker")
@@ -78,15 +77,15 @@ internal class BehovMediatorTest {
             Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata,
             "Trenger personopplysninger",
             mapOf(
-                "aktørId" to "12344"
-            )
+                "aktørId" to "12344",
+            ),
         )
         hendelse.behov(
             Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata,
             "Trenger personopplysninger",
             mapOf(
-                "aktørId" to "12344"
-            )
+                "aktørId" to "12344",
+            ),
         )
 
         assertThrows<IllegalArgumentException> { behovMediator.håndter(hendelse) }
@@ -103,14 +102,14 @@ internal class BehovMediatorTest {
     }
 
     private class Testkontekst(
-        private val melding: String
+        private val melding: String,
     ) : Aktivitetskontekst {
         override fun toSpesifikkKontekst() = SpesifikkKontekst(melding, mapOf(melding to melding))
     }
 
     private class TestHendelse(
         private val melding: String,
-        internal val logg: Aktivitetslogg
+        internal val logg: Aktivitetslogg,
     ) : Hendelse(logg), Aktivitetskontekst {
         init {
             logg.kontekst(this)

@@ -22,7 +22,6 @@ internal class JournalpostMottakTest {
 
     @Test
     fun `Skal håndtere at bruker er null`() {
-
         val slot = slot<Journalpost>()
         every { innsendingMediator.håndter(journalpost = capture(slot)) } returns Unit
 

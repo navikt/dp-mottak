@@ -7,7 +7,7 @@ internal fun lagjournalpostData(
     brevkode: String,
     dato: LocalDateTime = LocalDateTime.now(),
     vedlegg: String = "Vedlegg: Arbeidsavtale",
-    behandlingstema: String? = null
+    behandlingstema: String? = null,
 ): Journalpost {
     val journalpostData = Journalpost(
         aktivitetslogg = Aktivitetslogg(),
@@ -20,16 +20,16 @@ internal fun lagjournalpostData(
                 tittelHvisTilgjengelig = null,
                 dokumentInfoId = "1223",
                 brevkode = brevkode,
-                hovedDokument = true
+                hovedDokument = true,
             ),
             Journalpost.DokumentInfo(
                 tittelHvisTilgjengelig = vedlegg,
                 dokumentInfoId = "12234",
                 brevkode = "N6",
-                hovedDokument = false
-            )
+                hovedDokument = false,
+            ),
         ),
-        behandlingstema = behandlingstema
+        behandlingstema = behandlingstema,
     )
     return journalpostData
 }

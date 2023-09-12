@@ -15,7 +15,7 @@ import no.nav.helse.rapids_rivers.asLocalDateTime
 private val logg = KotlinLogging.logger {}
 internal class GosysOppgaveOpprettetMottak(
     private val innsendingMediator: InnsendingMediator,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
 
     private val løsning = "@løsning.${Behovtype.OpprettGosysoppgave.name}"
@@ -34,7 +34,7 @@ internal class GosysOppgaveOpprettetMottak(
         val oppgaveOpprettet = GosysOppgaveOpprettet(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = packet[løsning]["journalpostId"].asText(),
-            oppgaveId = oppgaveId
+            oppgaveId = oppgaveId,
         )
 
         innsendingMediator.håndter(oppgaveOpprettet)

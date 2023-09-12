@@ -19,7 +19,7 @@ private val sikkerLogg = KotlinLogging.logger("tjenestekall")
 
 internal class JournalpostMottak(
     private val innsendingMediator: InnsendingMediator,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
     private val løsning = "@løsning.${Behov.Journalpost.name}"
 
@@ -44,7 +44,7 @@ internal class JournalpostMottak(
                     bruker = it.getOrNull("bruker")?.let { jsonBruker ->
                         Journalpost.Bruker(
                             id = jsonBruker["id"].asText(),
-                            type = Journalpost.BrukerType.valueOf(jsonBruker["type"].asText())
+                            type = Journalpost.BrukerType.valueOf(jsonBruker["type"].asText()),
                         )
                     },
                     dokumenter = it["dokumenter"].map { jsonDokument ->
@@ -52,13 +52,13 @@ internal class JournalpostMottak(
                             tittelHvisTilgjengelig = jsonDokument["tittel"].textValue(),
                             dokumentInfoId = jsonDokument["dokumentInfoId"].asText(),
                             brevkode = jsonDokument["brevkode"].asText(),
-                            hovedDokument = jsonDokument["hovedDokument"].asBoolean()
+                            hovedDokument = jsonDokument["hovedDokument"].asBoolean(),
                         )
                     },
                     registrertDato = it["relevanteDatoer"].firstOrNull {
                         it["datotype"].asText() == "DATO_REGISTRERT"
                     }?.get("dato")?.asText().let { LocalDateTime.parse(it) } ?: LocalDateTime.now(),
-                    behandlingstema = it["behandlingstema"].textValue()
+                    behandlingstema = it["behandlingstema"].textValue(),
                 ).also {
                     logg.info { "Mottok ny journalpost. Antall dokumenter=${it.dokumenter().size}, brevkode=${it.hovedDokument().brevkode}, registrertDato=${it.datoRegistrert()}, behandlingstema=${packet[løsning]["behandlingstema"].textValue()}" }
                 }

@@ -17,7 +17,7 @@ private val logg = KotlinLogging.logger {}
 
 internal class PersondataMottak(
     private val innsendingMediator: InnsendingMediator,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
 
     private val løsning = "@løsning.${Persondata.name}"

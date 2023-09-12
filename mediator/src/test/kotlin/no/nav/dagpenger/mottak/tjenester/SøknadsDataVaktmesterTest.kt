@@ -36,8 +36,8 @@ class SøknadsDataVaktmesterTest {
                 session.run(
                     queryOf(
                         statement = """SELECT data FROM soknad_v1 where id = :id""",
-                        paramMap = mapOf("id" to innsendingData.id)
-                    ).map { row -> row.binaryStream("data") }.asSingle
+                        paramMap = mapOf("id" to innsendingData.id),
+                    ).map { row -> row.binaryStream("data") }.asSingle,
                 ).let { JsonMapper.jacksonJsonAdapter.readTree(it) }.also {
                     assertEquals("bubba", it["hubba"].asText())
                 }

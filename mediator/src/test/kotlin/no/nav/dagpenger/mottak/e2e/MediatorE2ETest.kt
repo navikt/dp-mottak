@@ -27,7 +27,7 @@ internal class MediatorE2ETest {
     private val innsendingMediator = InnsendingMediator(
         innsendingRepository = innsendingRepository,
         rapidsConnection = testRapid,
-        observatører = listOf(testObservatør)
+        observatører = listOf(testObservatør),
     )
 
     init {
@@ -61,7 +61,7 @@ internal class MediatorE2ETest {
         håndterHendelse(ferdigstiltJournalpostMotattHendelse())
         assertTrue(
             testRapid.inspektør.size == 8,
-            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}"
+            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
         )
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
     }
@@ -83,7 +83,7 @@ internal class MediatorE2ETest {
         håndterHendelse(ferdigstiltJournalpostMotattHendelse())
         assertTrue(
             testRapid.inspektør.size == 6,
-            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}"
+            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
         )
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
     }
@@ -109,7 +109,7 @@ internal class MediatorE2ETest {
         håndterHendelse(oppdatertJournalpostMotattHendelse())
         assertTrue(
             testRapid.inspektør.size == 8,
-            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}"
+            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
         )
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
     }
@@ -154,7 +154,7 @@ internal class MediatorE2ETest {
         håndterHendelse(ferdigstiltJournalpostMotattHendelse())
         assertTrue(
             testRapid.inspektør.size == 6,
-            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}"
+            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
         )
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
     }

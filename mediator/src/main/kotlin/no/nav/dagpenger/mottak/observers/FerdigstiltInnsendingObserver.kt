@@ -40,8 +40,8 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
         publish(
             key = event.journalpostId,
             message = JsonMessage.newMessage(
-                payload
-            )
+                payload,
+            ),
         )
     }
 
@@ -53,22 +53,22 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
         publish(
             key = event.journalpostId,
             message = JsonMessage.newMessage(
-                payload
+                payload,
             ),
         )
     }
 
     private fun publish(
         key: String,
-        message: JsonMessage
+        message: JsonMessage,
     ) {
         message.requireKey("@event_name")
         producer.send(
             ProducerRecord(
                 "teamdagpenger.journalforing.v1",
                 key,
-                message.toJson()
-            )
+                message.toJson(),
+            ),
         ).get(500, TimeUnit.MILLISECONDS)
 
         logger.info { "Send ${message["@event_name"].asText()} til Kafka for journalpostId=$key" }
@@ -90,7 +90,7 @@ private fun InnsendingObserver.InnsendingEvent.toPayload() =
         "datoRegistrert" to datoRegistrert,
         "skjemaKode" to skjemaKode,
         "tittel" to tittel,
-        "type" to type.name
+        "type" to type.name,
     ).apply {
         fødselsnummer?.let { set("fødselsnummer", it) }
         aktørId?.let { set("aktørId", it) }

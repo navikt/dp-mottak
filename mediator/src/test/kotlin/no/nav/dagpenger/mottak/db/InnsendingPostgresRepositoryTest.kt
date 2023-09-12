@@ -35,7 +35,7 @@ internal class InnsendingPostgresRepositoryTest {
             bruker: Journalpost.Bruker?,
             behandlingstema: String?,
             registrertDato: LocalDateTime,
-            dokumenter: List<Journalpost.DokumentInfo>
+            dokumenter: List<Journalpost.DokumentInfo>,
         ) {
             forventetDokumenter.addAll(dokumenter)
         }
@@ -72,18 +72,18 @@ internal class InnsendingPostgresRepositoryTest {
                     kontekster = listOf(
                         InnsendingData.AktivitetsloggData.SpesifikkKontekstData(
                             kontekstType = "TEST",
-                            kontekstMap = mapOf("kontekstVariabel" to "foo")
-                        )
+                            kontekstMap = mapOf("kontekstVariabel" to "foo"),
+                        ),
                     ),
-                    behovtype = null
-                )
+                    behovtype = null,
+                ),
             )
         }
         val innsending2 = innsendingData.copy(
             aktivitetslogg = InnsendingData.AktivitetsloggData(nyLogg.toList()),
             tilstand = InnsendingData.TilstandData(
                 InnsendingData.TilstandData.InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType,
-            )
+            ),
         ).createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
@@ -153,9 +153,9 @@ internal class InnsendingPostgresRepositoryTest {
         val innsending2 = innsendingData.copy(
             journalpostId = "287689",
             personData = innsendingData.personData!!.copy(
-                fødselsnummer = dnr
+                fødselsnummer = dnr,
 
-            )
+            ),
         ).createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
@@ -180,8 +180,8 @@ internal class InnsendingPostgresRepositoryTest {
         val innsending = innsendingData.copy(
             arenaSakData = InnsendingData.ArenaSakData(
                 oppgaveId = "2234",
-                fagsakId = null
-            )
+                fagsakId = null,
+            ),
         ).createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
@@ -214,7 +214,7 @@ internal class InnsendingPostgresRepositoryTest {
             session.run(
                 queryOf("select count(1) from $tabell").map { row ->
                     row.int(1)
-                }.asSingle
+                }.asSingle,
             )
         }
         assertEquals(antallRader, faktiskeRader, "Feil antall rader for tabell: $tabell")

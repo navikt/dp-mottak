@@ -27,9 +27,9 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
                         "packet" to PGobject().apply {
                             type = "jsonb"
                             value = packet.toJson()
-                        }
-                    )
-                ).asUpdate
+                        },
+                    ),
+                ).asUpdate,
             )
         }
     }
@@ -40,11 +40,11 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
                 queryOf(
                     "DELETE FROM minsteinntekt_vurdering_v1 WHERE journalpostId=:journalpostId RETURNING *",
                     mapOf(
-                        "journalpostId" to journalpostId.toLong()
-                    )
+                        "journalpostId" to journalpostId.toLong(),
+                    ),
                 ).map { res ->
                     res.string("packet")
-                }.asSingle
+                }.asSingle,
             )
         }?.let {
             JsonMessage(it, MessageProblems(it))
@@ -58,12 +58,12 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
                 return using(sessionOf(dataSource)) { session ->
                     session.run(
                         queryOf( //language=PostgreSQL
-                            "DELETE FROM minsteinntekt_vurdering_v1 WHERE opprettet < (now() - (make_interval(mins := 5))) RETURNING *"
+                            "DELETE FROM minsteinntekt_vurdering_v1 WHERE opprettet < (now() - (make_interval(mins := 5))) RETURNING *",
                         ).map { res ->
                             val jpId = res.string("journalpostId")
                             val packet = res.string("packet")
                             Pair(jpId, JsonMessage(packet, MessageProblems(packet)))
-                        }.asList
+                        }.asList,
                     )
                 }
             } finally {
@@ -79,10 +79,10 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
         return using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf( //language=PostgreSQL
-                    "SELECT pg_try_advisory_lock(:key)", mapOf("key" to låseNøkkel)
+                    "SELECT pg_try_advisory_lock(:key)", mapOf("key" to låseNøkkel),
                 ).map { res ->
                     res.boolean("pg_try_advisory_lock")
-                }.asSingle
+                }.asSingle,
             ) ?: false
         }
     }
@@ -90,10 +90,10 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
         return using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf( //language=PostgreSQL
-                    "SELECT pg_advisory_unlock(:key)", mapOf("key" to låseNøkkel)
+                    "SELECT pg_advisory_unlock(:key)", mapOf("key" to låseNøkkel),
                 ).map { res ->
                     res.boolean("pg_advisory_unlock")
-                }.asSingle
+                }.asSingle,
             ) ?: false
         }
     }

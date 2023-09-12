@@ -17,7 +17,7 @@ private val logg = KotlinLogging.logger {}
 
 internal class EksisterendeSakerMottak(
     private val innsendingMediator: InnsendingMediator,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
 
     private val løsning = "@løsning.${Behovtype.EksisterendeSaker.name}"
@@ -37,7 +37,7 @@ internal class EksisterendeSakerMottak(
         val eksisterendeSaker = Eksisterendesaker(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = journalpostId,
-            harEksisterendeSak = packet[løsning]["harEksisterendeSak"].asBoolean()
+            harEksisterendeSak = packet[løsning]["harEksisterendeSak"].asBoolean(),
         )
 
         try {

@@ -29,7 +29,7 @@ internal data class GosysOppgaveRequest(
     val aktivDato: LocalDate,
     val fristFerdigstillelse: LocalDate = aktivDato,
     val prioritet: String = "NORM",
-    val beskrivelse: String = "Kunne ikke automatisk journalføres"
+    val beskrivelse: String = "Kunne ikke automatisk journalføres",
 ) {
     val oppgavetype: String = "JFR"
     val opprettetAvEnhetsnr: String = "9999"

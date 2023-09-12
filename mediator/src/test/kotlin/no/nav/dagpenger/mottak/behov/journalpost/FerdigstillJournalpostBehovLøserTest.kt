@@ -19,7 +19,7 @@ internal class FerdigstillJournalpostBehovLøserTest {
     init {
         FerdigstillJournalpostBehovLøser(
             journalpostDokarkiv,
-            rapidsConnection = testRapid
+            rapidsConnection = testRapid,
         )
     }
 
@@ -41,13 +41,13 @@ internal class FerdigstillJournalpostBehovLøserTest {
     fun `Skal ignorere kjente feil`() {
         val ferdigstiller = FerdigstillJournalpostBehovLøser(
             journalpostDokarkiv,
-            rapidsConnection = testRapid
+            rapidsConnection = testRapid,
         )
         val exception = JournalpostFeil.JournalpostException(
             400,
             """
                 {"timestamp":"2021-06-08T21:10:42.062+00:00","status":400,"error":"Bad Request","message":"Journalpost med journalpostId=508859937 er ikke midlertidig journalført","path":"/rest/journalpostapi/v1/journalpost/508859937/ferdigstill"}
-            """.trimIndent()
+            """.trimIndent(),
 
         )
         assertDoesNotThrow { ferdigstiller.ignorerKjenteTilstander(exception) }

@@ -5,7 +5,7 @@ import org.intellij.lang.annotations.Language
 @Language("JSON")
 private fun søknadWithArbeidsforhold(
     lonnspliktigperiodedatofra: String? = "2020-03-19",
-    lonnspliktigperiodedatotil: String? = "2020-03-20"
+    lonnspliktigperiodedatotil: String? = "2020-03-20",
 ) =
     """{
   "fakta": [

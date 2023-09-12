@@ -15,7 +15,7 @@ import no.nav.helse.rapids_rivers.asLocalDateTime
 private val logg = KotlinLogging.logger {}
 internal class JournalpostFerdigstiltMottak(
     private val innsendingMediator: InnsendingMediator,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
 
     private val løsning = "@løsning.${Behovtype.FerdigstillJournalpost.name}"
@@ -33,7 +33,7 @@ internal class JournalpostFerdigstiltMottak(
         logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
         val journalpostFerdigstilt = JournalpostFerdigstilt(
             aktivitetslogg = Aktivitetslogg(),
-            journalpostId = journalpostId
+            journalpostId = journalpostId,
         )
 
         innsendingMediator.håndter(journalpostFerdigstilt)

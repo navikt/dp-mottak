@@ -546,7 +546,7 @@ internal fun delvisutfyltArbeidsforhold() = """
 internal fun avsluttedeArbeidsforholdQuizJson(
     permitterterFraFiskeForedling: Boolean = false,
     konkurs: Boolean = false,
-    permittert: Boolean = false
+    permittert: Boolean = false,
 ) =
     """
     {

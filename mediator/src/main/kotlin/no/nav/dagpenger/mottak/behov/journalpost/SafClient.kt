@@ -52,8 +52,8 @@ internal data class JournalPostQuery(@JsonIgnore val journalpostId: String) : Gr
             }
     """.trimIndent(),
     variables = mapOf(
-        "journalpostId" to journalpostId
-    )
+        "journalpostId" to journalpostId,
+    ),
 )
 
 internal class SafClient(config: Configuration) : JournalpostArkiv, SøknadsArkiv {

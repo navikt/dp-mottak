@@ -20,7 +20,7 @@ data class InnsendingData(
     val personData: PersonData?,
     val arenaSakData: ArenaSakData?,
     val søknadsData: JsonNode?,
-    val aktivitetslogg: AktivitetsloggData
+    val aktivitetslogg: AktivitetsloggData,
 ) {
     fun createInnsending(): Innsending {
         return Innsending::class.primaryConstructor!!
@@ -40,9 +40,9 @@ data class InnsendingData(
                                 it.tittel,
                                 it.dokumentInfoId,
                                 it.brevkode,
-                                it.hovedDokument
+                                it.hovedDokument,
                             )
-                        }
+                        },
                     )
                 },
                 søknadsData?.let { rutingOppslag(it) },
@@ -55,17 +55,17 @@ data class InnsendingData(
                         it.fødselsnummer,
                         it.norskTilknytning,
                         it.diskresjonskode,
-                        it.egenAnsatt
+                        it.egenAnsatt,
                     )
                 },
                 arenaSakData?.takeIf { it.fagsakId != null }
                     ?.let { ArenaOppgaveOpprettet.ArenaSak(it.oppgaveId, it.fagsakId) },
-                aktivitetslogg.let(::konverterTilAktivitetslogg)
+                aktivitetslogg.let(::konverterTilAktivitetslogg),
             )
     }
 
     data class TilstandData(
-        val type: InnsendingTilstandTypeData
+        val type: InnsendingTilstandTypeData,
     ) {
         fun createTilstand(): Innsending.Tilstand = when (type) {
             InnsendingTilstandTypeData.MottattType -> Innsending.Mottatt
@@ -98,12 +98,12 @@ data class InnsendingData(
             AventerArenaOppgaveType,
             AvventerGosysType,
             UkjentBrukerType,
-            AlleredeBehandletType
+            AlleredeBehandletType,
         }
     }
 
     data class AktivitetsloggData(
-        val aktiviteter: List<AktivitetData>
+        val aktiviteter: List<AktivitetData>,
     ) {
         data class AktivitetData(
             val alvorlighetsgrad: Alvorlighetsgrad,
@@ -112,12 +112,12 @@ data class InnsendingData(
             val melding: String,
             val tidsstempel: String,
             val kontekster: List<SpesifikkKontekstData>,
-            val detaljer: Map<String, Any>
+            val detaljer: Map<String, Any>,
         )
 
         data class SpesifikkKontekstData(
             val kontekstType: String,
-            val kontekstMap: Map<String, String>
+            val kontekstMap: Map<String, String>,
         )
 
         enum class Alvorlighetsgrad {
@@ -125,13 +125,13 @@ data class InnsendingData(
             WARN,
             BEHOV,
             ERROR,
-            SEVERE
+            SEVERE,
         }
     }
 
     data class ArenaSakData(
         val oppgaveId: String,
-        val fagsakId: String?
+        val fagsakId: String?,
     )
 
     data class PersonData(
@@ -140,7 +140,7 @@ data class InnsendingData(
         val fødselsnummer: String,
         val norskTilknytning: Boolean,
         val diskresjonskode: Boolean,
-        val egenAnsatt: Boolean
+        val egenAnsatt: Boolean,
     )
 
     data class JournalpostData(
@@ -149,7 +149,7 @@ data class InnsendingData(
         val bruker: BrukerData?,
         val behandlingstema: String?,
         val registertDato: LocalDateTime,
-        val dokumenter: List<DokumentInfoData>
+        val dokumenter: List<DokumentInfoData>,
     ) {
 
         enum class BrukerTypeData {
@@ -164,7 +164,7 @@ data class InnsendingData(
 
         data class BrukerData(
             val type: BrukerTypeData,
-            val id: String
+            val id: String,
         ) {
             fun createBruker() = Journalpost.Bruker(this.type.createBrukerType(), this.id)
         }
@@ -173,7 +173,7 @@ data class InnsendingData(
             val tittel: String,
             val brevkode: String,
             val dokumentInfoId: String,
-            val hovedDokument: Boolean
+            val hovedDokument: Boolean,
         )
     }
 }

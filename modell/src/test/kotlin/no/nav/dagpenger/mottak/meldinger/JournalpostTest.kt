@@ -15,6 +15,6 @@ internal class JournalpostTest {
         tittel,
         "1",
         brevkode,
-        true
+        true,
     )
 }

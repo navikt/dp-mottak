@@ -8,7 +8,7 @@ import kotlin.reflect.jvm.isAccessible
 
 @Suppress("UNCHECKED_CAST")
 internal class ReflectClass private constructor(
-    private val kClass: KClass<*>
+    private val kClass: KClass<*>,
 ) {
     internal operator fun <R> get(instance: Any, property: String): R =
         kClass.memberProperties
@@ -43,7 +43,7 @@ internal class ReflectClass private constructor(
 @Suppress("UNCHECKED_CAST")
 internal class ReflectInstance private constructor(
     private val reflectClass: ReflectClass,
-    private val instance: Any
+    private val instance: Any,
 ) {
     internal operator fun <R> get(property: String): R =
         reflectClass[instance, property]

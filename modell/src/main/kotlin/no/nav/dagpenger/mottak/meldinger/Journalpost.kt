@@ -10,13 +10,13 @@ import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.JournalpostVisitor
 import no.nav.dagpenger.mottak.KategorisertJournalpost
 import no.nav.dagpenger.mottak.Klage
+import no.nav.dagpenger.mottak.KlageForskudd
 import no.nav.dagpenger.mottak.KlageOgAnke
 import no.nav.dagpenger.mottak.NySøknad
 import no.nav.dagpenger.mottak.SpesifikkKontekst
 import no.nav.dagpenger.mottak.UkjentSkjemaKode
 import no.nav.dagpenger.mottak.Utdanning
 import no.nav.dagpenger.mottak.UtenBruker
-import no.nav.dagpenger.mottak.klageForskudd
 import no.nav.dagpenger.mottak.meldinger.Journalpost.DokumentInfo.Companion.hovedDokument
 import no.nav.dagpenger.mottak.meldinger.Journalpost.DokumentInfo.Companion.vedlegg
 import java.time.LocalDateTime
@@ -169,7 +169,7 @@ class Journalpost constructor(
         journalpost: Journalpost,
     ): KategorisertJournalpost {
         return when (journalpost.behandlingstema) {
-            "ab0451" -> klageForskudd(journalpost)
+            "ab0451" -> KlageForskudd(journalpost)
             else -> Klage(journalpost)
         }
     }

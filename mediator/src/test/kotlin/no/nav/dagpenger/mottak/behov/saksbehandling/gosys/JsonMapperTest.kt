@@ -16,7 +16,7 @@ internal class JsonMapperTest {
             aktivDato = dato,
             fristFerdigstillelse = dato,
             tildeltEnhetsnr = "aba",
-            aktoerId = "12345500"
+            aktoerId = "12345500",
         )
 
         val json = JsonMapper.jacksonJsonAdapter.writeValueAsString(oppgaveRequest)

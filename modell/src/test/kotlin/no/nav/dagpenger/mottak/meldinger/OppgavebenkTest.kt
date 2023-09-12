@@ -18,7 +18,7 @@ class OppgavebenkTest {
         GENERERT_FØDSELSNUMMER,
         norskTilknytning = true,
         diskresjonskode = false,
-        egenAnsatt = false
+        egenAnsatt = false,
     )
 
     @Test
@@ -26,7 +26,7 @@ class OppgavebenkTest {
         withSøknad(
             harEøsArbeidsforhold = true,
             harAvtjentVerneplikt = true,
-            harAvsluttetArbeidsforholdFraKonkurs = true
+            harAvsluttetArbeidsforholdFraKonkurs = true,
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = null, rutingOppslag = it)
             assertEquals("4470", oppgaveBenk.id)
@@ -38,18 +38,19 @@ class OppgavebenkTest {
     fun `Bruk original benk når bruker har diskresjonskode`() {
         withSøknad(
             harAvtjentVerneplikt = true,
-            harAvsluttetArbeidsforholdFraKonkurs = true
+            harAvsluttetArbeidsforholdFraKonkurs = true,
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person.copy(diskresjonskode = true), rutingOppslag = it)
             assertEquals("2103", oppgaveBenk.id)
             assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
         }
     }
+
     @Test
     fun `Egne ansatte skal rutes til 4483 dersom original benk er 4450`() {
         withSøknad(
             harAvtjentVerneplikt = true,
-            harAvsluttetArbeidsforholdFraKonkurs = true
+            harAvsluttetArbeidsforholdFraKonkurs = true,
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person.copy(egenAnsatt = true), rutingOppslag = it)
             assertEquals("4483", oppgaveBenk.id)
@@ -72,7 +73,7 @@ class OppgavebenkTest {
     fun `Diskresjonskode skal prioriteres fremfor egen ansatt`() {
         withSøknad(
             harAvtjentVerneplikt = true,
-            harAvsluttetArbeidsforholdFraKonkurs = true
+            harAvsluttetArbeidsforholdFraKonkurs = true,
         ) {
             val oppgaveBenk =
                 jp.oppgaveBenk(person = person.copy(diskresjonskode = true, egenAnsatt = true), rutingOppslag = it)
@@ -85,7 +86,7 @@ class OppgavebenkTest {
     fun `Finn riktig oppgave beskrivelse og benk når søker har avtjent verneplikt `() {
         withSøknad(
             harAvtjentVerneplikt = true,
-            harAvsluttetArbeidsforholdFraKonkurs = true
+            harAvsluttetArbeidsforholdFraKonkurs = true,
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, rutingOppslag = it)
             assertEquals("4450", oppgaveBenk.id)
@@ -97,7 +98,7 @@ class OppgavebenkTest {
     fun `Finn riktig oppgave beskrivelse ved Konkurs `() {
         withSøknad(
             harEøsArbeidsforhold = false,
-            harAvsluttetArbeidsforholdFraKonkurs = true
+            harAvsluttetArbeidsforholdFraKonkurs = true,
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, rutingOppslag = it)
             assertEquals("Konkurs\n", oppgaveBenk.beskrivelse)
@@ -109,7 +110,7 @@ class OppgavebenkTest {
     fun `Finn riktig benk og oppgavebeskrivelse ved eøs bostedsland og permittert`() {
         withSøknad(
             harEøsBostedsland = true,
-            erPermittert = true
+            erPermittert = true,
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, rutingOppslag = it)
             assertEquals("EØS\n", oppgaveBenk.beskrivelse)
@@ -132,7 +133,7 @@ class OppgavebenkTest {
     fun `Finn riktig benk og oppgavebeskrivelse når eøs arbeidsforhold overskriver eøs bostedsland`() {
         withSøknad(
             harEøsArbeidsforhold = true,
-            harEøsBostedsland = true
+            harEøsBostedsland = true,
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, rutingOppslag = it)
             assertEquals("MULIG SAMMENLEGGING - EØS\n", oppgaveBenk.beskrivelse)
@@ -143,7 +144,7 @@ class OppgavebenkTest {
     @Test
     fun `Finn riktig oppgave beskrivelse og benk når søker er permittert fra fiskeforedling`() {
         withSøknad(
-            erPermittertFraFiskeforedling = true
+            erPermittertFraFiskeforedling = true,
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, rutingOppslag = it)
             assertEquals("FISK\n", oppgaveBenk.beskrivelse)
@@ -212,11 +213,10 @@ class OppgavebenkTest {
         harAvsluttetArbeidsforholdFraKonkurs: Boolean = false,
         erPermittertFraFiskeforedling: Boolean = false,
         erPermittert: Boolean = false,
-        test: (søknadFakta: RutingOppslag) -> Unit
+        test: (søknadFakta: RutingOppslag) -> Unit,
     ) {
-
         mockkStatic(
-            "no.nav.dagpenger.mottak.SøknadFaktaKt"
+            "no.nav.dagpenger.mottak.SøknadFaktaKt",
         ) {
             val søknad = mockk<RutingOppslag>(relaxed = false).also {
                 every { it.eøsArbeidsforhold() } returns harEøsArbeidsforhold

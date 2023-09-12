@@ -34,8 +34,8 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
         withMDC(
             mapOf(
                 "behovId" to behovId,
-                "journalpostId" to journalpostId
-            )
+                "journalpostId" to journalpostId,
+            ),
         ) {
             try {
                 if (listOf("598125943", "598125958").contains(journalpostId) && System.getenv()["NAIS_CLUSTER_NAME"] == "dev-gcp") {
@@ -45,14 +45,14 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
 
                 runBlocking(MDCContext()) {
                     gosysOppslag.opprettOppgave(
-                        packet.gosysOppgave()
+                        packet.gosysOppgave(),
                     )
                 }.also {
                     packet["@løsning"] = mapOf(
                         BEHOV to mapOf(
                             "journalpostId" to journalpostId,
-                            "oppgaveId" to it
-                        )
+                            "oppgaveId" to it,
+                        ),
                     )
                     context.publish(packet.toJson())
                     logger.info { "Løste behov $BEHOV med løsning $it" }
@@ -70,5 +70,5 @@ private fun JsonMessage.gosysOppgave(): GosysOppgaveRequest = GosysOppgaveReques
     aktoerId = this["aktørId"].textValue(),
     tildeltEnhetsnr = this["behandlendeEnhetId"].asText(),
     aktivDato = LocalDate.now(),
-    beskrivelse = this["oppgavebeskrivelse"].asText()
+    beskrivelse = this["oppgavebeskrivelse"].asText(),
 )

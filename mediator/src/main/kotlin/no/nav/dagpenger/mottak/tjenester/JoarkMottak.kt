@@ -12,14 +12,14 @@ import no.nav.helse.rapids_rivers.River
 
 internal class JoarkMottak(
     private val innsendingMediator: InnsendingMediator,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
     private companion object {
         private val logg = KotlinLogging.logger {}
 
         private val forbudteMottaksKanaler = setOf<String>(
             "EESSI",
-            "NAV_NO_CHAT"
+            "NAV_NO_CHAT",
         )
     }
 
@@ -47,7 +47,8 @@ internal class JoarkMottak(
               |mottakskanal, ${packet["mottaksKanal"].asText()}, 
               |behandlingstema: ${packet["behandlingstema"].asText()}
               |journalpostStatus: ${packet["journalpostStatus"].asText()}
-              |""".trimMargin()
+              |
+            """.trimMargin(),
         )
 
         Metrics.mottakskanalInc(packet["mottaksKanal"].asText())
@@ -57,7 +58,7 @@ internal class JoarkMottak(
             journalpostId = packet["journalpostId"].asText(),
             hendelseType = packet["hendelsesType"].asText(),
             journalpostStatus = packet["journalpostStatus"].asText(),
-            behandlingstema = packet["behandlingstema"].asText() ?: null
+            behandlingstema = packet["behandlingstema"].asText() ?: null,
         )
 
         innsendingMediator.håndter(joarkHendelse)

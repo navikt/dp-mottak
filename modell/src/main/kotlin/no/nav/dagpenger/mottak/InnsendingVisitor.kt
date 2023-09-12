@@ -10,7 +10,7 @@ interface JournalpostVisitor {
         bruker: Journalpost.Bruker?,
         behandlingstema: String?,
         registrertDato: LocalDateTime,
-        dokumenter: List<Journalpost.DokumentInfo>
+        dokumenter: List<Journalpost.DokumentInfo>,
     ) {
     }
 }
@@ -26,7 +26,7 @@ interface PersonVisitor {
         ident: String,
         norskTilknytning: Boolean,
         diskresjonskode: Boolean,
-        egenAnsatt: Boolean
+        egenAnsatt: Boolean,
     ) {
     }
 }

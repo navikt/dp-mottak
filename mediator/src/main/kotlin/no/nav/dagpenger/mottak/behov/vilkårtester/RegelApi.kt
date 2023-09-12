@@ -44,8 +44,8 @@ internal class RegelApiProxy(config: Configuration) : RegelApiClient {
                 BehovRequest(
                     aktorId = aktørId,
                     regelkontekst = RegelKontekst(id = journalpostId),
-                    beregningsdato = LocalDate.now().toString()
-                ).toJson()
+                    beregningsdato = LocalDate.now().toString(),
+                ).toJson(),
             )
         }.also { response ->
             logger.info { "Opprettet minsteinntekt vurdering behov for journalpost med id $journalpostId, status: ${response.status}" }
@@ -57,7 +57,7 @@ internal data class BehovRequest(
     val aktorId: String,
     val regelkontekst: RegelKontekst,
     val beregningsdato: String,
-    val regelverksdato: String? = beregningsdato
+    val regelverksdato: String? = beregningsdato,
 ) {
     fun toJson(): String = jacksonJsonAdapter.writeValueAsString(this).trimIndent()
 }

@@ -280,7 +280,7 @@ class Innsending private constructor(
                 is KlageOgAnke -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
-                is klageForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
+                is KlageForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
             }
         }
     }
@@ -703,7 +703,7 @@ class Innsending private constructor(
         is UkjentSkjemaKode -> InnsendingObserver.Type.UkjentSkjemaKode
         is Utdanning -> InnsendingObserver.Type.Utdanning
         is UtenBruker -> InnsendingObserver.Type.UtenBruker
-        is klageForskudd -> InnsendingObserver.Type.KlageOgAnkeForskudd
+        is KlageForskudd -> InnsendingObserver.Type.KlageOgAnkeForskudd
         is Generell -> InnsendingObserver.Type.Generell
     }
 

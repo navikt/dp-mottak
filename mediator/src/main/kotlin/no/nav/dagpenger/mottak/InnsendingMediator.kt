@@ -23,12 +23,12 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall")
 internal class InnsendingMediator(
     private val innsendingRepository: InnsendingRepository,
     private val observatører: List<InnsendingObserver> = emptyList(),
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) {
 
     private val behovMediator: BehovMediator = BehovMediator(
         rapidsConnection = rapidsConnection,
-        sikkerLogg = sikkerlogg
+        sikkerLogg = sikkerlogg,
     )
 
     fun håndter(joarkHendelse: JoarkHendelse) {

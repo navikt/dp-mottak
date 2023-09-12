@@ -13,7 +13,7 @@ class PersonInformasjon(
     private val norskTilknytning: Boolean,
     private val navn: String,
     private val diskresjonskode: String? = null,
-    private val egenAnsatt: Boolean = false
+    private val egenAnsatt: Boolean = false,
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
 
@@ -23,7 +23,7 @@ class PersonInformasjon(
         ident = ident,
         norskTilknytning = norskTilknytning,
         diskresjonskode = harDiskresjonkode(diskresjonskode),
-        egenAnsatt = egenAnsatt
+        egenAnsatt = egenAnsatt,
 
     )
 
@@ -41,7 +41,7 @@ class PersonInformasjon(
         val ident: String,
         val norskTilknytning: Boolean,
         val diskresjonskode: Boolean,
-        val egenAnsatt: Boolean
+        val egenAnsatt: Boolean,
     ) {
 
         init {

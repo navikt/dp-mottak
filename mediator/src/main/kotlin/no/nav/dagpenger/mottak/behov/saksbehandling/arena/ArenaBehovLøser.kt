@@ -19,7 +19,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
 
     private class EksisterendeSakerBehovLøser(
         private val arenaOppslag: ArenaOppslag,
-        rapidsConnection: RapidsConnection
+        rapidsConnection: RapidsConnection,
     ) : River.PacketListener {
 
         companion object {
@@ -43,8 +43,8 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
             withMDC(
                 mapOf(
                     "behovId" to behovId,
-                    "journalpostId" to journalpostId
-                )
+                    "journalpostId" to journalpostId,
+                ),
             ) {
                 try {
                     runBlocking(MDCContext()) {
@@ -63,7 +63,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
 
     private class OpprettArenaOppgaveBehovLøser(
         private val arenaOppslag: ArenaOppslag,
-        rapidsConnection: RapidsConnection
+        rapidsConnection: RapidsConnection,
     ) : River.PacketListener {
 
         companion object {
@@ -76,7 +76,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                 validate {
                     it.demandAllOrAny(
                         "@behov",
-                        listOf("OpprettStartVedtakOppgave", "OpprettVurderhenvendelseOppgave")
+                        listOf("OpprettStartVedtakOppgave", "OpprettVurderhenvendelseOppgave"),
                     )
                 }
                 validate { it.rejectKey("@løsning") }
@@ -88,14 +88,13 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                         "behandlendeEnhetId",
                         "oppgavebeskrivelse",
                         "registrertDato",
-                        "tilleggsinformasjon"
+                        "tilleggsinformasjon",
                     )
                 }
             }.register(this)
         }
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
-
             val journalpostId = packet["journalpostId"].asText()
             val behovId = packet["@behovId"].asText()
 
@@ -107,8 +106,8 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
             withMDC(
                 mapOf(
                     "behovId" to behovId,
-                    "journalpostId" to journalpostId
-                )
+                    "journalpostId" to journalpostId,
+                ),
             ) {
                 try {
                     runBlocking(MDCContext()) {
@@ -117,12 +116,12 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                         val oppgaveResponse = when (behovNavn) {
                             "OpprettVurderhenvendelseOppgave" -> arenaOppslag.opprettVurderHenvendelsOppgave(
                                 journalpostId,
-                                packet.arenaOppgaveParametre()
+                                packet.arenaOppgaveParametre(),
                             )
 
                             "OpprettStartVedtakOppgave" -> arenaOppslag.opprettStartVedtakOppgave(
                                 journalpostId,
-                                packet.arenaOppgaveParametre()
+                                packet.arenaOppgaveParametre(),
                             )
 
                             else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
@@ -133,14 +132,14 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                                 behovNavn to mapOf(
                                     "journalpostId" to journalpostId,
                                     "fagsakId" to oppgaveResponse.fagsakId,
-                                    "oppgaveId" to oppgaveResponse.oppgaveId
-                                )
+                                    "oppgaveId" to oppgaveResponse.oppgaveId,
+                                ),
                             ).also {
                                 logger.info { "Løste behov $behovNavn med løsning $it" }
                             }
                         } else {
                             packet["@løsning"] = mapOf(
-                                behovNavn to mapOf("@feil" to "Kunne ikke opprettet Arena oppgave")
+                                behovNavn to mapOf("@feil" to "Kunne ikke opprettet Arena oppgave"),
                             )
                                 .also {
                                     logger.info { "Løste behov $behovNavn med feil $it" }

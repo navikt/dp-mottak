@@ -214,7 +214,7 @@ data class Anke(
     override fun henvendelseNavn(): String = "Anke\n"
 }
 
-data class klageForskudd(
+data class KlageForskudd(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage - Forskudd\n"

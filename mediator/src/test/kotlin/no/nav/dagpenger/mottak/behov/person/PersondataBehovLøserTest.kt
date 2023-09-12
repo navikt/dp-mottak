@@ -32,9 +32,9 @@ internal class PersondataBehovLøserTest {
                     fødselsnummer = "1234567891",
                     norskTilknytning = true,
                     diskresjonskode = "diskresjonskode",
-                    egenAnsatt = false
+                    egenAnsatt = false,
                 )
-            }
+            },
         )
         testRapid.sendTestMessage(persondataBehov())
         with(testRapid.inspektør) {
@@ -53,7 +53,7 @@ internal class PersondataBehovLøserTest {
             rapidsConnection = testRapid,
             personOppslag = object : PersonOppslag {
                 override suspend fun hentPerson(id: String): Person? = null
-            }
+            },
         )
         testRapid.sendTestMessage(persondataBehov())
         with(testRapid.inspektør) {

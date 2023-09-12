@@ -16,7 +16,7 @@ internal interface PersonOppslag {
         val fødselsnummer: String,
         val norskTilknytning: Boolean,
         val diskresjonskode: String?,
-        val egenAnsatt: Boolean?
+        val egenAnsatt: Boolean?,
     )
 }
 
@@ -38,7 +38,7 @@ internal fun createPersonOppslag(pdl: PdlPersondataOppslag, skjerming: Skjerming
                         fødselsnummer = it.fødselsnummer,
                         norskTilknytning = it.norskTilknytning,
                         diskresjonskode = it.diskresjonskode,
-                        egenAnsatt = egenAnsatt
+                        egenAnsatt = egenAnsatt,
                     )
                 }
             }

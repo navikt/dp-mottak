@@ -19,8 +19,8 @@ internal class PersonDeserialiseringTest {
         assertEquals(
             "LITEN hubba BRANNHYDRANT",
             jacksonJsonAdapter.readTree(
-                """{"data" :{"navn": [ { "fornavn": "LITEN", "mellomnavn": "hubba",  "etternavn": "BRANNHYDRANT" } ] }} """.trimIndent()
-            ).personNavn()
+                """{"data" :{"navn": [ { "fornavn": "LITEN", "mellomnavn": "hubba",  "etternavn": "BRANNHYDRANT" } ] }} """.trimIndent(),
+            ).personNavn(),
         )
     }
 
@@ -75,8 +75,8 @@ internal class PersonDeserialiseringTest {
                    }
                  }
                }
-                """.trimIndent()
-            )
+                """.trimIndent(),
+            ),
         )
     }
 
@@ -113,8 +113,8 @@ internal class PersonDeserialiseringTest {
                    }
                  }
                }
-                """.trimIndent()
-            )
+                """.trimIndent(),
+            ),
         )
     }
 
@@ -122,8 +122,8 @@ internal class PersonDeserialiseringTest {
     fun `Ikke kaste exception hvis personen ikke finnes i PDL`() {
         assertFalse(
             hasError(
-                fantIkkePersonResponse
-            )
+                fantIkkePersonResponse,
+            ),
         )
     }
 
@@ -132,22 +132,23 @@ internal class PersonDeserialiseringTest {
         assertEquals(
             "LITEN BRANNHYDRANT",
             jacksonJsonAdapter.readTree(
-                """{ "data": {"navn": [ { "fornavn": "LITEN", "etternavn": "BRANNHYDRANT" } ] } }""".trimIndent()
-            ).personNavn()
+                """{ "data": {"navn": [ { "fornavn": "LITEN", "etternavn": "BRANNHYDRANT" } ] } }""".trimIndent(),
+            ).personNavn(),
         )
 
         assertEquals(
             "LITEN BRANNHYDRANT",
             jacksonJsonAdapter.readTree(
-                """{ "data": {"navn": [ { "fornavn": "LITEN", "mellomnavn": null,  "etternavn": "BRANNHYDRANT" } ] } }""".trimIndent()
-            ).personNavn()
+                """{ "data": {"navn": [ { "fornavn": "LITEN", "mellomnavn": null,  "etternavn": "BRANNHYDRANT" } ] } }""".trimIndent(),
+            ).personNavn(),
         )
     }
 
     @Test
     fun `riktig identer`() {
-        @Language("JSON") val json = jacksonJsonAdapter.readTree(
-            """{ "data": {"identer": [ { "ident": "13086824072", "gruppe": "FOLKEREGISTERIDENT" }, { "ident": "2797593735308", "gruppe": "AKTORID" } ] }} """.trimIndent()
+        @Language("JSON")
+        val json = jacksonJsonAdapter.readTree(
+            """{ "data": {"identer": [ { "ident": "13086824072", "gruppe": "FOLKEREGISTERIDENT" }, { "ident": "2797593735308", "gruppe": "AKTORID" } ] }} """.trimIndent(),
         )
 
         assertEquals("2797593735308", json.aktørId())
@@ -183,7 +184,8 @@ internal class PersonDeserialiseringTest {
             jacksonJsonAdapter.readTree("""{ "data": { "hentPerson": { "adressebeskyttelse": [ { "gradering": null } ] } } } """.trimIndent())
         assertNull(ukjentGraderingJsone.diskresjonsKode())
 
-        @Language("JSON") val ingenBeskyttelseJson =
+        @Language("JSON")
+        val ingenBeskyttelseJson =
             jacksonJsonAdapter.readTree("""{ "data": { "hentPerson": { "adressebeskyttelse":[] } } } """.trimIndent())
         assertNull(ingenBeskyttelseJson.diskresjonsKode())
     }

@@ -26,12 +26,12 @@ internal interface ArenaOppslag {
     suspend fun harEksisterendeSaker(fnr: String): Boolean
     suspend fun opprettStartVedtakOppgave(
         journalpostId: String,
-        parametere: OpprettArenaOppgaveParametere
+        parametere: OpprettArenaOppgaveParametere,
     ): OpprettVedtakOppgaveResponse?
 
     suspend fun opprettVurderHenvendelsOppgave(
         journalpostId: String,
-        parametere: OpprettArenaOppgaveParametere
+        parametere: OpprettArenaOppgaveParametere,
     ): OpprettVedtakOppgaveResponse?
 }
 
@@ -70,12 +70,12 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
 
     override suspend fun opprettStartVedtakOppgave(
         journalpostId: String,
-        parametere: OpprettArenaOppgaveParametere
+        parametere: OpprettArenaOppgaveParametere,
     ): OpprettVedtakOppgaveResponse? = opprettArenaOppgave("$baseUrl/vedtak", parametere)
 
     private suspend fun opprettArenaOppgave(
         url: String,
-        parametereBody: OpprettArenaOppgaveParametere
+        parametereBody: OpprettArenaOppgaveParametere,
     ): OpprettVedtakOppgaveResponse? =
         try {
             proxyArenaClient.request(url) {
@@ -97,7 +97,7 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
 
     override suspend fun opprettVurderHenvendelsOppgave(
         journalpostId: String,
-        parametere: OpprettArenaOppgaveParametere
+        parametere: OpprettArenaOppgaveParametere,
     ): OpprettVedtakOppgaveResponse? = opprettArenaOppgave("$baseUrl/sak/henvendelse", parametere)
 }
 
@@ -109,10 +109,10 @@ internal data class OpprettArenaOppgaveParametere(
     val behandlendeEnhetId: String,
     val tilleggsinformasjon: String,
     val registrertDato: LocalDate,
-    val oppgavebeskrivelse: String
+    val oppgavebeskrivelse: String,
 )
 
 internal data class OpprettVedtakOppgaveResponse(
     val fagsakId: String?,
-    val oppgaveId: String
+    val oppgaveId: String,
 )

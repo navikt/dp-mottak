@@ -37,8 +37,8 @@ internal class InnsendingApiTest {
         val mockProducer = MockProducer(true, StringSerializer(), StringSerializer())
         val innsending = innsendingData.copy(
             tilstand = InnsendingData.TilstandData(
-                InnsendingFerdigstiltType
-            )
+                InnsendingFerdigstiltType,
+            ),
         ).createInnsending()
 
         val innsendingRepository = mockk<InnsendingRepository>().also {
@@ -87,15 +87,14 @@ internal class InnsendingApiTest {
                 InnsendingPeriode(
                     ident = "1234556777",
                     registrertDato = idag,
-                    journalpostId = "124433"
-                )
+                    journalpostId = "124433",
+                ),
             )
         }
 
         withMockAuthServerAndTestApplication({
             innsendingApi(innsendingRepository, mockk())
         }) {
-
             client.get("/innsending/periode?fom=2020-01-01T21:10&tom=2020-01-01T23:10") {
                 autentisert()
             }.let { response ->

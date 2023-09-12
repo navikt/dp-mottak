@@ -33,7 +33,7 @@ internal class KategorisertJournalpostTest {
                 "Registrert dato: 24.12.2019\n" +
                 "Dokumentet er skannet inn og journalført automatisk av digitale dagpenger. " +
                 "Gjennomfør rutinen \"Etterkontroll av automatisk journalførte dokumenter\".",
-            informasjon
+            informasjon,
         )
     }
 
@@ -47,7 +47,7 @@ internal class KategorisertJournalpostTest {
                 "Registrert dato: 24.12.2019\n" +
                 "Dokumentet er skannet inn og journalført automatisk av digitale dagpenger. " +
                 "Gjennomfør rutinen \"Etterkontroll av automatisk journalførte dokumenter\".",
-            informasjon
+            informasjon,
         )
     }
 

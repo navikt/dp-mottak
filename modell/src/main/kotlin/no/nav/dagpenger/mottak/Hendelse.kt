@@ -1,7 +1,7 @@
 package no.nav.dagpenger.mottak
 
 abstract class Hendelse protected constructor(
-    internal val aktivitetslogg: Aktivitetslogg = Aktivitetslogg()
+    internal val aktivitetslogg: Aktivitetslogg = Aktivitetslogg(),
 ) : IAktivitetslogg by aktivitetslogg, Aktivitetskontekst {
 
     abstract fun journalpostId(): String

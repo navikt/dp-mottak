@@ -25,7 +25,7 @@ internal interface JournalpostFeil {
         private val whitelistFeilmeldinger = setOf(
             "Bruker kan ikke oppdateres for journalpost med journalpostStatus=J og journalpostType=I.",
             "er ikke midlertidig journalført",
-            "er ikke midlertidig journalf&oslash;rt"
+            "er ikke midlertidig journalf&oslash;rt",
         )
     }
 
@@ -69,7 +69,7 @@ internal class JournalpostApi {
         val dokumenter: List<Dokument>,
         val behandlingstema: String = "ab0001",
         val tema: String = "DAG",
-        val journalfoerendeEnhet: String = "9999"
+        val journalfoerendeEnhet: String = "9999",
     )
 
     internal data class Sak(val fagsakId: String?) {
@@ -93,7 +93,7 @@ internal class JournalpostApi {
     internal data class Dokument(val dokumentInfoId: String, val tittel: String)
     internal enum class SaksType {
         GENERELL_SAK,
-        FAGSAK
+        FAGSAK,
     }
 }
 
@@ -116,7 +116,7 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
 
     override suspend fun oppdaterJournalpost(
         journalpostId: String,
-        journalpost: JournalpostApi.OppdaterJournalpostRequest
+        journalpost: JournalpostApi.OppdaterJournalpostRequest,
     ) {
         val feilmelding = "Kunne ikke oppdatere journalpost"
         try {
@@ -131,7 +131,7 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
             logger.error(e) { feilmelding }
             throw JournalpostFeil.JournalpostException(
                 e.response.status.value,
-                e.response.bodyAsText()
+                e.response.bodyAsText(),
             )
         } catch (e: Throwable) {
             logger.error(e) { feilmelding }
@@ -152,7 +152,7 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
             logger.error(e) { feilmelding }
             throw JournalpostFeil.JournalpostException(
                 e.response.status.value,
-                e.response.bodyAsText()
+                e.response.bodyAsText(),
             )
         } catch (e: Throwable) {
             logger.error(e) { feilmelding }

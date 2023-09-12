@@ -27,7 +27,6 @@ dependencies {
     implementation(Ktor2.Server.library("call-logging"))
     implementation("de.slub-dresden:urnlib:2.0.1")
 
-
     testImplementation(kotlin("test"))
     testImplementation("no.nav.security:mock-oauth2-server:1.0.0")
     testImplementation(Mockk.mockk)

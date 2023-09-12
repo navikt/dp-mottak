@@ -89,7 +89,7 @@ internal class FerdigstiltInnsendingObserverTest {
         fødselsnummer = null,
         aktørId = null,
         søknadsData = null,
-        fagsakId = null
+        fagsakId = null,
     )
 
     private fun ferdigstiltEvent(): InnsendingObserver.InnsendingEvent =
@@ -106,6 +106,6 @@ internal class FerdigstiltInnsendingObserverTest {
             },
             behandlendeEnhet = "Tadda",
             oppfyllerMinsteinntektArbeidsinntekt = false,
-            tittel = "Tittel"
+            tittel = "Tittel",
         )
 }

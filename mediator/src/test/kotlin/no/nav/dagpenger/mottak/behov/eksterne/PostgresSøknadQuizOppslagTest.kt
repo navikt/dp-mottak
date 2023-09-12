@@ -22,8 +22,8 @@ internal class PostgresSøknadQuizOppslagTest {
             using(sessionOf(PostgresDataSourceBuilder.dataSource)) { session ->
                 val id = session.run(
                     queryOf(
-                        "INSERT INTO innsending_v1(journalpostId, tilstand) VALUES($journalpostID, 'superduper') RETURNING id"
-                    ).map { row -> row.long("id") }.asSingle
+                        "INSERT INTO innsending_v1(journalpostId, tilstand) VALUES($journalpostID, 'superduper') RETURNING id",
+                    ).map { row -> row.long("id") }.asSingle,
                 )
                 session.run(
                     queryOf(
@@ -33,9 +33,9 @@ internal class PostgresSøknadQuizOppslagTest {
                             "data" to PGobject().apply {
                                 type = "jsonb"
                                 value = data
-                            }
-                        )
-                    ).asUpdate
+                            },
+                        ),
+                    ).asUpdate,
                 )
             }
 

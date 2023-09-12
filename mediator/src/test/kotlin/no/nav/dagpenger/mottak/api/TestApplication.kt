@@ -26,14 +26,14 @@ internal object TestApplication {
         mockOAuth2Server.issueToken(
             issuerId = Config.AzureAd.name,
             claims = mapOf(
-                "aud" to Config.AzureAd.audience
-            )
+                "aud" to Config.AzureAd.audience,
+            ),
         ).serialize()
     }
 
     internal fun withMockAuthServerAndTestApplication(
         moduleFunction: Application.() -> Unit,
-        test: suspend ApplicationTestBuilder.() -> Unit
+        test: suspend ApplicationTestBuilder.() -> Unit,
     ) {
         try {
             System.setProperty("AZURE_OPENID_CONFIG_JWKS_URI", "${mockOAuth2Server.jwksUrl(Config.AzureAd.name)}")
@@ -54,7 +54,7 @@ internal object TestApplication {
         endepunkt: String,
         token: String = azureAd,
         httpMethod: HttpMethod = HttpMethod.Get,
-        setup: TestApplicationRequest.() -> Unit = {}
+        setup: TestApplicationRequest.() -> Unit = {},
     ): TestApplicationCall = handleRequest(httpMethod, endepunkt) {
         addHeader(HttpHeaders.Authorization, "Bearer $token")
         setup()

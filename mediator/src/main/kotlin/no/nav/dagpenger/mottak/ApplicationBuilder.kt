@@ -45,7 +45,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(Config.kafkaProducerProperties)
 
     private val rapidsConnection = RapidApplication.Builder(
-        RapidApplication.RapidApplicationConfig.fromEnv(env)
+        RapidApplication.RapidApplicationConfig.fromEnv(env),
     )
         .also { builder ->
             builder.withKtorModule {
@@ -63,8 +63,8 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
                 observatører = listOf(
                     ferdigstiltInnsendingObserver,
                     MetrikkObserver(),
-                    InnsendingProbe
-                )
+                    InnsendingProbe,
+                ),
             )
             // Behovmottakere
             MottakMediator(mediator, this)
@@ -75,13 +75,13 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
             FerdigstillJournalpostBehovLøser(journalpostApiClient, this)
             PersondataBehovLøser(
                 createPersonOppslag(PdlPersondataOppslag(Config.properties), SkjermingOppslag(Config.properties)),
-                this
+                this,
             )
             SøknadsdataBehovLøser(safClient, this)
             MinsteinntektVurderingLøser(
                 regelApiClient = regelApiClient,
                 repository = minsteinntektVurderingRepository,
-                rapidsConnection = this
+                rapidsConnection = this,
             )
             ArenaBehovLøser(arenaApiClient, this)
             OpprettGosysOppgaveLøser(gosysProxyClient, this)

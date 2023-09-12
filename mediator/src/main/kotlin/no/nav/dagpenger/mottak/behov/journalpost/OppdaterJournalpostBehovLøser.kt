@@ -11,7 +11,7 @@ import no.nav.helse.rapids_rivers.withMDC
 
 internal class OppdaterJournalpostBehovLøser(
     private val journalpostDokarkiv: JournalpostDokarkiv,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener, JournalpostFeil {
 
     private companion object {
@@ -34,8 +34,8 @@ internal class OppdaterJournalpostBehovLøser(
         withMDC(
             mapOf(
                 "behovId" to behovId,
-                "journalpostId" to journalpostId
-            )
+                "journalpostId" to journalpostId,
+            ),
         ) {
             runBlocking {
                 try {
@@ -57,12 +57,12 @@ private fun JsonMessage.tilJournalføringOppdaterRequest(): OppdaterJournalpostR
         tittel = this["tittel"].asText(),
         sak = this.sak(),
         dokumenter = this.dokumenter(),
-        avsenderMottaker = this.avsender()
+        avsenderMottaker = this.avsender(),
     )
 
 private fun JsonMessage.avsender(): JournalpostApi.Avsender =
     JournalpostApi.Avsender(
-        id = this["fødselsnummer"].asText()
+        id = this["fødselsnummer"].asText(),
     )
 
 private fun JsonMessage.dokumenter(): List<JournalpostApi.Dokument> =
@@ -72,10 +72,10 @@ private fun JsonMessage.dokumenter(): List<JournalpostApi.Dokument> =
 
 private fun JsonMessage.sak(): JournalpostApi.Sak =
     JournalpostApi.Sak(
-        fagsakId = this["fagsakId"].asText(null)
+        fagsakId = this["fagsakId"].asText(null),
     )
 
 private fun JsonMessage.bruker(): JournalpostApi.Bruker =
     JournalpostApi.Bruker(
-        id = this["fødselsnummer"].asText()
+        id = this["fødselsnummer"].asText(),
     )

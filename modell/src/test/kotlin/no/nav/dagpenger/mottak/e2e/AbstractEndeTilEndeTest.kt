@@ -67,14 +67,13 @@ abstract class AbstractEndeTilEndeTest {
     }
 
     protected fun assertBehovDetaljer(type: Behovtype, detaljer: Set<String> = emptySet()) {
-
         val behov = inspektør.innsendingLogg.behov().find { behov ->
             behov.type == type
         } ?: throw AssertionError("Fant ikke behov ${type.name} i etterspurte behov")
 
         assertEquals(
             detaljer + setOf("tilstand", "journalpostId"),
-            behov.detaljer().keys + behov.kontekster.flatMap { it.kontekstMap.keys }
+            behov.detaljer().keys + behov.kontekster.flatMap { it.kontekstMap.keys },
         )
     }
 
@@ -106,15 +105,15 @@ abstract class AbstractEndeTilEndeTest {
         brevkode: String = "NAV 04-01.03",
         behandlingstema: String? = null,
         bruker: Bruker? = Bruker(id = "1234", type = Journalpost.BrukerType.AKTOERID),
-        journalpostStatus: String = "MOTTATT"
+        journalpostStatus: String = "MOTTATT",
     ) {
         innsending.håndter(
             journalpostData(
                 brevkode = brevkode,
                 behandlingstema = behandlingstema,
                 bruker = bruker,
-                journalpostStatus = journalpostStatus
-            )
+                journalpostStatus = journalpostStatus,
+            ),
         )
     }
 
@@ -155,43 +154,43 @@ abstract class AbstractEndeTilEndeTest {
 
     private fun journalpostFerdigstilt(): JournalpostFerdigstilt = JournalpostFerdigstilt(
         aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID
+        journalpostId = JOURNALPOST_ID,
     )
 
     private fun journalpostOppdatert(): JournalpostOppdatert = JournalpostOppdatert(
         aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID
+        journalpostId = JOURNALPOST_ID,
     )
 
     private fun arenaOppgaveOpprettet(): ArenaOppgaveOpprettet = ArenaOppgaveOpprettet(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
         oppgaveId = "1234",
-        fagsakId = "9867541"
+        fagsakId = "9867541",
     )
 
     private fun gosysOppgaveOpprettet(): GosysOppgaveOpprettet = GosysOppgaveOpprettet(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
-        oppgaveId = "1234567"
+        oppgaveId = "1234567",
     )
 
     private fun eksisterendesakData(): Eksisterendesaker = Eksisterendesaker(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
-        harEksisterendeSak = false
+        harEksisterendeSak = false,
     )
 
     private fun minsteinntektVurderingData(): MinsteinntektArbeidsinntektVurdert = MinsteinntektArbeidsinntektVurdert(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
-        oppfyllerMinsteArbeidsinntekt = false
+        oppfyllerMinsteArbeidsinntekt = false,
     )
 
     private fun søknadsdata(): Søknadsdata = Søknadsdata(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
-        data = utenSeksjoner()
+        data = utenSeksjoner(),
     )
 
     private fun personInformasjon(): PersonInformasjon = PersonInformasjon(
@@ -200,18 +199,18 @@ abstract class AbstractEndeTilEndeTest {
         aktørId = AKTØRID,
         ident = GENERERT_FØDSELSNUMMER,
         norskTilknytning = true,
-        navn = NAVN
+        navn = NAVN,
     )
     private fun personInformasjonIkkeFunnet(): PersonInformasjonIkkeFunnet = PersonInformasjonIkkeFunnet(
         aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID
+        journalpostId = JOURNALPOST_ID,
     )
 
     private fun journalpostData(
         brevkode: String,
         behandlingstema: String? = null,
         bruker: Bruker?,
-        journalpostStatus: String
+        journalpostStatus: String,
     ): Journalpost = Journalpost(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
@@ -224,15 +223,15 @@ abstract class AbstractEndeTilEndeTest {
                 tittelHvisTilgjengelig = null,
                 dokumentInfoId = "123",
                 brevkode = brevkode,
-                hovedDokument = true
-            )
-        )
+                hovedDokument = true,
+            ),
+        ),
     )
 
     private fun joarkhendelse(): JoarkHendelse = JoarkHendelse(
         aktivitetslogg = Aktivitetslogg(),
         journalpostId = JOURNALPOST_ID,
         hendelseType = "MIDLERTIDIG",
-        journalpostStatus = "MOTTATT"
+        journalpostStatus = "MOTTATT",
     )
 }

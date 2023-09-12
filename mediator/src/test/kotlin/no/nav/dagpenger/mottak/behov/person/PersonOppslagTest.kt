@@ -16,7 +16,7 @@ class PersonOppslagTest {
             aktørId = "aktørId",
             fødselsnummer = "fnr",
             norskTilknytning = false,
-            diskresjonskode = "kode"
+            diskresjonskode = "kode",
         )
     }
     private val skjermingMock = mockkClass(type = SkjermingOppslag::class).also {
@@ -43,7 +43,6 @@ class PersonOppslagTest {
 
     @Test
     fun `Feiler dersom skjermingsoppslag feiler`() {
-
         assertThrows<Throwable> {
             createPersonOppslag(pdl = pdlMock, skjerming = skjermingMock).let { personOppslag ->
                 runBlocking {

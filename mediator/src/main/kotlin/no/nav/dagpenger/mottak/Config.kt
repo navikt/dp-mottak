@@ -7,8 +7,6 @@ import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
-import no.finn.unleash.DefaultUnleash
-import no.finn.unleash.util.UnleashConfig
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
 import org.apache.kafka.clients.CommonClientConfigs
@@ -41,14 +39,14 @@ internal object Config {
             "AZURE_APP_CLIENT_ID" to "azureClientId",
             "AZURE_OPENID_CONFIG_JWKS_URI" to "http://localhost:4443",
 
-        )
+        ),
     )
     private val prodProperties = ConfigurationMap(
         mapOf(
             "DP_PROXY_SCOPE" to "api://prod-fss.teamdagpenger.dp-proxy/.default",
             "PDL_API_SCOPE" to "api://prod-fss.pdl.pdl-api/.default",
             "SKJERMING_API_SCOPE" to "api://prod-gcp.nom.skjermede-personer-pip/.default",
-        )
+        ),
     )
 
     val properties: Configuration by lazy {
@@ -70,14 +68,20 @@ internal object Config {
     private fun String.addHttprotocoll(): String = "https://$this"
 
     val Configuration.dpProxyTokenProvider: () -> String by lazy {
-        { cachedTokenProvider.clientCredentials(properties[Key("DP_PROXY_SCOPE", stringType)]).accessToken }
+        {
+            cachedTokenProvider.clientCredentials(properties[Key("DP_PROXY_SCOPE", stringType)]).accessToken
+        }
     }
 
     val Configuration.pdlApiTokenProvider: () -> String by lazy {
-        { cachedTokenProvider.clientCredentials(properties[Key("PDL_API_SCOPE", stringType)]).accessToken }
+        {
+            cachedTokenProvider.clientCredentials(properties[Key("PDL_API_SCOPE", stringType)]).accessToken
+        }
     }
     val Configuration.skjermingApiTokenProvider: () -> String by lazy {
-        { cachedTokenProvider.clientCredentials(properties[Key("SKJERMING_API_SCOPE", stringType)]).accessToken }
+        {
+            cachedTokenProvider.clientCredentials(properties[Key("SKJERMING_API_SCOPE", stringType)]).accessToken
+        }
     }
 
     val kafkaProducerProperties: Properties by lazy {
@@ -104,13 +108,6 @@ internal object Config {
     fun Configuration.skjermingApiUrl() = this[Key("SKJERMING_API_URL", stringType)]
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_HOST", stringType)].addHttprotocoll()
     fun Configuration.pdlApiUrl() = this[Key("PDL_API_HOST", stringType)].addHttprotocoll()
-    fun unleash() = DefaultUnleash(unleashConfig(), ByClusterStrategy(ByClusterStrategy.Cluster.current))
-    private fun unleashConfig(): UnleashConfig =
-        UnleashConfig.builder()
-            .appName("dp-mottak")
-            .instanceId(getHostname())
-            .unleashAPI(properties[Key("UNLEASH_URL", stringType)])
-            .build()
 
     fun asMap(): Map<String, String> = properties.list().reversed().fold(emptyMap()) { map, pair ->
         map + pair.second

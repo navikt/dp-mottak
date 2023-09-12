@@ -12,7 +12,7 @@ import java.time.format.DateTimeParseException
 
 internal class SøknadFaktaQuizLøser(
     private val søknadQuizOppslag: SøknadQuizOppslag,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
 
     private companion object {
@@ -32,7 +32,7 @@ internal class SøknadFaktaQuizLøser(
         "HelseTilAlleTyperJobb",
         "VilligTilÅBytteYrke",
         "FortsattRettKorona",
-        "JobbetUtenforNorge"
+        "JobbetUtenforNorge",
     )
 
     init {
@@ -46,12 +46,11 @@ internal class SøknadFaktaQuizLøser(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-
         withMDC(
             mapOf(
                 "søknadId" to packet["søknad_uuid"].asText(),
-                "behovId" to packet["@behovId"].asText()
-            )
+                "behovId" to packet["@behovId"].asText(),
+            ),
         ) {
             try {
                 val innsendtSøknadsId = packet.getInnsendtSøknadsId()
@@ -102,7 +101,7 @@ internal fun rettighetstypeUtregning(avsluttedeArbeidsforhold: List<AvsluttetArb
                 it.sluttårsak != AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT &&
                     it.sluttårsak != AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS &&
                     !it.fiskeforedling
-                )
+                ),
         )
     }
 

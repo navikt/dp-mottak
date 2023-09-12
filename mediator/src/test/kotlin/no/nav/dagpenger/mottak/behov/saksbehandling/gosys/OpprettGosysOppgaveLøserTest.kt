@@ -29,7 +29,7 @@ internal class OpprettGosysOppgaveLøserTest {
                     return "dfghjkl"
                 }
             },
-            rapidsConnection = testRapid
+            rapidsConnection = testRapid,
         )
     }
 

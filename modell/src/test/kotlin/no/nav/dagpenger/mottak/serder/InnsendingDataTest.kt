@@ -24,8 +24,8 @@ internal class InnsendingDataTest {
             tittel = "Fin tittel",
             brevkode = "NAV 04-01.03",
             dokumentInfoId = "12345678",
-            hovedDokument = true
-        )
+            hovedDokument = true,
+        ),
     )
 
     @Test
@@ -34,7 +34,7 @@ internal class InnsendingDataTest {
             id = 111L,
             journalpostId = journalpostId,
             tilstand = TilstandData(
-                TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType
+                TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType,
             ),
             journalpostData = JournalpostData(
                 journalpostId = journalpostId,
@@ -42,7 +42,7 @@ internal class InnsendingDataTest {
                 bruker = BrukerData(BrukerTypeData.FNR, fnr),
                 behandlingstema = "DAG",
                 registertDato = registrertdato,
-                dokumenter = dokumenter
+                dokumenter = dokumenter,
             ),
             oppfyllerMinsteArbeidsinntekt = true,
             eksisterendeSaker = false,
@@ -52,14 +52,14 @@ internal class InnsendingDataTest {
                 aktørId = "345678",
                 norskTilknytning = true,
                 diskresjonskode = false,
-                egenAnsatt = false
+                egenAnsatt = false,
             ),
             arenaSakData = ArenaSakData(
                 oppgaveId = "123487",
-                fagsakId = "129678"
+                fagsakId = "129678",
             ),
             søknadsData = søknadsjson,
-            aktivitetslogg = AktivitetsloggData(emptyList())
+            aktivitetslogg = AktivitetsloggData(emptyList()),
         )
 
         innsendingData.createInnsending().also {
@@ -73,6 +73,6 @@ internal class InnsendingDataTest {
             {
             "tadda":"it´s short for"
             }
-        """.trimIndent()
+        """.trimIndent(),
     )
 }

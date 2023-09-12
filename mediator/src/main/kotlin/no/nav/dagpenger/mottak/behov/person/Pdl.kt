@@ -89,7 +89,7 @@ internal data class PersonQuery(val id: String) : GraphqlQuery(
     }                
 }
     """.trimIndent(),
-    variables = mapOf("ident" to id)
+    variables = mapOf("ident" to id),
 )
 
 internal class Pdl {
@@ -100,7 +100,7 @@ internal class Pdl {
         val aktørId: String,
         val fødselsnummer: String,
         val norskTilknytning: Boolean,
-        val diskresjonskode: String?
+        val diskresjonskode: String?,
     ) {
         internal companion object {
             fun fromGraphQlJson(json: String): Person? =
@@ -142,19 +142,20 @@ internal class Pdl {
                     aktørId = node.aktørId(),
                     fødselsnummer = node.fødselsnummer(),
                     norskTilknytning = node.norskTilknyting(),
-                    diskresjonskode = node.diskresjonsKode()
+                    diskresjonskode = node.diskresjonsKode(),
                 )
             }.fold(
                 onSuccess = {
                     it
                 },
                 onFailure = {
-                    if (ukjentPersonIdent(node)) return null
-                    else {
+                    if (ukjentPersonIdent(node)) {
+                        return null
+                    } else {
                         sikkerlogg.info(node.toString())
                         throw it
                     }
-                }
+                },
             )
         }
     }

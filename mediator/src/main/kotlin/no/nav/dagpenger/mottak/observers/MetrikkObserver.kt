@@ -8,7 +8,7 @@ internal class MetrikkObserver : InnsendingObserver {
     override fun tilstandEndret(event: InnsendingObserver.InnsendingEndretTilstandEvent) {
         Metrics.tilstandCounterInc(
             event.gjeldendeTilstand.name,
-            event.forrigeTilstand.name
+            event.forrigeTilstand.name,
         )
     }
 

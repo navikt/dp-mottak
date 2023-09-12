@@ -18,7 +18,7 @@ internal class PostgresSøknadQuizOppslag(private val dataSource: DataSource) : 
         val query = queryOf(
             //language=PostgreSQL
             """SELECT * FROM soknad_v1 WHERE :jsonFragment::jsonb <@ data""",
-            mapOf("jsonFragment" to """{ "søknad_uuid": "$innsendtSøknadsId" }""")
+            mapOf("jsonFragment" to """{ "søknad_uuid": "$innsendtSøknadsId" }"""),
         )
 
         return using(sessionOf(dataSource)) { session ->
@@ -27,7 +27,7 @@ internal class PostgresSøknadQuizOppslag(private val dataSource: DataSource) : 
                     row.binaryStreamOrNull("data")?.use {
                         QuizSøknadFormat(JsonMapper.jacksonJsonAdapter.readTree(it))
                     }
-                }.asSingle
+                }.asSingle,
             ) ?: throw IllegalArgumentException("Fant ikke søknad med innsendtId $innsendtSøknadsId")
         }
     }

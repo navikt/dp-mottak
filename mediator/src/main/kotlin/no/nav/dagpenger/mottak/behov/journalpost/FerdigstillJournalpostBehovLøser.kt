@@ -27,15 +27,14 @@ internal class FerdigstillJournalpostBehovLøser(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-
         val journalpostId = packet["journalpostId"].asText()
         val behovId = packet["@behovId"].asText()
 
         withMDC(
             mapOf(
                 "behovId" to behovId,
-                "journalpostId" to journalpostId
-            )
+                "journalpostId" to journalpostId,
+            ),
         ) {
             try {
                 runBlocking {
@@ -47,8 +46,8 @@ internal class FerdigstillJournalpostBehovLøser(
 
             packet["@løsning"] = mapOf(
                 "FerdigstillJournalpost" to mapOf(
-                    "journalpostId" to journalpostId
-                )
+                    "journalpostId" to journalpostId,
+                ),
             )
             context.publish(packet.toJson())
             logger.info("løste behov FerdigstillJournalpost for journalpost med id $journalpostId")

@@ -57,7 +57,7 @@ internal class JournalpostBehovLøserTest {
             journalpostArkiv = object : JournalpostArkiv {
                 override suspend fun hentJournalpost(journalpostId: String): SafGraphQL.Journalpost =
                     SafGraphQL.Journalpost.fromGraphQlJson(journalpostJson)
-            }
+            },
         )
     }
 

@@ -28,9 +28,8 @@ private val logger = KotlinLogging.logger { }
 
 internal fun Application.innsendingApi(
     innsendingRepository: InnsendingRepository,
-    observer: InnsendingObserver
+    observer: InnsendingObserver,
 ) {
-
     install(StatusPages) {
         exception<Throwable> { call, cause ->
             when (cause) {
@@ -58,7 +57,7 @@ internal fun Application.innsendingApi(
             !setOf(
                 "isalive",
                 "isready",
-                "metrics"
+                "metrics",
             ).contains(call.request.document())
         }
     }

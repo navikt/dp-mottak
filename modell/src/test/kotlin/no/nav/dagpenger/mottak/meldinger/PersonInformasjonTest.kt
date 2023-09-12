@@ -15,7 +15,6 @@ internal class PersonInformasjonTest {
     @ParameterizedTest
     @ValueSource(strings = ["1234", "12345678901", "12020052345"])
     fun `Skal ikke validere riktig hvis ikke det er gyldig fødselsnummer eller dnummer`(ident: String) {
-
         val personInformasjon = PersonInformasjon(
             Aktivitetslogg(),
             journalpostId = "12345",
@@ -23,7 +22,7 @@ internal class PersonInformasjonTest {
             ident = ident,
             norskTilknytning = true,
             navn = "Test Testen",
-            diskresjonskode = null
+            diskresjonskode = null,
         )
         assertFalse(personInformasjon.validate())
     }
@@ -38,7 +37,7 @@ internal class PersonInformasjonTest {
             ident = GENERERT_FØDSELSNUMMER,
             norskTilknytning = true,
             navn = "Test Testen",
-            diskresjonskode = kode
+            diskresjonskode = kode,
         )
         assertTrue(person.person().diskresjonskode, "Kode $kode")
     }
@@ -52,7 +51,7 @@ internal class PersonInformasjonTest {
             ident = GENERERT_FØDSELSNUMMER,
             norskTilknytning = true,
             navn = "Test Testen",
-            diskresjonskode = null
+            diskresjonskode = null,
         )
         assertFalse(person.person().diskresjonskode)
     }
@@ -65,7 +64,7 @@ internal class PersonInformasjonTest {
             norskTilknytning = true,
             navn = "Test Testen",
             diskresjonskode = false,
-            egenAnsatt = false
+            egenAnsatt = false,
         )
 
         assertTrue(person.erDnummer(), "Skal være dnummer")
@@ -81,7 +80,7 @@ internal class PersonInformasjonTest {
                 norskTilknytning = true,
                 navn = "Test Testen",
                 diskresjonskode = false,
-                egenAnsatt = false
+                egenAnsatt = false,
             )
         }
     }

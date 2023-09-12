@@ -9,7 +9,7 @@ private val logg = KotlinLogging.logger {}
 
 class BehovMediator(
     private val rapidsConnection: RapidsConnection,
-    private val sikkerLogg: KLogger
+    private val sikkerLogg: KLogger,
 ) {
 
     internal fun håndter(hendelse: Hendelse) {
@@ -18,7 +18,7 @@ class BehovMediator(
 
     private fun håndter(
         hendelse: Hendelse,
-        behov: List<Aktivitetslogg.Aktivitet.Behov>
+        behov: List<Aktivitetslogg.Aktivitet.Behov>,
     ) {
         behov.groupBy { it.kontekst() }.forEach { (kontekst, behov) ->
             val behovsliste = mutableListOf<String>()
@@ -29,7 +29,7 @@ class BehovMediator(
                     require(behov.type.name !in behovsliste) { "Kan ikke produsere samme behov ${behov.type.name} på samme kontekst" }
                     require(
                         behov.detaljer().filterKeys { this.containsKey(it) && this[it] != behov.detaljer()[it] }
-                            .isEmpty()
+                            .isEmpty(),
                     ) { "Kan ikke produsere behov med duplikate detaljer" }
                     behovsliste.add(behov.type.name)
                     putAll(behov.detaljer())

@@ -18,7 +18,7 @@ private val logg = KotlinLogging.logger {}
 
 internal class OpprettArenaOppgaveMottak(
     private val innsendingMediator: InnsendingMediator,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
 
     init {
@@ -28,7 +28,7 @@ internal class OpprettArenaOppgaveMottak(
             validate {
                 it.demandAllOrAny(
                     "@behov",
-                    listOf(Behovtype.OpprettStartVedtakOppgave.name, Behovtype.OpprettVurderhenvendelseOppgave.name)
+                    listOf(Behovtype.OpprettStartVedtakOppgave.name, Behovtype.OpprettVurderhenvendelseOppgave.name),
                 )
             }
             validate { it.requireKey("@løsning") }
@@ -44,8 +44,8 @@ internal class OpprettArenaOppgaveMottak(
             innsendingMediator.håndter(
                 ArenaOppgaveFeilet(
                     aktivitetslogg = Aktivitetslogg(),
-                    journalpostId = packet["journalpostId"].asText()
-                )
+                    journalpostId = packet["journalpostId"].asText(),
+                ),
             )
         } else {
             innsendingMediator.håndter(
@@ -53,8 +53,8 @@ internal class OpprettArenaOppgaveMottak(
                     aktivitetslogg = Aktivitetslogg(),
                     journalpostId = journalpostId,
                     oppgaveId = arenaLøsning["oppgaveId"].asText(),
-                    fagsakId = arenaLøsning.getOrNull("fagsakId")?.asText()
-                )
+                    fagsakId = arenaLøsning.getOrNull("fagsakId")?.asText(),
+                ),
             )
         }
     }

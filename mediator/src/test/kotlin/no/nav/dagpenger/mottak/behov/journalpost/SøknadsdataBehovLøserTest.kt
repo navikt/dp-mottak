@@ -22,10 +22,10 @@ internal class SøknadsdataBehovLøserTest {
                             put("something", "something")
                             put("something else", "something else")
                             put("something entirely different", "something entirely different")
-                        }
+                        },
                     )
                 }
-            }
+            },
         )
     }
 

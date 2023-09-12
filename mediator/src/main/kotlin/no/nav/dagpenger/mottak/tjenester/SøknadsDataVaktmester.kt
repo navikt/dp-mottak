@@ -16,7 +16,7 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadsDataVaktmest
 
 internal class SøknadsDataVaktmester(
     private val safClient: SafClient,
-    private val ds: DataSource = PostgresDataSourceBuilder.dataSource
+    private val ds: DataSource = PostgresDataSourceBuilder.dataSource,
 ) {
 
     fun fixSoknadsData(jp: Int) {
@@ -49,9 +49,9 @@ internal class SøknadsDataVaktmester(
                     "data" to PGobject().apply {
                         type = "jsonb"
                         value = data
-                    }
-                )
-            ).asUpdate
+                    },
+                ),
+            ).asUpdate,
         )
     }
 
@@ -66,13 +66,13 @@ internal class SøknadsDataVaktmester(
                             join journalpost_dokumenter_v1 v on j.id = v.id
                             where  journalpostid = :journalpostId
                             and  v.hoveddokument = true """,
-                paramMap = mapOf("journalpostId" to jp)
+                paramMap = mapOf("journalpostId" to jp),
             ).map { row ->
                 Pair(
                     first = row.int("id"),
                     second = row.int("dokumentinfoid"),
                 )
-            }.asSingle
+            }.asSingle,
         ) ?: throw RuntimeException("Fant ikke innsendingD/dokumentinfoid for $jp")
     }
 
@@ -80,10 +80,10 @@ internal class SøknadsDataVaktmester(
         return this.run(
             queryOf( //language=PostgreSQL
                 "SELECT pg_advisory_unlock(:key)",
-                mapOf("key" to låseNøkkel)
+                mapOf("key" to låseNøkkel),
             ).map { res ->
                 res.boolean("pg_advisory_unlock")
-            }.asSingle
+            }.asSingle,
         ) ?: false
     }
 
@@ -91,10 +91,10 @@ internal class SøknadsDataVaktmester(
         return this.run(
             queryOf( //language=PostgreSQL
                 "SELECT pg_try_advisory_lock(:key)",
-                mapOf("key" to låseNøkkel)
+                mapOf("key" to låseNøkkel),
             ).map { res ->
                 res.boolean("pg_try_advisory_lock")
-            }.asSingle
+            }.asSingle,
         ) ?: false
     }
 }

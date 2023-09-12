@@ -33,7 +33,7 @@ internal class QuizSøknadFormatTest {
     fun `Kan parse avsluttede arbeidsforhold`() {
         assertEquals(
             2,
-            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson()).avsluttetArbeidsforhold().size
+            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson()).avsluttetArbeidsforhold().size,
         )
     }
 
@@ -41,7 +41,7 @@ internal class QuizSøknadFormatTest {
     fun `kan parse tom arbeidsforhold`() {
         assertEquals(
             0,
-            QuizSøknadFormat(tomAvsluttedeArbeidsforhold()).avsluttetArbeidsforhold().size
+            QuizSøknadFormat(tomAvsluttedeArbeidsforhold()).avsluttetArbeidsforhold().size,
         )
     }
 
@@ -49,7 +49,7 @@ internal class QuizSøknadFormatTest {
     fun `skal kunne parse delvise utfylt arbeidsforhold`() {
         assertEquals(
             2,
-            QuizSøknadFormat(delvisutfyltArbeidsforhold()).avsluttetArbeidsforhold().size
+            QuizSøknadFormat(delvisutfyltArbeidsforhold()).avsluttetArbeidsforhold().size,
         )
     }
 
@@ -57,11 +57,11 @@ internal class QuizSøknadFormatTest {
     fun permittertFraFiskeForedling() {
         assertEquals(
             true,
-            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(permitterterFraFiskeForedling = true)).permittertFraFiskeForedling()
+            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(permitterterFraFiskeForedling = true)).permittertFraFiskeForedling(),
         )
         assertEquals(
             false,
-            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(permitterterFraFiskeForedling = false)).permittertFraFiskeForedling()
+            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(permitterterFraFiskeForedling = false)).permittertFraFiskeForedling(),
         )
     }
 
@@ -70,16 +70,16 @@ internal class QuizSøknadFormatTest {
         assertDoesNotThrow {
             assertEquals(
                 false,
-                QuizSøknadFormat(utenArbeidsforholdQuizJson()).avsluttetArbeidsforholdFraKonkurs()
+                QuizSøknadFormat(utenArbeidsforholdQuizJson()).avsluttetArbeidsforholdFraKonkurs(),
             )
         }
         assertEquals(
             true,
-            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(konkurs = true)).avsluttetArbeidsforholdFraKonkurs()
+            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(konkurs = true)).avsluttetArbeidsforholdFraKonkurs(),
         )
         assertEquals(
             false,
-            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(konkurs = false)).avsluttetArbeidsforholdFraKonkurs()
+            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(konkurs = false)).avsluttetArbeidsforholdFraKonkurs(),
         )
     }
 
@@ -87,11 +87,11 @@ internal class QuizSøknadFormatTest {
     fun permittert() {
         assertEquals(
             true,
-            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(permittert = true)).permittert()
+            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(permittert = true)).permittert(),
         )
         assertEquals(
             false,
-            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(permittert = false)).permittert()
+            QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(permittert = false)).permittert(),
         )
     }
 
@@ -99,7 +99,7 @@ internal class QuizSøknadFormatTest {
     fun fangstOgFiske() {
         assertEquals(
             false,
-            QuizSøknadFormat(utenSeksjoner()).fangstOgFisk()
+            QuizSøknadFormat(utenSeksjoner()).fangstOgFisk(),
         )
     }
 
@@ -108,7 +108,7 @@ internal class QuizSøknadFormatTest {
         val now = LocalDate.now()
         assertEquals(
             now,
-            QuizSøknadFormat(ønskerDagpengerFraDatoJson(now.toString())).ønskerDagpengerFraDato()
+            QuizSøknadFormat(ønskerDagpengerFraDatoJson(now.toString())).ønskerDagpengerFraDato(),
         )
     }
 
@@ -117,7 +117,7 @@ internal class QuizSøknadFormatTest {
         val uuid = UUID.randomUUID()
         assertEquals(
             uuid.toString(),
-            QuizSøknadFormat(utenSeksjoner(uuid)).søknadsId()
+            QuizSøknadFormat(utenSeksjoner(uuid)).søknadsId(),
         )
     }
 }

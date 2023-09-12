@@ -36,7 +36,7 @@ internal class MinsteinntektVurderingLøserTest {
         MinsteinntektVurderingLøser(
             regelApiClient = regelApiClientMock,
             repository = minsteinntektVurderingRepository,
-            rapidsConnection = testRapid
+            rapidsConnection = testRapid,
         )
     }
 
@@ -72,14 +72,14 @@ internal class MinsteinntektVurderingLøserTest {
             val repository = mockk<MinsteinntektVurderingRepository>().also {
                 every { it.slettUtgåtteVurderinger() } returns listOf(
                     Pair("0", JsonMessage("""{}""", MessageProblems(""))),
-                    Pair("1", JsonMessage("""{}""", MessageProblems("")))
+                    Pair("1", JsonMessage("""{}""", MessageProblems(""))),
                 ) andThen emptyList()
             }
             MinsteinntektVurderingLøser(
                 oppryddningPeriode = 100.toLong(),
                 regelApiClient = mockk(),
                 repository = repository,
-                rapidsConnection = testRapid
+                rapidsConnection = testRapid,
             )
             delay(500)
 
@@ -104,28 +104,28 @@ internal class MinsteinntektVurderingLøserTest {
                             "packet" to PGobject().apply {
                                 type = "jsonb"
                                 value = JsonMessage("""{}""", MessageProblems("")).toJson()
-                            }
-                        )
-                    ).asUpdate
+                            },
+                        ),
+                    ).asUpdate,
                 )
 
                 MinsteinntektVurderingLøser(
                     oppryddningPeriode = 400.toLong(),
                     regelApiClient = mockk(),
                     repository = minsteinntektVurderingRepository,
-                    rapidsConnection = testRapid
+                    rapidsConnection = testRapid,
                 )
                 MinsteinntektVurderingLøser(
                     oppryddningPeriode = 401.toLong(),
                     regelApiClient = mockk(),
                     repository = minsteinntektVurderingRepository,
-                    rapidsConnection = testRapid
+                    rapidsConnection = testRapid,
                 )
                 MinsteinntektVurderingLøser(
                     oppryddningPeriode = 402.toLong(),
                     regelApiClient = mockk(),
                     repository = minsteinntektVurderingRepository,
-                    rapidsConnection = testRapid
+                    rapidsConnection = testRapid,
                 )
             }
 

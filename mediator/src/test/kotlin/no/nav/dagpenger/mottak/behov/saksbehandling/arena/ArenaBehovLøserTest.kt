@@ -21,18 +21,18 @@ internal class ArenaBehovLøserTest {
         coEvery { it.harEksisterendeSaker(any()) } returns true
         coEvery { it.opprettStartVedtakOppgave(any(), any()) } returns OpprettVedtakOppgaveResponse(
             fagsakId = "123",
-            oppgaveId = "123"
+            oppgaveId = "123",
         )
         coEvery { it.opprettVurderHenvendelsOppgave(any(), any()) } returns OpprettVedtakOppgaveResponse(
             fagsakId = null,
-            oppgaveId = "123"
+            oppgaveId = "123",
         )
     }
 
     init {
         ArenaBehovLøser(
             arenaOppslag = arenaOppslagMock,
-            rapidsConnection = testRapid
+            rapidsConnection = testRapid,
         )
     }
 

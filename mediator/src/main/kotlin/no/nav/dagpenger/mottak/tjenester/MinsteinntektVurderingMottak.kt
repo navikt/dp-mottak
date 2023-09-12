@@ -16,7 +16,7 @@ import no.nav.helse.rapids_rivers.asLocalDateTime
 private val logg = KotlinLogging.logger {}
 internal class MinsteinntektVurderingMottak(
     private val innsendingMediator: InnsendingMediator,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
 
     private val løsning = "@løsning.${Behovtype.MinsteinntektVurdering.name}"
@@ -36,7 +36,7 @@ internal class MinsteinntektVurderingMottak(
         val minsteinntektVurdering = MinsteinntektArbeidsinntektVurdert(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = journalpostId,
-            oppfyllerMinsteArbeidsinntekt = packet[løsning].getOrNull("oppfyllerMinsteArbeidsinntekt")?.asBoolean()
+            oppfyllerMinsteArbeidsinntekt = packet[løsning].getOrNull("oppfyllerMinsteArbeidsinntekt")?.asBoolean(),
         )
 
         innsendingMediator.håndter(minsteinntektVurdering)

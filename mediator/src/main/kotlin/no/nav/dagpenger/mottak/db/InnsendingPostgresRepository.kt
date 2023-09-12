@@ -70,7 +70,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
         session.run(
             queryOf(
                 hentDataSql,
-                mapOf("jpId" to journalpostId.toLong())
+                mapOf("jpId" to journalpostId.toLong()),
             ).map { row ->
                 InnsendingData(
                     id = row.long("internId"),
@@ -85,7 +85,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                             journalpostStatus = row.string("status"),
                             behandlingstema = row.stringOrNull("behandlingstema"),
                             registertDato = it,
-                            dokumenter = listOf()
+                            dokumenter = listOf(),
                         )
                     },
                     oppfyllerMinsteArbeidsinntekt = row.booleanOrNull("oppfyllerMinsteArbeidsinntekt"),
@@ -97,14 +97,14 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                             fødselsnummer = row.string("ident"),
                             norskTilknytning = row.boolean("norsktilknytning"),
                             diskresjonskode = row.boolean("diskresjonskode"),
-                            egenAnsatt = row.boolean("egenansatt")
+                            egenAnsatt = row.boolean("egenansatt"),
 
                         )
                     },
                     arenaSakData = row.stringOrNull("fagsakId")?.let {
                         InnsendingData.ArenaSakData(
                             oppgaveId = row.string("oppgaveId"),
-                            fagsakId = it
+                            fagsakId = it,
                         )
                     },
                     søknadsData = row.binaryStreamOrNull("søknadsData")?.use {
@@ -113,11 +113,11 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                     aktivitetslogg = row.binaryStream("aktivitetslogg").use {
                         JsonMapper.jacksonJsonAdapter.readValue(
                             it,
-                            InnsendingData.AktivitetsloggData::class.java
+                            InnsendingData.AktivitetsloggData::class.java,
                         )
-                    }
+                    },
                 )
-            }.asSingle
+            }.asSingle,
         )?.let {
             val dokumenter = session.run(
                 queryOf( //language=PostgreSQL
@@ -130,17 +130,17 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         FROM journalpost_dokumenter_v1 WHERE id = :internId
                     """.trimIndent(),
                     mapOf(
-                        "internId" to it.id
-                    )
+                        "internId" to it.id,
+                    ),
 
                 ).map { row ->
                     InnsendingData.JournalpostData.DokumentInfoData(
                         brevkode = row.string("brevkode"),
                         tittel = row.string("tittel"),
                         dokumentInfoId = row.string("dokumentInfoId"),
-                        hovedDokument = row.boolean("hovedDokument")
+                        hovedDokument = row.boolean("hovedDokument"),
                     )
-                }.asList
+                }.asList,
             )
 
             it.copy(journalpostData = it.journalpostData?.copy(dokumenter = dokumenter)).createInnsending()
@@ -155,10 +155,10 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         """ 
                         SELECT id from innsending_v1 where journalpostid = :journalpostId
                         """.trimIndent(),
-                        mapOf("journalpostId" to innsending.journalpostId().toLong())
+                        mapOf("journalpostId" to innsending.journalpostId().toLong()),
                     ).map {
                         it.longOrNull("id")
-                    }.asSingle
+                    }.asSingle,
                 ) ?: NyInnsendingQueryVisiotor(innsending, transactionalSession).internId
                 val visitor = InnsendingQueryVisitor(innsending, internId)
                 visitor.lagreQueries.sumOf { transactionalSession.run(it.asUpdate) }
@@ -181,21 +181,21 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                 """.trimIndent(),
                 mapOf(
                     "fom" to periode.fom,
-                    "tom" to periode.tom
-                )
+                    "tom" to periode.tom,
+                ),
             ).map { row ->
                 InnsendingPeriode(
                     ident = row.stringOrNull("ident") ?: "Ident mangler",
                     registrertDato = row.localDateTime("registrertDato"),
-                    journalpostId = row.string("journalpostId")
+                    journalpostId = row.string("journalpostId"),
                 )
-            }.asList
+            }.asList,
         )
     }
 
     class NyInnsendingQueryVisiotor(
         private val innsending: Innsending,
-        private val transactionalSession: TransactionalSession
+        private val transactionalSession: TransactionalSession,
     ) :
         InnsendingVisitor {
         var internId: Long = 0
@@ -210,11 +210,11 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                     "INSERT INTO innsending_v1(journalpostId,tilstand) VALUES(:jpId, :tilstand) RETURNING id",
                     mapOf(
                         "jpId" to innsending.journalpostId().toLong(),
-                        "tilstand" to tilstandType.type.name
-                    )
+                        "tilstand" to tilstandType.type.name,
+                    ),
                 ).map { row ->
                     row.long("id")
-                }.asSingle
+                }.asSingle,
             ) ?: throw IllegalArgumentException("Feil ved opprettelse av Innsending! Noe er galt")
         }
     }
@@ -236,9 +236,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                     """.trimIndent(),
                     mapOf(
                         "id" to internId,
-                        "tilstand" to tilstandType.type.name
-                    )
-                )
+                        "tilstand" to tilstandType.type.name,
+                    ),
+                ),
             )
         }
 
@@ -249,9 +249,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         "INSERT INTO innsending_oppfyller_minsteinntekt_v1(id,verdi) VALUES (:id, :verdi) ON CONFLICT DO NOTHING ",
                         mapOf(
                             "id" to internId,
-                            "verdi" to it
-                        )
-                    )
+                            "verdi" to it,
+                        ),
+                    ),
                 )
             }
             eksisterendeSaker?.let {
@@ -260,9 +260,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         "INSERT INTO innsending_eksisterende_arena_saker_v1(id,verdi) VALUES (:id, :verdi) ON CONFLICT DO NOTHING ",
                         mapOf(
                             "id" to internId,
-                            "verdi" to it
-                        )
-                    )
+                            "verdi" to it,
+                        ),
+                    ),
                 )
             }
         }
@@ -273,7 +273,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             bruker: Journalpost.Bruker?,
             behandlingstema: String?,
             registrertDato: LocalDateTime,
-            dokumenter: List<Journalpost.DokumentInfo>
+            dokumenter: List<Journalpost.DokumentInfo>,
         ) {
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
@@ -288,9 +288,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         "brukerId" to bruker?.id,
                         "brukerType" to bruker?.type?.name,
                         "behandlingstema" to behandlingstema,
-                        "registrertDato" to registrertDato
-                    )
-                )
+                        "registrertDato" to registrertDato,
+                    ),
+                ),
             )
 
             val dokumentQueries = dokumenter.map {
@@ -304,8 +304,8 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         "tittel" to it.tittel,
                         "dokumentInfoId" to it.dokumentInfoId.toLong(),
                         "brevkode" to it.brevkode,
-                        "hovedDokument" to it.hovedDokument
-                    )
+                        "hovedDokument" to it.hovedDokument,
+                    ),
                 )
             }
 
@@ -324,9 +324,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                             "data" to PGobject().apply {
                                 type = "jsonb"
                                 value = it.data().toString()
-                            }
-                        )
-                    )
+                            },
+                        ),
+                    ),
                 )
             }
         }
@@ -337,22 +337,21 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
             ident: String,
             norskTilknytning: Boolean,
             diskresjonskode: Boolean,
-            egenAnsatt: Boolean
+            egenAnsatt: Boolean,
         ) {
-
             lagreQueries.add(
                 queryOf( //language=PostgreSQL
                     """
                        INSERT INTO person_v1(ident, aktørId)
                         VALUES(:ident,:aktoerId) 
                         ON CONFLICT DO NOTHING
-                        """.trimMargin(),
+                    """.trimMargin(),
                     mapOf(
                         "id" to internId,
                         "ident" to ident,
-                        "aktoerId" to aktørId
-                    )
-                )
+                        "aktoerId" to aktørId,
+                    ),
+                ),
             )
 
             lagreQueries.add(
@@ -362,7 +361,7 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         SELECT :id, :navn, id, :norskTilknytning, :diskresjonskode,:egenansatt
                         FROM public.person_v1 WHERE ident = :ident 
                         AND aktørid = :aktoerId ON CONFLICT DO NOTHING 
-                        """.trimMargin(),
+                    """.trimMargin(),
                     mapOf(
                         "id" to internId,
                         "ident" to ident,
@@ -370,9 +369,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         "aktoerId" to aktørId,
                         "norskTilknytning" to norskTilknytning,
                         "diskresjonskode" to diskresjonskode,
-                        "egenansatt" to egenAnsatt
-                    )
-                )
+                        "egenansatt" to egenAnsatt,
+                    ),
+                ),
             )
         }
 
@@ -386,9 +385,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                     mapOf(
                         "id" to internId,
                         "fagsakId" to fagsakId,
-                        "oppgaveId" to oppgaveId
-                    )
-                )
+                        "oppgaveId" to oppgaveId,
+                    ),
+                ),
             )
         }
 
@@ -404,9 +403,9 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                         "data" to PGobject().apply {
                             type = "jsonb"
                             value = JsonMapper.jacksonJsonAdapter.writeValueAsString(aktivitetslogg.toMap())
-                        }
-                    )
-                )
+                        },
+                    ),
+                ),
             )
         }
     }

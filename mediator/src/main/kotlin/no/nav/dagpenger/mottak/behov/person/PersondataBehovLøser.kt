@@ -11,7 +11,7 @@ import no.nav.helse.rapids_rivers.withMDC
 
 internal class PersondataBehovLøser(
     private val personOppslag: PersonOppslag,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
 
     companion object {
@@ -29,14 +29,13 @@ internal class PersondataBehovLøser(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-
         val journalpostId = packet["journalpostId"].asText()
         val behovId = packet["@behovId"].asText()
         withMDC(
             mapOf(
                 "behovId" to behovId,
-                "journalpostId" to journalpostId
-            )
+                "journalpostId" to journalpostId,
+            ),
         ) {
             runBlocking(MDCContext()) { personOppslag.hentPerson(packet["brukerId"].asText()) }.also {
                 packet["@løsning"] = mapOf("Persondata" to it)

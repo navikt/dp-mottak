@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 
 internal class JournalpostBehovLøser(
     private val journalpostArkiv: JournalpostArkiv,
-    rapidsConnection: RapidsConnection
+    rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
     companion object {
         private val logger = KotlinLogging.logger { }
@@ -30,14 +30,13 @@ internal class JournalpostBehovLøser(
     }
 
     override fun onPacket(packet: JsonMessage, context: MessageContext) {
-
         val journalpostId = packet["journalpostId"].asText()
         val behovId = packet["@behovId"].asText()
         withMDC(
             mapOf(
                 "behovId" to behovId,
-                "journalpostId" to journalpostId
-            )
+                "journalpostId" to journalpostId,
+            ),
         ) {
             runBlocking(MDCContext()) { journalpostArkiv.hentJournalpost(journalpostId) }.also {
                 packet["@løsning"] = mapOf("Journalpost" to it)

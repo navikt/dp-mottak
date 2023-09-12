@@ -25,7 +25,7 @@ internal class OppdaterJournalpostBehovLøserTest {
     init {
         OppdaterJournalpostBehovLøser(
             journalpostDokarkiv = mockedJournalpostDokarkiv,
-            rapidsConnection = testRapid
+            rapidsConnection = testRapid,
         )
     }
 
@@ -73,7 +73,7 @@ internal class OppdaterJournalpostBehovLøserTest {
   "error": "Bad Request",
   "message": "Bruker kan ikke oppdateres for journalpost med journalpostStatus=J og journalpostType=I.",
   "path": "/rest/journalpostapi/v1/journalpost/493358469"
-}"""
+}""",
 
         )
         testRapid.sendTestMessage(journalpostBehov("12345"))

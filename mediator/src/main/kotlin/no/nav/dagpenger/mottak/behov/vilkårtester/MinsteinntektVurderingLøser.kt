@@ -13,7 +13,7 @@ internal class MinsteinntektVurderingLøser(
     oppryddningPeriode: Long = FEM_MINUTTER,
     regelApiClient: RegelApiClient,
     private val repository: MinsteinntektVurderingRepository,
-    private val rapidsConnection: RapidsConnection
+    private val rapidsConnection: RapidsConnection,
 ) {
     private companion object {
         private const val FEM_MINUTTER = 300000.toLong()
@@ -29,13 +29,13 @@ internal class MinsteinntektVurderingLøser(
             name = "MinsteinntektVurderingVaktmester",
             daemon = true,
             initialDelay = oppryddningPeriode,
-            period = oppryddningPeriode
+            period = oppryddningPeriode,
         ) { minsteInntektVurderingVaktmester.rydd() }
     }
 
     private inner class StartBehovPacketListener(
         private val regelApiClient: RegelApiClient,
-        rapidsConnection: RapidsConnection
+        rapidsConnection: RapidsConnection,
     ) :
         River.PacketListener {
         init {
@@ -49,23 +49,21 @@ internal class MinsteinntektVurderingLøser(
         }
 
         override fun onPacket(packet: JsonMessage, context: MessageContext) {
-
             val journalpostId = packet["journalpostId"].asText()
             val behovId = packet["@behovId"].asText()
 
             withMDC(
                 mapOf(
                     "behovId" to behovId,
-                    "journalpostId" to journalpostId
-                )
+                    "journalpostId" to journalpostId,
+                ),
             ) {
-
                 runBlocking {
                     try {
                         logger.info { "Forsøker å opprette minsteinntektvurderingsbehov i regel-api for journalpost med $journalpostId" }
                         regelApiClient.startMinsteinntektVurdering(
                             aktørId = packet["aktørId"].asText(),
-                            journalpostId = journalpostId
+                            journalpostId = journalpostId,
                         )
                         repository.lagre(journalpostId, packet)
                     } catch (e: Exception) {
@@ -92,7 +90,7 @@ internal class MinsteinntektVurderingLøser(
     }
 
     private inner class LøsningPacketListener(
-        rapidsConnection: RapidsConnection
+        rapidsConnection: RapidsConnection,
     ) :
         River.PacketListener {
         init {
@@ -120,8 +118,8 @@ internal class MinsteinntektVurderingLøser(
 
     private fun ikkeFåttSvar() = mapOf(
         "MinsteinntektVurdering" to mapOf(
-            "oppfyllerMinsteArbeidsinntekt" to null
-        )
+            "oppfyllerMinsteArbeidsinntekt" to null,
+        ),
     )
 }
 

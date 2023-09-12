@@ -63,8 +63,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "behandlendeEnhetId",
                 "oppgavebeskrivelse",
                 "registrertDato",
-                "tilleggsinformasjon"
-            )
+                "tilleggsinformasjon",
+            ),
         )
 
         håndterJournalpostOppdatert()
@@ -76,8 +76,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "navn",
                 "fagsakId",
                 "tittel",
-                "dokumenter"
-            )
+                "dokumenter",
+            ),
         )
 
         håndterJournalpostFerdigstilt()
@@ -93,7 +93,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerSvarOmEksisterendeSakerType,
             AventerArenaStartVedtakType,
             AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType
+            InnsendingFerdigstiltType,
         )
 
         inspektør.also {
@@ -143,8 +143,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "behandlendeEnhetId",
                 "oppgavebeskrivelse",
                 "registrertDato",
-                "tilleggsinformasjon"
-            )
+                "tilleggsinformasjon",
+            ),
         )
 
         håndterJournalpostOppdatert()
@@ -156,8 +156,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "navn",
                 "fagsakId",
                 "tittel",
-                "dokumenter"
-            )
+                "dokumenter",
+            ),
         )
 
         håndterJournalpostFerdigstilt()
@@ -171,7 +171,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerSøknadsdataType,
             AventerArenaOppgaveType,
             AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType
+            InnsendingFerdigstiltType,
         )
 
         inspektør.also {
@@ -207,8 +207,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "behandlendeEnhetId",
                 "oppgavebeskrivelse",
                 "registrertDato",
-                "tilleggsinformasjon"
-            )
+                "tilleggsinformasjon",
+            ),
         )
         håndterJournalpostOppdatert()
         assertBehovDetaljer(
@@ -219,8 +219,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "fagsakId",
                 "navn",
                 "tittel",
-                "dokumenter"
-            )
+                "dokumenter",
+            ),
         )
         håndterJournalpostFerdigstilt()
 
@@ -231,7 +231,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             KategoriseringType,
             AventerArenaOppgaveType,
             AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType
+            InnsendingFerdigstiltType,
         )
 
         inspektør.also {
@@ -268,8 +268,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "behandlendeEnhetId",
                 "oppgavebeskrivelse",
                 "registrertDato",
-                "tilleggsinformasjon"
-            )
+                "tilleggsinformasjon",
+            ),
         )
         håndterJournalpostOppdatert()
         assertBehovDetaljer(
@@ -280,8 +280,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "fagsakId",
                 "navn",
                 "tittel",
-                "dokumenter"
-            )
+                "dokumenter",
+            ),
         )
         håndterJournalpostFerdigstilt()
 
@@ -293,7 +293,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerSøknadsdataType,
             AventerArenaOppgaveType,
             AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType
+            InnsendingFerdigstiltType,
         )
 
         inspektør.also {
@@ -330,8 +330,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "behandlendeEnhetId",
                 "oppgavebeskrivelse",
                 "registrertDato",
-                "tilleggsinformasjon"
-            )
+                "tilleggsinformasjon",
+            ),
         )
         håndterJournalpostOppdatert()
         assertBehovDetaljer(
@@ -342,8 +342,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "fagsakId",
                 "navn",
                 "tittel",
-                "dokumenter"
-            )
+                "dokumenter",
+            ),
         )
         håndterJournalpostFerdigstilt()
 
@@ -355,7 +355,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerSøknadsdataType,
             AventerArenaOppgaveType,
             AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType
+            InnsendingFerdigstiltType,
         )
 
         inspektør.also {
@@ -389,7 +389,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerPersondataType,
             KategoriseringType,
             AvventerGosysType,
-            InnsendingFerdigstiltType
+            InnsendingFerdigstiltType,
         )
 
         inspektør.also {
@@ -415,7 +415,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         assertTilstander(
             MottattType,
             AvventerJournalpostType,
-            AlleredeBehandletType
+            AlleredeBehandletType,
         )
 
         assertPuml("JournalpostStatus annen enn MOTTATT")
@@ -437,8 +437,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "behandlendeEnhetId",
                 "oppgavebeskrivelse",
                 "registrertDato",
-                "tilleggsinformasjon"
-            )
+                "tilleggsinformasjon",
+            ),
         )
         assertBehovDetaljer(
             OpprettGosysoppgave,
@@ -448,8 +448,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "behandlendeEnhetId",
                 "oppgavebeskrivelse",
                 "registrertDato",
-                "tilleggsinformasjon"
-            )
+                "tilleggsinformasjon",
+            ),
         )
         assertTilstander(
             MottattType,
@@ -457,7 +457,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerPersondataType,
             KategoriseringType,
             AvventerGosysType,
-            InnsendingFerdigstiltType
+            InnsendingFerdigstiltType,
         )
         inspektør.also { it ->
             assertNoErrors(it)
@@ -490,8 +490,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             "NAVe 04-01.04",
             "NAV 04-06.05",
             "GENERELL_INNSENDING",
-            "ukjent"
-        ]
+            "ukjent",
+        ],
     )
     fun `skal håndtere journalpost uten bruker`(brevkode: String) {
         håndterJoarkHendelse()
@@ -503,8 +503,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "behandlendeEnhetId",
                 "oppgavebeskrivelse",
                 "registrertDato",
-                "tilleggsinformasjon"
-            )
+                "tilleggsinformasjon",
+            ),
         )
 
         assertTilstander(
@@ -512,7 +512,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerJournalpostType,
             KategoriseringType,
             UkjentBrukerType,
-            InnsendingFerdigstiltType
+            InnsendingFerdigstiltType,
         )
 
         inspektør.also {
@@ -538,7 +538,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerJournalpostType,
             AvventerPersondataType,
             UkjentBrukerType,
-            InnsendingFerdigstiltType
+            InnsendingFerdigstiltType,
         )
 
         inspektør.also {
@@ -559,7 +559,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             "ab0438",
             "ab0451",
             "ab0452",
-        ]
+        ],
     )
     @ParameterizedTest
     fun `skal håndtere at informasjon om bruker ikke er funnet og skjema er klage og anke`(behandlingstema: String) {
@@ -573,7 +573,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerJournalpostType,
             AvventerPersondataType,
             UkjentBrukerType,
-            InnsendingFerdigstiltType
+            InnsendingFerdigstiltType,
         )
 
         inspektør.also {
@@ -586,8 +586,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.datoRegistrert)
             assertEquals("4450", it.behandlendeEnhet)
         }
-
-        assertPuml("Ukjent bruker")
     }
 
     @Test
@@ -610,7 +608,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerPersondataType,
             KategoriseringType,
             AvventerGosysType,
-            InnsendingFerdigstiltType
+            InnsendingFerdigstiltType,
         )
         assertPuml("Ferdigstilte journalposter")
     }
