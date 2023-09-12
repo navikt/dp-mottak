@@ -33,7 +33,7 @@ dependencies {
     }
 
     testImplementation(kotlin("test"))
-    testImplementation("no.nav.security:mock-oauth2-server:0.4.5")
+    testImplementation("no.nav.security:mock-oauth2-server:1.0.0")
     testImplementation(Mockk.mockk)
     testImplementation(TestContainers.postgresql)
     testImplementation(Junit5.params)
