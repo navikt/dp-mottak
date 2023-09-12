@@ -27,10 +27,6 @@ dependencies {
     implementation(Ktor2.Server.library("call-logging"))
     implementation("de.slub-dresden:urnlib:2.0.1")
 
-    // unleash
-    implementation("no.finn.unleash:unleash-client-java:4.4.1") {
-        exclude("org.apache.logging.log4j")
-    }
 
     testImplementation(kotlin("test"))
     testImplementation("no.nav.security:mock-oauth2-server:1.0.0")
