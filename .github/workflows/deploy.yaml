@@ -1,7 +1,9 @@
 name: Build and deploy
 
-on: [push]
-
+on:
+  push:
+    branches-ignore:
+      - 'dependabot/**'
 env:
   IMAGE: ghcr.io/${{ github.repository }}/dp-mottak:${{ github.sha }}
 
