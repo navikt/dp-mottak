@@ -13,7 +13,7 @@ dependencies {
     implementation(Database.HikariCP)
     implementation(Database.Kotlinquery)
     implementation(Database.Postgres)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.7.3")
     implementation(Jackson.core)
     implementation(Jackson.jsr310)
     implementation(Jackson.kotlin)
