@@ -28,7 +28,7 @@ dependencies {
     implementation("de.slub-dresden:urnlib:2.0.1")
 
     testImplementation(kotlin("test"))
-    testImplementation("no.nav.security:mock-oauth2-server:1.0.0")
+    testImplementation("no.nav.security:mock-oauth2-server:2.0.0")
     testImplementation(Mockk.mockk)
     testImplementation(TestContainers.postgresql)
     testImplementation(Junit5.params)
