@@ -10,19 +10,22 @@ import kotlin.test.assertEquals
 class PersonOppslagTest {
     private val id = "id"
     private val id2 = "id2"
-    private val pdlMock = mockkClass(type = PdlPersondataOppslag::class).also {
-        coEvery { it.hentPerson(any()) } returns Pdl.Person(
-            navn = "navn",
-            aktørId = "aktørId",
-            fødselsnummer = "fnr",
-            norskTilknytning = false,
-            diskresjonskode = "kode",
-        )
-    }
-    private val skjermingMock = mockkClass(type = SkjermingOppslag::class).also {
-        coEvery { it.egenAnsatt(id) } returns Result.success(true)
-        coEvery { it.egenAnsatt(id2) } returns Result.failure(Throwable("test"))
-    }
+    private val pdlMock =
+        mockkClass(type = PdlPersondataOppslag::class).also {
+            coEvery { it.hentPerson(any()) } returns
+                Pdl.Person(
+                    navn = "navn",
+                    aktørId = "aktørId",
+                    fødselsnummer = "fnr",
+                    norskTilknytning = false,
+                    diskresjonskode = "kode",
+                )
+        }
+    private val skjermingMock =
+        mockkClass(type = SkjermingOppslag::class).also {
+            coEvery { it.egenAnsatt(id) } returns Result.success(true)
+            coEvery { it.egenAnsatt(id2) } returns Result.failure(Throwable("test"))
+        }
 
     @Test
     fun `skal hente person info fra forskjellige kilder`() {

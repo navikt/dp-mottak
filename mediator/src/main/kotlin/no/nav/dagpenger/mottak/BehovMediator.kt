@@ -11,7 +11,6 @@ class BehovMediator(
     private val rapidsConnection: RapidsConnection,
     private val sikkerLogg: KLogger,
 ) {
-
     internal fun håndter(hendelse: Hendelse) {
         hendelse.kontekster().forEach { if (!it.hasErrors()) håndter(hendelse, it.behov()) }
     }

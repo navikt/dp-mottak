@@ -12,14 +12,15 @@ import org.junit.jupiter.params.provider.ValueSource
 
 class OppgavebenkTest {
     private val jp = lagjournalpostData("NAV 04-01.03").kategorisertJournalpost()
-    private val person = PersonInformasjon.Person(
-        "Test Navn",
-        "12344",
-        GENERERT_FØDSELSNUMMER,
-        norskTilknytning = true,
-        diskresjonskode = false,
-        egenAnsatt = false,
-    )
+    private val person =
+        PersonInformasjon.Person(
+            "Test Navn",
+            "12344",
+            GENERERT_FØDSELSNUMMER,
+            norskTilknytning = true,
+            diskresjonskode = false,
+            egenAnsatt = false,
+        )
 
     @Test
     fun `Finn riktig oppgave beskrivelse og benk når søker har eøs arbeidsforhold de siste 3 årene `() {
@@ -164,8 +165,9 @@ class OppgavebenkTest {
     @Test
     fun `Finn riktig oppgave beskrivelse og benk ved oppfyller minsteinntekt ved permittering   `() {
         withSøknad {
-            val oppgaveBenk = lagjournalpostData("NAV 04-01.04").kategorisertJournalpost()
-                .oppgaveBenk(person = person, rutingOppslag = it, oppfyllerMinsteArbeidsinntekt = false)
+            val oppgaveBenk =
+                lagjournalpostData("NAV 04-01.04").kategorisertJournalpost()
+                    .oppgaveBenk(person = person, rutingOppslag = it, oppfyllerMinsteArbeidsinntekt = false)
             assertEquals("Minsteinntekt - mulig avslag\n", oppgaveBenk.beskrivelse)
             assertEquals("4450", oppgaveBenk.id)
         }
@@ -174,8 +176,9 @@ class OppgavebenkTest {
     @Test
     fun `Finn riktig oppgave beskrivelse og person ikke har norsk tilknytning ved permittering`() {
         withSøknad {
-            val oppgaveBenk = lagjournalpostData("NAV 04-01.04").kategorisertJournalpost()
-                .oppgaveBenk(person = person.copy(norskTilknytning = false), rutingOppslag = it)
+            val oppgaveBenk =
+                lagjournalpostData("NAV 04-01.04").kategorisertJournalpost()
+                    .oppgaveBenk(person = person.copy(norskTilknytning = false), rutingOppslag = it)
             assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
             assertEquals("4465", oppgaveBenk.id)
         }
@@ -218,14 +221,15 @@ class OppgavebenkTest {
         mockkStatic(
             "no.nav.dagpenger.mottak.SøknadFaktaKt",
         ) {
-            val søknad = mockk<RutingOppslag>(relaxed = false).also {
-                every { it.eøsArbeidsforhold() } returns harEøsArbeidsforhold
-                every { it.avtjentVerneplikt() } returns harAvtjentVerneplikt
-                every { it.eøsBostedsland() } returns harEøsBostedsland
-                every { it.avsluttetArbeidsforholdFraKonkurs() } returns harAvsluttetArbeidsforholdFraKonkurs
-                every { it.permittertFraFiskeForedling() } returns erPermittertFraFiskeforedling
-                every { it.permittert() } returns erPermittert
-            }
+            val søknad =
+                mockk<RutingOppslag>(relaxed = false).also {
+                    every { it.eøsArbeidsforhold() } returns harEøsArbeidsforhold
+                    every { it.avtjentVerneplikt() } returns harAvtjentVerneplikt
+                    every { it.eøsBostedsland() } returns harEøsBostedsland
+                    every { it.avsluttetArbeidsforholdFraKonkurs() } returns harAvsluttetArbeidsforholdFraKonkurs
+                    every { it.permittertFraFiskeForedling() } returns erPermittertFraFiskeforedling
+                    every { it.permittert() } returns erPermittert
+                }
             test(søknad)
         }
     }

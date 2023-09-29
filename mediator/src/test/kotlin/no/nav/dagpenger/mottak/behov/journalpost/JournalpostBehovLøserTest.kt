@@ -12,7 +12,6 @@ import java.util.UUID
 import kotlin.test.assertTrue
 
 internal class JournalpostBehovLøserTest {
-
     private companion object {
         val JOURNALPOST_ID = "124567"
 
@@ -54,10 +53,11 @@ internal class JournalpostBehovLøserTest {
     init {
         JournalpostBehovLøser(
             rapidsConnection = testRapid,
-            journalpostArkiv = object : JournalpostArkiv {
-                override suspend fun hentJournalpost(journalpostId: String): SafGraphQL.Journalpost =
-                    SafGraphQL.Journalpost.fromGraphQlJson(journalpostJson)
-            },
+            journalpostArkiv =
+                object : JournalpostArkiv {
+                    override suspend fun hentJournalpost(journalpostId: String): SafGraphQL.Journalpost =
+                        SafGraphQL.Journalpost.fromGraphQlJson(journalpostJson)
+                },
         )
     }
 
@@ -83,7 +83,8 @@ internal class JournalpostBehovLøserTest {
     }
 
     private fun journalpostBehov(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behovId": "${UUID.randomUUID()}",

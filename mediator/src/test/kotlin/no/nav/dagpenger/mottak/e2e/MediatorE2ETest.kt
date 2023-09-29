@@ -16,19 +16,20 @@ import java.util.UUID
 import kotlin.random.Random
 
 internal class MediatorE2ETest {
-
     var journalpostId: Long = 0L
 
     private val testRapid = TestRapid()
-    private val innsendingRepository = InnsendingPostgresRepository(datasource = PostgresDataSourceBuilder.dataSource).also {
-        PostgresDataSourceBuilder.runMigration()
-    }
+    private val innsendingRepository =
+        InnsendingPostgresRepository(datasource = PostgresDataSourceBuilder.dataSource).also {
+            PostgresDataSourceBuilder.runMigration()
+        }
     private val testObservatør = TestObservatør()
-    private val innsendingMediator = InnsendingMediator(
-        innsendingRepository = innsendingRepository,
-        rapidsConnection = testRapid,
-        observatører = listOf(testObservatør),
-    )
+    private val innsendingMediator =
+        InnsendingMediator(
+            innsendingRepository = innsendingRepository,
+            rapidsConnection = testRapid,
+            observatører = listOf(testObservatør),
+        )
 
     init {
         MottakMediator(innsendingMediator, testRapid)
@@ -159,7 +160,10 @@ internal class MediatorE2ETest {
         assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
     }
 
-    private fun assertBehov(expectedBehov: String, indexPåMelding: Int) {
+    private fun assertBehov(
+        expectedBehov: String,
+        indexPåMelding: Int,
+    ) {
         assertTrue(testRapid.inspektør.size == indexPåMelding + 1, "Ingen melding på index $indexPåMelding")
         testRapid.inspektør.message(indexPåMelding).also { jsonNode ->
             assertEquals(expectedBehov, jsonNode["@behov"].map { it.asText() }.first())
@@ -171,9 +175,13 @@ internal class MediatorE2ETest {
         testRapid.sendTestMessage(melding)
     }
 
-    private fun journalpostMottattHendelse(brevkode: String, journalstatus: String = "MOTTATT"): String =
+    private fun journalpostMottattHendelse(
+        brevkode: String,
+        journalstatus: String = "MOTTATT",
+    ): String =
         //language=JSON
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behov": [
@@ -217,7 +225,8 @@ internal class MediatorE2ETest {
 
     //language=JSON
     private fun persondataMottattHendelse(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behov": [
@@ -238,7 +247,8 @@ internal class MediatorE2ETest {
         """.trimIndent()
 
     //language=JSON
-    private fun joarkMelding(): String = """
+    private fun joarkMelding(): String =
+        """
         {
           "hendelsesId": "",
           "versjon": "",
@@ -250,11 +260,12 @@ internal class MediatorE2ETest {
           "mottaksKanal": "NAV_NO",
           "kanalReferanseId": "vetikke"
         }
-    """.trimIndent()
+        """.trimIndent()
 
     //language=JSON
     private fun søknadsdataMottakHendelse(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behov": [
@@ -275,7 +286,8 @@ internal class MediatorE2ETest {
 
     //language=JSON
     private fun minsteinntektVurderingMotattHendelse(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behov": [
@@ -293,7 +305,8 @@ internal class MediatorE2ETest {
 
     //language=JSON
     private fun eksisterendeSakerMotattHendelse(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behov": [
@@ -311,25 +324,27 @@ internal class MediatorE2ETest {
 
     //language=JSON
     private fun opprettArenaOppgaveFeilet(): String =
-        """{
-          "@event_name": "behov",
-          "@id": "${UUID.randomUUID()}",
-          "@behov": [
-            "OpprettStartVedtakOppgave"
-          ],
-          "@opprettet": "${now()}",
-          "journalpostId": "$journalpostId",
-          "@løsning": {
-            "OpprettStartVedtakOppgave": {
-              "@feil" : "Kunne ikke opprettet arenaoppgave"
-            }
-          }
-}
+        """
+        {
+                  "@event_name": "behov",
+                  "@id": "${UUID.randomUUID()}",
+                  "@behov": [
+                    "OpprettStartVedtakOppgave"
+                  ],
+                  "@opprettet": "${now()}",
+                  "journalpostId": "$journalpostId",
+                  "@løsning": {
+                    "OpprettStartVedtakOppgave": {
+                      "@feil" : "Kunne ikke opprettet arenaoppgave"
+                    }
+                  }
+        }
         """.trimIndent()
 
     //language=JSON
     private fun opprettStartVedtakMotattHendelse(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behov": [
@@ -348,7 +363,8 @@ internal class MediatorE2ETest {
 
     //language=JSON
     private fun opprettOpprettVurderhenvendelseHendelse(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behov": [
@@ -367,7 +383,8 @@ internal class MediatorE2ETest {
 
     //language=JSON
     private fun oppdatertJournalpostMotattHendelse(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behov": [
@@ -385,7 +402,8 @@ internal class MediatorE2ETest {
 
     //language=JSON
     private fun ferdigstiltJournalpostMotattHendelse(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behov": [
@@ -403,7 +421,8 @@ internal class MediatorE2ETest {
 
     //language=JSON
     private fun gosysOppgaveOpprettetHendelse(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behov": [

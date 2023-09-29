@@ -17,37 +17,37 @@ import java.net.UnknownHostException
 import java.util.Properties
 
 internal object Config {
-
-    private val defaultProperties = ConfigurationMap(
-        mapOf(
-            "DB_DATABASE" to "dp-mottak",
-            "DB_HOST" to "localhost",
-            "DB_PASSWORD" to "password",
-            "DB_PORT" to "5432",
-            "DB_USERNAME" to "username",
-            "DP_PROXY_SCOPE" to "api://dev-fss.teamdagpenger.dp-proxy/.default",
-            "HTTP_PORT" to "8080",
-            "KAFKA_CONSUMER_GROUP_ID" to "dp-mottak-v1",
-            "KAFKA_EXTRA_TOPIC" to "teamdagpenger.mottak.v1,teamdagpenger.regel.v1",
-            "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
-            "KAFKA_RESET_POLICY" to "latest",
-            "PDL_API_SCOPE" to "api://dev-fss.pdl.pdl-api/.default",
-            "SKJERMING_API_SCOPE" to "api://dev-gcp.nom.skjermede-personer-pip/.default",
-            "SKJERMING_API_URL" to "http://skjermede-personer-pip.nom/skjermet",
-            "UNLEASH_URL" to "https://unleash.nais.io/api/",
-            "AZURE_OPENID_CONFIG_ISSUER" to "azureAd",
-            "AZURE_APP_CLIENT_ID" to "azureClientId",
-            "AZURE_OPENID_CONFIG_JWKS_URI" to "http://localhost:4443",
-
-        ),
-    )
-    private val prodProperties = ConfigurationMap(
-        mapOf(
-            "DP_PROXY_SCOPE" to "api://prod-fss.teamdagpenger.dp-proxy/.default",
-            "PDL_API_SCOPE" to "api://prod-fss.pdl.pdl-api/.default",
-            "SKJERMING_API_SCOPE" to "api://prod-gcp.nom.skjermede-personer-pip/.default",
-        ),
-    )
+    private val defaultProperties =
+        ConfigurationMap(
+            mapOf(
+                "DB_DATABASE" to "dp-mottak",
+                "DB_HOST" to "localhost",
+                "DB_PASSWORD" to "password",
+                "DB_PORT" to "5432",
+                "DB_USERNAME" to "username",
+                "DP_PROXY_SCOPE" to "api://dev-fss.teamdagpenger.dp-proxy/.default",
+                "HTTP_PORT" to "8080",
+                "KAFKA_CONSUMER_GROUP_ID" to "dp-mottak-v1",
+                "KAFKA_EXTRA_TOPIC" to "teamdagpenger.mottak.v1,teamdagpenger.regel.v1",
+                "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
+                "KAFKA_RESET_POLICY" to "latest",
+                "PDL_API_SCOPE" to "api://dev-fss.pdl.pdl-api/.default",
+                "SKJERMING_API_SCOPE" to "api://dev-gcp.nom.skjermede-personer-pip/.default",
+                "SKJERMING_API_URL" to "http://skjermede-personer-pip.nom/skjermet",
+                "UNLEASH_URL" to "https://unleash.nais.io/api/",
+                "AZURE_OPENID_CONFIG_ISSUER" to "azureAd",
+                "AZURE_APP_CLIENT_ID" to "azureClientId",
+                "AZURE_OPENID_CONFIG_JWKS_URI" to "http://localhost:4443",
+            ),
+        )
+    private val prodProperties =
+        ConfigurationMap(
+            mapOf(
+                "DP_PROXY_SCOPE" to "api://prod-fss.teamdagpenger.dp-proxy/.default",
+                "PDL_API_SCOPE" to "api://prod-fss.pdl.pdl-api/.default",
+                "SKJERMING_API_SCOPE" to "api://prod-gcp.nom.skjermede-personer-pip/.default",
+            ),
+        )
 
     val properties: Configuration by lazy {
         val systemAndEnvProperties = ConfigurationProperties.systemProperties() overriding EnvironmentVariables()
@@ -99,19 +99,22 @@ internal object Config {
     }
 
     object AzureAd {
-        const val name = "azureAd"
+        const val NAME = "azureAd"
         val audience = properties[Key("AZURE_APP_CLIENT_ID", stringType)]
         val issuer = properties[Key("AZURE_OPENID_CONFIG_ISSUER", stringType)]
         val jwksURI = properties[Key("AZURE_OPENID_CONFIG_JWKS_URI", stringType)]
     }
 
     fun Configuration.skjermingApiUrl() = this[Key("SKJERMING_API_URL", stringType)]
+
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_HOST", stringType)].addHttprotocoll()
+
     fun Configuration.pdlApiUrl() = this[Key("PDL_API_HOST", stringType)].addHttprotocoll()
 
-    fun asMap(): Map<String, String> = properties.list().reversed().fold(emptyMap()) { map, pair ->
-        map + pair.second
-    }
+    fun asMap(): Map<String, String> =
+        properties.list().reversed().fold(emptyMap()) { map, pair ->
+            map + pair.second
+        }
 }
 
 private fun getHostname(): String {

@@ -18,7 +18,6 @@ internal class SøknadsDataVaktmester(
     private val safClient: SafClient,
     private val ds: DataSource = PostgresDataSourceBuilder.dataSource,
 ) {
-
     fun fixSoknadsData(jp: Int) {
         using(sessionOf(ds)) { session ->
             try {
@@ -39,18 +38,23 @@ internal class SøknadsDataVaktmester(
         }
     }
 
-    private fun Session.insertSøknadsData(id: Int, data: String) {
+    private fun Session.insertSøknadsData(
+        id: Int,
+        data: String,
+    ) {
         this.run(
             queryOf(
                 //language=PostgreSQL
                 statement = """INSERT INTO soknad_v1(id,data) VALUES(:id,:data) ON CONFLICT(id) DO UPDATE SET data = :data """,
-                paramMap = mapOf(
-                    "id" to id,
-                    "data" to PGobject().apply {
-                        type = "jsonb"
-                        value = data
-                    },
-                ),
+                paramMap =
+                    mapOf(
+                        "id" to id,
+                        "data" to
+                            PGobject().apply {
+                                type = "jsonb"
+                                value = data
+                            },
+                    ),
             ).asUpdate,
         )
     }
@@ -78,7 +82,8 @@ internal class SøknadsDataVaktmester(
 
     private fun Session.låsOpp(låseNøkkel: Int): Boolean {
         return this.run(
-            queryOf( //language=PostgreSQL
+            queryOf(
+                // language=PostgreSQL
                 "SELECT pg_advisory_unlock(:key)",
                 mapOf("key" to låseNøkkel),
             ).map { res ->
@@ -89,7 +94,8 @@ internal class SøknadsDataVaktmester(
 
     private fun Session.lås(låseNøkkel: Int): Boolean {
         return this.run(
-            queryOf( //language=PostgreSQL
+            queryOf(
+                // language=PostgreSQL
                 "SELECT pg_try_advisory_lock(:key)",
                 mapOf("key" to låseNøkkel),
             ).map { res ->

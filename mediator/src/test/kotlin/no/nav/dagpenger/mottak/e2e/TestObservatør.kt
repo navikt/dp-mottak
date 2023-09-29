@@ -4,7 +4,6 @@ import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 
 internal class TestObservatør : InnsendingObserver {
-
     internal val tilstander = mutableListOf<InnsendingTilstandType>()
 
     override fun tilstandEndret(event: InnsendingObserver.InnsendingEndretTilstandEvent) {

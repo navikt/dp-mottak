@@ -48,7 +48,10 @@ internal class MinsteinntektVurderingLøser(
             }.register(this)
         }
 
-        override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        override fun onPacket(
+            packet: JsonMessage,
+            context: MessageContext,
+        ) {
             val journalpostId = packet["journalpostId"].asText()
             val behovId = packet["@behovId"].asText()
 
@@ -103,11 +106,17 @@ internal class MinsteinntektVurderingLøser(
             }.register(this)
         }
 
-        override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        override fun onPacket(
+            packet: JsonMessage,
+            context: MessageContext,
+        ) {
             val key = repository.fjern(packet["kontekstId"].asText())
             key?.let {
                 it["@løsning"] =
-                    mapOf("MinsteinntektVurdering" to MinsteinntektVurdering(packet["minsteinntektResultat"]["oppfyllerMinsteinntekt"].asBoolean()))
+                    mapOf(
+                        "MinsteinntektVurdering" to
+                            MinsteinntektVurdering(packet["minsteinntektResultat"]["oppfyllerMinsteinntekt"].asBoolean()),
+                    )
                 context.publish(it.toJson())
                 logger.info { "Løste behov for minsteinntekt ${packet["kontekstId"].asText()}" }
             }
@@ -116,15 +125,22 @@ internal class MinsteinntektVurderingLøser(
 
     private data class MinsteinntektVurdering(val oppfyllerMinsteArbeidsinntekt: Boolean)
 
-    private fun ikkeFåttSvar() = mapOf(
-        "MinsteinntektVurdering" to mapOf(
-            "oppfyllerMinsteArbeidsinntekt" to null,
-        ),
-    )
+    private fun ikkeFåttSvar() =
+        mapOf(
+            "MinsteinntektVurdering" to
+                mapOf(
+                    "oppfyllerMinsteArbeidsinntekt" to null,
+                ),
+        )
 }
 
 interface MinsteinntektVurderingRepository {
-    fun lagre(journalpostId: String, packet: JsonMessage): Int
+    fun lagre(
+        journalpostId: String,
+        packet: JsonMessage,
+    ): Int
+
     fun fjern(journalpostId: String): JsonMessage?
+
     fun slettUtgåtteVurderinger(): List<Pair<String, JsonMessage>>
 }

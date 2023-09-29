@@ -43,6 +43,8 @@ interface InnsendingObserver {
     )
 
     fun tilstandEndret(event: InnsendingEndretTilstandEvent) {}
+
     fun innsendingFerdigstilt(event: InnsendingEvent) {}
+
     fun innsendingMottatt(event: InnsendingEvent) {}
 }

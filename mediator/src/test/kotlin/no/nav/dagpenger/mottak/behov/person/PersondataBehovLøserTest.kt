@@ -25,16 +25,18 @@ internal class PersondataBehovLøserTest {
     fun `Skal løse persondata behov`() {
         PersondataBehovLøser(
             rapidsConnection = testRapid,
-            personOppslag = object : PersonOppslag {
-                override suspend fun hentPerson(id: String): Person = Person(
-                    navn = "Hubba bubba",
-                    aktørId = "12345678",
-                    fødselsnummer = "1234567891",
-                    norskTilknytning = true,
-                    diskresjonskode = "diskresjonskode",
-                    egenAnsatt = false,
-                )
-            },
+            personOppslag =
+                object : PersonOppslag {
+                    override suspend fun hentPerson(id: String): Person =
+                        Person(
+                            navn = "Hubba bubba",
+                            aktørId = "12345678",
+                            fødselsnummer = "1234567891",
+                            norskTilknytning = true,
+                            diskresjonskode = "diskresjonskode",
+                            egenAnsatt = false,
+                        )
+                },
         )
         testRapid.sendTestMessage(persondataBehov())
         with(testRapid.inspektør) {
@@ -51,9 +53,10 @@ internal class PersondataBehovLøserTest {
     fun `Skal løse persondata behov hvis person ikke er funnet`() {
         PersondataBehovLøser(
             rapidsConnection = testRapid,
-            personOppslag = object : PersonOppslag {
-                override suspend fun hentPerson(id: String): Person? = null
-            },
+            personOppslag =
+                object : PersonOppslag {
+                    override suspend fun hentPerson(id: String): Person? = null
+                },
         )
         testRapid.sendTestMessage(persondataBehov())
         with(testRapid.inspektør) {
@@ -63,7 +66,8 @@ internal class PersondataBehovLøserTest {
     }
 
     private fun persondataBehov(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behovId": "${UUID.randomUUID()}",

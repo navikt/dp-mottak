@@ -4,7 +4,6 @@ import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 
 class TestObservatør : InnsendingObserver {
-
     internal val tilstander = mutableMapOf<String, MutableList<InnsendingTilstandType>>()
     internal var event: InnsendingObserver.InnsendingEvent? = null
     internal var mottattEvent: InnsendingObserver.InnsendingEvent? = null

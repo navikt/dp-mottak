@@ -21,10 +21,11 @@ class PersondataMottakTest {
     private val testRapid = TestRapid()
     private val slot = CapturingSlot<PersonInformasjon>()
 
-    private val innsendingMediator = mockk<InnsendingMediator>().also {
-        every { it.håndter(any<PersonInformasjonIkkeFunnet>()) } just Runs
-        every { it.håndter(capture(slot)) } just Runs
-    }
+    private val innsendingMediator =
+        mockk<InnsendingMediator>().also {
+            every { it.håndter(any<PersonInformasjonIkkeFunnet>()) } just Runs
+            every { it.håndter(capture(slot)) } just Runs
+        }
 
     init {
         PersondataMottak(innsendingMediator, testRapid)
@@ -58,39 +59,43 @@ class PersondataMottakTest {
     }
 
     //language=JSON
-    private val personDataHendelse: String = """{
-      "@event_name": "behov",
-      "@id": "${UUID.randomUUID()}",
-      "@behov": [
-        "Persondata"
-      ],
-      "@opprettet" : "${LocalDateTime.now()}",
-      "journalpostId": "45645646",
-      "@løsning": {
-        "Persondata": {
-         "navn": "navn",
-         "aktørId": "aktorId",
-         "fødselsnummer": "$GENERERT_FØDSELSNUMMER",
-         "norskTilknytning": true,
-         "diskresjonskode": "kode",
-         "egenAnsatt": true
+    private val personDataHendelse: String =
+        """
+        {
+          "@event_name": "behov",
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "Persondata"
+          ],
+          "@opprettet" : "${LocalDateTime.now()}",
+          "journalpostId": "45645646",
+          "@løsning": {
+            "Persondata": {
+             "navn": "navn",
+             "aktørId": "aktorId",
+             "fødselsnummer": "$GENERERT_FØDSELSNUMMER",
+             "norskTilknytning": true,
+             "diskresjonskode": "kode",
+             "egenAnsatt": true
+            }
+          }
         }
-      }
-    }
-    """.trimIndent()
+        """.trimIndent()
 
     //language=JSON
-    private val nullPersonData: String = """{
-      "@event_name": "behov",
-      "@id": "${UUID.randomUUID()}",
-      "@behov": [
-        "Persondata"
-      ],
-      "@opprettet" : "${LocalDateTime.now()}",
-      "journalpostId": "45645646",
-      "@løsning": {
-        "Persondata": null
-      }
-    }
-    """.trimIndent()
+    private val nullPersonData: String =
+        """
+        {
+          "@event_name": "behov",
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "Persondata"
+          ],
+          "@opprettet" : "${LocalDateTime.now()}",
+          "journalpostId": "45645646",
+          "@løsning": {
+            "Persondata": null
+          }
+        }
+        """.trimIndent()
 }

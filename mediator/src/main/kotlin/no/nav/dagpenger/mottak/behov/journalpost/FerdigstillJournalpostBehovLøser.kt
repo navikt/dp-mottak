@@ -12,7 +12,6 @@ internal class FerdigstillJournalpostBehovLøser(
     private val journalpostDokarkiv: JournalpostDokarkiv,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener, JournalpostFeil {
-
     private companion object {
         val logger = KotlinLogging.logger { }
     }
@@ -26,7 +25,10 @@ internal class FerdigstillJournalpostBehovLøser(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val journalpostId = packet["journalpostId"].asText()
         val behovId = packet["@behovId"].asText()
 
@@ -44,11 +46,13 @@ internal class FerdigstillJournalpostBehovLøser(
                 ignorerKjenteTilstander(e)
             }
 
-            packet["@løsning"] = mapOf(
-                "FerdigstillJournalpost" to mapOf(
-                    "journalpostId" to journalpostId,
-                ),
-            )
+            packet["@løsning"] =
+                mapOf(
+                    "FerdigstillJournalpost" to
+                        mapOf(
+                            "journalpostId" to journalpostId,
+                        ),
+                )
             context.publish(packet.toJson())
             logger.info("løste behov FerdigstillJournalpost for journalpost med id $journalpostId")
         }

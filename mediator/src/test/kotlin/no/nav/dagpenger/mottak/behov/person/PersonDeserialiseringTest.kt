@@ -30,51 +30,51 @@ internal class PersonDeserialiseringTest {
         assertTrue(
             hasError(
                 """
-               {
-                 "errors": [
-                   {
-                     "message": "Ikke tilgang til å se person",
-                     "locations": [
-                       {
-                         "line": 12,
-                         "column": 5
-                       }
-                     ],
-                     "path": [
-                       "hentGeografiskTilknytning"
-                     ],
-                     "extensions": {
-                       "code": "unauthorized",
-                       "classification": "ExecutionAborted"
-                     }
-                   }
-                 ],
-                 "data": {
-                   "hentPerson": {
-                     "navn": [
-                       {
-                         "fornavn": "DØLL",
-                         "mellomnavn": null,
-                         "etternavn": "MYGG"
-                       }
-                     ],
-                     "adressebeskyttelse": []
-                   },
-                   "hentGeografiskTilknytning": null,
-                   "hentIdenter": {
-                     "identer": [
-                       {
-                         "ident": "21341",
-                         "gruppe": "FOLKEREGISTERIDENT"
-                       },
-                       {
-                         "ident": "21341",
-                         "gruppe": "AKTORID"
-                       }
-                     ]
-                   }
-                 }
-               }
+                {
+                  "errors": [
+                    {
+                      "message": "Ikke tilgang til å se person",
+                      "locations": [
+                        {
+                          "line": 12,
+                          "column": 5
+                        }
+                      ],
+                      "path": [
+                        "hentGeografiskTilknytning"
+                      ],
+                      "extensions": {
+                        "code": "unauthorized",
+                        "classification": "ExecutionAborted"
+                      }
+                    }
+                  ],
+                  "data": {
+                    "hentPerson": {
+                      "navn": [
+                        {
+                          "fornavn": "DØLL",
+                          "mellomnavn": null,
+                          "etternavn": "MYGG"
+                        }
+                      ],
+                      "adressebeskyttelse": []
+                    },
+                    "hentGeografiskTilknytning": null,
+                    "hentIdenter": {
+                      "identer": [
+                        {
+                          "ident": "21341",
+                          "gruppe": "FOLKEREGISTERIDENT"
+                        },
+                        {
+                          "ident": "21341",
+                          "gruppe": "AKTORID"
+                        }
+                      ]
+                    }
+                  }
+                }
                 """.trimIndent(),
             ),
         )
@@ -86,33 +86,33 @@ internal class PersonDeserialiseringTest {
         assertFalse(
             hasError(
                 """
-               {
-                 "data": {
-                   "hentPerson": {
-                     "navn": [
-                       {
-                         "fornavn": "DØLL",
-                         "mellomnavn": null,
-                         "etternavn": "MYGG"
-                       }
-                     ],
-                     "adressebeskyttelse": []
-                   },
-                   "hentGeografiskTilknytning": null,
-                   "hentIdenter": {
-                     "identer": [
-                       {
-                         "ident": "21341",
-                         "gruppe": "FOLKEREGISTERIDENT"
-                       },
-                       {
-                         "ident": "21341",
-                         "gruppe": "AKTORID"
-                       }
-                     ]
-                   }
-                 }
-               }
+                {
+                  "data": {
+                    "hentPerson": {
+                      "navn": [
+                        {
+                          "fornavn": "DØLL",
+                          "mellomnavn": null,
+                          "etternavn": "MYGG"
+                        }
+                      ],
+                      "adressebeskyttelse": []
+                    },
+                    "hentGeografiskTilknytning": null,
+                    "hentIdenter": {
+                      "identer": [
+                        {
+                          "ident": "21341",
+                          "gruppe": "FOLKEREGISTERIDENT"
+                        },
+                        {
+                          "ident": "21341",
+                          "gruppe": "AKTORID"
+                        }
+                      ]
+                    }
+                  }
+                }
                 """.trimIndent(),
             ),
         )
@@ -145,11 +145,13 @@ internal class PersonDeserialiseringTest {
     }
 
     @Test
+    @Suppress("ktlint:standard:max-line-length")
     fun `riktig identer`() {
         @Language("JSON")
-        val json = jacksonJsonAdapter.readTree(
-            """{ "data": {"identer": [ { "ident": "13086824072", "gruppe": "FOLKEREGISTERIDENT" }, { "ident": "2797593735308", "gruppe": "AKTORID" } ] }} """.trimIndent(),
-        )
+        val json =
+            jacksonJsonAdapter.readTree(
+                """{ "data": {"identer": [ { "ident": "13086824072", "gruppe": "FOLKEREGISTERIDENT" }, { "ident": "2797593735308", "gruppe": "AKTORID" } ] }} """.trimIndent(),
+            )
 
         assertEquals("2797593735308", json.aktørId())
         assertEquals("13086824072", json.fødselsnummer())
@@ -176,12 +178,16 @@ internal class PersonDeserialiseringTest {
     fun `riktig diskresjonskode`() {
         //language=JSON
         val strengtFortroligJson =
-            jacksonJsonAdapter.readTree("""{ "data": { "hentPerson": { "adressebeskyttelse": [ { "gradering": "STRENGT_FORTROLIG_UTLAND" } ] } } } """.trimIndent())
+            jacksonJsonAdapter.readTree(
+                """{ "data": { "hentPerson": { "adressebeskyttelse": [ { "gradering": "STRENGT_FORTROLIG_UTLAND" } ] } } } """.trimIndent(),
+            )
         assertEquals("STRENGT_FORTROLIG_UTLAND", strengtFortroligJson.diskresjonsKode())
 
         //language=JSON
         val ukjentGraderingJsone =
-            jacksonJsonAdapter.readTree("""{ "data": { "hentPerson": { "adressebeskyttelse": [ { "gradering": null } ] } } } """.trimIndent())
+            jacksonJsonAdapter.readTree(
+                """{ "data": { "hentPerson": { "adressebeskyttelse": [ { "gradering": null } ] } } } """.trimIndent(),
+            )
         assertNull(ukjentGraderingJsone.diskresjonsKode())
 
         @Language("JSON")

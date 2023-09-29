@@ -16,9 +16,10 @@ import no.nav.dagpenger.mottak.serder.InnsendingData.AktivitetsloggData.Alvorlig
 internal class AktivitetsloggReflect(aktivitetslogg: Aktivitetslogg) {
     private val aktiviteter = Aktivitetslogginspektør(aktivitetslogg).aktiviteter
 
-    internal fun toMap() = mutableMapOf(
-        "aktiviteter" to aktiviteter,
-    )
+    internal fun toMap() =
+        mutableMapOf(
+            "aktiviteter" to aktiviteter,
+        )
 
     private inner class Aktivitetslogginspektør(aktivitetslogg: Aktivitetslogg) : AktivitetsloggVisitor {
         internal val aktiviteter = mutableListOf<Map<String, Any>>()

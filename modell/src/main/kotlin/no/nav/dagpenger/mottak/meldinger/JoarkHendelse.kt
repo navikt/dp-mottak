@@ -10,6 +10,5 @@ class JoarkHendelse(
     private val journalpostStatus: String,
     private val behandlingstema: String? = null,
 ) : Hendelse(aktivitetslogg) {
-
     override fun journalpostId() = journalpostId
 }

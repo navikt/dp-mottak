@@ -24,6 +24,7 @@ import java.time.LocalDate
 
 internal interface ArenaOppslag {
     suspend fun harEksisterendeSaker(fnr: String): Boolean
+
     suspend fun opprettStartVedtakOppgave(
         journalpostId: String,
         parametere: OpprettArenaOppgaveParametere,
@@ -36,7 +37,6 @@ internal interface ArenaOppslag {
 }
 
 internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
-
     companion object {
         private val logger = KotlinLogging.logger {}
         private val sikkerlogg = KotlinLogging.logger("tjenestekall")
@@ -45,17 +45,18 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
     private val tokenProvider = config.dpProxyTokenProvider
 
     private val baseUrl = "${config.dpProxyUrl()}/proxy/v1/arena"
-    private val proxyArenaClient = HttpClient(engine = CIO.create { requestTimeout = Long.MAX_VALUE }) {
-        expectSuccess = true
-        install(HttpTimeout) {
-            connectTimeoutMillis = Duration.ofSeconds(30).toMillis()
-            requestTimeoutMillis = Duration.ofSeconds(30).toMillis()
-            socketTimeoutMillis = Duration.ofSeconds(30).toMillis()
+    private val proxyArenaClient =
+        HttpClient(engine = CIO.create { requestTimeout = Long.MAX_VALUE }) {
+            expectSuccess = true
+            install(HttpTimeout) {
+                connectTimeoutMillis = Duration.ofSeconds(30).toMillis()
+                requestTimeoutMillis = Duration.ofSeconds(30).toMillis()
+                socketTimeoutMillis = Duration.ofSeconds(30).toMillis()
+            }
+            install(ContentNegotiation) {
+                register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
+            }
         }
-        install(ContentNegotiation) {
-            register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
-        }
-    }
 
     override suspend fun harEksisterendeSaker(fnr: String): Boolean {
         sikkerlogg.info { "Forsøker å hente eksisterende saker fra arena for fnr $fnr" }
@@ -102,6 +103,7 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
 }
 
 private data class AktivSakRequest(val fnr: String)
+
 private data class AktivSakResponse(val harAktivSak: Boolean)
 
 internal data class OpprettArenaOppgaveParametere(

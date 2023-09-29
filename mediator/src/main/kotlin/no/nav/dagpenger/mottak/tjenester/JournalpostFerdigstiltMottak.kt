@@ -13,12 +13,13 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
 
 private val logg = KotlinLogging.logger {}
+
 internal class JournalpostFerdigstiltMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
-
     private val løsning = "@løsning.${Behovtype.FerdigstillJournalpost.name}"
+
     init {
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
@@ -28,13 +29,17 @@ internal class JournalpostFerdigstiltMottak(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val journalpostId = packet["journalpostId"].asText()
         logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
-        val journalpostFerdigstilt = JournalpostFerdigstilt(
-            aktivitetslogg = Aktivitetslogg(),
-            journalpostId = journalpostId,
-        )
+        val journalpostFerdigstilt =
+            JournalpostFerdigstilt(
+                aktivitetslogg = Aktivitetslogg(),
+                journalpostId = journalpostId,
+            )
 
         innsendingMediator.håndter(journalpostFerdigstilt)
     }

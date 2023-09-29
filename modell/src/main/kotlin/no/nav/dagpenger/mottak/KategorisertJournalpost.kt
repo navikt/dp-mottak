@@ -5,18 +5,18 @@ import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-private const val maksTegn = 1999
+private const val MAKS_TEGN = 1999
 
 sealed class KategorisertJournalpost(
     open val journalpost: Journalpost,
 ) {
     protected abstract fun henvendelseNavn(): String
+
     protected open fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?,
-    ): OppgaveBenk =
-        OppgaveBenk(behandlendeEnhet(person), henvendelseNavn(), journalpost.datoRegistrert(), tilleggsinformasjon())
+    ): OppgaveBenk = OppgaveBenk(behandlendeEnhet(person), henvendelseNavn(), journalpost.datoRegistrert(), tilleggsinformasjon())
 
     protected fun behandlendeEnhet(person: Person?): String {
         val brevkode = journalpost.hovedskjema()
@@ -36,11 +36,11 @@ sealed class KategorisertJournalpost(
         val oppgaveBenk = finnOppgaveBenk(rutingOppslag, oppfyllerMinsteArbeidsinntekt, person)
 
         return when (person?.diskresjonskode) {
-            true -> oppgaveBenk.copy(
-                id = "2103",
-                beskrivelse = henvendelseNavn(),
-            )
-
+            true ->
+                oppgaveBenk.copy(
+                    id = "2103",
+                    beskrivelse = henvendelseNavn(),
+                )
             else -> {
                 when (person?.egenAnsatt == true && oppgaveBenk.id == "4450") {
                     true -> oppgaveBenk.copy(id = "4483", beskrivelse = henvendelseNavn())
@@ -49,18 +49,6 @@ sealed class KategorisertJournalpost(
             }
         }
     }
-
-    private val PERMITTERING_BREVKODER =
-        listOf(
-            "NAV 04-01.04",
-            "NAVe 04-01.04",
-            "NAV 04-16.04",
-            "NAVe 04-16.04",
-            "NAVe 04-08.04",
-            "NAV 04-08.04",
-        )
-    private val UTLAND_BREVKODER =
-        listOf("NAV 04-02.01", "NAVe 04-02.01", "NAV 04-02.03", "NAV 04-02.05", "NAVe 04-02.05", "UTL")
 
     fun tilleggsinformasjon(): String {
         val hovedDokument = journalpost.tittel()
@@ -73,12 +61,16 @@ sealed class KategorisertJournalpost(
             }
         val formatertDato = journalpost.datoRegistrert().toLocalDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
         val datoBeskrivelse = "Registrert dato: ${formatertDato}\n"
-        val informasjon = "Hoveddokument: ${hovedDokument}\n" +
-            formatertVedlegg +
-            datoBeskrivelse +
-            "Dokumentet er skannet inn og journalført automatisk av digitale dagpenger. Gjennomfør rutinen \"Etterkontroll av automatisk journalførte dokumenter\"."
 
-        return if (informasjon.length > maksTegn) {
+        @Suppress("ktlint:standard:max-line-length")
+        val informasjon =
+            "Hoveddokument: ${hovedDokument}\n" +
+                formatertVedlegg +
+                datoBeskrivelse +
+                "Dokumentet er skannet inn og journalført automatisk av digitale dagpenger. Gjennomfør rutinen \"Etterkontroll av automatisk journalførte dokumenter\"."
+
+        @Suppress("ktlint:standard:max-line-length")
+        return if (informasjon.length > MAKS_TEGN) {
             "Hoveddokument: ${hovedDokument}\nRegistrert dato: ${formatertDato}\nDokumentet er skannet inn og journalført automatisk av digitale dagpenger. Gjennomfør rutinen \"Etterkontroll av automatisk journalførte dokumenter\"."
         } else {
             informasjon
@@ -91,13 +83,26 @@ sealed class KategorisertJournalpost(
         val datoRegistrert: LocalDateTime,
         val tilleggsinformasjon: String,
     )
+
+    companion object {
+        private val PERMITTERING_BREVKODER =
+            listOf(
+                "NAV 04-01.04",
+                "NAVe 04-01.04",
+                "NAV 04-16.04",
+                "NAVe 04-16.04",
+                "NAVe 04-08.04",
+                "NAV 04-08.04",
+            )
+        private val UTLAND_BREVKODER =
+            listOf("NAV 04-02.01", "NAVe 04-02.01", "NAV 04-02.03", "NAV 04-02.05", "NAVe 04-02.05", "UTL")
+    }
 }
 
 data class NySøknad(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String =
-        "Start Vedtaksbehandling - automatisk journalført.\n"
+    override fun henvendelseNavn(): String = "Start Vedtaksbehandling - automatisk journalført.\n"
 
     override fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
@@ -123,47 +128,53 @@ data class NySøknad(
                 )
             }
 
-            harAvtjentVerneplikt -> OppgaveBenk(
-                behandlendeEnhet(person),
-                "VERNEPLIKT\n",
-                datoRegistrert,
-                tilleggsinformasjon(),
-            )
+            harAvtjentVerneplikt ->
+                OppgaveBenk(
+                    behandlendeEnhet(person),
+                    "VERNEPLIKT\n",
+                    datoRegistrert,
+                    tilleggsinformasjon(),
+                )
 
-            eøsBostedsland && erPermittert -> OppgaveBenk(
-                "4465",
-                "EØS\n",
-                datoRegistrert,
-                tilleggsinformasjon(),
-            )
+            eøsBostedsland && erPermittert ->
+                OppgaveBenk(
+                    "4465",
+                    "EØS\n",
+                    datoRegistrert,
+                    tilleggsinformasjon(),
+                )
 
-            konkurs -> OppgaveBenk(
-                "4401",
-                "Konkurs\n",
-                datoRegistrert,
-                tilleggsinformasjon(),
-            )
+            konkurs ->
+                OppgaveBenk(
+                    "4401",
+                    "Konkurs\n",
+                    datoRegistrert,
+                    tilleggsinformasjon(),
+                )
 
-            erPermittertFraFiskeforedling -> OppgaveBenk(
-                "4450",
-                "FISK\n",
-                datoRegistrert,
-                tilleggsinformasjon(),
-            )
+            erPermittertFraFiskeforedling ->
+                OppgaveBenk(
+                    "4450",
+                    "FISK\n",
+                    datoRegistrert,
+                    tilleggsinformasjon(),
+                )
 
-            kanAvslåsPåMinsteinntekt -> OppgaveBenk(
-                "4450",
-                "Minsteinntekt - mulig avslag\n",
-                datoRegistrert,
-                tilleggsinformasjon(),
-            )
+            kanAvslåsPåMinsteinntekt ->
+                OppgaveBenk(
+                    "4450",
+                    "Minsteinntekt - mulig avslag\n",
+                    datoRegistrert,
+                    tilleggsinformasjon(),
+                )
 
-            else -> OppgaveBenk(
-                behandlendeEnhet(person),
-                henvendelseNavn(),
-                datoRegistrert,
-                tilleggsinformasjon(),
-            )
+            else ->
+                OppgaveBenk(
+                    behandlendeEnhet(person),
+                    henvendelseNavn(),
+                    datoRegistrert,
+                    tilleggsinformasjon(),
+                )
         }
     }
 }
@@ -203,11 +214,13 @@ data class KlageOgAnke(
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage og anke\n"
 }
+
 data class Klage(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage\n"
 }
+
 data class Anke(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
@@ -218,6 +231,7 @@ data class KlageForskudd(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Klage - Forskudd\n"
+
     override fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,

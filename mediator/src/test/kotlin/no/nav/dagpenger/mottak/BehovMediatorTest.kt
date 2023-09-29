@@ -15,7 +15,7 @@ import java.util.UUID
 
 internal class BehovMediatorTest {
     private companion object {
-        private const val journalpostId = "journalpostId"
+        private const val JOURNALPOST_ID = "journalpostId"
         private lateinit var behovMediator: BehovMediator
     }
 
@@ -25,12 +25,13 @@ internal class BehovMediatorTest {
 
     @BeforeEach
     fun setup() {
-        innsending = Innsending(journalpostId = journalpostId)
+        innsending = Innsending(journalpostId = JOURNALPOST_ID)
         aktivitetslogg = Aktivitetslogg()
-        behovMediator = BehovMediator(
-            rapidsConnection = testRapid,
-            sikkerLogg = mockk(relaxed = true),
-        )
+        behovMediator =
+            BehovMediator(
+                rapidsConnection = testRapid,
+                sikkerLogg = mockk(relaxed = true),
+            )
         testRapid.reset()
     }
 
@@ -54,7 +55,7 @@ internal class BehovMediatorTest {
         val inspektør = testRapid.inspektør
 
         assertEquals(1, inspektør.size)
-        assertEquals(journalpostId, inspektør.key(0))
+        assertEquals(JOURNALPOST_ID, inspektør.key(0))
 
         inspektør.message(0).also {
             assertEquals("behov", it["@event_name"].asText())
@@ -65,7 +66,7 @@ internal class BehovMediatorTest {
             assertEquals(listOf("Persondata", "Søknadsdata", "EksisterendeSaker"), it["@behov"].map(JsonNode::asText))
             assertEquals("behov", it["@event_name"].asText())
             assertEquals("12344", it["aktørId"].asText())
-            assertEquals(journalpostId, it["journalpostId"].asText())
+            assertEquals(JOURNALPOST_ID, it["journalpostId"].asText())
         }
     }
 
@@ -115,9 +116,10 @@ internal class BehovMediatorTest {
             logg.kontekst(this)
         }
 
-        override fun journalpostId(): String = journalpostId
+        override fun journalpostId(): String = JOURNALPOST_ID
 
         override fun toSpesifikkKontekst() = SpesifikkKontekst("TestHendelse")
+
         override fun kontekst(kontekst: Aktivitetskontekst) {
             logg.kontekst(kontekst)
         }

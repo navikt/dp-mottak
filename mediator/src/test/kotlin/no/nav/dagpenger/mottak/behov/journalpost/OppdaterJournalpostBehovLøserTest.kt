@@ -12,15 +12,15 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 internal class OppdaterJournalpostBehovLøserTest {
-
     private val testRapid = TestRapid()
     private val fagsakId = "23456"
     private val fødselsnummer = "12345678910"
 
     private val slot = slot<JournalpostApi.OppdaterJournalpostRequest>()
-    private val mockedJournalpostDokarkiv: JournalpostDokarkiv = mockk<JournalpostDokarkiv>().also {
-        coEvery { it.oppdaterJournalpost(journalpostId = any(), journalpost = capture(slot)) } returns Unit
-    }
+    private val mockedJournalpostDokarkiv: JournalpostDokarkiv =
+        mockk<JournalpostDokarkiv>().also {
+            coEvery { it.oppdaterJournalpost(journalpostId = any(), journalpost = capture(slot)) } returns Unit
+        }
 
     init {
         OppdaterJournalpostBehovLøser(
@@ -64,18 +64,18 @@ internal class OppdaterJournalpostBehovLøserTest {
 
     @Test
     fun `test kjente feil tilstander`() {
-        coEvery { mockedJournalpostDokarkiv.oppdaterJournalpost(journalpostId = "12345", journalpost = any()) } throws JournalpostFeil.JournalpostException(
-            statusCode = 400,
-            //language=JSON
-            content = """{
+        coEvery { mockedJournalpostDokarkiv.oppdaterJournalpost(journalpostId = "12345", journalpost = any()) } throws
+            JournalpostFeil.JournalpostException(
+                statusCode = 400,
+                //language=JSON
+                content = """{
   "timestamp": "2021-04-30T07:54:09.362+00:00",
   "status": 400,
   "error": "Bad Request",
   "message": "Bruker kan ikke oppdateres for journalpost med journalpostStatus=J og journalpostType=I.",
   "path": "/rest/journalpostapi/v1/journalpost/493358469"
 }""",
-
-        )
+            )
         testRapid.sendTestMessage(journalpostBehov("12345"))
         with(testRapid.inspektør) {
             assertEquals(1, size)
@@ -85,7 +85,8 @@ internal class OppdaterJournalpostBehovLøserTest {
 
     //language=JSON
     private fun journalpostBehov(journalpostId: String = "23456789"): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behovId": "${UUID.randomUUID()}",
@@ -104,7 +105,8 @@ internal class OppdaterJournalpostBehovLøserTest {
 
     //language=JSON
     private fun journalpostBehovUtenFagsakId(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behovId": "${UUID.randomUUID()}",

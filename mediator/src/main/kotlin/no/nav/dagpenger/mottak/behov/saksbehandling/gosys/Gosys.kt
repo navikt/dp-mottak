@@ -45,15 +45,16 @@ internal class GosysProxyClient(config: Configuration) : GosysOppslag {
 
     private val tokenProvider = config.dpProxyTokenProvider
 
-    private val proxyGosysClient = HttpClient() {
-        expectSuccess = true
-        install(DefaultRequest) {
-            this.url("${config.dpProxyUrl()}/proxy/v1/gosys/oppgaver")
+    private val proxyGosysClient =
+        HttpClient {
+            expectSuccess = true
+            install(DefaultRequest) {
+                this.url("${config.dpProxyUrl()}/proxy/v1/gosys/oppgaver")
+            }
+            install(ContentNegotiation) {
+                register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
+            }
         }
-        install(ContentNegotiation) {
-            register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
-        }
-    }
 
     override suspend fun opprettOppgave(oppgave: GosysOppgaveRequest): String {
         return try {

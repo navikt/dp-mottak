@@ -14,20 +14,22 @@ import java.util.UUID
 private const val JOURNALPOST_ID = "2345678"
 
 internal class ArenaBehovLøserTest {
-
     private val testRapid = TestRapid()
 
-    private val arenaOppslagMock = mockk<ArenaOppslag>().also {
-        coEvery { it.harEksisterendeSaker(any()) } returns true
-        coEvery { it.opprettStartVedtakOppgave(any(), any()) } returns OpprettVedtakOppgaveResponse(
-            fagsakId = "123",
-            oppgaveId = "123",
-        )
-        coEvery { it.opprettVurderHenvendelsOppgave(any(), any()) } returns OpprettVedtakOppgaveResponse(
-            fagsakId = null,
-            oppgaveId = "123",
-        )
-    }
+    private val arenaOppslagMock =
+        mockk<ArenaOppslag>().also {
+            coEvery { it.harEksisterendeSaker(any()) } returns true
+            coEvery { it.opprettStartVedtakOppgave(any(), any()) } returns
+                OpprettVedtakOppgaveResponse(
+                    fagsakId = "123",
+                    oppgaveId = "123",
+                )
+            coEvery { it.opprettVurderHenvendelsOppgave(any(), any()) } returns
+                OpprettVedtakOppgaveResponse(
+                    fagsakId = null,
+                    oppgaveId = "123",
+                )
+        }
 
     init {
         ArenaBehovLøser(
@@ -99,7 +101,8 @@ internal class ArenaBehovLøserTest {
 
     //language=JSON
     private fun eksisterendeSakerBehov(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behovId": "${UUID.randomUUID()}",
@@ -114,7 +117,8 @@ internal class ArenaBehovLøserTest {
 
     //language=JSON
     private fun opprettStartVedtakBehov(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behovId": "${UUID.randomUUID()}",
@@ -133,7 +137,8 @@ internal class ArenaBehovLøserTest {
 
     //language=JSON
     private fun opprettVurderhenvendelseOppgaveBehov(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behovId": "${UUID.randomUUID()}",

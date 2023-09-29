@@ -19,48 +19,54 @@ internal class InnsendingDataTest {
     private val journalpostStatus = "aktiv"
     private val fnr = GENERERT_FØDSELSNUMMER
     private val registrertdato = LocalDateTime.now()
-    private val dokumenter = listOf(
-        DokumentInfoData(
-            tittel = "Fin tittel",
-            brevkode = "NAV 04-01.03",
-            dokumentInfoId = "12345678",
-            hovedDokument = true,
-        ),
-    )
+    private val dokumenter =
+        listOf(
+            DokumentInfoData(
+                tittel = "Fin tittel",
+                brevkode = "NAV 04-01.03",
+                dokumentInfoId = "12345678",
+                hovedDokument = true,
+            ),
+        )
 
     @Test
     fun `Skal lage innsending`() {
-        val innsendingData = InnsendingData(
-            id = 111L,
-            journalpostId = journalpostId,
-            tilstand = TilstandData(
-                TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType,
-            ),
-            journalpostData = JournalpostData(
+        val innsendingData =
+            InnsendingData(
+                id = 111L,
                 journalpostId = journalpostId,
-                journalpostStatus = journalpostStatus,
-                bruker = BrukerData(BrukerTypeData.FNR, fnr),
-                behandlingstema = "DAG",
-                registertDato = registrertdato,
-                dokumenter = dokumenter,
-            ),
-            oppfyllerMinsteArbeidsinntekt = true,
-            eksisterendeSaker = false,
-            personData = PersonData(
-                navn = "Hubba Bubba",
-                fødselsnummer = fnr,
-                aktørId = "345678",
-                norskTilknytning = true,
-                diskresjonskode = false,
-                egenAnsatt = false,
-            ),
-            arenaSakData = ArenaSakData(
-                oppgaveId = "123487",
-                fagsakId = "129678",
-            ),
-            søknadsData = søknadsjson,
-            aktivitetslogg = AktivitetsloggData(emptyList()),
-        )
+                tilstand =
+                    TilstandData(
+                        TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType,
+                    ),
+                journalpostData =
+                    JournalpostData(
+                        journalpostId = journalpostId,
+                        journalpostStatus = journalpostStatus,
+                        bruker = BrukerData(BrukerTypeData.FNR, fnr),
+                        behandlingstema = "DAG",
+                        registertDato = registrertdato,
+                        dokumenter = dokumenter,
+                    ),
+                oppfyllerMinsteArbeidsinntekt = true,
+                eksisterendeSaker = false,
+                personData =
+                    PersonData(
+                        navn = "Hubba Bubba",
+                        fødselsnummer = fnr,
+                        aktørId = "345678",
+                        norskTilknytning = true,
+                        diskresjonskode = false,
+                        egenAnsatt = false,
+                    ),
+                arenaSakData =
+                    ArenaSakData(
+                        oppgaveId = "123487",
+                        fagsakId = "129678",
+                    ),
+                søknadsData = søknadsjson,
+                aktivitetslogg = AktivitetsloggData(emptyList()),
+            )
 
         innsendingData.createInnsending().also {
             assertEquals(journalpostId, it.journalpostId())
@@ -68,11 +74,12 @@ internal class InnsendingDataTest {
     }
 
     //language=JSON
-    private val søknadsjson = jacksonObjectMapper().readTree(
-        """
+    private val søknadsjson =
+        jacksonObjectMapper().readTree(
+            """
             {
             "tadda":"it´s short for"
             }
-        """.trimIndent(),
-    )
+            """.trimIndent(),
+        )
 }

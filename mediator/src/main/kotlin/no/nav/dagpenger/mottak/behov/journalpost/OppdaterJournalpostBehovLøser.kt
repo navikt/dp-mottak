@@ -13,7 +13,6 @@ internal class OppdaterJournalpostBehovLøser(
     private val journalpostDokarkiv: JournalpostDokarkiv,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener, JournalpostFeil {
-
     private companion object {
         val logger = KotlinLogging.logger { }
     }
@@ -28,7 +27,10 @@ internal class OppdaterJournalpostBehovLøser(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val journalpostId = packet["journalpostId"].asText()
         val behovId = packet["@behovId"].asText()
         withMDC(

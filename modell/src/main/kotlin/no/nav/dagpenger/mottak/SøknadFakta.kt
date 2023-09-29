@@ -5,25 +5,37 @@ import java.time.LocalDate
 
 interface SøknadOppslag {
     fun data(): JsonNode
+
     fun accept(visitor: SøknadVisitor)
+
     fun eøsBostedsland(): Boolean
+
     fun eøsArbeidsforhold(): Boolean
+
     fun avtjentVerneplikt(): Boolean
+
     fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold
+
     fun harBarn(): Boolean
+
     fun harAndreYtelser(): Boolean
 }
 
 interface QuizOppslag : SøknadOppslag {
     fun fangstOgFisk(): Boolean
+
     fun ønskerDagpengerFraDato(): LocalDate
+
     fun søknadsId(): String?
+
     fun reellArbeidsSøker(): ReellArbeidsSøker
 }
 
 interface RutingOppslag : SøknadOppslag {
     fun permittertFraFiskeForedling(): Boolean
+
     fun avsluttetArbeidsforholdFraKonkurs(): Boolean
+
     fun permittert(): Boolean
 }
 

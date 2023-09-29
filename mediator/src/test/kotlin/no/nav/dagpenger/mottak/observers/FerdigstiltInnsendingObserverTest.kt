@@ -85,12 +85,13 @@ internal class FerdigstiltInnsendingObserverTest {
         assertFalse(message.has("fagsakId"))
     }
 
-    private fun ukjentPersonEvent(): InnsendingObserver.InnsendingEvent = ferdigstiltEvent().copy(
-        fødselsnummer = null,
-        aktørId = null,
-        søknadsData = null,
-        fagsakId = null,
-    )
+    private fun ukjentPersonEvent(): InnsendingObserver.InnsendingEvent =
+        ferdigstiltEvent().copy(
+            fødselsnummer = null,
+            aktørId = null,
+            søknadsData = null,
+            fagsakId = null,
+        )
 
     private fun ferdigstiltEvent(): InnsendingObserver.InnsendingEvent =
         InnsendingObserver.InnsendingEvent(
@@ -101,9 +102,10 @@ internal class FerdigstiltInnsendingObserverTest {
             fødselsnummer = "12345678901",
             fagsakId = "1234",
             datoRegistrert = LocalDateTime.now(),
-            søknadsData = JsonMapper.jacksonJsonAdapter.createObjectNode().also {
-                it.put("test", "test")
-            },
+            søknadsData =
+                JsonMapper.jacksonJsonAdapter.createObjectNode().also {
+                    it.put("test", "test")
+                },
             behandlendeEnhet = "Tadda",
             oppfyllerMinsteinntektArbeidsinntekt = false,
             tittel = "Tittel",

@@ -19,14 +19,14 @@ import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.behov.JsonMapper
 
 internal interface JournalpostFeil {
-
     private companion object {
         val logger = KotlinLogging.logger { }
-        private val whitelistFeilmeldinger = setOf(
-            "Bruker kan ikke oppdateres for journalpost med journalpostStatus=J og journalpostType=I.",
-            "er ikke midlertidig journalført",
-            "er ikke midlertidig journalf&oslash;rt",
-        )
+        private val whitelistFeilmeldinger =
+            setOf(
+                "Bruker kan ikke oppdateres for journalpost med journalpostStatus=J og journalpostType=I.",
+                "er ikke midlertidig journalført",
+                "er ikke midlertidig journalf&oslash;rt",
+            )
     }
 
     class JournalpostException(val statusCode: Int, val content: String?) : RuntimeException()
@@ -56,7 +56,11 @@ internal interface JournalpostFeil {
 }
 
 internal interface JournalpostDokarkiv {
-    suspend fun oppdaterJournalpost(journalpostId: String, journalpost: JournalpostApi.OppdaterJournalpostRequest)
+    suspend fun oppdaterJournalpost(
+        journalpostId: String,
+        journalpost: JournalpostApi.OppdaterJournalpostRequest,
+    )
+
     suspend fun ferdigstill(journalpostId: String)
 }
 
@@ -90,7 +94,9 @@ internal class JournalpostApi {
     internal data class Avsender(val id: String, val idType: String = "FNR")
 
     internal data class Bruker(val id: String, val idType: String = "FNR")
+
     internal data class Dokument(val dokumentInfoId: String, val tittel: String)
+
     internal enum class SaksType {
         GENERELL_SAK,
         FAGSAK,
@@ -98,21 +104,21 @@ internal class JournalpostApi {
 }
 
 internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv {
-
     private companion object {
         val logger = KotlinLogging.logger { }
     }
 
     private val journalføringBaseUrl = "${config.dpProxyUrl()}/proxy/v1/dokarkiv/rest/journalpostapi/v1/journalpost"
     private val tokenProvider = config.dpProxyTokenProvider
-    private val proxyJournalpostApiClient = HttpClient() {
-        expectSuccess = true
-        install(DefaultRequest) {
+    private val proxyJournalpostApiClient =
+        HttpClient {
+            expectSuccess = true
+            install(DefaultRequest) {
+            }
+            install(ContentNegotiation) {
+                register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
+            }
         }
-        install(ContentNegotiation) {
-            register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
-        }
-    }
 
     override suspend fun oppdaterJournalpost(
         journalpostId: String,

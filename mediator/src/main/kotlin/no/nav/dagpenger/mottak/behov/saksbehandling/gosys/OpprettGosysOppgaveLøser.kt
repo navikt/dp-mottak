@@ -27,7 +27,10 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val journalpostId = packet["journalpostId"].asText()
         val behovId = packet["@behovId"].asText()
 
@@ -48,12 +51,14 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
                         packet.gosysOppgave(),
                     )
                 }.also {
-                    packet["@løsning"] = mapOf(
-                        BEHOV to mapOf(
-                            "journalpostId" to journalpostId,
-                            "oppgaveId" to it,
-                        ),
-                    )
+                    packet["@løsning"] =
+                        mapOf(
+                            BEHOV to
+                                mapOf(
+                                    "journalpostId" to journalpostId,
+                                    "oppgaveId" to it,
+                                ),
+                        )
                     context.publish(packet.toJson())
                     logger.info { "Løste behov $BEHOV med løsning $it" }
                 }
@@ -65,10 +70,11 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
     }
 }
 
-private fun JsonMessage.gosysOppgave(): GosysOppgaveRequest = GosysOppgaveRequest(
-    journalpostId = this["journalpostId"].asText(),
-    aktoerId = this["aktørId"].textValue(),
-    tildeltEnhetsnr = this["behandlendeEnhetId"].asText(),
-    aktivDato = LocalDate.now(),
-    beskrivelse = this["oppgavebeskrivelse"].asText(),
-)
+private fun JsonMessage.gosysOppgave(): GosysOppgaveRequest =
+    GosysOppgaveRequest(
+        journalpostId = this["journalpostId"].asText(),
+        aktoerId = this["aktørId"].textValue(),
+        tildeltEnhetsnr = this["behandlendeEnhetId"].asText(),
+        aktivDato = LocalDate.now(),
+        beskrivelse = this["oppgavebeskrivelse"].asText(),
+    )

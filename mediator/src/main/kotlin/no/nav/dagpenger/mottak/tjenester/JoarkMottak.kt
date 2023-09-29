@@ -17,10 +17,11 @@ internal class JoarkMottak(
     private companion object {
         private val logg = KotlinLogging.logger {}
 
-        private val forbudteMottaksKanaler = setOf<String>(
-            "EESSI",
-            "NAV_NO_CHAT",
-        )
+        private val forbudteMottaksKanaler =
+            setOf<String>(
+                "EESSI",
+                "NAV_NO_CHAT",
+            )
     }
 
     init {
@@ -39,7 +40,10 @@ internal class JoarkMottak(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         logg.info(
             """Received journalpost with journalpost id: ${packet["journalpostId"].asText()} 
               |tema: ${packet["temaNytt"].asText()}, 
@@ -53,13 +57,14 @@ internal class JoarkMottak(
 
         Metrics.mottakskanalInc(packet["mottaksKanal"].asText())
 
-        val joarkHendelse = JoarkHendelse(
-            aktivitetslogg = Aktivitetslogg(),
-            journalpostId = packet["journalpostId"].asText(),
-            hendelseType = packet["hendelsesType"].asText(),
-            journalpostStatus = packet["journalpostStatus"].asText(),
-            behandlingstema = packet["behandlingstema"].asText() ?: null,
-        )
+        val joarkHendelse =
+            JoarkHendelse(
+                aktivitetslogg = Aktivitetslogg(),
+                journalpostId = packet["journalpostId"].asText(),
+                hendelseType = packet["hendelsesType"].asText(),
+                journalpostStatus = packet["journalpostStatus"].asText(),
+                behandlingstema = packet["behandlingstema"].asText() ?: null,
+            )
 
         innsendingMediator.håndter(joarkHendelse)
     }

@@ -20,7 +20,9 @@ internal class SafGraphQL {
     }
 
     enum class BrukerType {
-        ORGNR, AKTOERID, FNR
+        ORGNR,
+        AKTOERID,
+        FNR,
     }
 
     data class RelevantDato(
@@ -29,11 +31,11 @@ internal class SafGraphQL {
     )
 
     class DokumentInfo(val tittel: String?, val dokumentInfoId: String, val brevkode: String?, val hovedDokument: Boolean) {
-
         override fun toString(): String {
             return "DokumentInfo(tittel=$tittel, dokumentInfoId=$dokumentInfoId, brevkode=$brevkode)"
         }
     }
+
     internal data class Journalpost(
         val journalstatus: Journalstatus?,
         val journalpostId: String,
@@ -46,14 +48,15 @@ internal class SafGraphQL {
         val dokumenter: List<DokumentInfo>,
         val behandlingstema: String? = null,
     ) {
-
         internal companion object {
-            private val objectMapper = jacksonObjectMapper().also {
-                it.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            }
+            private val objectMapper =
+                jacksonObjectMapper().also {
+                    it.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                }
 
             fun fromGraphQlJson(json: String): Journalpost =
-                objectMapper.readValue(json, GraphQlJournalpostResponse::class.java).data?.journalpost ?: throw IllegalArgumentException("SAF response har ingen data")
+                objectMapper.readValue(json, GraphQlJournalpostResponse::class.java).data?.journalpost
+                    ?: throw IllegalArgumentException("SAF response har ingen data")
         }
 
         private data class GraphQlJournalpostResponse(val data: Data?, val errors: List<String>?) {
@@ -62,6 +65,7 @@ internal class SafGraphQL {
                     throw IllegalArgumentException("SAF returnerte liste med feil: ${errors.joinToString("\n")}")
                 }
             }
+
             class Data(val journalpost: Journalpost)
         }
     }
@@ -73,20 +77,35 @@ internal class SafGraphQL {
     }
 
     enum class Datotype {
-        DATO_SENDT_PRINT, DATO_EKSPEDERT, DATO_JOURNALFOERT,
-        DATO_REGISTRERT, DATO_AVS_RETUR, DATO_DOKUMENT
+        DATO_SENDT_PRINT,
+        DATO_EKSPEDERT,
+        DATO_JOURNALFOERT,
+        DATO_REGISTRERT,
+        DATO_AVS_RETUR,
+        DATO_DOKUMENT,
     }
 
     enum class Journalstatus {
-        MOTTATT, JOURNALFOERT, FERDIGSTILT, EKSPEDERT,
-        UNDER_ARBEID, FEILREGISTRERT, UTGAAR, AVBRUTT,
-        UKJENT_BRUKER, RESERVERT, OPPLASTING_DOKUMENT,
+        MOTTATT,
+        JOURNALFOERT,
+        FERDIGSTILT,
+        EKSPEDERT,
+        UNDER_ARBEID,
+        FEILREGISTRERT,
+        UTGAAR,
+        AVBRUTT,
+        UKJENT_BRUKER,
+        RESERVERT,
+        OPPLASTING_DOKUMENT,
         UKJENT,
     }
 }
 
 internal class DokumentInfoDeserializer : JsonDeserializer<List<SafGraphQL.DokumentInfo>>() {
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): List<SafGraphQL.DokumentInfo> {
+    override fun deserialize(
+        p: JsonParser,
+        ctxt: DeserializationContext,
+    ): List<SafGraphQL.DokumentInfo> {
         val node: JsonNode = p.readValueAsTree()
         return node.mapIndexed { index, dokument ->
             SafGraphQL.DokumentInfo(

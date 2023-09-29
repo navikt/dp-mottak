@@ -32,7 +32,10 @@ interface PersonVisitor {
 }
 
 interface ArenaSakVisitor {
-    fun visitArenaSak(oppgaveId: String, fagsakId: String?) {}
+    fun visitArenaSak(
+        oppgaveId: String,
+        fagsakId: String?,
+    ) {}
 }
 
 interface InnsendingVisitor :
@@ -41,9 +44,22 @@ interface InnsendingVisitor :
     PersonVisitor,
     ArenaSakVisitor,
     AktivitetsloggVisitor {
-    fun preVisitInnsending(innsending: Innsending, journalpostId: String) {}
+    fun preVisitInnsending(
+        innsending: Innsending,
+        journalpostId: String,
+    ) {}
+
     fun visitTilstand(tilstandType: Innsending.Tilstand) {}
-    fun visitInnsending(oppfyllerMinsteArbeidsinntekt: Boolean?, eksisterendeSaker: Boolean?) {}
+
+    fun visitInnsending(
+        oppfyllerMinsteArbeidsinntekt: Boolean?,
+        eksisterendeSaker: Boolean?,
+    ) {}
+
     fun visitInnsendingAktivitetslogg(aktivitetslogg: Aktivitetslogg) {}
-    fun postVisitInnsending(innsending: Innsending, journalpostId: String) {}
+
+    fun postVisitInnsending(
+        innsending: Innsending,
+        journalpostId: String,
+    ) {}
 }

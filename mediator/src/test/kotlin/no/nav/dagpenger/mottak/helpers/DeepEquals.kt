@@ -6,13 +6,21 @@ import java.math.BigDecimal
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
-fun assertDeepEquals(one: Any?, other: Any?) {
+fun assertDeepEquals(
+    one: Any?,
+    other: Any?,
+) {
     ModelDeepEquals().assertDeepEquals(one, other, "ROOT")
 }
 
 private class ModelDeepEquals {
     val checkLog = mutableListOf<Pair<Any, Any>>()
-    fun assertDeepEquals(one: Any?, other: Any?, fieldName: String) {
+
+    fun assertDeepEquals(
+        one: Any?,
+        other: Any?,
+        fieldName: String,
+    ) {
         if (one == null && other == null) return
         assertFalse(one == null || other == null, "For field $fieldName: $one or $other is null")
         requireNotNull(one)
@@ -31,7 +39,11 @@ private class ModelDeepEquals {
         }
     }
 
-    private fun assertObjectEquals(one: Any, other: Any, fieldName: String) {
+    private fun assertObjectEquals(
+        one: Any,
+        other: Any,
+        fieldName: String,
+    ) {
         assertEquals(
             one::class,
             other::class,
@@ -49,7 +61,10 @@ private class ModelDeepEquals {
         }
     }
 
-    private fun assertHelseObjectEquals(one: Any, other: Any) {
+    private fun assertHelseObjectEquals(
+        one: Any,
+        other: Any,
+    ) {
         one::class.memberProperties
             .filterNot { it.isLateinit }
             .map { it.apply { isAccessible = true } }
@@ -58,14 +73,22 @@ private class ModelDeepEquals {
             }
     }
 
-    private fun assertMapEquals(one: Map<*, *>, other: Map<*, *>, fieldName: String) {
+    private fun assertMapEquals(
+        one: Map<*, *>,
+        other: Map<*, *>,
+        fieldName: String,
+    ) {
         assertEquals(one.size, other.size)
         one.keys.forEach {
             assertDeepEquals(one[it], other[it], fieldName)
         }
     }
 
-    private fun assertCollectionEquals(one: Collection<*>, other: Collection<*>, fieldName: String) {
+    private fun assertCollectionEquals(
+        one: Collection<*>,
+        other: Collection<*>,
+        fieldName: String,
+    ) {
         assertEquals(one.size, other.size, "Failure for size of field: $fieldName")
         (one.toTypedArray() to other.toTypedArray()).forEach { i1, i2 ->
             this.assertDeepEquals(i1, i2, fieldName)

@@ -27,28 +27,30 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall.Pdl")
 
 internal class PdlPersondataOppslag(config: Configuration) {
     private val tokenProvider = config.pdlApiTokenProvider
-    private val pdlClient = HttpClient() {
-        expectSuccess = true
-        install(DefaultRequest) {
-            this.url("${config.pdlApiUrl()}/graphql")
-            header("Content-Type", "application/json")
-            header("TEMA", "DAG")
-            accept(ContentType.Application.Json)
+    private val pdlClient =
+        HttpClient {
+            expectSuccess = true
+            install(DefaultRequest) {
+                this.url("${config.pdlApiUrl()}/graphql")
+                header("Content-Type", "application/json")
+                header("TEMA", "DAG")
+                accept(ContentType.Application.Json)
+            }
         }
-    }
 
-    suspend fun hentPerson(id: String): Pdl.Person? = pdlClient.request {
-        header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
-        method = HttpMethod.Post
-        setBody(PersonQuery(id).toJson().also { sikkerlogg.info { "Forsøker å hente person med id $id fra PDL" } })
-    }.bodyAsText().let {
-        if (hasError(it)) {
-            sikkerlogg.error { "Feil i person oppslag for person med id $id: $it" }
-            throw PdlPersondataOppslagException(it)
-        } else {
-            Pdl.Person.fromGraphQlJson(it)
+    suspend fun hentPerson(id: String): Pdl.Person? =
+        pdlClient.request {
+            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+            method = HttpMethod.Post
+            setBody(PersonQuery(id).toJson().also { sikkerlogg.info { "Forsøker å hente person med id $id fra PDL" } })
+        }.bodyAsText().let {
+            if (hasError(it)) {
+                sikkerlogg.error { "Feil i person oppslag for person med id $id: $it" }
+                throw PdlPersondataOppslagException(it)
+            } else {
+                Pdl.Person.fromGraphQlJson(it)
+            }
         }
-    }
 }
 
 internal class PdlPersondataOppslagException(s: String) : RuntimeException(s)
@@ -58,42 +60,40 @@ internal fun hasError(json: String): Boolean {
     return (harGraphqlErrors(j) && !ukjentPersonIdent(j))
 }
 
-private fun harGraphqlErrors(json: JsonNode) =
-    json["errors"] != null && !json["errors"].isEmpty
+private fun harGraphqlErrors(json: JsonNode) = json["errors"] != null && !json["errors"].isEmpty
 
-private fun ukjentPersonIdent(node: JsonNode) =
-    node["errors"].any { it["message"].asText() == "Fant ikke person" }
+private fun ukjentPersonIdent(node: JsonNode) = node["errors"].any { it["message"].asText() == "Fant ikke person" }
 
 internal data class PersonQuery(val id: String) : GraphqlQuery(
     //language=Graphql
     query =
-    """query(${'$'}ident: ID!) {
-    hentPerson(ident: ${'$'}ident) {
-        navn {
-            fornavn,
-            mellomnavn,
-            etternavn
-        },
-        adressebeskyttelse{
-            gradering
+        """
+        query(${'$'}ident: ID!) {
+            hentPerson(ident: ${'$'}ident) {
+                navn {
+                    fornavn,
+                    mellomnavn,
+                    etternavn
+                },
+                adressebeskyttelse{
+                    gradering
+                }
+            }
+            hentGeografiskTilknytning(ident: ${'$'}ident){
+                gtLand
+            }
+            hentIdenter(ident: ${'$'}ident, grupper: [AKTORID,FOLKEREGISTERIDENT]) {
+                identer {
+                    ident,
+                    gruppe
+                }
+            }                
         }
-    }
-    hentGeografiskTilknytning(ident: ${'$'}ident){
-        gtLand
-    }
-    hentIdenter(ident: ${'$'}ident, grupper: [AKTORID,FOLKEREGISTERIDENT]) {
-        identer {
-            ident,
-            gruppe
-        }
-    }                
-}
-    """.trimIndent(),
+        """.trimIndent(),
     variables = mapOf("ident" to id),
 )
 
 internal class Pdl {
-
     @JsonDeserialize(using = PersonDeserializer::class)
     data class Person(
         val navn: String,
@@ -103,15 +103,17 @@ internal class Pdl {
         val diskresjonskode: String?,
     ) {
         internal companion object {
-            fun fromGraphQlJson(json: String): Person? =
-                jacksonJsonAdapter.readValue(json, Person::class.java)
+            fun fromGraphQlJson(json: String): Person? = jacksonJsonAdapter.readValue(json, Person::class.java)
         }
     }
 
     object PersonDeserializer : JsonDeserializer<Person>() {
         internal fun JsonNode.aktørId() = this.ident("AKTORID")
+
         internal fun JsonNode.fødselsnummer() = this.ident("FOLKEREGISTERIDENT")
+
         internal fun JsonNode.norskTilknyting(): Boolean = findValue("gtLand")?.isNull ?: false
+
         internal fun JsonNode.diskresjonsKode(): String? {
             return findValue("adressebeskyttelse").firstOrNull()?.path("gradering")?.asText(null)
         }
@@ -133,7 +135,10 @@ internal class Pdl {
             return findValue("identer").first { it.path("gruppe").asText() == type }.get("ident").asText()
         }
 
-        override fun deserialize(p: JsonParser, ctxt: DeserializationContext?): Person? {
+        override fun deserialize(
+            p: JsonParser,
+            ctxt: DeserializationContext?,
+        ): Person? {
             val node: JsonNode = p.readValueAsTree()
 
             return kotlin.runCatching {
