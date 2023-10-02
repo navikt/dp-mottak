@@ -12,22 +12,29 @@ import javax.sql.DataSource
 
 internal class MinsteinntektVurderingPostgresRepository(private val dataSource: DataSource) :
     MinsteinntektVurderingRepository {
-
     private companion object {
         val logger = KotlinLogging.logger {}
         private val låseNøkkel = 573463
     }
-    override fun lagre(journalpostId: String, packet: JsonMessage): Int {
+
+    override fun lagre(
+        journalpostId: String,
+        packet: JsonMessage,
+    ): Int {
         return using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf(
-                    "INSERT INTO  minsteinntekt_vurdering_v1(journalpostId,packet) VALUES(:journalpostId,:packet) ON CONFLICT DO NOTHING",
+                    // language=PostgreSQL
+                    """INSERT INTO  minsteinntekt_vurdering_v1(journalpostId,packet) 
+                        |VALUES(:journalpostId,:packet) ON CONFLICT DO NOTHING
+                    """.trimMargin(),
                     mapOf(
                         "journalpostId" to journalpostId.toLong(),
-                        "packet" to PGobject().apply {
-                            type = "jsonb"
-                            value = packet.toJson()
-                        },
+                        "packet" to
+                            PGobject().apply {
+                                type = "jsonb"
+                                value = packet.toJson()
+                            },
                     ),
                 ).asUpdate,
             )
@@ -38,6 +45,7 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
         return using(sessionOf(dataSource)) { session ->
             session.run(
                 queryOf(
+                    // language=PostgreSQL
                     "DELETE FROM minsteinntekt_vurdering_v1 WHERE journalpostId=:journalpostId RETURNING *",
                     mapOf(
                         "journalpostId" to journalpostId.toLong(),
@@ -57,7 +65,8 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
                 logger.info { "Fikk lås, kjører vaktmesterspørring" }
                 return using(sessionOf(dataSource)) { session ->
                     session.run(
-                        queryOf( //language=PostgreSQL
+                        queryOf(
+                            // language=PostgreSQL
                             "DELETE FROM minsteinntekt_vurdering_v1 WHERE opprettet < (now() - (make_interval(mins := 5))) RETURNING *",
                         ).map { res ->
                             val jpId = res.string("journalpostId")
@@ -78,7 +87,8 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
     private fun lås(): Boolean {
         return using(sessionOf(dataSource)) { session ->
             session.run(
-                queryOf( //language=PostgreSQL
+                queryOf(
+                    // language=PostgreSQL
                     "SELECT pg_try_advisory_lock(:key)", mapOf("key" to låseNøkkel),
                 ).map { res ->
                     res.boolean("pg_try_advisory_lock")
@@ -86,10 +96,12 @@ internal class MinsteinntektVurderingPostgresRepository(private val dataSource: 
             ) ?: false
         }
     }
+
     private fun låsOpp(): Boolean {
         return using(sessionOf(dataSource)) { session ->
             session.run(
-                queryOf( //language=PostgreSQL
+                queryOf(
+                    // language=PostgreSQL
                     "SELECT pg_advisory_unlock(:key)", mapOf("key" to låseNøkkel),
                 ).map { res ->
                     res.boolean("pg_advisory_unlock")

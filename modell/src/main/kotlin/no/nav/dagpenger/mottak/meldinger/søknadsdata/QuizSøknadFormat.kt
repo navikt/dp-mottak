@@ -79,6 +79,7 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag
     }
 
     override fun permittert(): Boolean = avsluttetArbeidsforhold().any { it.sluttårsak == Sluttårsak.PERMITTERT }
+
     override fun fangstOgFisk(): Boolean {
         // todo remove behov from quiz
         return false
@@ -112,19 +113,20 @@ private fun JsonNode.fiskForedling(): Boolean =
     this.find { it["beskrivendeId"].asText() == "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering" }
         ?.get("svar")?.asBoolean() ?: false
 
-private fun JsonNode.sluttårsak(): Sluttårsak = this.faktaSvar("faktum.arbeidsforhold.endret").asText().let {
-    when (it) {
-        "faktum.arbeidsforhold.endret.svar.ikke-endret" -> Sluttårsak.IKKE_ENDRET
-        "faktum.arbeidsforhold.endret.svar.avskjediget" -> Sluttårsak.AVSKJEDIGET
-        "faktum.arbeidsforhold.endret.svar.sagt-opp-av-arbeidsgiver" -> Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
-        "faktum.arbeidsforhold.endret.svar.arbeidsgiver-konkurs" -> Sluttårsak.ARBEIDSGIVER_KONKURS
-        "faktum.arbeidsforhold.endret.svar.kontrakt-utgaatt" -> Sluttårsak.KONTRAKT_UTGAATT
-        "faktum.arbeidsforhold.endret.svar.sagt-opp-selv" -> Sluttårsak.SAGT_OPP_SELV
-        "faktum.arbeidsforhold.endret.svar.redusert-arbeidstid" -> Sluttårsak.REDUSERT_ARBEIDSTID
-        "faktum.arbeidsforhold.endret.svar.permittert" -> Sluttårsak.PERMITTERT
-        else -> throw IllegalArgumentException("Ukjent sluttårsak: $it")
+private fun JsonNode.sluttårsak(): Sluttårsak =
+    this.faktaSvar("faktum.arbeidsforhold.endret").asText().let {
+        when (it) {
+            "faktum.arbeidsforhold.endret.svar.ikke-endret" -> Sluttårsak.IKKE_ENDRET
+            "faktum.arbeidsforhold.endret.svar.avskjediget" -> Sluttårsak.AVSKJEDIGET
+            "faktum.arbeidsforhold.endret.svar.sagt-opp-av-arbeidsgiver" -> Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
+            "faktum.arbeidsforhold.endret.svar.arbeidsgiver-konkurs" -> Sluttårsak.ARBEIDSGIVER_KONKURS
+            "faktum.arbeidsforhold.endret.svar.kontrakt-utgaatt" -> Sluttårsak.KONTRAKT_UTGAATT
+            "faktum.arbeidsforhold.endret.svar.sagt-opp-selv" -> Sluttårsak.SAGT_OPP_SELV
+            "faktum.arbeidsforhold.endret.svar.redusert-arbeidstid" -> Sluttårsak.REDUSERT_ARBEIDSTID
+            "faktum.arbeidsforhold.endret.svar.permittert" -> Sluttårsak.PERMITTERT
+            else -> throw IllegalArgumentException("Ukjent sluttårsak: $it")
+        }
     }
-}
 
 private fun JsonNode.hentFaktaFraSeksjon(navn: String) =
     try {
@@ -146,38 +148,41 @@ private fun JsonNode.faktaSvar(navn: String) =
     }
 
 private fun JsonNode.asLocalDateTime(): LocalDateTime = this.asText().let { LocalDateTime.parse(it) }
+
 private fun JsonNode.asLocalDate(): LocalDate = this.asText().let { LocalDate.parse(it) }
+
 private fun String.erEøsLand(): Boolean = eøsLandOgSveits.contains(this)
 
-private val eøsLandOgSveits = listOf(
-    "BEL",
-    "BGR",
-    "DNK",
-    "EST",
-    "FIN",
-    "FRA",
-    "GRC",
-    "IRL",
-    "ISL",
-    "ITA",
-    "HRV",
-    "CYP",
-    "LVA",
-    "LIE",
-    "LTU",
-    "LUX",
-    "MLT",
-    "NLD",
-    "POL",
-    "PRT",
-    "ROU",
-    "SVK",
-    "SVN",
-    "ESP",
-    "CHE",
-    "SWE",
-    "CZE",
-    "DEU",
-    "HUN",
-    "AUT",
-)
+private val eøsLandOgSveits =
+    listOf(
+        "BEL",
+        "BGR",
+        "DNK",
+        "EST",
+        "FIN",
+        "FRA",
+        "GRC",
+        "IRL",
+        "ISL",
+        "ITA",
+        "HRV",
+        "CYP",
+        "LVA",
+        "LIE",
+        "LTU",
+        "LUX",
+        "MLT",
+        "NLD",
+        "POL",
+        "PRT",
+        "ROU",
+        "SVK",
+        "SVN",
+        "ESP",
+        "CHE",
+        "SWE",
+        "CZE",
+        "DEU",
+        "HUN",
+        "AUT",
+    )

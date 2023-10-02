@@ -20,20 +20,22 @@ internal class PostgresSøknadQuizOppslagTest {
         withMigratedDb {
             val data = this.javaClass.getResource("/testdata/soknadsdata.json").readText(Charset.forName("UTF-8"))
             using(sessionOf(PostgresDataSourceBuilder.dataSource)) { session ->
-                val id = session.run(
-                    queryOf(
-                        "INSERT INTO innsending_v1(journalpostId, tilstand) VALUES($journalpostID, 'superduper') RETURNING id",
-                    ).map { row -> row.long("id") }.asSingle,
-                )
+                val id =
+                    session.run(
+                        queryOf(
+                            "INSERT INTO innsending_v1(journalpostId, tilstand) VALUES($journalpostID, 'superduper') RETURNING id",
+                        ).map { row -> row.long("id") }.asSingle,
+                    )
                 session.run(
                     queryOf(
                         "INSERT INTO soknad_v1(id,data) VALUES(:id, :data)",
                         mapOf(
                             "id" to id,
-                            "data" to PGobject().apply {
-                                type = "jsonb"
-                                value = data
-                            },
+                            "data" to
+                                PGobject().apply {
+                                    type = "jsonb"
+                                    value = data
+                                },
                         ),
                     ).asUpdate,
                 )

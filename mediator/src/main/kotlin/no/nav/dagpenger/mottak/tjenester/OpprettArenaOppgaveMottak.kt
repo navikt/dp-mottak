@@ -20,7 +20,6 @@ internal class OpprettArenaOppgaveMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
-
     init {
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
@@ -36,7 +35,10 @@ internal class OpprettArenaOppgaveMottak(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val arenaLøsning = packet["@løsning"].first()
         val journalpostId = packet["journalpostId"].asText()
         logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId" }

@@ -61,30 +61,34 @@ internal class InnsendingPostgresRepositoryTest {
     @Test
     fun `håndterer ny lagring av aktivitetslogg`() {
         val innsending = innsendingData.createInnsending()
-        val nyLogg = innsendingData.aktivitetslogg.aktiviteter.toMutableList().also {
-            it.add(
-                InnsendingData.AktivitetsloggData.AktivitetData(
-                    alvorlighetsgrad = InnsendingData.AktivitetsloggData.Alvorlighetsgrad.INFO,
-                    label = 'N',
-                    melding = "NY TEST",
-                    tidsstempel = LocalDateTime.now().toString(),
-                    detaljer = mapOf("detaljVariabel" to "tt"),
-                    kontekster = listOf(
-                        InnsendingData.AktivitetsloggData.SpesifikkKontekstData(
-                            kontekstType = "TEST",
-                            kontekstMap = mapOf("kontekstVariabel" to "foo"),
-                        ),
+        val nyLogg =
+            innsendingData.aktivitetslogg.aktiviteter.toMutableList().also {
+                it.add(
+                    InnsendingData.AktivitetsloggData.AktivitetData(
+                        alvorlighetsgrad = InnsendingData.AktivitetsloggData.Alvorlighetsgrad.INFO,
+                        label = 'N',
+                        melding = "NY TEST",
+                        tidsstempel = LocalDateTime.now().toString(),
+                        detaljer = mapOf("detaljVariabel" to "tt"),
+                        kontekster =
+                            listOf(
+                                InnsendingData.AktivitetsloggData.SpesifikkKontekstData(
+                                    kontekstType = "TEST",
+                                    kontekstMap = mapOf("kontekstVariabel" to "foo"),
+                                ),
+                            ),
+                        behovtype = null,
                     ),
-                    behovtype = null,
-                ),
-            )
-        }
-        val innsending2 = innsendingData.copy(
-            aktivitetslogg = InnsendingData.AktivitetsloggData(nyLogg.toList()),
-            tilstand = InnsendingData.TilstandData(
-                InnsendingData.TilstandData.InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType,
-            ),
-        ).createInnsending()
+                )
+            }
+        val innsending2 =
+            innsendingData.copy(
+                aktivitetslogg = InnsendingData.AktivitetsloggData(nyLogg.toList()),
+                tilstand =
+                    InnsendingData.TilstandData(
+                        InnsendingData.TilstandData.InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType,
+                    ),
+            ).createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending).also {
@@ -150,13 +154,14 @@ internal class InnsendingPostgresRepositoryTest {
     fun `håndterer flere innsendinger for samme person men med dnr og fnr skille`() {
         val innsending = innsendingData.createInnsending()
 
-        val innsending2 = innsendingData.copy(
-            journalpostId = "287689",
-            personData = innsendingData.personData!!.copy(
-                fødselsnummer = dnr,
-
-            ),
-        ).createInnsending()
+        val innsending2 =
+            innsendingData.copy(
+                journalpostId = "287689",
+                personData =
+                    innsendingData.personData!!.copy(
+                        fødselsnummer = dnr,
+                    ),
+            ).createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending).also {
@@ -177,12 +182,14 @@ internal class InnsendingPostgresRepositoryTest {
 
     @Test
     fun `Lagring der arena sak er null`() {
-        val innsending = innsendingData.copy(
-            arenaSakData = InnsendingData.ArenaSakData(
-                oppgaveId = "2234",
-                fagsakId = null,
-            ),
-        ).createInnsending()
+        val innsending =
+            innsendingData.copy(
+                arenaSakData =
+                    InnsendingData.ArenaSakData(
+                        oppgaveId = "2234",
+                        fagsakId = null,
+                    ),
+            ).createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending).also {
@@ -209,14 +216,18 @@ internal class InnsendingPostgresRepositoryTest {
         }
     }
 
-    private fun assertAntallRader(tabell: String, antallRader: Int) {
-        val faktiskeRader = using(sessionOf(PostgresDataSourceBuilder.dataSource)) { session ->
-            session.run(
-                queryOf("select count(1) from $tabell").map { row ->
-                    row.int(1)
-                }.asSingle,
-            )
-        }
+    private fun assertAntallRader(
+        tabell: String,
+        antallRader: Int,
+    ) {
+        val faktiskeRader =
+            using(sessionOf(PostgresDataSourceBuilder.dataSource)) { session ->
+                session.run(
+                    queryOf("select count(1) from $tabell").map { row ->
+                        row.int(1)
+                    }.asSingle,
+                )
+            }
         assertEquals(antallRader, faktiskeRader, "Feil antall rader for tabell: $tabell")
     }
 }

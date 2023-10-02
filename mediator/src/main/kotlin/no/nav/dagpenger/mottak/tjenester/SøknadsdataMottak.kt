@@ -30,20 +30,24 @@ internal class SøknadsdataMottak(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val journalpostId = packet["journalpostId"].asText()
 
         withLoggingContext("journalpostId" to journalpostId) {
             logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
-            val søknadsdata: Søknadsdata = packet["@løsning.${Behovtype.Søknadsdata.name}"].let { data ->
-                Søknadsdata(
-                    aktivitetslogg = Aktivitetslogg(),
-                    journalpostId = journalpostId,
-                    data = data,
-                ).also { søknadsdata ->
-                    with(søknadsdata.søknad()) {
-                        logg.info {
-                            """Søknadsdata sier:
+            val søknadsdata: Søknadsdata =
+                packet["@løsning.${Behovtype.Søknadsdata.name}"].let { data ->
+                    Søknadsdata(
+                        aktivitetslogg = Aktivitetslogg(),
+                        journalpostId = journalpostId,
+                        data = data,
+                    ).also { søknadsdata ->
+                        with(søknadsdata.søknad()) {
+                            logg.info {
+                                """Søknadsdata sier:
                                 |  konkurs=${avsluttetArbeidsforholdFraKonkurs()}
                                 |  eøsBostedsland=${eøsBostedsland()}
                                 |  eøsArbeidsforhold=${eøsArbeidsforhold()}
@@ -54,15 +58,15 @@ internal class SøknadsdataMottak(
                                 |  harAndreYtelser=${harAndreYtelser()}
                                 |  avsluttedeArbeidsforhold=${avsluttetArbeidsforhold().isEmpty()}
                                 |  rutingoppslag=${this.javaClass.simpleName}
-                            """.trimMargin()
-                        }
+                                """.trimMargin()
+                            }
 
-                        if (avtjentVerneplikt() && avsluttetArbeidsforhold().isEmpty() && !harBarn() && !harAndreYtelser()) {
-                            logg.info { "Søknad er en mulig Viggo." }
+                            if (avtjentVerneplikt() && avsluttetArbeidsforhold().isEmpty() && !harBarn() && !harAndreYtelser()) {
+                                logg.info { "Søknad er en mulig Viggo." }
+                            }
                         }
                     }
                 }
-            }
 
             innsendingMediator.håndter(søknadsdata)
         }

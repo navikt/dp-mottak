@@ -13,7 +13,6 @@ internal class SøknadsdataBehovLøser(
     private val søknadsArkiv: SøknadsArkiv,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
-
     companion object {
         private val logger = KotlinLogging.logger { }
     }
@@ -28,7 +27,10 @@ internal class SøknadsdataBehovLøser(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val journalpostId = packet["journalpostId"].asText()
         val behovId = packet["@behovId"].asText()
         withMDC(

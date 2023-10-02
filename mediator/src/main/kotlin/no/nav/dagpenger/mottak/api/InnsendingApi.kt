@@ -38,7 +38,6 @@ internal fun Application.innsendingApi(
                     logger.error(cause) { "Kunne ikke håndtere API kall" }
                     call.respond(
                         HttpStatusCode.InternalServerError,
-
                     )
                 }
             }
@@ -63,18 +62,20 @@ internal fun Application.innsendingApi(
     }
 
     install(Authentication) {
-        jwt(Config.AzureAd.name) {
+        jwt(Config.AzureAd.NAME) {
             withAudience(Config.AzureAd.audience)
         }
     }
     routing {
-        authenticate(Config.AzureAd.name) {
+        authenticate(Config.AzureAd.NAME) {
             put("/internal/replay/{journalpostId}") {
-                val journalpostId = this.call.parameters["journalpostId"]
-                    ?: throw IllegalArgumentException("Må sette parameter til journalpostid")
-                val innsending = innsendingRepository.hent(journalpostId)?.also {
-                    it.addObserver(observer)
-                } ?: throw IllegalArgumentException("Fant ikke journalpostId med id $journalpostId")
+                val journalpostId =
+                    this.call.parameters["journalpostId"]
+                        ?: throw IllegalArgumentException("Må sette parameter til journalpostid")
+                val innsending =
+                    innsendingRepository.hent(journalpostId)?.also {
+                        it.addObserver(observer)
+                    } ?: throw IllegalArgumentException("Fant ikke journalpostId med id $journalpostId")
                 innsending.håndter(ReplayFerdigstillEvent(journalpostId))
                 call.respond("OK")
             }
@@ -89,7 +90,6 @@ internal fun Application.innsendingApi(
 }
 
 data class Periode(val fom: LocalDateTime, val tom: LocalDateTime) {
-
     init {
         require(fom.isBefore(tom)) { " FOM kan ikke være etter TOM " }
     }

@@ -35,14 +35,15 @@ data class InnsendingData(
                         journalpostStatus = journalpostData.journalpostStatus,
                         behandlingstema = journalpostData.behandlingstema,
                         registrertDato = journalpostData.registertDato,
-                        dokumenter = journalpostData.dokumenter.map {
-                            Journalpost.DokumentInfo(
-                                it.tittel,
-                                it.dokumentInfoId,
-                                it.brevkode,
-                                it.hovedDokument,
-                            )
-                        },
+                        dokumenter =
+                            journalpostData.dokumenter.map {
+                                Journalpost.DokumentInfo(
+                                    it.tittel,
+                                    it.dokumentInfoId,
+                                    it.brevkode,
+                                    it.hovedDokument,
+                                )
+                            },
                     )
                 },
                 søknadsData?.let { rutingOppslag(it) },
@@ -67,22 +68,23 @@ data class InnsendingData(
     data class TilstandData(
         val type: InnsendingTilstandTypeData,
     ) {
-        fun createTilstand(): Innsending.Tilstand = when (type) {
-            InnsendingTilstandTypeData.MottattType -> Innsending.Mottatt
-            InnsendingTilstandTypeData.AvventerJournalpostType -> Innsending.AvventerJournalpost
-            InnsendingTilstandTypeData.AvventerPersondataType -> Innsending.AvventerPersondata
-            InnsendingTilstandTypeData.KategoriseringType -> Innsending.Kategorisering
-            InnsendingTilstandTypeData.AvventerSøknadsdataType -> Innsending.AvventerSøknadsdata
-            InnsendingTilstandTypeData.AvventerMinsteinntektVurderingType -> Innsending.AventerMinsteinntektVurdering
-            InnsendingTilstandTypeData.AvventerSvarOmEksisterendeSakerType -> Innsending.AvventerSvarOmEksisterendeSaker
-            InnsendingTilstandTypeData.AventerArenaStartVedtakType -> Innsending.AventerArenaStartVedtak
-            InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType -> Innsending.AventerFerdigstill
-            InnsendingTilstandTypeData.InnsendingFerdigstiltType -> Innsending.InnsendingFerdigStilt
-            InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerVurderHenvendelseArenaOppgave
-            InnsendingTilstandTypeData.AvventerGosysType -> Innsending.AvventerGosysOppgave
-            InnsendingTilstandTypeData.UkjentBrukerType -> Innsending.UkjentBruker
-            InnsendingTilstandTypeData.AlleredeBehandletType -> Innsending.AlleredeBehandlet
-        }
+        fun createTilstand(): Innsending.Tilstand =
+            when (type) {
+                InnsendingTilstandTypeData.MottattType -> Innsending.Mottatt
+                InnsendingTilstandTypeData.AvventerJournalpostType -> Innsending.AvventerJournalpost
+                InnsendingTilstandTypeData.AvventerPersondataType -> Innsending.AvventerPersondata
+                InnsendingTilstandTypeData.KategoriseringType -> Innsending.Kategorisering
+                InnsendingTilstandTypeData.AvventerSøknadsdataType -> Innsending.AvventerSøknadsdata
+                InnsendingTilstandTypeData.AvventerMinsteinntektVurderingType -> Innsending.AventerMinsteinntektVurdering
+                InnsendingTilstandTypeData.AvventerSvarOmEksisterendeSakerType -> Innsending.AvventerSvarOmEksisterendeSaker
+                InnsendingTilstandTypeData.AventerArenaStartVedtakType -> Innsending.AventerArenaStartVedtak
+                InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType -> Innsending.AventerFerdigstill
+                InnsendingTilstandTypeData.InnsendingFerdigstiltType -> Innsending.InnsendingFerdigStilt
+                InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerVurderHenvendelseArenaOppgave
+                InnsendingTilstandTypeData.AvventerGosysType -> Innsending.AvventerGosysOppgave
+                InnsendingTilstandTypeData.UkjentBrukerType -> Innsending.UkjentBruker
+                InnsendingTilstandTypeData.AlleredeBehandletType -> Innsending.AlleredeBehandlet
+            }
 
         enum class InnsendingTilstandTypeData {
             MottattType,
@@ -151,15 +153,18 @@ data class InnsendingData(
         val registertDato: LocalDateTime,
         val dokumenter: List<DokumentInfoData>,
     ) {
-
         enum class BrukerTypeData {
-            ORGNR, AKTOERID, FNR;
+            ORGNR,
+            AKTOERID,
+            FNR,
+            ;
 
-            fun createBrukerType() = when (this) {
-                ORGNR -> Journalpost.BrukerType.ORGNR
-                AKTOERID -> Journalpost.BrukerType.AKTOERID
-                FNR -> Journalpost.BrukerType.FNR
-            }
+            fun createBrukerType() =
+                when (this) {
+                    ORGNR -> Journalpost.BrukerType.ORGNR
+                    AKTOERID -> Journalpost.BrukerType.AKTOERID
+                    FNR -> Journalpost.BrukerType.FNR
+                }
         }
 
         data class BrukerData(

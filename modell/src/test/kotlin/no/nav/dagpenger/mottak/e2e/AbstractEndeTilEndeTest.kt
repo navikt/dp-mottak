@@ -30,7 +30,6 @@ import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDateTime
 
 abstract class AbstractEndeTilEndeTest {
-
     protected companion object {
         private const val NAVN = "TEST TESTEN"
         private const val AKTØRID = "42"
@@ -46,12 +45,14 @@ abstract class AbstractEndeTilEndeTest {
     @BeforeEach
     internal fun setup() {
         innsending = Innsending(JOURNALPOST_ID)
-        observatør = TestObservatør().also {
-            innsending.addObserver(it)
-        }
-        plantUmlObservatør = PlantUmlObservatør().also {
-            innsending.addObserver(it)
-        }
+        observatør =
+            TestObservatør().also {
+                innsending.addObserver(it)
+            }
+        plantUmlObservatør =
+            PlantUmlObservatør().also {
+                innsending.addObserver(it)
+            }
     }
 
     protected fun assertTilstander(vararg tilstander: InnsendingTilstandType) {
@@ -66,10 +67,14 @@ abstract class AbstractEndeTilEndeTest {
         assertTrue(inspektør.innsendingLogg.hasMessages(), inspektør.innsendingLogg.toString())
     }
 
-    protected fun assertBehovDetaljer(type: Behovtype, detaljer: Set<String> = emptySet()) {
-        val behov = inspektør.innsendingLogg.behov().find { behov ->
-            behov.type == type
-        } ?: throw AssertionError("Fant ikke behov ${type.name} i etterspurte behov")
+    protected fun assertBehovDetaljer(
+        type: Behovtype,
+        detaljer: Set<String> = emptySet(),
+    ) {
+        val behov =
+            inspektør.innsendingLogg.behov().find { behov ->
+                behov.type == type
+            } ?: throw AssertionError("Fant ikke behov ${type.name} i etterspurte behov")
 
         assertEquals(
             detaljer + setOf("tilstand", "journalpostId"),
@@ -120,6 +125,7 @@ abstract class AbstractEndeTilEndeTest {
     protected fun håndterPersonInformasjon() {
         innsending.håndter(personInformasjon())
     }
+
     protected fun håndterPersonInformasjonIkkeFunnet() {
         innsending.håndter(personInformasjonIkkeFunnet())
     }
@@ -152,86 +158,99 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(journalpostFerdigstilt())
     }
 
-    private fun journalpostFerdigstilt(): JournalpostFerdigstilt = JournalpostFerdigstilt(
-        aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID,
-    )
+    private fun journalpostFerdigstilt(): JournalpostFerdigstilt =
+        JournalpostFerdigstilt(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+        )
 
-    private fun journalpostOppdatert(): JournalpostOppdatert = JournalpostOppdatert(
-        aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID,
-    )
+    private fun journalpostOppdatert(): JournalpostOppdatert =
+        JournalpostOppdatert(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+        )
 
-    private fun arenaOppgaveOpprettet(): ArenaOppgaveOpprettet = ArenaOppgaveOpprettet(
-        aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID,
-        oppgaveId = "1234",
-        fagsakId = "9867541",
-    )
+    private fun arenaOppgaveOpprettet(): ArenaOppgaveOpprettet =
+        ArenaOppgaveOpprettet(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+            oppgaveId = "1234",
+            fagsakId = "9867541",
+        )
 
-    private fun gosysOppgaveOpprettet(): GosysOppgaveOpprettet = GosysOppgaveOpprettet(
-        aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID,
-        oppgaveId = "1234567",
-    )
+    private fun gosysOppgaveOpprettet(): GosysOppgaveOpprettet =
+        GosysOppgaveOpprettet(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+            oppgaveId = "1234567",
+        )
 
-    private fun eksisterendesakData(): Eksisterendesaker = Eksisterendesaker(
-        aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID,
-        harEksisterendeSak = false,
-    )
+    private fun eksisterendesakData(): Eksisterendesaker =
+        Eksisterendesaker(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+            harEksisterendeSak = false,
+        )
 
-    private fun minsteinntektVurderingData(): MinsteinntektArbeidsinntektVurdert = MinsteinntektArbeidsinntektVurdert(
-        aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID,
-        oppfyllerMinsteArbeidsinntekt = false,
-    )
+    private fun minsteinntektVurderingData(): MinsteinntektArbeidsinntektVurdert =
+        MinsteinntektArbeidsinntektVurdert(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+            oppfyllerMinsteArbeidsinntekt = false,
+        )
 
-    private fun søknadsdata(): Søknadsdata = Søknadsdata(
-        aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID,
-        data = utenSeksjoner(),
-    )
+    private fun søknadsdata(): Søknadsdata =
+        Søknadsdata(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+            data = utenSeksjoner(),
+        )
 
-    private fun personInformasjon(): PersonInformasjon = PersonInformasjon(
-        aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID,
-        aktørId = AKTØRID,
-        ident = GENERERT_FØDSELSNUMMER,
-        norskTilknytning = true,
-        navn = NAVN,
-    )
-    private fun personInformasjonIkkeFunnet(): PersonInformasjonIkkeFunnet = PersonInformasjonIkkeFunnet(
-        aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID,
-    )
+    private fun personInformasjon(): PersonInformasjon =
+        PersonInformasjon(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+            aktørId = AKTØRID,
+            ident = GENERERT_FØDSELSNUMMER,
+            norskTilknytning = true,
+            navn = NAVN,
+        )
+
+    private fun personInformasjonIkkeFunnet(): PersonInformasjonIkkeFunnet =
+        PersonInformasjonIkkeFunnet(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+        )
 
     private fun journalpostData(
         brevkode: String,
         behandlingstema: String? = null,
         bruker: Bruker?,
         journalpostStatus: String,
-    ): Journalpost = Journalpost(
-        aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID,
-        journalpostStatus = journalpostStatus,
-        bruker = bruker,
-        behandlingstema = behandlingstema,
-        registrertDato = LocalDateTime.now(),
-        dokumenter = listOf(
-            Journalpost.DokumentInfo(
-                tittelHvisTilgjengelig = null,
-                dokumentInfoId = "123",
-                brevkode = brevkode,
-                hovedDokument = true,
-            ),
-        ),
-    )
+    ): Journalpost =
+        Journalpost(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+            journalpostStatus = journalpostStatus,
+            bruker = bruker,
+            behandlingstema = behandlingstema,
+            registrertDato = LocalDateTime.now(),
+            dokumenter =
+                listOf(
+                    Journalpost.DokumentInfo(
+                        tittelHvisTilgjengelig = null,
+                        dokumentInfoId = "123",
+                        brevkode = brevkode,
+                        hovedDokument = true,
+                    ),
+                ),
+        )
 
-    private fun joarkhendelse(): JoarkHendelse = JoarkHendelse(
-        aktivitetslogg = Aktivitetslogg(),
-        journalpostId = JOURNALPOST_ID,
-        hendelseType = "MIDLERTIDIG",
-        journalpostStatus = "MOTTATT",
-    )
+    private fun joarkhendelse(): JoarkHendelse =
+        JoarkHendelse(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+            hendelseType = "MIDLERTIDIG",
+            journalpostStatus = "MOTTATT",
+        )
 }

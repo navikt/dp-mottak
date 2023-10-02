@@ -1,15 +1,15 @@
 plugins {
-    id("dagpenger.common")
+    id("common")
 }
 
 dependencies {
-    implementation(Jackson.core)
-    implementation(Jackson.kotlin)
-    implementation(Jackson.jsr310)
+    implementation(libs.jackson.core)
+    implementation(libs.jackson.kotlin)
+    implementation(libs.jackson.datatype.jsr310)
     api("no.bekk.bekkopen:nocommons:0.12.0")
-    api(Kotlin.Logging.kotlinLogging)
+    api(libs.kotlin.logging)
 
-    testImplementation(Junit5.params)
-    testImplementation(Mockk.mockk)
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${libs.versions.junit.get()}")
+    testImplementation(libs.mockk)
     testImplementation("com.approvaltests:approvaltests:19.0.0")
 }

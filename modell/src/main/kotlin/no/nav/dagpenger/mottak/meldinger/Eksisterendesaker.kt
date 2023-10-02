@@ -9,5 +9,6 @@ class Eksisterendesaker(
     private val harEksisterendeSak: Boolean,
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
+
     fun harEksisterendeSaker(): Boolean = harEksisterendeSak
 }

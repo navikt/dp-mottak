@@ -9,5 +9,6 @@ class MinsteinntektArbeidsinntektVurdert(
     private val oppfyllerMinsteArbeidsinntekt: Boolean?,
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
+
     fun oppfyllerMinsteArbeidsinntekt(): Boolean? = oppfyllerMinsteArbeidsinntekt
 }

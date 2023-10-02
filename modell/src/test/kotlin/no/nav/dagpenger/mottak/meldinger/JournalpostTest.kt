@@ -11,7 +11,10 @@ internal class JournalpostTest {
         assertEquals("Ukjent dokumenttittel", dokumentInfo(null, "ukjent-brevkode").tittel)
     }
 
-    private fun dokumentInfo(tittel: String?, brevkode: String = "NAV 04-16.03") = Journalpost.DokumentInfo(
+    private fun dokumentInfo(
+        tittel: String?,
+        brevkode: String = "NAV 04-16.03",
+    ) = Journalpost.DokumentInfo(
         tittel,
         "1",
         brevkode,

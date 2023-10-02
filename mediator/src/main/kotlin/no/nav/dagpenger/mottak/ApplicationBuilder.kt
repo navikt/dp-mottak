@@ -33,7 +33,6 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 private val logg = KotlinLogging.logger {}
 
 internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.StatusListener {
-
     private val innsendingRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
     private val safClient = SafClient(Config.properties)
     private val regelApiClient = RegelApiProxy(Config.properties)
@@ -44,51 +43,53 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
         MinsteinntektVurderingPostgresRepository(PostgresDataSourceBuilder.dataSource)
     private val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(Config.kafkaProducerProperties)
 
-    private val rapidsConnection = RapidApplication.Builder(
-        RapidApplication.RapidApplicationConfig.fromEnv(env),
-    )
-        .also { builder ->
-            builder.withKtorModule {
-                innsendingApi(
-                    innsendingRepository,
-                    ferdigstiltInnsendingObserver,
-
-                )
+    private val rapidsConnection =
+        RapidApplication.Builder(
+            RapidApplication.RapidApplicationConfig.fromEnv(env),
+        )
+            .also { builder ->
+                builder.withKtorModule {
+                    innsendingApi(
+                        innsendingRepository,
+                        ferdigstiltInnsendingObserver,
+                    )
+                }
             }
-        }
-        .build().apply {
-            val mediator = InnsendingMediator(
-                innsendingRepository = innsendingRepository,
-                rapidsConnection = this,
-                observatører = listOf(
-                    ferdigstiltInnsendingObserver,
-                    MetrikkObserver(),
-                    InnsendingProbe,
-                ),
-            )
-            // Behovmottakere
-            MottakMediator(mediator, this)
+            .build().apply {
+                val mediator =
+                    InnsendingMediator(
+                        innsendingRepository = innsendingRepository,
+                        rapidsConnection = this,
+                        observatører =
+                            listOf(
+                                ferdigstiltInnsendingObserver,
+                                MetrikkObserver(),
+                                InnsendingProbe,
+                            ),
+                    )
+                // Behovmottakere
+                MottakMediator(mediator, this)
 
-            // Behovløsere
-            JournalpostBehovLøser(safClient, this)
-            OppdaterJournalpostBehovLøser(journalpostApiClient, this)
-            FerdigstillJournalpostBehovLøser(journalpostApiClient, this)
-            PersondataBehovLøser(
-                createPersonOppslag(PdlPersondataOppslag(Config.properties), SkjermingOppslag(Config.properties)),
-                this,
-            )
-            SøknadsdataBehovLøser(safClient, this)
-            MinsteinntektVurderingLøser(
-                regelApiClient = regelApiClient,
-                repository = minsteinntektVurderingRepository,
-                rapidsConnection = this,
-            )
-            ArenaBehovLøser(arenaApiClient, this)
-            OpprettGosysOppgaveLøser(gosysProxyClient, this)
+                // Behovløsere
+                JournalpostBehovLøser(safClient, this)
+                OppdaterJournalpostBehovLøser(journalpostApiClient, this)
+                FerdigstillJournalpostBehovLøser(journalpostApiClient, this)
+                PersondataBehovLøser(
+                    createPersonOppslag(PdlPersondataOppslag(Config.properties), SkjermingOppslag(Config.properties)),
+                    this,
+                )
+                SøknadsdataBehovLøser(safClient, this)
+                MinsteinntektVurderingLøser(
+                    regelApiClient = regelApiClient,
+                    repository = minsteinntektVurderingRepository,
+                    rapidsConnection = this,
+                )
+                ArenaBehovLøser(arenaApiClient, this)
+                OpprettGosysOppgaveLøser(gosysProxyClient, this)
 
-            // Eksterne behovløsere
-            SøknadFaktaQuizLøser(PostgresSøknadQuizOppslag(PostgresDataSourceBuilder.dataSource), this)
-        }
+                // Eksterne behovløsere
+                SøknadFaktaQuizLøser(PostgresSøknadQuizOppslag(PostgresDataSourceBuilder.dataSource), this)
+            }
 
     init {
         rapidsConnection.register(this)

@@ -13,12 +13,13 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
 
 private val logg = KotlinLogging.logger {}
+
 internal class GosysOppgaveOpprettetMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
-
     private val løsning = "@løsning.${Behovtype.OpprettGosysoppgave.name}"
+
     init {
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
@@ -28,14 +29,18 @@ internal class GosysOppgaveOpprettetMottak(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val oppgaveId = packet[løsning]["oppgaveId"].asText()
         logg.info { "Motatt løsning for $løsning med journalpostId: ${packet["journalpostId"]} og oppgavevId $oppgaveId" }
-        val oppgaveOpprettet = GosysOppgaveOpprettet(
-            aktivitetslogg = Aktivitetslogg(),
-            journalpostId = packet[løsning]["journalpostId"].asText(),
-            oppgaveId = oppgaveId,
-        )
+        val oppgaveOpprettet =
+            GosysOppgaveOpprettet(
+                aktivitetslogg = Aktivitetslogg(),
+                journalpostId = packet[løsning]["journalpostId"].asText(),
+                oppgaveId = oppgaveId,
+            )
 
         innsendingMediator.håndter(oppgaveOpprettet)
     }

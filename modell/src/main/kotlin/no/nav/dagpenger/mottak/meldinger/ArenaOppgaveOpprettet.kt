@@ -11,6 +11,7 @@ class ArenaOppgaveOpprettet(
     private val fagsakId: String?,
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
+
     fun arenaSak(): ArenaSak = ArenaSak(oppgaveId, fagsakId)
 
     class ArenaSak(

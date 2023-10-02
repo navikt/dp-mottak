@@ -6,7 +6,6 @@ import org.flywaydb.core.Flyway
 import org.flywaydb.core.internal.configuration.ConfigUtils
 
 internal object PostgresDataSourceBuilder {
-
     const val DB_USERNAME_KEY = "DB_USERNAME"
     const val DB_PASSWORD_KEY = "DB_PASSWORD"
     const val DB_DATABASE_KEY = "DB_DATABASE"
@@ -31,9 +30,10 @@ internal object PostgresDataSourceBuilder {
         }
     }
 
-    internal fun clean() = Flyway.configure()
-        .cleanDisabled(getOrThrow(ConfigUtils.CLEAN_DISABLED).toBooleanStrict())
-        .dataSource(dataSource).load().clean()
+    internal fun clean() =
+        Flyway.configure()
+            .cleanDisabled(getOrThrow(ConfigUtils.CLEAN_DISABLED).toBooleanStrict())
+            .dataSource(dataSource).load().clean()
 
     internal fun runMigration(initSql: String? = null): Int =
         Flyway.configure()

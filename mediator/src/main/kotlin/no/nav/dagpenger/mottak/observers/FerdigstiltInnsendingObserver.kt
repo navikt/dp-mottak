@@ -15,72 +15,77 @@ import java.util.concurrent.TimeUnit
 
 internal class FerdigstiltInnsendingObserver internal constructor(private val producer: Producer<String, String>) :
     InnsendingObserver {
-    constructor(producerProperties: Properties) : this(createProducer(producerProperties))
+        constructor(producerProperties: Properties) : this(createProducer(producerProperties))
 
-    init {
-        Runtime.getRuntime().addShutdownHook(Thread(::shutdownHook))
-    }
-
-    private companion object {
-        private val logger = KotlinLogging.logger {}
-        private val sikkerLogger = KotlinLogging.logger("tjenestekall")
-        private fun createProducer(producerProperties: Properties): KafkaProducer<String, String> {
-            producerProperties[ProducerConfig.ACKS_CONFIG] = "all"
-            producerProperties[ProducerConfig.LINGER_MS_CONFIG] = "0"
-            producerProperties[ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION] = "1"
-            return KafkaProducer(producerProperties, StringSerializer(), StringSerializer())
-        }
-    }
-
-    override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
-        val payload = event.toPayload().also {
-            it["@event_name"] = "innsending_ferdigstilt"
+        init {
+            Runtime.getRuntime().addShutdownHook(Thread(::shutdownHook))
         }
 
-        publish(
-            key = event.journalpostId,
-            message = JsonMessage.newMessage(
-                payload,
-            ),
-        )
-    }
+        private companion object {
+            private val logger = KotlinLogging.logger {}
+            private val sikkerLogger = KotlinLogging.logger("tjenestekall")
 
-    override fun innsendingMottatt(event: InnsendingObserver.InnsendingEvent) {
-        val payload = event.toPayload().also {
-            it["@event_name"] = "innsending_mottatt"
+            private fun createProducer(producerProperties: Properties): KafkaProducer<String, String> {
+                producerProperties[ProducerConfig.ACKS_CONFIG] = "all"
+                producerProperties[ProducerConfig.LINGER_MS_CONFIG] = "0"
+                producerProperties[ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION] = "1"
+                return KafkaProducer(producerProperties, StringSerializer(), StringSerializer())
+            }
         }
 
-        publish(
-            key = event.journalpostId,
-            message = JsonMessage.newMessage(
-                payload,
-            ),
-        )
-    }
+        override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
+            val payload =
+                event.toPayload().also {
+                    it["@event_name"] = "innsending_ferdigstilt"
+                }
 
-    private fun publish(
-        key: String,
-        message: JsonMessage,
-    ) {
-        message.requireKey("@event_name")
-        producer.send(
-            ProducerRecord(
-                "teamdagpenger.journalforing.v1",
-                key,
-                message.toJson(),
-            ),
-        ).get(500, TimeUnit.MILLISECONDS)
+            publish(
+                key = event.journalpostId,
+                message =
+                    JsonMessage.newMessage(
+                        payload,
+                    ),
+            )
+        }
 
-        logger.info { "Send ${message["@event_name"].asText()} til Kafka for journalpostId=$key" }
-        sikkerLogger.info { message.toJson() }
-    }
+        override fun innsendingMottatt(event: InnsendingObserver.InnsendingEvent) {
+            val payload =
+                event.toPayload().also {
+                    it["@event_name"] = "innsending_mottatt"
+                }
 
-    private fun shutdownHook() {
-        logger.info("received shutdown signal, stopping app")
-        producer.flush()
-        producer.close()
+            publish(
+                key = event.journalpostId,
+                message =
+                    JsonMessage.newMessage(
+                        payload,
+                    ),
+            )
+        }
+
+        private fun publish(
+            key: String,
+            message: JsonMessage,
+        ) {
+            message.requireKey("@event_name")
+            producer.send(
+                ProducerRecord(
+                    "teamdagpenger.journalforing.v1",
+                    key,
+                    message.toJson(),
+                ),
+            ).get(500, TimeUnit.MILLISECONDS)
+
+            logger.info { "Send ${message["@event_name"].asText()} til Kafka for journalpostId=$key" }
+            sikkerLogger.info { message.toJson() }
+        }
+
+        private fun shutdownHook() {
+            logger.info("received shutdown signal, stopping app")
+            producer.flush()
+            producer.close()
+        }
     }
-}
 
 private fun InnsendingObserver.InnsendingEvent.toPayload() =
     mutableMapOf<String, Any>(

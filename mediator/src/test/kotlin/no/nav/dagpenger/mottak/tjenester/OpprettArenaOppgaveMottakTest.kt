@@ -12,7 +12,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 internal class OpprettArenaOppgaveMottakTest {
-
     private val testRapid = TestRapid()
     private val innsendingMediator = mockk<InnsendingMediator>(relaxed = true)
 
@@ -40,7 +39,8 @@ internal class OpprettArenaOppgaveMottakTest {
 
     //language=JSON
     private fun opprettArenaOppgaveHendelseFeilet(behov: String): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behov": [
@@ -58,7 +58,8 @@ internal class OpprettArenaOppgaveMottakTest {
 
     //language=JSON
     private fun opprettArenaOppgaveHendelse(behov: String): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behov": [

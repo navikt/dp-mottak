@@ -38,43 +38,43 @@ internal class JournalpostMottakTest {
     private fun journalpostUtenBruker(): String =
         //language=JSON
         """
-            {
-              "@event_name": "behov",
-              "@opprettet": "2021-05-07T14:19:03.105592",
-              "@id": "ac432da1-2914-43cc-a92f-791da0544c49",
-              "@behov": [
-                "Journalpost"
-              ],
+        {
+          "@event_name": "behov",
+          "@opprettet": "2021-05-07T14:19:03.105592",
+          "@id": "ac432da1-2914-43cc-a92f-791da0544c49",
+          "@behov": [
+            "Journalpost"
+          ],
+          "journalpostId": "506565476",
+          "@løsning": {
+            "Journalpost": {
+              "journalstatus": "MOTTATT",
               "journalpostId": "506565476",
-              "@løsning": {
-                "Journalpost": {
-                  "journalstatus": "MOTTATT",
-                  "journalpostId": "506565476",
-                  "bruker": null,
-                  "tittel": null,
-                  "datoOpprettet": "2021-05-07T13:45:51",
-                  "journalfoerendeEnhet": "4416",
-                  "relevanteDatoer": [
-                    {
-                      "dato": "2021-05-07T13:45:51",
-                      "datotype": "DATO_DOKUMENT"
-                    },
-                    {
-                      "dato": "2021-05-06T02:00",
-                      "datotype": "DATO_REGISTRERT"
-                    }
-                  ],
-                  "dokumenter": [
-                    {
-                      "tittel": "Bekreftelse på sluttårsak/nedsatt arbeidstid (ikke permittert)",
-                      "dokumentInfoId": "529249966",
-                      "brevkode": "NAV 04-08.03",
-                      "hovedDokument": true
-                    }
-                  ],
-                  "behandlingstema": null
+              "bruker": null,
+              "tittel": null,
+              "datoOpprettet": "2021-05-07T13:45:51",
+              "journalfoerendeEnhet": "4416",
+              "relevanteDatoer": [
+                {
+                  "dato": "2021-05-07T13:45:51",
+                  "datotype": "DATO_DOKUMENT"
+                },
+                {
+                  "dato": "2021-05-06T02:00",
+                  "datotype": "DATO_REGISTRERT"
                 }
-              }
+              ],
+              "dokumenter": [
+                {
+                  "tittel": "Bekreftelse på sluttårsak/nedsatt arbeidstid (ikke permittert)",
+                  "dokumentInfoId": "529249966",
+                  "brevkode": "NAV 04-08.03",
+                  "hovedDokument": true
+                }
+              ],
+              "behandlingstema": null
             }
+          }
+        }
         """.trimIndent()
 }

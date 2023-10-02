@@ -10,7 +10,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 internal class JoarkMottakTest {
-
     private val testRapid = TestRapid()
     private val mediator = mockk<InnsendingMediator>(relaxed = true)
 
@@ -51,7 +50,12 @@ internal class JoarkMottakTest {
     }
 
     //language=JSON
-    private fun joarkMelding(hendelseType: String = "MidlertidigJournalført", mottaksKanal: String = "NAV_NO", tema: String = "DAG"): String = """
+    private fun joarkMelding(
+        hendelseType: String = "MidlertidigJournalført",
+        mottaksKanal: String = "NAV_NO",
+        tema: String = "DAG",
+    ): String =
+        """
         {
           "hendelsesId": "",
           "versjon": "",
@@ -63,5 +67,5 @@ internal class JoarkMottakTest {
           "mottaksKanal": "$mottaksKanal",
           "kanalReferanseId": "vetikke"
         }
-    """.trimIndent()
+        """.trimIndent()
 }

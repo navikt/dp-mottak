@@ -17,10 +17,11 @@ internal class SøknadsdataMottakTest {
     }
 }
 
-private val søknadsdataJSON = JsonMessage.newNeed(
-    listOf("Søknadsdata"),
-    mapOf(
-        "journalpostId" to "123",
-        "@løsning" to mapOf("Søknadsdata" to ""),
-    ),
-)
+private val søknadsdataJSON =
+    JsonMessage.newNeed(
+        listOf("Søknadsdata"),
+        mapOf(
+            "journalpostId" to "123",
+            "@løsning" to mapOf("Søknadsdata" to ""),
+        ),
+    )

@@ -21,13 +21,18 @@ internal interface JournalpostArkiv {
 }
 
 internal interface SøknadsArkiv {
-    suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): SafGraphQL.SøknadsData
+    suspend fun hentSøknadsData(
+        journalpostId: String,
+        dokumentInfoId: String,
+    ): SafGraphQL.SøknadsData
 }
 
-internal data class JournalPostQuery(@JsonIgnore val journalpostId: String) : GraphqlQuery(
-    //language=Graphql
-    query =
-    """ 
+internal data class JournalPostQuery(
+    @JsonIgnore val journalpostId: String,
+) : GraphqlQuery(
+        //language=Graphql
+        query =
+            """ 
             query(${'$'}journalpostId: String!) {
                 journalpost(journalpostId: ${'$'}journalpostId) {
                     journalstatus
@@ -50,14 +55,14 @@ internal data class JournalPostQuery(@JsonIgnore val journalpostId: String) : Gr
                     }
                 }
             }
-    """.trimIndent(),
-    variables = mapOf(
-        "journalpostId" to journalpostId,
-    ),
-)
+            """.trimIndent(),
+        variables =
+            mapOf(
+                "journalpostId" to journalpostId,
+            ),
+    )
 
 internal class SafClient(config: Configuration) : JournalpostArkiv, SøknadsArkiv {
-
     companion object {
         private val logger = KotlinLogging.logger {}
     }
@@ -65,13 +70,15 @@ internal class SafClient(config: Configuration) : JournalpostArkiv, SøknadsArki
     private val tokenProvider = config.dpProxyTokenProvider
     private val dpProxyUrl = config.dpProxyUrl()
 
-    private val proxyJoarkClient = HttpClient {
-        expectSuccess = true
-    }
+    private val proxyJoarkClient =
+        HttpClient {
+            expectSuccess = true
+        }
 
-    private val proxySøknadsDataClient = HttpClient {
-        expectSuccess = true
-    }
+    private val proxySøknadsDataClient =
+        HttpClient {
+            expectSuccess = true
+        }
 
     override suspend fun hentJournalpost(journalpostId: String): SafGraphQL.Journalpost =
         proxyJoarkClient.request("$dpProxyUrl//proxy/v1/saf/graphql") {
@@ -83,7 +90,10 @@ internal class SafClient(config: Configuration) : JournalpostArkiv, SøknadsArki
             SafGraphQL.Journalpost.fromGraphQlJson(it.bodyAsText())
         }
 
-    override suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): SafGraphQL.SøknadsData =
+    override suspend fun hentSøknadsData(
+        journalpostId: String,
+        dokumentInfoId: String,
+    ): SafGraphQL.SøknadsData =
         try {
             proxySøknadsDataClient.request("$dpProxyUrl/proxy/v1/saf/rest/hentdokument/$journalpostId/$dokumentInfoId/ORIGINAL") {
                 header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")

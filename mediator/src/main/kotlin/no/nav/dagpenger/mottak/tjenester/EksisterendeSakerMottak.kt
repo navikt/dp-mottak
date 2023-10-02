@@ -19,7 +19,6 @@ internal class EksisterendeSakerMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
-
     private val løsning = "@løsning.${Behovtype.EksisterendeSaker.name}"
 
     init {
@@ -31,14 +30,18 @@ internal class EksisterendeSakerMottak(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val journalpostId = packet["journalpostId"].asText()
         logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
-        val eksisterendeSaker = Eksisterendesaker(
-            aktivitetslogg = Aktivitetslogg(),
-            journalpostId = journalpostId,
-            harEksisterendeSak = packet[løsning]["harEksisterendeSak"].asBoolean(),
-        )
+        val eksisterendeSaker =
+            Eksisterendesaker(
+                aktivitetslogg = Aktivitetslogg(),
+                journalpostId = journalpostId,
+                harEksisterendeSak = packet[løsning]["harEksisterendeSak"].asBoolean(),
+            )
 
         try {
             innsendingMediator.håndter(eksisterendeSaker)

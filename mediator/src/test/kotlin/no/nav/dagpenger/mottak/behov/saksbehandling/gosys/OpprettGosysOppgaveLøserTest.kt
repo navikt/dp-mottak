@@ -23,12 +23,13 @@ internal class OpprettGosysOppgaveLøserTest {
 
     init {
         OpprettGosysOppgaveLøser(
-            gosysOppslag = object : GosysOppslag {
-                override suspend fun opprettOppgave(oppgave: GosysOppgaveRequest): String {
-                    expectedOppgave = oppgave
-                    return "dfghjkl"
-                }
-            },
+            gosysOppslag =
+                object : GosysOppslag {
+                    override suspend fun opprettOppgave(oppgave: GosysOppgaveRequest): String {
+                        expectedOppgave = oppgave
+                        return "dfghjkl"
+                    }
+                },
             rapidsConnection = testRapid,
         )
     }
@@ -61,7 +62,8 @@ internal class OpprettGosysOppgaveLøserTest {
 
     //language=JSON
     private fun opprettGosysOppgaveBehov(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behovId": "${UUID.randomUUID()}",
@@ -79,7 +81,8 @@ internal class OpprettGosysOppgaveLøserTest {
 
     //language=JSON
     private fun opprettGosysOppgaveBehovUtenPersondata(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behovId": "${UUID.randomUUID()}",

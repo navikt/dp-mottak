@@ -22,7 +22,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 internal class MinsteinntektVurderingLøserTest {
-
     private val journalpostId = "1234567"
     private val aktørId = "456"
     val testRapid = TestRapid()
@@ -69,12 +68,14 @@ internal class MinsteinntektVurderingLøserTest {
     @Test
     fun `Vaktermester skal rydde`() {
         runBlocking {
-            val repository = mockk<MinsteinntektVurderingRepository>().also {
-                every { it.slettUtgåtteVurderinger() } returns listOf(
-                    Pair("0", JsonMessage("""{}""", MessageProblems(""))),
-                    Pair("1", JsonMessage("""{}""", MessageProblems(""))),
-                ) andThen emptyList()
-            }
+            val repository =
+                mockk<MinsteinntektVurderingRepository>().also {
+                    every { it.slettUtgåtteVurderinger() } returns
+                        listOf(
+                            Pair("0", JsonMessage("""{}""", MessageProblems(""))),
+                            Pair("1", JsonMessage("""{}""", MessageProblems(""))),
+                        ) andThen emptyList()
+                }
             MinsteinntektVurderingLøser(
                 oppryddningPeriode = 100.toLong(),
                 regelApiClient = mockk(),
@@ -97,14 +98,18 @@ internal class MinsteinntektVurderingLøserTest {
             using(sessionOf(PostgresDataSourceBuilder.dataSource)) { session ->
                 session.run(
                     queryOf(
-                        "INSERT INTO  minsteinntekt_vurdering_v1(journalpostId,packet, opprettet) VALUES(:journalpostId,:packet, :opprettet) ON CONFLICT DO NOTHING",
+                        // language=PostgreSQL
+                        """INSERT INTO  minsteinntekt_vurdering_v1(journalpostId,packet, opprettet) 
+                            |VALUES(:journalpostId,:packet, :opprettet) ON CONFLICT DO NOTHING
+                        """.trimMargin(),
                         mapOf(
                             "journalpostId" to 12345,
                             "opprettet" to LocalDateTime.now().minusDays(2),
-                            "packet" to PGobject().apply {
-                                type = "jsonb"
-                                value = JsonMessage("""{}""", MessageProblems("")).toJson()
-                            },
+                            "packet" to
+                                PGobject().apply {
+                                    type = "jsonb"
+                                    value = JsonMessage("""{}""", MessageProblems("")).toJson()
+                                },
                         ),
                     ).asUpdate,
                 )
@@ -136,7 +141,8 @@ internal class MinsteinntektVurderingLøserTest {
     }
 
     private fun minsteinntektBehov(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behovId": "${UUID.randomUUID()}",

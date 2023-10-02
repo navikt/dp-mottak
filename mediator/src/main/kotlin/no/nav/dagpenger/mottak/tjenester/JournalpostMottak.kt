@@ -32,41 +32,55 @@ internal class JournalpostMottak(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val journalpostId = packet["journalpostId"].asText()
         logg.info { "Fått løsning for $løsning, journalpostId=$journalpostId" }
-        val journalpostData = try {
-            packet[løsning].let {
-                Journalpost(
-                    aktivitetslogg = Aktivitetslogg(),
-                    journalpostId = journalpostId,
-                    journalpostStatus = it["journalstatus"].asText(),
-                    bruker = it.getOrNull("bruker")?.let { jsonBruker ->
-                        Journalpost.Bruker(
-                            id = jsonBruker["id"].asText(),
-                            type = Journalpost.BrukerType.valueOf(jsonBruker["type"].asText()),
-                        )
-                    },
-                    dokumenter = it["dokumenter"].map { jsonDokument ->
-                        Journalpost.DokumentInfo(
-                            tittelHvisTilgjengelig = jsonDokument["tittel"].textValue(),
-                            dokumentInfoId = jsonDokument["dokumentInfoId"].asText(),
-                            brevkode = jsonDokument["brevkode"].asText(),
-                            hovedDokument = jsonDokument["hovedDokument"].asBoolean(),
-                        )
-                    },
-                    registrertDato = it["relevanteDatoer"].firstOrNull {
-                        it["datotype"].asText() == "DATO_REGISTRERT"
-                    }?.get("dato")?.asText().let { LocalDateTime.parse(it) } ?: LocalDateTime.now(),
-                    behandlingstema = it["behandlingstema"].textValue(),
-                ).also {
-                    logg.info { "Mottok ny journalpost. Antall dokumenter=${it.dokumenter().size}, brevkode=${it.hovedDokument().brevkode}, registrertDato=${it.datoRegistrert()}, behandlingstema=${packet[løsning]["behandlingstema"].textValue()}" }
+        val journalpostData =
+            try {
+                packet[løsning].let {
+                    Journalpost(
+                        aktivitetslogg = Aktivitetslogg(),
+                        journalpostId = journalpostId,
+                        journalpostStatus = it["journalstatus"].asText(),
+                        bruker =
+                            it.getOrNull("bruker")?.let { jsonBruker ->
+                                Journalpost.Bruker(
+                                    id = jsonBruker["id"].asText(),
+                                    type = Journalpost.BrukerType.valueOf(jsonBruker["type"].asText()),
+                                )
+                            },
+                        dokumenter =
+                            it["dokumenter"].map { jsonDokument ->
+                                Journalpost.DokumentInfo(
+                                    tittelHvisTilgjengelig = jsonDokument["tittel"].textValue(),
+                                    dokumentInfoId = jsonDokument["dokumentInfoId"].asText(),
+                                    brevkode = jsonDokument["brevkode"].asText(),
+                                    hovedDokument = jsonDokument["hovedDokument"].asBoolean(),
+                                )
+                            },
+                        registrertDato =
+                            it["relevanteDatoer"].firstOrNull {
+                                it["datotype"].asText() == "DATO_REGISTRERT"
+                            }?.get("dato")?.asText().let { LocalDateTime.parse(it) } ?: LocalDateTime.now(),
+                        behandlingstema = it["behandlingstema"].textValue(),
+                    ).also {
+                        logg.info {
+                            """Mottok ny journalpost. 
+                            |Antall dokumenter=${it.dokumenter().size}, 
+                            |brevkode=${it.hovedDokument().brevkode}, 
+                            |registrertDato=${it.datoRegistrert()}, 
+                            |behandlingstema=${packet[løsning]["behandlingstema"].textValue()}
+                            """.trimMargin()
+                        }
+                    }
                 }
+            } catch (e: Exception) {
+                sikkerLogg.error { "Klarte ikke å lese $journalpostId, ${packet.toJson()}" }
+                throw e
             }
-        } catch (e: Exception) {
-            sikkerLogg.error { "Klarte ikke å lese $journalpostId, ${packet.toJson()}" }
-            throw e
-        }
 
         innsendingMediator.håndter(journalpostData)
     }

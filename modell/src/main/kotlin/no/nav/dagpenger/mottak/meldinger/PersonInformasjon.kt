@@ -17,15 +17,15 @@ class PersonInformasjon(
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
 
-    fun person(): Person = Person(
-        navn = navn,
-        aktørId = aktørId,
-        ident = ident,
-        norskTilknytning = norskTilknytning,
-        diskresjonskode = harDiskresjonkode(diskresjonskode),
-        egenAnsatt = egenAnsatt,
-
-    )
+    fun person(): Person =
+        Person(
+            navn = navn,
+            aktørId = aktørId,
+            ident = ident,
+            norskTilknytning = norskTilknytning,
+            diskresjonskode = harDiskresjonkode(diskresjonskode),
+            egenAnsatt = egenAnsatt,
+        )
 
     fun validate() = kotlin.runCatching { person() }.isSuccess
 
@@ -43,7 +43,6 @@ class PersonInformasjon(
         val diskresjonskode: Boolean,
         val egenAnsatt: Boolean,
     ) {
-
         init {
             require(FodselsnummerValidator.isValid(ident) || erSyntetiskTestIdent()) { "Ikke gyldig ident" }
         }

@@ -25,11 +25,11 @@ internal class InnsendingMediator(
     private val observatører: List<InnsendingObserver> = emptyList(),
     rapidsConnection: RapidsConnection,
 ) {
-
-    private val behovMediator: BehovMediator = BehovMediator(
-        rapidsConnection = rapidsConnection,
-        sikkerLogg = sikkerlogg,
-    )
+    private val behovMediator: BehovMediator =
+        BehovMediator(
+            rapidsConnection = rapidsConnection,
+            sikkerLogg = sikkerlogg,
+        )
 
     fun håndter(joarkHendelse: JoarkHendelse) {
         håndter(joarkHendelse) { innsending ->
@@ -103,7 +103,10 @@ internal class InnsendingMediator(
         }
     }
 
-    private fun håndter(hendelse: Hendelse, handler: (Innsending) -> Unit) {
+    private fun håndter(
+        hendelse: Hendelse,
+        handler: (Innsending) -> Unit,
+    ) {
         try {
             MDC.put("journalpostId", hendelse.journalpostId())
             innsending(hendelse).also { innsending ->
@@ -132,7 +135,10 @@ internal class InnsendingMediator(
         }
     }
 
-    private fun finalize(innsending: Innsending, hendelse: Hendelse) {
+    private fun finalize(
+        innsending: Innsending,
+        hendelse: Hendelse,
+    ) {
         innsendingRepository.lagre(innsending)
         if (!hendelse.hasMessages()) return
         if (hendelse.hasErrors()) return sikkerlogg.info("aktivitetslogg inneholder errors: ${hendelse.toLogString()}")

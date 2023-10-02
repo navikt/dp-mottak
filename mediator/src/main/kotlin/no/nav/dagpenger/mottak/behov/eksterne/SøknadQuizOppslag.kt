@@ -15,11 +15,12 @@ internal interface SøknadQuizOppslag {
 internal class PostgresSøknadQuizOppslag(private val dataSource: DataSource) : SøknadQuizOppslag {
     override fun hentSøknad(innsendtSøknadsId: String): QuizOppslag {
         // TODO: bruke fnr? (brukerbehandligId skal være unik, vil evt være et safety measure for å være helt sikker på at bruker ikke får feil søknad)
-        val query = queryOf(
-            //language=PostgreSQL
-            """SELECT * FROM soknad_v1 WHERE :jsonFragment::jsonb <@ data""",
-            mapOf("jsonFragment" to """{ "søknad_uuid": "$innsendtSøknadsId" }"""),
-        )
+        val query =
+            queryOf(
+                //language=PostgreSQL
+                """SELECT * FROM soknad_v1 WHERE :jsonFragment::jsonb <@ data""",
+                mapOf("jsonFragment" to """{ "søknad_uuid": "$innsendtSøknadsId" }"""),
+            )
 
         return using(sessionOf(dataSource)) { session ->
             session.run(

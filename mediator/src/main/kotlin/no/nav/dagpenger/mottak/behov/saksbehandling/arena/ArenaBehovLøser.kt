@@ -11,7 +11,6 @@ import no.nav.helse.rapids_rivers.asLocalDateTime
 import no.nav.helse.rapids_rivers.withMDC
 
 internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: RapidsConnection) {
-
     init {
         EksisterendeSakerBehovLøser(arenaOppslag, rapidsConnection)
         OpprettArenaOppgaveBehovLøser(arenaOppslag, rapidsConnection)
@@ -21,7 +20,6 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
         private val arenaOppslag: ArenaOppslag,
         rapidsConnection: RapidsConnection,
     ) : River.PacketListener {
-
         companion object {
             private val logger = KotlinLogging.logger { }
         }
@@ -36,7 +34,10 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
             }.register(this)
         }
 
-        override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        override fun onPacket(
+            packet: JsonMessage,
+            context: MessageContext,
+        ) {
             val journalpostId = packet["journalpostId"].asText()
             val behovId = packet["@behovId"].asText()
 
@@ -65,7 +66,6 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
         private val arenaOppslag: ArenaOppslag,
         rapidsConnection: RapidsConnection,
     ) : River.PacketListener {
-
         companion object {
             private val logger = KotlinLogging.logger { }
         }
@@ -94,7 +94,10 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
             }.register(this)
         }
 
-        override fun onPacket(packet: JsonMessage, context: MessageContext) {
+        override fun onPacket(
+            packet: JsonMessage,
+            context: MessageContext,
+        ) {
             val journalpostId = packet["journalpostId"].asText()
             val behovId = packet["@behovId"].asText()
 
@@ -113,37 +116,43 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                     runBlocking(MDCContext()) {
                         val behovNavn = packet["@behov"].first().asText()
 
-                        val oppgaveResponse = when (behovNavn) {
-                            "OpprettVurderhenvendelseOppgave" -> arenaOppslag.opprettVurderHenvendelsOppgave(
-                                journalpostId,
-                                packet.arenaOppgaveParametre(),
-                            )
+                        val oppgaveResponse =
+                            when (behovNavn) {
+                                "OpprettVurderhenvendelseOppgave" ->
+                                    arenaOppslag.opprettVurderHenvendelsOppgave(
+                                        journalpostId,
+                                        packet.arenaOppgaveParametre(),
+                                    )
 
-                            "OpprettStartVedtakOppgave" -> arenaOppslag.opprettStartVedtakOppgave(
-                                journalpostId,
-                                packet.arenaOppgaveParametre(),
-                            )
+                                "OpprettStartVedtakOppgave" ->
+                                    arenaOppslag.opprettStartVedtakOppgave(
+                                        journalpostId,
+                                        packet.arenaOppgaveParametre(),
+                                    )
 
-                            else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
-                        }
+                                else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
+                            }
 
                         if (oppgaveResponse != null) {
-                            packet["@løsning"] = mapOf(
-                                behovNavn to mapOf(
-                                    "journalpostId" to journalpostId,
-                                    "fagsakId" to oppgaveResponse.fagsakId,
-                                    "oppgaveId" to oppgaveResponse.oppgaveId,
-                                ),
-                            ).also {
-                                logger.info { "Løste behov $behovNavn med løsning $it" }
-                            }
-                        } else {
-                            packet["@løsning"] = mapOf(
-                                behovNavn to mapOf("@feil" to "Kunne ikke opprettet Arena oppgave"),
-                            )
-                                .also {
-                                    logger.info { "Løste behov $behovNavn med feil $it" }
+                            packet["@løsning"] =
+                                mapOf(
+                                    behovNavn to
+                                        mapOf(
+                                            "journalpostId" to journalpostId,
+                                            "fagsakId" to oppgaveResponse.fagsakId,
+                                            "oppgaveId" to oppgaveResponse.oppgaveId,
+                                        ),
+                                ).also {
+                                    logger.info { "Løste behov $behovNavn med løsning $it" }
                                 }
+                        } else {
+                            packet["@løsning"] =
+                                mapOf(
+                                    behovNavn to mapOf("@feil" to "Kunne ikke opprettet Arena oppgave"),
+                                )
+                                    .also {
+                                        logger.info { "Løste behov $behovNavn med feil $it" }
+                                    }
                         }
 
                         context.publish(packet.toJson())
@@ -157,10 +166,11 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
     }
 }
 
-private fun JsonMessage.arenaOppgaveParametre(): OpprettArenaOppgaveParametere = OpprettArenaOppgaveParametere(
-    naturligIdent = this["fødselsnummer"].asText(),
-    behandlendeEnhetId = this["behandlendeEnhetId"].asText(),
-    tilleggsinformasjon = this["tilleggsinformasjon"].asText(),
-    registrertDato = this["registrertDato"].asLocalDateTime().toLocalDate(),
-    oppgavebeskrivelse = this["oppgavebeskrivelse"].asText(),
-)
+private fun JsonMessage.arenaOppgaveParametre(): OpprettArenaOppgaveParametere =
+    OpprettArenaOppgaveParametere(
+        naturligIdent = this["fødselsnummer"].asText(),
+        behandlendeEnhetId = this["behandlendeEnhetId"].asText(),
+        tilleggsinformasjon = this["tilleggsinformasjon"].asText(),
+        registrertDato = this["registrertDato"].asLocalDateTime().toLocalDate(),
+        oppgavebeskrivelse = this["oppgavebeskrivelse"].asText(),
+    )

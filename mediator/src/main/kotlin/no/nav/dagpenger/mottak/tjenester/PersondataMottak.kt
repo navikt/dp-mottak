@@ -19,7 +19,6 @@ internal class PersondataMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
-
     private val løsning = "@løsning.${Persondata.name}"
 
     init {
@@ -31,7 +30,10 @@ internal class PersondataMottak(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val journalpostId = packet["journalpostId"].asText()
         logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
         val persondata = packet[løsning]

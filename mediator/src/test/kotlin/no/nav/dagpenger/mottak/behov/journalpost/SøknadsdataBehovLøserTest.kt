@@ -9,23 +9,26 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 internal class SøknadsdataBehovLøserTest {
-
     private val testRapid = TestRapid()
 
     init {
         SøknadsdataBehovLøser(
             rapidsConnection = testRapid,
-            søknadsArkiv = object : SøknadsArkiv {
-                override suspend fun hentSøknadsData(journalpostId: String, dokumentInfoId: String): SafGraphQL.SøknadsData {
-                    return SafGraphQL.SøknadsData(
-                        jacksonJsonAdapter.createObjectNode().apply {
-                            put("something", "something")
-                            put("something else", "something else")
-                            put("something entirely different", "something entirely different")
-                        },
-                    )
-                }
-            },
+            søknadsArkiv =
+                object : SøknadsArkiv {
+                    override suspend fun hentSøknadsData(
+                        journalpostId: String,
+                        dokumentInfoId: String,
+                    ): SafGraphQL.SøknadsData {
+                        return SafGraphQL.SøknadsData(
+                            jacksonJsonAdapter.createObjectNode().apply {
+                                put("something", "something")
+                                put("something else", "something else")
+                                put("something entirely different", "something entirely different")
+                            },
+                        )
+                    }
+                },
         )
     }
 
@@ -40,7 +43,8 @@ internal class SøknadsdataBehovLøserTest {
 
     //language=JSON
     private fun journalpostBehov(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behovId": "${UUID.randomUUID()}",

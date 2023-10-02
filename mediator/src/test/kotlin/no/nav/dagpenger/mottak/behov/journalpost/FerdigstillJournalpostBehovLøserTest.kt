@@ -16,6 +16,7 @@ internal class FerdigstillJournalpostBehovLøserTest {
     private val testRapid = TestRapid()
     private val journalpostDokarkiv: JournalpostDokarkiv = mockk()
     private val journalpostId = "23456789"
+
     init {
         FerdigstillJournalpostBehovLøser(
             journalpostDokarkiv,
@@ -39,23 +40,25 @@ internal class FerdigstillJournalpostBehovLøserTest {
 
     @Test
     fun `Skal ignorere kjente feil`() {
-        val ferdigstiller = FerdigstillJournalpostBehovLøser(
-            journalpostDokarkiv,
-            rapidsConnection = testRapid,
-        )
-        val exception = JournalpostFeil.JournalpostException(
-            400,
-            """
+        val ferdigstiller =
+            FerdigstillJournalpostBehovLøser(
+                journalpostDokarkiv,
+                rapidsConnection = testRapid,
+            )
+        val exception =
+            JournalpostFeil.JournalpostException(
+                400,
+                """
                 {"timestamp":"2021-06-08T21:10:42.062+00:00","status":400,"error":"Bad Request","message":"Journalpost med journalpostId=508859937 er ikke midlertidig journalført","path":"/rest/journalpostapi/v1/journalpost/508859937/ferdigstill"}
-            """.trimIndent(),
-
-        )
+                """.trimIndent(),
+            )
         assertDoesNotThrow { ferdigstiller.ignorerKjenteTilstander(exception) }
     }
 
     //language=JSON
     private fun ferdigstillBehov(): String =
-        """{
+        """
+        {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
           "@behovId": "${UUID.randomUUID()}",

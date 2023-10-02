@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class SøknadsDataVaktmesterTest {
-
     @Test
     fun `Skal overskrive søknads data`() {
         val innsending = innsendingData.createInnsending()
@@ -25,11 +24,12 @@ class SøknadsDataVaktmesterTest {
             InnsendingPostgresRepository().lagre(innsending)
 
             SøknadsDataVaktmester(
-                safClient = mockk<SafClient>().also {
-                    coEvery {
-                        it.hentSøknadsData(innsending.journalpostId(), "12345678")
-                    } returns SafGraphQL.SøknadsData.fromJson("""{"hubba": "bubba"}""")
-                },
+                safClient =
+                    mockk<SafClient>().also {
+                        coEvery {
+                            it.hentSøknadsData(innsending.journalpostId(), "12345678")
+                        } returns SafGraphQL.SøknadsData.fromJson("""{"hubba": "bubba"}""")
+                    },
             ).fixSoknadsData(jp)
 
             using(sessionOf(PostgresDataSourceBuilder.dataSource)) { session ->

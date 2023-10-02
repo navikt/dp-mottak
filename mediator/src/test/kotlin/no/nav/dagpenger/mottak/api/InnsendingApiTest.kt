@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 internal class InnsendingApiTest {
-
     companion object {
         val objectMapper = jacksonObjectMapper()
     }
@@ -35,15 +34,18 @@ internal class InnsendingApiTest {
         val journalpostId = "187689"
 
         val mockProducer = MockProducer(true, StringSerializer(), StringSerializer())
-        val innsending = innsendingData.copy(
-            tilstand = InnsendingData.TilstandData(
-                InnsendingFerdigstiltType,
-            ),
-        ).createInnsending()
+        val innsending =
+            innsendingData.copy(
+                tilstand =
+                    InnsendingData.TilstandData(
+                        InnsendingFerdigstiltType,
+                    ),
+            ).createInnsending()
 
-        val innsendingRepository = mockk<InnsendingRepository>().also {
-            every { it.hent(journalpostId) } returns innsending
-        }
+        val innsendingRepository =
+            mockk<InnsendingRepository>().also {
+                every { it.hent(journalpostId) } returns innsending
+            }
         val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(mockProducer)
         withMockAuthServerAndTestApplication({ innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver) }) {
             client.put("/internal/replay/187689") {
@@ -63,9 +65,10 @@ internal class InnsendingApiTest {
         val mockProducer = MockProducer(true, StringSerializer(), StringSerializer())
         val innsending = innsendingData.createInnsending()
 
-        val innsendingRepository = mockk<InnsendingRepository>().also {
-            every { it.hent(journalpostId) } returns innsending
-        }
+        val innsendingRepository =
+            mockk<InnsendingRepository>().also {
+                every { it.hent(journalpostId) } returns innsending
+            }
         val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(mockProducer)
 
         withMockAuthServerAndTestApplication({ innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver) }) {
@@ -82,15 +85,17 @@ internal class InnsendingApiTest {
     @Test
     fun `skal kunne hente innsendinger i en gitt periode`() {
         val idag = LocalDateTime.now()
-        val innsendingRepository = mockk<InnsendingRepository>().also {
-            every { it.forPeriode(any()) } returns listOf(
-                InnsendingPeriode(
-                    ident = "1234556777",
-                    registrertDato = idag,
-                    journalpostId = "124433",
-                ),
-            )
-        }
+        val innsendingRepository =
+            mockk<InnsendingRepository>().also {
+                every { it.forPeriode(any()) } returns
+                    listOf(
+                        InnsendingPeriode(
+                            ident = "1234556777",
+                            registrertDato = idag,
+                            journalpostId = "124433",
+                        ),
+                    )
+            }
 
         withMockAuthServerAndTestApplication({
             innsendingApi(innsendingRepository, mockk())

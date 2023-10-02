@@ -5,7 +5,8 @@ import no.nav.dagpenger.mottak.toJsonNode
 import org.intellij.lang.annotations.Language
 import java.util.UUID
 
-fun utenSeksjoner(søknadUUID: UUID = UUID.fromString("cfd84357-cdd9-4811-ada5-63d77625e91e")): JsonNode = """{
+fun utenSeksjoner(søknadUUID: UUID = UUID.fromString("cfd84357-cdd9-4811-ada5-63d77625e91e")): JsonNode =
+    """{
 "fødselsnummer": "12020052345",
 "@event_name": "søker_oppgave",
 "versjon_id": -1,
@@ -19,26 +20,27 @@ fun utenSeksjoner(søknadUUID: UUID = UUID.fromString("cfd84357-cdd9-4811-ada5-6
 
 @Language("JSON")
 fun ønskerDagpengerFraDatoJson(dato: String) =
-    """ {
-   "seksjoner": [
+    """
      {
-       "beskrivendeId": "din-situasjon",
-       "fakta": [
-         {
-           "id": "108",
-           "svar": "$dato",
-           "type": "localdate",
-           "roller": [
-             "søker"
-           ],
-           "readOnly": false,
-           "beskrivendeId": "faktum.dagpenger-soknadsdato",
-           "sannsynliggjoresAv": []
-         }
-       ]
-     }
-   ]
- }
+      "seksjoner": [
+        {
+          "beskrivendeId": "din-situasjon",
+          "fakta": [
+            {
+              "id": "108",
+              "svar": "$dato",
+              "type": "localdate",
+              "roller": [
+                "søker"
+              ],
+              "readOnly": false,
+              "beskrivendeId": "faktum.dagpenger-soknadsdato",
+              "sannsynliggjoresAv": []
+            }
+          ]
+        }
+      ]
+    }
     """.trimIndent().toJsonNode()
 
 fun vernepliktQuizJson(harAvtjentVerneplikt: Boolean) =
@@ -299,7 +301,8 @@ fun eøsArbeidsforholdQuizJson(harEøsarbeidsforhold: Boolean) =
     }""".toJsonNode()
 
 @Language("JSON")
-internal fun tomAvsluttedeArbeidsforhold() = """
+internal fun tomAvsluttedeArbeidsforhold() =
+    """
     {
         "seksjoner": [
         {
@@ -318,10 +321,11 @@ internal fun tomAvsluttedeArbeidsforhold() = """
         ]
     }
 
-""".trimIndent().toJsonNode()
+    """.trimIndent().toJsonNode()
 
 @Language("JSON")
-internal fun delvisutfyltArbeidsforhold() = """
+internal fun delvisutfyltArbeidsforhold() =
+    """
     {
         "seksjoner": [
         {
@@ -540,15 +544,14 @@ internal fun delvisutfyltArbeidsforhold() = """
         ]
     }
 
-""".trimIndent().toJsonNode()
+    """.trimIndent().toJsonNode()
 
 @Language("JSON")
 internal fun avsluttedeArbeidsforholdQuizJson(
     permitterterFraFiskeForedling: Boolean = false,
     konkurs: Boolean = false,
     permittert: Boolean = false,
-) =
-    """
+) = """
     {
         "seksjoner": [
         {
@@ -638,7 +641,10 @@ internal fun avsluttedeArbeidsforholdQuizJson(
         ]
     }""".toJsonNode()
 
-private fun årsak(permittert: Boolean, konkurs: Boolean): String {
+private fun årsak(
+    permittert: Boolean,
+    konkurs: Boolean,
+): String {
     return if (permittert) {
         "faktum.arbeidsforhold.endret.svar.permittert"
     } else if (konkurs) {

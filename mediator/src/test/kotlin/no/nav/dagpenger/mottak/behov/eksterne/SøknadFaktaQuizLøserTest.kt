@@ -15,16 +15,16 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 
 internal class SøknadFaktaQuizLøserTest {
-
     val testRapid = TestRapid()
     val testSøknad =
         QuizSøknadFormat(JsonMapper.jacksonJsonAdapter.readTree(this.javaClass.getResource("/testdata/soknadsdata.json")))
 
     init {
         SøknadFaktaQuizLøser(
-            søknadQuizOppslag = object : SøknadQuizOppslag {
-                override fun hentSøknad(innsendtSøknadsId: String): QuizOppslag = testSøknad
-            },
+            søknadQuizOppslag =
+                object : SøknadQuizOppslag {
+                    override fun hentSøknad(innsendtSøknadsId: String): QuizOppslag = testSøknad
+                },
             rapidsConnection = testRapid,
         )
     }
@@ -49,7 +49,10 @@ internal class SøknadFaktaQuizLøserTest {
         ],
         delimiter = ':',
     )
-    fun `besvarer fakta behov`(behovNavn: String, forventetVerdi: String) {
+    fun `besvarer fakta behov`(
+        behovNavn: String,
+        forventetVerdi: String,
+    ) {
         testRapid.sendTestMessage(behovMelding(behovNavn))
         with(testRapid.inspektør) {
             assertEquals(1, size)
@@ -173,35 +176,35 @@ internal class SøknadFaktaQuizLøserTest {
     //language=JSON
     private fun behovMelding(behovNavn: String) =
         """
-    {
-      "@event_name": "faktum_svar",
-      "@opprettet": "2020-11-18T11:04:32.867824",
-      "@id": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
-      "@behovId": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
-      "identer":[{"id":"12345678910","type":"folkeregisterident","historisk":false}],
-      "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
-      "@behov": [
-       "$behovNavn"
-      ],
-      "InnsendtSøknadsId":{"lastOppTidsstempel":"2020-11-26T10:33:38.684844","urn":"urn:soknadid:321"}
-    }
+        {
+          "@event_name": "faktum_svar",
+          "@opprettet": "2020-11-18T11:04:32.867824",
+          "@id": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
+          "@behovId": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
+          "identer":[{"id":"12345678910","type":"folkeregisterident","historisk":false}],
+          "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
+          "@behov": [
+           "$behovNavn"
+          ],
+          "InnsendtSøknadsId":{"lastOppTidsstempel":"2020-11-26T10:33:38.684844","urn":"urn:soknadid:321"}
+        }
         """.trimIndent()
 
     //language=JSON
     private fun meldingMedFlereBehov() =
         """
-    {
-      "@event_name": "faktum_svar",
-      "@opprettet": "2020-11-18T11:04:32.867824",
-      "@id": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
-      "@behovId": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
-      "identer":[{"id":"12345678910","type":"folkeregisterident","historisk":false}],
-      "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
-      "@behov": [
-       "JobbetUtenforNorge",
-       "Verneplikt"
-      ],
-      "InnsendtSøknadsId":{"lastOppTidsstempel":"2020-11-26T10:33:38.684844","urn":"urn:soknadid:321"}
-    }
+        {
+          "@event_name": "faktum_svar",
+          "@opprettet": "2020-11-18T11:04:32.867824",
+          "@id": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
+          "@behovId": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
+          "identer":[{"id":"12345678910","type":"folkeregisterident","historisk":false}],
+          "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
+          "@behov": [
+           "JobbetUtenforNorge",
+           "Verneplikt"
+          ],
+          "InnsendtSøknadsId":{"lastOppTidsstempel":"2020-11-26T10:33:38.684844","urn":"urn:soknadid:321"}
+        }
         """.trimIndent()
 }

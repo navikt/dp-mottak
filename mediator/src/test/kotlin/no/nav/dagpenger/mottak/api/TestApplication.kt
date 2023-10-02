@@ -15,7 +15,6 @@ import no.nav.dagpenger.mottak.Config
 import no.nav.security.mock.oauth2.MockOAuth2Server
 
 internal object TestApplication {
-
     private val mockOAuth2Server: MockOAuth2Server by lazy {
         MockOAuth2Server().also { server ->
             server.start()
@@ -24,10 +23,11 @@ internal object TestApplication {
 
     internal val azureAd: String by lazy {
         mockOAuth2Server.issueToken(
-            issuerId = Config.AzureAd.name,
-            claims = mapOf(
-                "aud" to Config.AzureAd.audience,
-            ),
+            issuerId = Config.AzureAd.NAME,
+            claims =
+                mapOf(
+                    "aud" to Config.AzureAd.audience,
+                ),
         ).serialize()
     }
 
@@ -36,8 +36,8 @@ internal object TestApplication {
         test: suspend ApplicationTestBuilder.() -> Unit,
     ) {
         try {
-            System.setProperty("AZURE_OPENID_CONFIG_JWKS_URI", "${mockOAuth2Server.jwksUrl(Config.AzureAd.name)}")
-            System.setProperty("AZURE_OPENID_CONFIG_ISSUER", "${mockOAuth2Server.issuerUrl(Config.AzureAd.name)}")
+            System.setProperty("AZURE_OPENID_CONFIG_JWKS_URI", "${mockOAuth2Server.jwksUrl(Config.AzureAd.NAME)}")
+            System.setProperty("AZURE_OPENID_CONFIG_ISSUER", "${mockOAuth2Server.issuerUrl(Config.AzureAd.NAME)}")
             testApplication {
                 application(moduleFunction)
                 test()
@@ -55,8 +55,9 @@ internal object TestApplication {
         token: String = azureAd,
         httpMethod: HttpMethod = HttpMethod.Get,
         setup: TestApplicationRequest.() -> Unit = {},
-    ): TestApplicationCall = handleRequest(httpMethod, endepunkt) {
-        addHeader(HttpHeaders.Authorization, "Bearer $token")
-        setup()
-    }
+    ): TestApplicationCall =
+        handleRequest(httpMethod, endepunkt) {
+            addHeader(HttpHeaders.Authorization, "Bearer $token")
+            setup()
+        }
 }

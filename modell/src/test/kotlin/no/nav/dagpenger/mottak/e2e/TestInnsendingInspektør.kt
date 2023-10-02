@@ -13,7 +13,6 @@ import org.approvaltests.namer.NamerWrapper
 import java.nio.file.Paths
 
 class TestInnsendingInspektør(innsending: Innsending) : InnsendingVisitor {
-
     lateinit var gjeldendetilstand: InnsendingTilstandType
     internal lateinit var innsendingLogg: Aktivitetslogg
 
@@ -37,9 +36,10 @@ class PlantUmlObservatør() : InnsendingObserver {
         val path = "${
             Paths.get("").toAbsolutePath().toString().substringBeforeLast("/")
         }/docs/arkitektur/"
-        val options = Options()
-            .forFile()
-            .withExtension(".puml")
+        val options =
+            Options()
+                .forFile()
+                .withExtension(".puml")
     }
 
     override fun tilstandEndret(event: InnsendingObserver.InnsendingEndretTilstandEvent) {
@@ -73,4 +73,5 @@ class PlantUmlObservatør() : InnsendingObserver {
 }
 
 private fun MutableList<String>.førsteTilstand(): String = this.first().substringBefore("--> ")
+
 private fun MutableList<String>.sisteTilstand(): String = this.last().substringAfter("--> ")

@@ -29,7 +29,10 @@ internal class JournalpostBehovLøser(
         }.register(this)
     }
 
-    override fun onPacket(packet: JsonMessage, context: MessageContext) {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+    ) {
         val journalpostId = packet["journalpostId"].asText()
         val behovId = packet["@behovId"].asText()
         withMDC(
@@ -46,9 +49,10 @@ internal class JournalpostBehovLøser(
                     sikkerlogg.info { "Mottok journalpost fra Joark. Dokumentene har tittlene:\n$dokumentTitler" }
                 }
                 logger.info {
-                    val tidSidenOpprettet = it.datoOpprettet?.let { datoOpprettet ->
-                        Duration.between(LocalDateTime.parse(datoOpprettet), LocalDateTime.now())
-                    }
+                    val tidSidenOpprettet =
+                        it.datoOpprettet?.let { datoOpprettet ->
+                            Duration.between(LocalDateTime.parse(datoOpprettet), LocalDateTime.now())
+                        }
                     "Løst behov Journalpost for journalpost med id ${it.journalpostId}. Opprettet Joark for $tidSidenOpprettet siden."
                 }
             }

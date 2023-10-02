@@ -6,7 +6,6 @@ import org.testcontainers.containers.PostgreSQLContainer.POSTGRESQL_PORT
 import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy
 
 internal object PostgresTestHelper {
-
     val instance by lazy {
         PostgreSQLContainer<Nothing>("postgres:12").apply {
             this.waitingFor(HostPortWaitStrategy())

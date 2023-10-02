@@ -17,25 +17,31 @@ import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 import java.time.LocalDate
 
 internal interface RegelApiClient {
-    suspend fun startMinsteinntektVurdering(aktørId: String, journalpostId: String)
+    suspend fun startMinsteinntektVurdering(
+        aktørId: String,
+        journalpostId: String,
+    )
 }
 
 internal class RegelApiProxy(config: Configuration) : RegelApiClient {
-
     companion object {
         private val logger = KotlinLogging.logger {}
     }
 
     private val tokenProvider = config.dpProxyTokenProvider
 
-    private val proxyBehovClient = HttpClient {
-        expectSuccess = true
-        install(DefaultRequest) {
-            this.url("${config.dpProxyUrl()}/proxy/v1/regelapi/behov")
+    private val proxyBehovClient =
+        HttpClient {
+            expectSuccess = true
+            install(DefaultRequest) {
+                this.url("${config.dpProxyUrl()}/proxy/v1/regelapi/behov")
+            }
         }
-    }
 
-    override suspend fun startMinsteinntektVurdering(aktørId: String, journalpostId: String) {
+    override suspend fun startMinsteinntektVurdering(
+        aktørId: String,
+        journalpostId: String,
+    ) {
         proxyBehovClient.request {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
             contentType(ContentType.Application.Json)
