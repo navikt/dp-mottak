@@ -4,6 +4,7 @@ import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.header
 import io.ktor.client.request.request
@@ -17,6 +18,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.behov.JsonMapper
+import kotlin.time.Duration.Companion.minutes
 
 internal interface JournalpostFeil {
     private companion object {
@@ -114,6 +116,9 @@ internal class JournalpostApiClient(config: Configuration) : JournalpostDokarkiv
         HttpClient {
             expectSuccess = true
             install(DefaultRequest) {
+            }
+            install(HttpTimeout) {
+                requestTimeoutMillis = 2.minutes.inWholeMilliseconds
             }
             install(ContentNegotiation) {
                 register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
