@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak
 
 import mu.KotlinLogging
+import no.nav.dagpenger.mottak.Config.dokarkivTokenProvider
 import no.nav.dagpenger.mottak.api.innsendingApi
 import no.nav.dagpenger.mottak.behov.eksterne.PostgresSøknadQuizOppslag
 import no.nav.dagpenger.mottak.behov.eksterne.SøknadFaktaQuizLøser
@@ -37,7 +38,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val safClient = SafClient(Config.properties)
     private val regelApiClient = RegelApiProxy(Config.properties)
     private val arenaApiClient = ArenaApiClient(Config.properties)
-    private val journalpostApiClient = JournalpostApiClient(Config.properties)
+    private val journalpostApiClient = JournalpostApiClient(tokenProvider = Config.properties.dokarkivTokenProvider)
     private val gosysProxyClient = GosysProxyClient(Config.properties)
     private val minsteinntektVurderingRepository =
         MinsteinntektVurderingPostgresRepository(PostgresDataSourceBuilder.dataSource)

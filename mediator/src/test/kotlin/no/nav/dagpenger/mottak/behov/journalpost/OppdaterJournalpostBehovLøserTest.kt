@@ -19,7 +19,13 @@ internal class OppdaterJournalpostBehovLøserTest {
     private val slot = slot<JournalpostApi.OppdaterJournalpostRequest>()
     private val mockedJournalpostDokarkiv: JournalpostDokarkiv =
         mockk<JournalpostDokarkiv>().also {
-            coEvery { it.oppdaterJournalpost(journalpostId = any(), journalpost = capture(slot)) } returns Unit
+            coEvery {
+                it.oppdaterJournalpost(
+                    journalpostId = any(),
+                    journalpost = capture(slot),
+                    eksternReferanseId = any(),
+                )
+            } returns Unit
         }
 
     init {
@@ -64,7 +70,13 @@ internal class OppdaterJournalpostBehovLøserTest {
 
     @Test
     fun `test kjente feil tilstander`() {
-        coEvery { mockedJournalpostDokarkiv.oppdaterJournalpost(journalpostId = "12345", journalpost = any()) } throws
+        coEvery {
+            mockedJournalpostDokarkiv.oppdaterJournalpost(
+                journalpostId = "12345",
+                journalpost = any(),
+                eksternReferanseId = any(),
+            )
+        } throws
             JournalpostFeil.JournalpostException(
                 statusCode = 400,
                 //language=JSON

@@ -7,6 +7,7 @@ import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
+import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.oauth2.OAuth2Config
 import org.apache.kafka.clients.CommonClientConfigs
@@ -38,11 +39,15 @@ internal object Config {
                 "AZURE_OPENID_CONFIG_ISSUER" to "azureAd",
                 "AZURE_APP_CLIENT_ID" to "azureClientId",
                 "AZURE_OPENID_CONFIG_JWKS_URI" to "http://localhost:4443",
+                "DOKARKIV_SCOPE" to "api://dev-fss.teamdokumenthandtering.dokarkiv-q1/.default",
+                "DOKARKIV_INGRESS" to "dokarkiv.dev-fss-pub.nais.io",
             ),
         )
     private val prodProperties =
         ConfigurationMap(
             mapOf(
+                "DOKARKIV_SCOPE" to "api://prod-fss.teamdokumenthandtering.dokarkiv/.default",
+                "DOKARKIV_INGRESS" to "dokarkiv.prod-fss-pub.nais.io",
                 "DP_PROXY_SCOPE" to "api://prod-fss.teamdagpenger.dp-proxy/.default",
                 "PDL_API_SCOPE" to "api://prod-fss.pdl.pdl-api/.default",
                 "SKJERMING_API_SCOPE" to "api://prod-gcp.nom.skjermede-personer-pip/.default",
@@ -65,7 +70,7 @@ internal object Config {
         )
     }
 
-    private fun String.addHttprotocoll(): String = "https://$this"
+    internal fun String.addHttprotocoll(): String = "https://$this"
 
     val Configuration.dpProxyTokenProvider: () -> String by lazy {
         {
@@ -73,16 +78,25 @@ internal object Config {
         }
     }
 
-    val Configuration.pdlApiTokenProvider: () -> String by lazy {
+    val Configuration.pdlApiTokenProvider by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("PDL_API_SCOPE", stringType)]).accessToken
+            azureAdTokenSupplier(properties[Key("PDL_API_SCOPE", stringType)])
         }
     }
-    val Configuration.skjermingApiTokenProvider: () -> String by lazy {
+    val Configuration.skjermingApiTokenProvider by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("SKJERMING_API_SCOPE", stringType)]).accessToken
+            azureAdTokenSupplier(properties[Key("SKJERMING_API_SCOPE", stringType)])
         }
     }
+
+    val Configuration.dokarkivTokenProvider by lazy {
+        azureAdTokenSupplier(properties[Key("DOKARKIV_SCOPE", stringType)])
+    }
+
+    private fun azureAdTokenSupplier(scope: String): () -> String =
+        {
+            runBlocking { cachedTokenProvider.clientCredentials(scope).accessToken }
+        }
 
     val kafkaProducerProperties: Properties by lazy {
         Properties().apply {

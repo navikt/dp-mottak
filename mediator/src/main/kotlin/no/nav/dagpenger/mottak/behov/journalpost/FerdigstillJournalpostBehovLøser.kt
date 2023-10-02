@@ -40,7 +40,7 @@ internal class FerdigstillJournalpostBehovLøser(
         ) {
             try {
                 runBlocking {
-                    journalpostDokarkiv.ferdigstill(journalpostId)
+                    journalpostDokarkiv.ferdigstill(journalpostId, behovId)
                 }
             } catch (e: JournalpostFeil.JournalpostException) {
                 ignorerKjenteTilstander(e)
