@@ -36,12 +36,22 @@ internal class FerdigstillJournalpostBehovLøser(
                 "journalpostId" to journalpostId,
             ),
         ) {
-            try {
-                runBlocking {
-                    journalpostDokarkiv.ferdigstill(journalpostId)
+            if (journalpostId == "628251939") {
+                logger.info { "628251939 er allerede ferdigstilt. " }
+
+                packet["@løsning"] = mapOf(
+                    "FerdigstillJournalpost" to mapOf(
+                        "journalpostId" to journalpostId,
+                    ),
+                )
+            } else {
+                try {
+                    runBlocking {
+                        journalpostDokarkiv.ferdigstill(journalpostId)
+                    }
+                } catch (e: JournalpostFeil.JournalpostException) {
+                    ignorerKjenteTilstander(e)
                 }
-            } catch (e: JournalpostFeil.JournalpostException) {
-                ignorerKjenteTilstander(e)
             }
 
             packet["@løsning"] = mapOf(
