@@ -6,7 +6,7 @@ dependencies {
     implementation(libs.jackson.core)
     implementation(libs.jackson.kotlin)
     implementation(libs.jackson.datatype.jsr310)
-    api("no.bekk.bekkopen:nocommons:0.12.0")
+    api("no.bekk.bekkopen:nocommons:0.15.0")
     api(libs.kotlin.logging)
 
     testImplementation("org.junit.jupiter:junit-jupiter-params:${libs.versions.junit.get()}")
