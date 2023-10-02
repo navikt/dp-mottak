@@ -36,8 +36,8 @@ internal class FerdigstillJournalpostBehovLøser(
                 "journalpostId" to journalpostId,
             ),
         ) {
-            if (journalpostId == "628251939") {
-                logger.info { "628251939 er allerede ferdigstilt. " }
+            if (journalpostId == "628245791") {
+                logger.info { "628245791 er allerede ferdigstilt. " }
 
                 packet["@løsning"] = mapOf(
                     "FerdigstillJournalpost" to mapOf(
