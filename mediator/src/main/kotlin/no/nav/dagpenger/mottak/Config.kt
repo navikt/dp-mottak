@@ -72,9 +72,9 @@ internal object Config {
 
     internal fun String.addHttprotocoll(): String = "https://$this"
 
-    val Configuration.dpProxyTokenProvider: () -> String by lazy {
+    val Configuration.dpProxyTokenProvider by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("DP_PROXY_SCOPE", stringType)]).accessToken
+            azureAdTokenSupplier(properties[Key("DP_PROXY_SCOPE", stringType)])
         }
     }
 
@@ -95,7 +95,7 @@ internal object Config {
 
     private fun azureAdTokenSupplier(scope: String): () -> String =
         {
-            runBlocking { cachedTokenProvider.clientCredentials(scope).accessToken }
+            cachedTokenProvider.clientCredentials(scope).accessToken
         }
 
     val kafkaProducerProperties: Properties by lazy {
