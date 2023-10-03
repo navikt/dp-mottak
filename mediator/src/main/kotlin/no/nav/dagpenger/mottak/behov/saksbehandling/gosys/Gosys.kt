@@ -4,7 +4,6 @@ import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.DefaultRequest
-import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.header
 import io.ktor.client.request.request
@@ -18,7 +17,6 @@ import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import java.time.LocalDate
-import kotlin.time.Duration.Companion.minutes
 
 internal interface GosysOppslag {
     suspend fun opprettOppgave(oppgave: GosysOppgaveRequest): String
@@ -55,9 +53,6 @@ internal class GosysProxyClient(config: Configuration) : GosysOppslag {
             }
             install(ContentNegotiation) {
                 register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
-            }
-            install(HttpTimeout) {
-                requestTimeoutMillis = 2.minutes.inWholeMilliseconds
             }
         }
 
