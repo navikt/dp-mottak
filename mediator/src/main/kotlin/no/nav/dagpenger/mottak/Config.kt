@@ -72,31 +72,29 @@ internal object Config {
 
     internal fun String.addHttprotocoll(): String = "https://$this"
 
-    val Configuration.dpProxyTokenProvider by lazy {
+    val Configuration.dpProxyTokenProvider: () -> String by lazy {
         {
-            azureAdTokenSupplier(properties[Key("DP_PROXY_SCOPE", stringType)])
+            cachedTokenProvider.clientCredentials(properties[Key("DP_PROXY_SCOPE", stringType)]).accessToken
         }
     }
 
-    val Configuration.pdlApiTokenProvider by lazy {
+    val Configuration.pdlApiTokenProvider: () -> String by lazy {
         {
-            azureAdTokenSupplier(properties[Key("PDL_API_SCOPE", stringType)])
+            cachedTokenProvider.clientCredentials(properties[Key("PDL_API_SCOPE", stringType)]).accessToken
         }
     }
-    val Configuration.skjermingApiTokenProvider by lazy {
+    val Configuration.skjermingApiTokenProvider: () -> String by lazy {
         {
-            azureAdTokenSupplier(properties[Key("SKJERMING_API_SCOPE", stringType)])
+            cachedTokenProvider.clientCredentials(properties[Key("SKJERMING_API_SCOPE", stringType)]).accessToken
         }
     }
 
-    val Configuration.dokarkivTokenProvider by lazy {
-        azureAdTokenSupplier(properties[Key("DOKARKIV_SCOPE", stringType)])
+    val Configuration.dokarkivTokenProvider: () -> String by lazy {
+        {
+            cachedTokenProvider.clientCredentials(properties[Key("DOKARKIV_SCOPE", stringType)]).accessToken
+        }
     }
 
-    private fun azureAdTokenSupplier(scope: String): () -> String =
-        {
-            cachedTokenProvider.clientCredentials(scope).accessToken
-        }
 
     val kafkaProducerProperties: Properties by lazy {
         Properties().apply {
