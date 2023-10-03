@@ -42,15 +42,16 @@ spec:
     - name: PDL_API_HOST
       value: {{pdl.ingress}}
     - name: DOKARKIV_INGRESS
-      value: {{ dokarkiv.ingress }}
+      value: {{dokarkiv.ingress}}
   accessPolicy:
     outbound:
       rules:
        - application: skjermede-personer-pip
          namespace: nom
       external:
-        - host: {{DP_PROXY_HOST}}
-        - host: {{PDL_API_HOST}}
+        - host: {{dp_proxy.ingress}}
+        - host: {{pdl.ingress}}
+        - host: {{dokarkiv.ingress}}
     inbound:
       rules:
         - application: dp-quiz-retting
