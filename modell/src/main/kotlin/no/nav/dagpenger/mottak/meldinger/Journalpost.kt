@@ -34,7 +34,11 @@ class Journalpost constructor(
     private val registrertDato: LocalDateTime = registrertDato.truncatedTo(ChronoUnit.MILLIS)
 
     internal companion object {
-        val allKnownTypes =
+        /**
+         * Oversikt over skjemakoder kan en finne på https://www.nav.no/soknader/api/sanity/skjemautlisting
+         *
+         */
+        val kjenteSkjemaer =
             mapOf(
                 "GENERELL_INNSENDING" to "Generell innsending",
                 "K1" to "Dokumentasjon av andre ytelser",
@@ -119,7 +123,7 @@ class Journalpost constructor(
             if (tittelHvisTilgjengelig != null && tittelHvisTilgjengelig != "null") {
                 tittelHvisTilgjengelig
             } else {
-                allKnownTypes[brevkode] ?: "Ukjent dokumenttittel"
+                kjenteSkjemaer[brevkode] ?: "Ukjent dokumenttittel"
             }
 
         companion object {
