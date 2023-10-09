@@ -338,7 +338,6 @@ class Innsending private constructor(
                 is Etablering -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is Klage -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is Anke -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
-                is KlageOgAnke -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
                 is KlageForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
@@ -834,7 +833,6 @@ class Innsending private constructor(
             is Etablering -> InnsendingObserver.Type.Etablering
             is Ettersending -> InnsendingObserver.Type.Ettersending
             is Gjenopptak -> InnsendingObserver.Type.Gjenopptak
-            is KlageOgAnke -> InnsendingObserver.Type.KlageOgAnke
             is Klage -> InnsendingObserver.Type.Klage
             is Anke -> InnsendingObserver.Type.Anke
             is NySøknad -> InnsendingObserver.Type.NySøknad

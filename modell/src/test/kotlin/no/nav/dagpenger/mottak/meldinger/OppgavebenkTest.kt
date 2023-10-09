@@ -198,7 +198,7 @@ class OppgavebenkTest {
         val jp = lagjournalpostData(brevkode = "NAV 90-00.08 A").kategorisertJournalpost()
         jp.oppgaveBenk(person = person, rutingOppslag = null, oppfyllerMinsteArbeidsinntekt = null).also {
             assertEquals("Anke\n", it.beskrivelse)
-            assertEquals("4450", it.id)
+            assertEquals("4270", it.id)
         }
     }
 

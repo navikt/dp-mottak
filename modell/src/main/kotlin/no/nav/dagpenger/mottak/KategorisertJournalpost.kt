@@ -209,12 +209,6 @@ data class Etablering(
     override fun henvendelseNavn(): String = "Etablering\n"
 }
 
-data class KlageOgAnke(
-    override val journalpost: Journalpost,
-) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String = "Klage og anke\n"
-}
-
 data class Klage(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
@@ -225,6 +219,19 @@ data class Anke(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Anke\n"
+
+    override fun finnOppgaveBenk(
+        rutingOppslag: RutingOppslag?,
+        oppfyllerMinsteArbeidsinntekt: Boolean?,
+        person: Person?,
+    ): OppgaveBenk {
+        return OppgaveBenk(
+            id = "4270",
+            beskrivelse = henvendelseNavn(),
+            datoRegistrert = journalpost.datoRegistrert(),
+            tilleggsinformasjon = tilleggsinformasjon(),
+        )
+    }
 }
 
 data class KlageForskudd(

@@ -11,7 +11,6 @@ import no.nav.dagpenger.mottak.JournalpostVisitor
 import no.nav.dagpenger.mottak.KategorisertJournalpost
 import no.nav.dagpenger.mottak.Klage
 import no.nav.dagpenger.mottak.KlageForskudd
-import no.nav.dagpenger.mottak.KlageOgAnke
 import no.nav.dagpenger.mottak.NySøknad
 import no.nav.dagpenger.mottak.SpesifikkKontekst
 import no.nav.dagpenger.mottak.UkjentSkjemaKode
@@ -173,11 +172,6 @@ class Journalpost constructor(
             in setOf("GENERELL_INNSENDING") -> Generell(this)
             else -> UkjentSkjemaKode(this)
         }
-    }
-
-    private fun klageOgAnkeType(journalpost: Journalpost): KategorisertJournalpost {
-        // Klage og anke på papir (hvor det ikke skilles)
-        return KlageOgAnke(journalpost)
     }
 
     private fun klageType(journalpost: Journalpost): KategorisertJournalpost {
