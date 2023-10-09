@@ -38,11 +38,15 @@ internal object Config {
                 "AZURE_OPENID_CONFIG_ISSUER" to "azureAd",
                 "AZURE_APP_CLIENT_ID" to "azureClientId",
                 "AZURE_OPENID_CONFIG_JWKS_URI" to "http://localhost:4443",
+                "DOKARKIV_SCOPE" to "api://dev-fss.teamdokumenthandtering.dokarkiv-q1/.default",
+                "DOKARKIV_INGRESS" to "dokarkiv.dev-fss-pub.nais.io",
             ),
         )
     private val prodProperties =
         ConfigurationMap(
             mapOf(
+                "DOKARKIV_SCOPE" to "api://prod-fss.teamdokumenthandtering.dokarkiv/.default",
+                "DOKARKIV_INGRESS" to "dokarkiv.prod-fss-pub.nais.io",
                 "DP_PROXY_SCOPE" to "api://prod-fss.teamdagpenger.dp-proxy/.default",
                 "PDL_API_SCOPE" to "api://prod-fss.pdl.pdl-api/.default",
                 "SKJERMING_API_SCOPE" to "api://prod-gcp.nom.skjermede-personer-pip/.default",
@@ -65,7 +69,7 @@ internal object Config {
         )
     }
 
-    private fun String.addHttprotocoll(): String = "https://$this"
+    internal fun String.addHttprotocoll(): String = "https://$this"
 
     val Configuration.dpProxyTokenProvider: () -> String by lazy {
         {
@@ -81,6 +85,12 @@ internal object Config {
     val Configuration.skjermingApiTokenProvider: () -> String by lazy {
         {
             cachedTokenProvider.clientCredentials(properties[Key("SKJERMING_API_SCOPE", stringType)]).accessToken
+        }
+    }
+
+    val Configuration.dokarkivTokenProvider: () -> String by lazy {
+        {
+            cachedTokenProvider.clientCredentials(properties[Key("DOKARKIV_SCOPE", stringType)]).accessToken
         }
     }
 

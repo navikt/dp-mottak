@@ -1,7 +1,5 @@
 app: dp-mottak
 kafka_pool: nav-dev
-DP_PROXY_HOST: dp-proxy.dev-fss-pub.nais.io
-PDL_API_HOST: pdl-api.dev-fss-pub.nais.io
 db_tier: db-custom-1-3840
 db_size: 20
 replicas_min: 2
@@ -9,3 +7,9 @@ replicas_max: 2
 point_in_time_recovery_days: 2
 ingresses:
   - "https://dp-mottak.intern.dev.nav.no/"
+dp_proxy:
+  ingress: dp-proxy.dev-fss-pub.nais.io
+pdl:
+  ingress: pdl-api.dev-fss-pub.nais.io
+dokarkiv:
+  ingress: dokarkiv.dev-fss-pub.nais.io

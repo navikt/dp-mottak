@@ -24,6 +24,7 @@ dependencies {
 
     implementation(libs.bundles.ktor.server)
     implementation(libs.bundles.ktor.client)
+    implementation("io.ktor:ktor-client-logging-jvm:${libs.versions.ktor.get()}")
     implementation("de.slub-dresden:urnlib:2.0.1")
 
     testImplementation(kotlin("test"))
@@ -32,4 +33,5 @@ dependencies {
     testImplementation(libs.mock.oauth2.server)
     testImplementation(libs.bundles.postgres.test)
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
+    testImplementation("io.ktor:ktor-client-mock-jvm:${libs.versions.ktor.get()}")
 }

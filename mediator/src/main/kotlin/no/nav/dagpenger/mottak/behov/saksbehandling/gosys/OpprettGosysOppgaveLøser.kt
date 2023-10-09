@@ -40,31 +40,30 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
                 "journalpostId" to journalpostId,
             ),
         ) {
-            try {
-                if (listOf("598125943", "598125958").contains(journalpostId) && System.getenv()["NAIS_CLUSTER_NAME"] == "dev-gcp") {
-                    logger.warn { "Skipper journalpost" }
-                    return@withMDC
-                }
+            if (listOf(
+                    "598125943",
+                    "598125958",
+                ).contains(journalpostId) && System.getenv()["NAIS_CLUSTER_NAME"] == "dev-gcp"
+            ) {
+                logger.warn { "Skipper journalpost" }
+                return@withMDC
+            }
 
-                runBlocking(MDCContext()) {
-                    gosysOppslag.opprettOppgave(
-                        packet.gosysOppgave(),
+            runBlocking(MDCContext()) {
+                gosysOppslag.opprettOppgave(
+                    packet.gosysOppgave(),
+                )
+            }.also {
+                packet["@løsning"] =
+                    mapOf(
+                        BEHOV to
+                            mapOf(
+                                "journalpostId" to journalpostId,
+                                "oppgaveId" to it,
+                            ),
                     )
-                }.also {
-                    packet["@løsning"] =
-                        mapOf(
-                            BEHOV to
-                                mapOf(
-                                    "journalpostId" to journalpostId,
-                                    "oppgaveId" to it,
-                                ),
-                        )
-                    context.publish(packet.toJson())
-                    logger.info { "Løste behov $BEHOV med løsning $it" }
-                }
-            } catch (e: Exception) {
-                logger.info { "Kunne ikke opprette gosys oppgave for journalpost med id $journalpostId" }
-                throw e
+                context.publish(packet.toJson())
+                logger.info { "Løste behov $BEHOV med løsning $it" }
             }
         }
     }

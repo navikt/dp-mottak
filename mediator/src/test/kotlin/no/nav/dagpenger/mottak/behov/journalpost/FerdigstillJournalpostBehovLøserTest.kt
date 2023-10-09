@@ -26,11 +26,12 @@ internal class FerdigstillJournalpostBehovLøserTest {
 
     @Test
     fun `Løser behov FerdigstillJournalpost `() {
+        val behovId = UUID.randomUUID()
         coEvery {
-            journalpostDokarkiv.ferdigstill(journalpostId)
+            journalpostDokarkiv.ferdigstill(journalpostId, behovId.toString())
         } just Runs
 
-        testRapid.sendTestMessage(ferdigstillBehov())
+        testRapid.sendTestMessage(ferdigstillBehov(behovId = behovId))
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertNotNull(field(0, "@løsning")["FerdigstillJournalpost"])
@@ -56,12 +57,12 @@ internal class FerdigstillJournalpostBehovLøserTest {
     }
 
     //language=JSON
-    private fun ferdigstillBehov(): String =
+    private fun ferdigstillBehov(behovId: UUID = UUID.randomUUID()): String =
         """
         {
           "@event_name": "behov",
           "@id": "${UUID.randomUUID()}",
-          "@behovId": "${UUID.randomUUID()}",
+          "@behovId": "$behovId",
           "@behov": [
             "FerdigstillJournalpost"
           ],

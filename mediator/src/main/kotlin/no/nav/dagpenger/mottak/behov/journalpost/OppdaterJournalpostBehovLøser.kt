@@ -41,7 +41,7 @@ internal class OppdaterJournalpostBehovLøser(
         ) {
             runBlocking {
                 try {
-                    journalpostDokarkiv.oppdaterJournalpost(journalpostId, packet.tilJournalføringOppdaterRequest())
+                    journalpostDokarkiv.oppdaterJournalpost(journalpostId, packet.tilJournalføringOppdaterRequest(), behovId)
                 } catch (e: JournalpostFeil.JournalpostException) {
                     ignorerKjenteTilstander(e)
                 }
