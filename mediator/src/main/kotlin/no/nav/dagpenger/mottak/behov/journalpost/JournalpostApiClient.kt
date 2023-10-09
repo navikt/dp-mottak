@@ -52,7 +52,7 @@ internal class JournalpostApiClient(
                 header("X-Nav-Consumer", "dp-mottak")
                 url {
                     protocol = URLProtocol.HTTPS
-                    host = Config.properties[Key("DOKARKIV_INGRESS", stringType)].addHttprotocoll()
+                    host = Config.properties[Key("DOKARKIV_INGRESS", stringType)]
                 }
             }
             install(ContentNegotiation) {
