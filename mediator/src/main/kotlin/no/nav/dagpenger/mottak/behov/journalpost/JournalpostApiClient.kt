@@ -9,9 +9,6 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
 import io.ktor.client.request.patch
 import io.ktor.client.request.put
@@ -34,11 +31,6 @@ internal class JournalpostApiClient(
 ) : JournalpostDokarkiv {
     private companion object {
         val logger = KotlinLogging.logger { }
-        private object SecureLogger : Logger {
-            private val secureLog = KotlinLogging.logger("tjenestekall.JournalpostApiClient")
-
-            override fun log(message: String) = secureLog.info(message)
-        }
     }
 
     private val client =
@@ -56,10 +48,6 @@ internal class JournalpostApiClient(
             }
             install(ContentNegotiation) {
                 register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
-            }
-            install(Logging) {
-                logger = SecureLogger
-                level = LogLevel.ALL
             }
         }
 
