@@ -10,4 +10,4 @@ dp_proxy:
 pdl:
   ingress: pdl-api.prod-fss-pub.nais.io
 dokarkiv:
-  ingress: dokarkiv.dev-fss-pub.nais.io
+  ingress: dokarkiv.prod-fss-pub.nais.io
