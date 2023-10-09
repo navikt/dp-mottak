@@ -24,7 +24,6 @@ import io.ktor.http.encodedPath
 import io.ktor.serialization.jackson.JacksonConverter
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config
-import no.nav.dagpenger.mottak.Config.addHttprotocoll
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import kotlin.time.Duration.Companion.minutes
 

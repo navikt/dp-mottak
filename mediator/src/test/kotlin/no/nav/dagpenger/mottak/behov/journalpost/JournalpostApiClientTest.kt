@@ -4,6 +4,7 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.URLProtocol
 import io.ktor.http.headersOf
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.runBlocking
@@ -26,10 +27,11 @@ class JournalpostApiClientTest {
             val requestData = mockHttpEngine.requestHistory.first()
             assertEquals("PUT", requestData.method.value)
             assertEquals(
-                "//dokarkiv.dev-fss-pub.nais.io/rest/journalpostapi/v1/journalpost/123",
+                "/rest/journalpostapi/v1/journalpost/123",
                 requestData.url.encodedPathAndQuery,
             )
-            assertEquals("https://dokarkiv.dev-fss-pub.nais.io", requestData.url.host)
+            assertEquals(URLProtocol.HTTPS, requestData.url.protocol)
+            assertEquals("dokarkiv.dev-fss-pub.nais.io", requestData.url.host)
             assertEquals("Bearer token", requestData.headers["Authorization"])
             assertEquals("eksternReferanseId", requestData.headers["X-Request-ID"])
         }
@@ -47,10 +49,10 @@ class JournalpostApiClientTest {
             val requestData = mockHttpEngine.requestHistory.first()
             assertEquals("PATCH", requestData.method.value)
             assertEquals(
-                "//dokarkiv.dev-fss-pub.nais.io/rest/journalpostapi/v1/journalpost/123/ferdigstill",
+                "/rest/journalpostapi/v1/journalpost/123/ferdigstill",
                 requestData.url.encodedPathAndQuery,
             )
-            assertEquals("https://dokarkiv.dev-fss-pub.nais.io", requestData.url.host)
+            assertEquals("dokarkiv.dev-fss-pub.nais.io", requestData.url.host)
 
             assertEquals("Bearer token", requestData.headers["Authorization"])
             assertEquals("eksternReferanseId", requestData.headers["X-Request-ID"])
