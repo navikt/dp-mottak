@@ -42,7 +42,7 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
         ) {
             if (listOf(
                     "598125943",
-                    "598125958"
+                    "598125958",
                 ).contains(journalpostId) && System.getenv()["NAIS_CLUSTER_NAME"] == "dev-gcp"
             ) {
                 logger.warn { "Skipper journalpost" }
@@ -57,10 +57,10 @@ internal class OpprettGosysOppgaveLøser(private val gosysOppslag: GosysOppslag,
                 packet["@løsning"] =
                     mapOf(
                         BEHOV to
-                                mapOf(
-                                    "journalpostId" to journalpostId,
-                                    "oppgaveId" to it,
-                                ),
+                            mapOf(
+                                "journalpostId" to journalpostId,
+                                "oppgaveId" to it,
+                            ),
                     )
                 context.publish(packet.toJson())
                 logger.info { "Løste behov $BEHOV med løsning $it" }

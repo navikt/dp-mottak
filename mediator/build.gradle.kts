@@ -24,6 +24,7 @@ dependencies {
 
     implementation(libs.bundles.ktor.server)
     implementation(libs.bundles.ktor.client)
+    implementation("io.ktor:ktor-client-logging-jvm:${libs.versions.ktor.get()}")
     implementation("de.slub-dresden:urnlib:2.0.1")
 
     testImplementation(kotlin("test"))
