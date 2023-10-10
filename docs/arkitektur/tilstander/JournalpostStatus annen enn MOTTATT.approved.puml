@@ -2,8 +2,11 @@
 title 
 Innløpet – flyt for brevkode JournalpostStatus annen enn MOTTATT
 end title           
-[*]-->MottattType 
+[*]-->MottattType
 MottattType --> AvventerJournalpostType
 AvventerJournalpostType --> AlleredeBehandletType
 AlleredeBehandletType--> [*]
+note left of AlleredeBehandletType
+  
+end note
 @enduml

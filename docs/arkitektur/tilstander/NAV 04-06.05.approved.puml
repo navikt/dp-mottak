@@ -2,7 +2,7 @@
 title 
 Innløpet – flyt for brevkode NAV 04-06.05
 end title           
-[*]-->MottattType 
+[*]-->MottattType
 MottattType --> AvventerJournalpostType
 AvventerJournalpostType --> AvventerPersondataType
 AvventerPersondataType --> KategoriseringType
@@ -10,4 +10,8 @@ KategoriseringType --> AventerArenaOppgaveType
 AventerArenaOppgaveType --> AvventerFerdigstillJournalpostType
 AvventerFerdigstillJournalpostType --> InnsendingFerdigstiltType
 InnsendingFerdigstiltType--> [*]
+note left of InnsendingFerdigstiltType
+Kategorisert som: Utdanning
+Behandlende enhet: 4450  
+end note
 @enduml

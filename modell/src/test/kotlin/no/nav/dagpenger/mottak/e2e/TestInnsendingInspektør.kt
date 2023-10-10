@@ -8,7 +8,6 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.InnsendingVisitor
 import org.approvaltests.Approvals
 import org.approvaltests.core.Options
-import org.approvaltests.namer.ApprovalNamer
 import org.approvaltests.namer.NamerWrapper
 import java.nio.file.Paths
 
@@ -30,7 +29,8 @@ class TestInnsendingInspektør(innsending: Innsending) : InnsendingVisitor {
 }
 
 class PlantUmlObservatør() : InnsendingObserver {
-    private val tilstander = mutableListOf<String>()
+    private val tilstander = mutableListOf<Pair<String, String>>()
+    private val innsendingdetaljer = mutableListOf<String>()
 
     private companion object {
         val path = "${
@@ -43,11 +43,12 @@ class PlantUmlObservatør() : InnsendingObserver {
     }
 
     override fun tilstandEndret(event: InnsendingObserver.InnsendingEndretTilstandEvent) {
-        tilstander.add("${event.forrigeTilstand} --> ${event.gjeldendeTilstand.name}")
+        tilstander.add(event.forrigeTilstand.name to event.gjeldendeTilstand.name)
     }
 
-    fun reset() {
-        tilstander.clear()
+    override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
+        innsendingdetaljer.add("Kategorisert som: ${event.type}")
+        innsendingdetaljer.add("Behandlende enhet: ${event.behandlendeEnhet}")
     }
 
     fun toPlantUml(brevkode: String): String =
@@ -57,13 +58,18 @@ class PlantUmlObservatør() : InnsendingObserver {
           |Innløpet – flyt for brevkode $brevkode
           |end title           
           |[*]-->${tilstander.førsteTilstand()}
-          |${tilstander.joinToString("\n")}
+          |${tilstander.joinToString(separator = "\n") {
+            it.first + " --> " + it.second
+        }}
           |${tilstander.sisteTilstand()}--> [*]
+          |note left of ${tilstander.sisteTilstand()}
+          |${innsendingdetaljer.joinToString(separator = "\n")}  
+          |end note
           |@enduml
         """.trimMargin()
 
     fun verify(brevkode: String) {
-        Approvals.namerCreater = Loader<ApprovalNamer> { NamerWrapper({ "tilstander/$brevkode" }, { path }) }
+        Approvals.namerCreater = Loader { NamerWrapper({ "tilstander/$brevkode" }, { path }) }
         Approvals
             .verify(
                 toPlantUml(brevkode),
@@ -72,6 +78,6 @@ class PlantUmlObservatør() : InnsendingObserver {
     }
 }
 
-private fun MutableList<String>.førsteTilstand(): String = this.first().substringBefore("--> ")
+private fun MutableList<Pair<String, String>>.førsteTilstand(): String = this.first().first
 
-private fun MutableList<String>.sisteTilstand(): String = this.last().substringAfter("--> ")
+private fun MutableList<Pair<String, String>>.sisteTilstand(): String = this.last().second

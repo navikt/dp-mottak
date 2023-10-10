@@ -2,7 +2,7 @@
 title 
 Innløpet – flyt for brevkode NAV 04-16.03
 end title           
-[*]-->MottattType 
+[*]-->MottattType
 MottattType --> AvventerJournalpostType
 AvventerJournalpostType --> AvventerPersondataType
 AvventerPersondataType --> KategoriseringType
@@ -11,4 +11,8 @@ AvventerSøknadsdataType --> AventerArenaOppgaveType
 AventerArenaOppgaveType --> AvventerFerdigstillJournalpostType
 AvventerFerdigstillJournalpostType --> InnsendingFerdigstiltType
 InnsendingFerdigstiltType--> [*]
+note left of InnsendingFerdigstiltType
+Kategorisert som: Gjenopptak
+Behandlende enhet: 4450  
+end note
 @enduml

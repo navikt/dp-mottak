@@ -2,11 +2,15 @@
 title 
 Innløpet – flyt for brevkode NAV 90-00.08-forskudd
 end title           
-[*]-->MottattType 
+[*]-->MottattType
 MottattType --> AvventerJournalpostType
 AvventerJournalpostType --> AvventerPersondataType
 AvventerPersondataType --> KategoriseringType
 KategoriseringType --> AvventerGosysType
 AvventerGosysType --> InnsendingFerdigstiltType
 InnsendingFerdigstiltType--> [*]
+note left of InnsendingFerdigstiltType
+Kategorisert som: KlageOgAnkeForskudd
+Behandlende enhet: 4153  
+end note
 @enduml

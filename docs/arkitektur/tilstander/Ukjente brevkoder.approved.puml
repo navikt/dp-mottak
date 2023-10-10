@@ -2,11 +2,15 @@
 title 
 Innløpet – flyt for brevkode Ukjente brevkoder
 end title           
-[*]-->MottattType 
+[*]-->MottattType
 MottattType --> AvventerJournalpostType
 AvventerJournalpostType --> AvventerPersondataType
 AvventerPersondataType --> KategoriseringType
 KategoriseringType --> AvventerGosysType
 AvventerGosysType --> InnsendingFerdigstiltType
 InnsendingFerdigstiltType--> [*]
+note left of InnsendingFerdigstiltType
+Kategorisert som: UkjentSkjemaKode
+Behandlende enhet: 4450  
+end note
 @enduml
