@@ -39,7 +39,7 @@ class PlantUmlObservatør() : InnsendingObserver {
         val options =
             Options()
                 .forFile()
-                .withExtension(".puml")
+                .withExtension(".md")
     }
 
     override fun tilstandEndret(event: InnsendingObserver.InnsendingEndretTilstandEvent) {
@@ -47,32 +47,30 @@ class PlantUmlObservatør() : InnsendingObserver {
     }
 
     override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
-        innsendingdetaljer.add("Kategorisert som: ${event.type}")
-        innsendingdetaljer.add("Behandlende enhet: ${event.behandlendeEnhet}")
+        innsendingdetaljer.add("Kategorisert som: `${event.type}`")
+        innsendingdetaljer.add("Behandlende enhet: `${event.behandlendeEnhet}`")
     }
 
-    fun toPlantUml(brevkode: String): String =
+    fun toMermaidMd(brevkode: String) =
         """
-          |@startuml
-          |title 
-          |Innløpet – flyt for brevkode $brevkode
-          |end title           
-          |[*]-->${tilstander.førsteTilstand()}
-          |${tilstander.joinToString(separator = "\n") {
-            it.first + " --> " + it.second
-        }}
-          |${tilstander.sisteTilstand()}--> [*]
-          |note left of ${tilstander.sisteTilstand()}
-          |${innsendingdetaljer.joinToString(separator = "\n")}  
-          |end note
-          |@enduml
+        |## Innløpet – flyt for brevkode $brevkode
+        |${innsendingdetaljer.joinToString()}
+        |```mermaid
+        |   stateDiagram
+        |   [*]-->${tilstander.førsteTilstand()}
+        |   ${tilstander.joinToString(separator = "\n") {
+            "\t" + it.first + " --> " + it.second
+        }
+        }
+        |   ${tilstander.sisteTilstand()}--> [*]    
+        |```
         """.trimMargin()
 
     fun verify(brevkode: String) {
         Approvals.namerCreater = Loader { NamerWrapper({ "tilstander/$brevkode" }, { path }) }
         Approvals
             .verify(
-                toPlantUml(brevkode),
+                toMermaidMd(brevkode),
                 options,
             )
     }

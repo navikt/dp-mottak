@@ -13,8 +13,7 @@ Gradle brukes som byggverktøy og er bundlet inn.
 
 ## Dokumentasjon
 
-Tilstander se [tilstander](docs/arkitektur/tilstander)
-(Legg til plantuml plugin i IntelliJ hvis du vil se visuell representasjon)
+Skjemakoder og hvilke behandlende enhet (benk) en blir sendt til, se [tilstander](docs/arkitektur/tilstander)
 
 Databasediagram
 ![databasediagram](docs/db/DB-layout-2020-05-21.png)
