@@ -562,7 +562,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         ],
     )
     @ParameterizedTest
-    fun `skal håndtere at informasjon om bruker ikke er funnet og skjema er klage og anke`(behandlingstema: String) {
+    fun `skal håndtere at informasjon om bruker ikke er funnet og skjema er klage`(behandlingstema: String) {
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = behandlingstema)
         håndterPersonInformasjonIkkeFunnet()
@@ -585,6 +585,40 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         assertFerdigstilt {
             assertNotNull(it.datoRegistrert)
             assertEquals("4450", it.behandlendeEnhet)
+        }
+    }
+
+    @ValueSource(
+        strings = [
+            "ab0438",
+            "ab0451",
+            "ab0452",
+        ],
+    )
+    @ParameterizedTest
+    fun `skal håndtere at informasjon om bruker ikke er funnet og skjema er anke`(behandlingstema: String) {
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode = "NAV 90-00.08 A", behandlingstema = behandlingstema)
+        håndterPersonInformasjonIkkeFunnet()
+        håndterGosysOppgaveOpprettet()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            UkjentBrukerType,
+            InnsendingFerdigstiltType,
+        )
+
+        inspektør.also {
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+        }
+
+        assertFerdigstilt {
+            assertNotNull(it.datoRegistrert)
+            assertEquals("4270", it.behandlendeEnhet)
         }
     }
 
