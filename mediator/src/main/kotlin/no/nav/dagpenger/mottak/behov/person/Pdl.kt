@@ -34,7 +34,10 @@ internal class PdlPersondataOppslag(config: Configuration) {
                 this.url("${config.pdlApiUrl()}/graphql")
                 header("Content-Type", "application/json")
                 header("TEMA", "DAG")
-                header("behandlingsnummer", "B286") // https://behandlingskatalog.intern.nav.no/process/purpose/DAGPENGER/486f1672-52ed-46fb-8d64-bda906ec1bc9
+                header(
+                    "behandlingsnummer",
+                    "B286",
+                ) // https://behandlingskatalog.intern.nav.no/process/purpose/DAGPENGER/486f1672-52ed-46fb-8d64-bda906ec1bc9
                 accept(ContentType.Application.Json)
             }
         }
