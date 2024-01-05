@@ -61,7 +61,6 @@ internal class PdlPersondataOppslag(config: Configuration) {
             setBody(PersonQuery(id).toJson().also { sikkerlogg.info { "Forsøker å hente person med id $id fra PDL" } })
         }.bodyAsText().let {
             if (hasError(it)) {
-                sikkerlogg.error { "Feil i person oppslag for person med id $id: $it" }
                 throw PdlPersondataOppslagException(it)
             } else {
                 Pdl.Person.fromGraphQlJson(it)
@@ -73,7 +72,6 @@ internal class PdlPersondataOppslagException(s: String) : RuntimeException(s)
 
 internal fun hasError(json: String): Boolean {
     val j = jacksonObjectMapper().readTree(json)
-    logg.error { "Feil fra PDL: ${jacksonObjectMapper().writeValueAsString(j["errors"])}" }
     return (harGraphqlErrors(j) && !ukjentPersonIdent(j))
 }
 
@@ -171,6 +169,7 @@ internal class Pdl {
                     it
                 },
                 onFailure = {
+                    sikkerlogg.error(it) { "Feil ved deserialisering av PDL response: $node" }
                     if (ukjentPersonIdent(node)) {
                         return null
                     } else {
