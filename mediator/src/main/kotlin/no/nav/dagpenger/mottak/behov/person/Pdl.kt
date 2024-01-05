@@ -24,6 +24,7 @@ import no.nav.dagpenger.mottak.Config.pdlApiUrl
 import no.nav.dagpenger.mottak.behov.GraphqlQuery
 import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 
+private val logg = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.Pdl")
 
 internal class PdlPersondataOppslag(config: Configuration) {
@@ -57,11 +58,6 @@ internal class PdlPersondataOppslag(config: Configuration) {
             method = HttpMethod.Post
             setBody(PersonQuery(id).toJson().also { sikkerlogg.info { "Forsøker å hente person med id $id fra PDL" } })
         }.bodyAsText().let {
-            try {
-                hasError(it)
-            } catch (e: Exception) {
-                sikkerlogg.error { "Respons fra PDL ble ikke parset: $it" }
-            }
             if (hasError(it)) {
                 sikkerlogg.error { "Feil i person oppslag for person med id $id: $it" }
                 throw PdlPersondataOppslagException(it)
@@ -75,6 +71,9 @@ internal class PdlPersondataOppslagException(s: String) : RuntimeException(s)
 
 internal fun hasError(json: String): Boolean {
     val j = jacksonObjectMapper().readTree(json)
+    if (harGraphqlErrors(j)) {
+        logg.error { "Feil fra PDL: ${jacksonObjectMapper().writeValueAsBytes(j["errors"])}" }
+    }
     return (harGraphqlErrors(j) && !ukjentPersonIdent(j))
 }
 
