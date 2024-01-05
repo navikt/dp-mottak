@@ -77,7 +77,6 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
             ).get(500, TimeUnit.MILLISECONDS)
 
             logger.info { "Send ${message["@event_name"].asText()} til Kafka for journalpostId=$key" }
-            sikkerLogger.info { message.toJson() }
         }
 
         private fun shutdownHook() {
