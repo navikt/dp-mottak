@@ -18,7 +18,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import org.slf4j.MDC
 
 private val log = KotlinLogging.logger {}
-private val sikkerlogg = KotlinLogging.logger("tjenestekall")
+private val sikkerlogg = KotlinLogging.logger("tjenestekall.InnsendingMediator")
 
 internal class InnsendingMediator(
     private val innsendingRepository: InnsendingRepository,

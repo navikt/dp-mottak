@@ -39,7 +39,7 @@ internal interface ArenaOppslag {
 internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
     companion object {
         private val logger = KotlinLogging.logger {}
-        private val sikkerlogg = KotlinLogging.logger("tjenestekall")
+        private val sikkerlogg = KotlinLogging.logger("tjenestekall.ArenaApiClient")
     }
 
     private val tokenProvider = config.dpProxyTokenProvider

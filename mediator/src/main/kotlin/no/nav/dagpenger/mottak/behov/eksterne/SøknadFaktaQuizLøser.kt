@@ -16,7 +16,7 @@ internal class SøknadFaktaQuizLøser(
 ) : River.PacketListener {
     private companion object {
         val logger = KotlinLogging.logger { }
-        val sikkerlogg = KotlinLogging.logger("tjenestekall")
+        val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadFaktaQuizLøser")
     }
 
     private val løserBehov =

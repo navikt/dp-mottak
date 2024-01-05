@@ -12,7 +12,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import no.nav.helse.rapids_rivers.asLocalDateTime
 
-private val sikkerlogg = KotlinLogging.logger("tjenestekall")
+private val sikkerlogg = KotlinLogging.logger("tjenestekall.EksisterendeSakerMottak")
 private val logg = KotlinLogging.logger {}
 
 internal class EksisterendeSakerMottak(

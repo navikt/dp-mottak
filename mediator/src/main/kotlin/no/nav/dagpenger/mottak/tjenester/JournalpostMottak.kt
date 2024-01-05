@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype as Behov
 
 private val logg = KotlinLogging.logger {}
-private val sikkerLogg = KotlinLogging.logger("tjenestekall")
+private val sikkerLogg = KotlinLogging.logger("tjenestekall.JournalpostMottak")
 
 internal class JournalpostMottak(
     private val innsendingMediator: InnsendingMediator,
