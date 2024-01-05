@@ -74,7 +74,6 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag
     override fun permittertFraFiskeForedling(): Boolean = avsluttetArbeidsforhold().any { it.fiskeforedling }
 
     override fun avsluttetArbeidsforholdFraKonkurs(): Boolean {
-        sikkerlogg.info { "Har JSON: $data" }
         return avsluttetArbeidsforhold().any { it.sluttårsak == Sluttårsak.ARBEIDSGIVER_KONKURS }
     }
 
