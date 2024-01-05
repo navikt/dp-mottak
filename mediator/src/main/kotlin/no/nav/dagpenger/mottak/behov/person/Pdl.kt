@@ -77,7 +77,7 @@ internal fun hasError(json: String): Boolean {
 
 private fun harGraphqlErrors(json: JsonNode) = json["errors"] != null && !json["errors"].isEmpty
 
-private fun ukjentPersonIdent(node: JsonNode) = node["errors"].any { it["message"].asText() == "Fant ikke person" }
+private fun ukjentPersonIdent(node: JsonNode) = node["errors"]?.any { it["message"].asText() == "Fant ikke person" } ?: false
 
 internal data class PersonQuery(val id: String) : GraphqlQuery(
     //language=Graphql
@@ -169,11 +169,10 @@ internal class Pdl {
                     it
                 },
                 onFailure = {
-                    sikkerlogg.error(it) { "Feil ved deserialisering av PDL response: $node" }
                     if (ukjentPersonIdent(node)) {
                         return null
                     } else {
-                        sikkerlogg.info(node.toString())
+                        sikkerlogg.error(it) { "Feil ved deserialisering av PDL response: $node" }
                         throw it
                     }
                 },
