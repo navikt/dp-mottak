@@ -9,6 +9,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.accept
 import io.ktor.client.request.header
 import io.ktor.client.request.request
@@ -39,6 +40,14 @@ internal class PdlPersondataOppslag(config: Configuration) {
                     "B286",
                 ) // https://behandlingskatalog.intern.nav.no/process/purpose/DAGPENGER/486f1672-52ed-46fb-8d64-bda906ec1bc9
                 accept(ContentType.Application.Json)
+            }
+            install(Logging) {
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        sikkerlogg.info(message)
+                    }
+                }
+                level = LogLevel.ALL
             }
         }
 
