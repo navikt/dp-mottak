@@ -73,9 +73,7 @@ internal class PdlPersondataOppslagException(s: String) : RuntimeException(s)
 
 internal fun hasError(json: String): Boolean {
     val j = jacksonObjectMapper().readTree(json)
-    if (harGraphqlErrors(j)) {
-        logg.error { "Feil fra PDL: ${jacksonObjectMapper().writeValueAsBytes(j["errors"])}" }
-    }
+    logg.error { "Feil fra PDL: ${jacksonObjectMapper().writeValueAsBytes(j["errors"])}" }
     return (harGraphqlErrors(j) && !ukjentPersonIdent(j))
 }
 
