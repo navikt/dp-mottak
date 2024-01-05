@@ -4,7 +4,6 @@ import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.aktørId
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.diskresjonsKode
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.fødselsnummer
-import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.harIdent
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.norskTilknyting
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.personNavn
 import org.intellij.lang.annotations.Language

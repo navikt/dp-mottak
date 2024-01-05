@@ -23,7 +23,6 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
 
         private companion object {
             private val logger = KotlinLogging.logger {}
-            private val sikkerLogger = KotlinLogging.logger("tjenestekall.FerdigstiltInnsendingObserver")
 
             private fun createProducer(producerProperties: Properties): KafkaProducer<String, String> {
                 producerProperties[ProducerConfig.ACKS_CONFIG] = "all"

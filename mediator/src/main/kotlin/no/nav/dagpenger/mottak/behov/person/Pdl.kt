@@ -66,13 +66,12 @@ internal fun hasError(json: String): Boolean {
 
 private fun harGraphqlErrors(json: JsonNode) = json["errors"] != null && !json["errors"].isEmpty
 
-private fun ukjentPersonIdent(node: JsonNode) =
-    node["errors"]?.any { it["message"].asText() == "Fant ikke person" } ?: false
+private fun ukjentPersonIdent(node: JsonNode) = node["errors"]?.any { it["message"].asText() == "Fant ikke person" } ?: false
 
 internal data class PersonQuery(val id: String) : GraphqlQuery(
     //language=Graphql
     query =
-    """
+        """
         query(${'$'}ident: ID!) {
             hentPerson(ident: ${'$'}ident) {
                 navn {
@@ -140,8 +139,7 @@ internal class Pdl {
             return findValue("identer").first { it.path("gruppe").asText() == type }.get("ident").asText()
         }
 
-        private fun JsonNode.harIdent(type: String): Boolean =
-            findValue("identer").map { it["gruppe"].asText() }.contains(type)
+        private fun JsonNode.harIdent(type: String): Boolean = findValue("identer").map { it["gruppe"].asText() }.contains(type)
 
         override fun deserialize(
             p: JsonParser,
