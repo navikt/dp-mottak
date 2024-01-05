@@ -48,6 +48,11 @@ internal class PdlPersondataOppslag(config: Configuration) {
             method = HttpMethod.Post
             setBody(PersonQuery(id).toJson().also { sikkerlogg.info { "Forsøker å hente person med id $id fra PDL" } })
         }.bodyAsText().let {
+            try {
+                hasError(it)
+            } catch (e: Exception) {
+                sikkerlogg.error { "Respons fra PDL ble ikke parset: $it" }
+            }
             if (hasError(it)) {
                 sikkerlogg.error { "Feil i person oppslag for person med id $id: $it" }
                 throw PdlPersondataOppslagException(it)
@@ -71,7 +76,7 @@ private fun ukjentPersonIdent(node: JsonNode) = node["errors"].any { it["message
 internal data class PersonQuery(val id: String) : GraphqlQuery(
     //language=Graphql
     query =
-        """
+    """
         query(${'$'}ident: ID!) {
             hentPerson(ident: ${'$'}ident) {
                 navn {
