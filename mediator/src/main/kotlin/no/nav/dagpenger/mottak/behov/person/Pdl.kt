@@ -9,9 +9,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.DefaultRequest
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logger
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.accept
 import io.ktor.client.request.header
 import io.ktor.client.request.request
@@ -44,14 +41,6 @@ internal class PdlPersondataOppslag(config: Configuration) {
                 ) // https://behandlingskatalog.intern.nav.no/process/purpose/DAGPENGER/486f1672-52ed-46fb-8d64-bda906ec1bc9
                 accept(ContentType.Application.Json)
             }
-            install(Logging) {
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        sikkerlogg.info(message)
-                    }
-                }
-                level = LogLevel.ALL
-            }
         }
 
     suspend fun hentPerson(id: String): Pdl.Person? =
@@ -77,7 +66,8 @@ internal fun hasError(json: String): Boolean {
 
 private fun harGraphqlErrors(json: JsonNode) = json["errors"] != null && !json["errors"].isEmpty
 
-private fun ukjentPersonIdent(node: JsonNode) = node["errors"]?.any { it["message"].asText() == "Fant ikke person" } ?: false
+private fun ukjentPersonIdent(node: JsonNode) =
+    node["errors"]?.any { it["message"].asText() == "Fant ikke person" } ?: false
 
 internal data class PersonQuery(val id: String) : GraphqlQuery(
     //language=Graphql
@@ -150,6 +140,9 @@ internal class Pdl {
             return findValue("identer").first { it.path("gruppe").asText() == type }.get("ident").asText()
         }
 
+        private fun JsonNode.harIdent(type: String): Boolean =
+            findValue("identer").map { it["gruppe"].asText() }.contains(type)
+
         override fun deserialize(
             p: JsonParser,
             ctxt: DeserializationContext?,
@@ -169,7 +162,7 @@ internal class Pdl {
                     it
                 },
                 onFailure = {
-                    if (ukjentPersonIdent(node)) {
+                    if (ukjentPersonIdent(node) || !node.harIdent("FOLKEREGISTERIDENT")) {
                         return null
                     } else {
                         sikkerlogg.error(it) { "Feil ved deserialisering av PDL response: $node" }
