@@ -1,23 +1,24 @@
 name: Build and deploy
+
 on:
   push:
     branches-ignore:
       - 'dependabot/**'
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build:
     name: Build and publish Docker image
     runs-on: ubuntu-latest
-    permissions: # Sjekk https://docs.github.com/en/actions/using-jobs/assigning-permissions-to-jobs
-      contents: write
-      packages: write
-      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
       - uses: gradle/wrapper-validation-action@v1.1.0
       - uses: gradle/gradle-build-action@v2.11.1
         env:
@@ -30,7 +31,6 @@ jobs:
 
       - name: docker-build-push
         uses: nais/docker-build-push@v0
-        if: github.ref == 'refs/heads/main'
         id: docker-build-push
         with:
           team: teamdagpenger
@@ -52,7 +52,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .nais/nais.yaml
           VAR: image=${{ needs.build.outputs.image }}
@@ -69,7 +68,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
           RESOURCE: .nais/nais.yaml
           VAR: image=${{ needs.build.outputs.image }}
