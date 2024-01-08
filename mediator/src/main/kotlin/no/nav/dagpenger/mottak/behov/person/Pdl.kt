@@ -48,11 +48,14 @@ internal class PdlPersondataOppslag(config: Configuration) {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
             method = HttpMethod.Post
             setBody(PersonQuery(id).toJson().also { sikkerlogg.info { "Forsøker å hente person med id $id fra PDL" } })
-        }.bodyAsText().let {
-            if (hasError(it)) {
-                throw PdlPersondataOppslagException(it)
+        }.bodyAsText().let { body ->
+            getWarnings(body).takeIf { it.isNotEmpty() }?.map { warnings ->
+                logg.warn { "Warnings ved henting av person fra PDL: $warnings" }
+            }
+            if (hasError(body)) {
+                throw PdlPersondataOppslagException(body)
             } else {
-                Pdl.Person.fromGraphQlJson(it)
+                Pdl.Person.fromGraphQlJson(body)
             }
         }
 }
@@ -63,6 +66,32 @@ internal fun hasError(json: String): Boolean {
     val j = jacksonObjectMapper().readTree(json)
     return (harGraphqlErrors(j) && !ukjentPersonIdent(j))
 }
+
+internal fun getWarnings(json: String): List<QueryWarning> {
+    val node = jacksonObjectMapper().readTree(json)
+    return node["extensions"]?.get("warnings")?.map {
+        QueryWarning(
+            id = it["id"].asText(),
+            code = it["code"].asText(),
+            message = it["message"].asText(),
+            details =
+                WarningDetails(
+                    missing = it["details"]["missing"].map { missing -> missing.asText() },
+                ),
+        )
+    } ?: emptyList()
+}
+
+data class QueryWarning(
+    val id: String,
+    val code: String,
+    val message: String,
+    val details: WarningDetails,
+)
+
+data class WarningDetails(
+    val missing: List<String>,
+)
 
 private fun harGraphqlErrors(json: JsonNode) = json["errors"] != null && !json["errors"].isEmpty
 

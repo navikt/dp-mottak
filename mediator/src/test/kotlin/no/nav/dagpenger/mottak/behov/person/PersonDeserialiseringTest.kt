@@ -202,6 +202,61 @@ internal class PersonDeserialiseringTest {
             assertNull(it)
         }
     }
+
+    @Test
+    fun `logger warnings fra PDL`() {
+        @Language("JSON")
+        val json =
+            """
+            {
+                  "data": {
+                "hentPerson": {
+                  "navn": [
+                    {
+                      "fornavn": "Hi",
+                      "mellomnavn": null,
+                      "etternavn": "Bob"
+                    }
+                  ],
+                  "adressebeskyttelse": []
+                },
+                "hentGeografiskTilknytning": {
+                  "gtLand": null
+                },
+                "hentIdenter": {
+                  "identer": [
+                    {
+                      "ident": "123123123",
+                      "gruppe": "AKTORID"
+                    }
+                  ]
+                }
+              },
+              "extensions": {
+                "warnings": [
+                  {
+                    "query": "HentGeografiskTilknytning",
+                    "id": "tilgangsstyring",
+                    "code": "mangler_opplysninger_i_katalog",
+                    "message": "Behandling mangler opplysningstyper",
+                    "details": {
+                      "missing": [
+                        "GEOGRAFISK_TILKNYTNING_V1"
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+            """.trimIndent()
+        val warnings = getWarnings(json)
+        assertEquals(1, warnings.size)
+        assertEquals("Behandling mangler opplysningstyper", warnings.first().message)
+        assertEquals(
+            "QueryWarning(id=tilgangsstyring, code=mangler_opplysninger_i_katalog, message=Behandling mangler opplysningstyper, details=WarningDetails(missing=[GEOGRAFISK_TILKNYTNING_V1]))",
+            warnings.first().toString(),
+        )
+    }
 }
 
 @Language("JSON")
