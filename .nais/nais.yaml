@@ -70,7 +70,7 @@ spec:
         highAvailability: false
         diskSize: {{db_size}}
         diskAutoresize: true
-        autoBackupTime: "03:00"
+        autoBackupTime: 3
         databases:
           - name: mottak
             envVarPrefix: DB
