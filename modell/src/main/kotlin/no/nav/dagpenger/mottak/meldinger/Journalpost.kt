@@ -96,6 +96,8 @@ class Journalpost constructor(
 
     fun dokumenter() = dokumenter
 
+    fun erEttersending() = hovedskjema().startsWith("NAVe")
+
     fun hovedskjema() = dokumenter.hovedDokument().brevkode
 
     fun hovedDokument() = dokumenter.hovedDokument()
@@ -170,8 +172,8 @@ class Journalpost constructor(
             in setOf("NAV 04-16.03", "NAV 04-16.04") -> Gjenopptak(this)
             in setOf("NAV 04-06.05") -> Utdanning(this)
             in setOf("NAV 04-06.08") -> Etablering(this)
-            in setOf("NAV 90-00.08", "NAV 90-00.08 K") -> klageType(this)
-            in setOf("NAV 90-00.08 A") -> ankeType(this)
+            in setOf("NAV 90-00.08", "NAV 90-00.08 K", "NAVe 90-00.08 K") -> klageType(this)
+            in setOf("NAV 90-00.08 A", "NAVe 90-00.08 A") -> ankeType(this)
             in setOf("NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04") -> Ettersending(this)
             in setOf("GENERELL_INNSENDING") -> Generell(this)
             else -> UkjentSkjemaKode(this)

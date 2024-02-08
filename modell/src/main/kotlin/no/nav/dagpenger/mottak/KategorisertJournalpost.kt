@@ -212,13 +212,21 @@ data class Etablering(
 data class Klage(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String = "Klage\n"
+    override fun henvendelseNavn(): String =
+        when (journalpost.erEttersending()) {
+            true -> "Ettersending til klage\n"
+            false -> "Klage\n"
+        }
 }
 
 data class Anke(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String = "Anke\n"
+    override fun henvendelseNavn(): String =
+        when (journalpost.erEttersending()) {
+            true -> "Ettersending til anke\n"
+            false -> "Anke\n"
+        }
 
     override fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
