@@ -194,6 +194,15 @@ class OppgavebenkTest {
     }
 
     @Test
+    fun `Finner riktig benk for ettersending til klage når behandlingstema er forskudd`() {
+        val jp = lagjournalpostData(brevkode = "NAVe 90-00.08 K", behandlingstema = "ab0451").kategorisertJournalpost()
+        jp.oppgaveBenk(person = person, rutingOppslag = null, oppfyllerMinsteArbeidsinntekt = null).also {
+            assertEquals("4153", it.id)
+            assertEquals("Ettersending til klage - Forskudd\n", it.beskrivelse)
+        }
+    }
+
+    @Test
     fun `Finner riktig benk for anke når brevkode er klage `() {
         val jp = lagjournalpostData(brevkode = "NAV 90-00.08 K").kategorisertJournalpost()
         jp.oppgaveBenk(person = person, rutingOppslag = null, oppfyllerMinsteArbeidsinntekt = null).also {

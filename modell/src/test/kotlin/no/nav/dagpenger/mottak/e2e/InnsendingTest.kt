@@ -556,13 +556,14 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
     @ValueSource(
         strings = [
-            "ab0438",
-            "ab0451",
-            "ab0452",
+            "ab0438|4450",
+            "ab0451|4153",
+            "ab0452|4450",
         ],
     )
     @ParameterizedTest
-    fun `skal håndtere at informasjon om bruker ikke er funnet og skjema er klage`(behandlingstema: String) {
+    fun `skal håndtere at informasjon om bruker ikke er funnet og skjema er klage`(behandlingstemaOgEnhet: String) {
+        val (behandlingstema, forventetEnhet) = behandlingstemaOgEnhet.split("|")
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = behandlingstema)
         håndterPersonInformasjonIkkeFunnet()
@@ -584,7 +585,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
         assertFerdigstilt {
             assertNotNull(it.datoRegistrert)
-            assertEquals("4450", it.behandlendeEnhet)
+            assertEquals(forventetEnhet, it.behandlendeEnhet)
         }
     }
 

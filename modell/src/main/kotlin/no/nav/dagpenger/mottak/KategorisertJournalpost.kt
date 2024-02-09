@@ -245,14 +245,17 @@ data class Anke(
 data class KlageForskudd(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String = "Klage - Forskudd\n"
+    override fun henvendelseNavn(): String =
+        when (journalpost.erEttersending()) {
+            true -> "Ettersending til klage - Forskudd\n"
+            false -> "Klage - Forskudd\n"
+        }
 
     override fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?,
     ): OppgaveBenk {
-        if (person == null) return super.finnOppgaveBenk(rutingOppslag, oppfyllerMinsteArbeidsinntekt, person)
         return OppgaveBenk(
             beskrivelse = henvendelseNavn(),
             id = "4153",
