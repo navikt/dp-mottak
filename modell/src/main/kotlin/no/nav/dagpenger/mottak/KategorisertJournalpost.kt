@@ -212,13 +212,21 @@ data class Etablering(
 data class Klage(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String = "Klage\n"
+    override fun henvendelseNavn(): String =
+        when (journalpost.erEttersending()) {
+            true -> "Ettersending til klage\n"
+            false -> "Klage\n"
+        }
 }
 
 data class Anke(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String = "Anke\n"
+    override fun henvendelseNavn(): String =
+        when (journalpost.erEttersending()) {
+            true -> "Ettersending til anke\n"
+            false -> "Anke\n"
+        }
 
     override fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
@@ -237,14 +245,17 @@ data class Anke(
 data class KlageForskudd(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
-    override fun henvendelseNavn(): String = "Klage - Forskudd\n"
+    override fun henvendelseNavn(): String =
+        when (journalpost.erEttersending()) {
+            true -> "Ettersending til klage - Forskudd\n"
+            false -> "Klage - Forskudd\n"
+        }
 
     override fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
         oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?,
     ): OppgaveBenk {
-        if (person == null) return super.finnOppgaveBenk(rutingOppslag, oppfyllerMinsteArbeidsinntekt, person)
         return OppgaveBenk(
             beskrivelse = henvendelseNavn(),
             id = "4153",
