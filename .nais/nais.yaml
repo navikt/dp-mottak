@@ -48,6 +48,7 @@ spec:
       rules:
        - application: skjermede-personer-pip
          namespace: nom
+       - application: dp-regel-api
       external:
         - host: {{dp_proxy.ingress}}
         - host: {{pdl.ingress}}

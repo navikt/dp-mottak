@@ -11,8 +11,8 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import mu.KotlinLogging
-import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
-import no.nav.dagpenger.mottak.Config.dpProxyUrl
+import no.nav.dagpenger.mottak.Config.dpRegelApiTokenProvider
+import no.nav.dagpenger.mottak.Config.dpRegelApiUrl
 import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 import java.time.LocalDate
 
@@ -23,18 +23,18 @@ internal interface RegelApiClient {
     )
 }
 
-internal class RegelApiProxy(config: Configuration) : RegelApiClient {
+internal class RegelApiHttpClient(config: Configuration) : RegelApiClient {
     companion object {
         private val logger = KotlinLogging.logger {}
     }
 
-    private val tokenProvider = config.dpProxyTokenProvider
+    private val tokenProvider = config.dpRegelApiTokenProvider
 
-    private val proxyBehovClient =
+    private val behovClient =
         HttpClient {
             expectSuccess = true
             install(DefaultRequest) {
-                this.url("${config.dpProxyUrl()}/proxy/v1/regelapi/behov")
+                this.url("${config.dpRegelApiUrl()}/behov")
             }
         }
 
@@ -42,7 +42,7 @@ internal class RegelApiProxy(config: Configuration) : RegelApiClient {
         aktørId: String,
         journalpostId: String,
     ) {
-        proxyBehovClient.request {
+        behovClient.request {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
             contentType(ContentType.Application.Json)
             method = HttpMethod.Post

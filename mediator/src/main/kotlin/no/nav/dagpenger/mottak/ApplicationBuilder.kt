@@ -20,7 +20,7 @@ import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysProxyClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.OpprettGosysOppgaveLøser
 import no.nav.dagpenger.mottak.behov.vilkårtester.MinsteinntektVurderingLøser
-import no.nav.dagpenger.mottak.behov.vilkårtester.RegelApiProxy
+import no.nav.dagpenger.mottak.behov.vilkårtester.RegelApiHttpClient
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.MinsteinntektVurderingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
@@ -36,7 +36,7 @@ private val logg = KotlinLogging.logger {}
 internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.StatusListener {
     private val innsendingRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
     private val safClient = SafClient(Config.properties)
-    private val regelApiClient = RegelApiProxy(Config.properties)
+    private val regelApiClient = RegelApiHttpClient(Config.properties)
     private val arenaApiClient = ArenaApiClient(Config.properties)
     private val journalpostApiClient = JournalpostApiClient(tokenProvider = Config.properties.dokarkivTokenProvider)
     private val gosysProxyClient = GosysProxyClient(Config.properties)
