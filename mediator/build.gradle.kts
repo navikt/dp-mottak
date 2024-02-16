@@ -21,7 +21,7 @@ dependencies {
     implementation(libs.rapids.and.rivers)
 
     implementation(libs.bundles.postgres)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.8.0")
 
     implementation(libs.bundles.jackson)
 
