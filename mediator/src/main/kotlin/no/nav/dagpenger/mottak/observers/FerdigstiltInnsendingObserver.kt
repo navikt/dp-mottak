@@ -99,4 +99,5 @@ private fun InnsendingObserver.InnsendingEvent.toPayload() =
         aktørId?.let { set("aktørId", it) }
         fagsakId?.let { set("fagsakId", it) }
         søknadsData?.let { set("søknadsData", it) }
+        oppfyllerMinsteinntektArbeidsinntekt?.let { set("oppfyllerMinsteinntektArbeidsinntekt", it) }
     }
