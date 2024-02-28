@@ -66,6 +66,8 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
         private val arenaOppslag: ArenaOppslag,
         rapidsConnection: RapidsConnection,
     ) : River.PacketListener {
+        private val skipList = listOf("637583903", "637583904")
+
         companion object {
             private val logger = KotlinLogging.logger { }
         }
@@ -101,7 +103,7 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
             val journalpostId = packet["journalpostId"].asText()
             val behovId = packet["@behovId"].asText()
 
-            if (emptyList<String>().contains(journalpostId)) {
+            if (skipList.contains(journalpostId)) {
                 logger.warn { "SKipper $journalpostId" }
                 return
             }
