@@ -126,7 +126,9 @@ internal object Config {
     fun Configuration.skjermingApiUrl() = this[Key("SKJERMING_API_URL", stringType)]
 
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_HOST", stringType)].addHttprotocoll()
+
     fun Configuration.dpRegelApiUrl() = this[Key("DP_REGEL_API_URL", stringType)]
+
     fun Configuration.pdlApiUrl() = this[Key("PDL_API_HOST", stringType)].addHttprotocoll()
 
     fun asMap(): Map<String, String> =
