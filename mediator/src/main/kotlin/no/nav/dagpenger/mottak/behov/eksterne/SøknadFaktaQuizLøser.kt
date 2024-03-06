@@ -37,7 +37,7 @@ internal class SøknadFaktaQuizLøser(
 
     init {
         River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "faktum_svar") }
+            validate { it.demandAny("@event_name", listOf("faktum_svar", "behov")) }
             validate { it.demandAllOrAny("@behov", løserBehov) }
             validate { it.rejectKey("@løsning") }
             validate { it.requireKey("InnsendtSøknadsId") }
@@ -65,6 +65,7 @@ internal class SøknadFaktaQuizLøser(
                         when (behov) {
                             "ØnskerDagpengerFraDato" ->
                                 søknad.ønskerDagpengerFraDato()
+
                             "Verneplikt" -> søknad.avtjentVerneplikt()
                             "FangstOgFiske" -> søknad.fangstOgFisk()
                             "EØSArbeid" -> søknad.eøsArbeidsforhold()
