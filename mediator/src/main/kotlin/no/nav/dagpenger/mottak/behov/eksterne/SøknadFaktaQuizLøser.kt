@@ -40,7 +40,9 @@ internal class SøknadFaktaQuizLøser(
             validate { it.demandAny("@event_name", listOf("faktum_svar", "behov")) }
             validate { it.demandAllOrAny("@behov", løserBehov) }
             validate { it.rejectKey("@løsning") }
-            validate { it.requireKey("InnsendtSøknadsId") }
+            validate {
+                it.require("InnsendtSøknadsId") { innsendtSøknad -> innsendtSøknad["urn"].asText().let { urn -> URN.rfc8141().parse(urn).namespaceSpecificString().toString() } }
+            }
             validate { it.interestedIn("søknad_uuid", "@behovId") }
         }.register(this)
     }
