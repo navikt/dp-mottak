@@ -13,6 +13,8 @@ import java.util.Properties
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 
+private val sikkerlogg = KotlinLogging.logger("tjenestekall.FerdigstiltInnsendingObserver")
+
 internal class FerdigstiltInnsendingObserver internal constructor(private val producer: Producer<String, String>) :
     InnsendingObserver {
         constructor(producerProperties: Properties) : this(createProducer(producerProperties))
@@ -76,6 +78,7 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
             ).get(500, TimeUnit.MILLISECONDS)
 
             logger.info { "Send ${message["@event_name"].asText()} til Kafka for journalpostId=$key" }
+            sikkerlogg.info { "Sent ${message.toJson()}} til Kafka " }
         }
 
         private fun shutdownHook() {
