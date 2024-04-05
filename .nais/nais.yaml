@@ -47,6 +47,8 @@ spec:
       value: {{pdl.ingress}}
     - name: DOKARKIV_INGRESS
       value: {{dokarkiv.ingress}}
+  envFrom:
+    - secret: dp-mottak-unleash-api-token
   accessPolicy:
     outbound:
       rules:
@@ -57,6 +59,7 @@ spec:
         - host: {{dp_proxy.ingress}}
         - host: {{pdl.ingress}}
         - host: {{dokarkiv.ingress}}
+        - host: teamdagpenger-unleash-api.nav.cloud.nais.io
     inbound:
       rules:
         - application: dp-quiz-retting

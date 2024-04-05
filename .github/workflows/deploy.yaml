@@ -53,8 +53,8 @@ jobs:
       - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-gcp
-          RESOURCE: .nais/nais.yaml
-          VAR: image=${{ needs.build.outputs.image }}
+          RESOURCE: .nais/nais.yaml,.nais/unleash.yaml
+          VAR: image=${{ needs.build.outputs.image }},unleashEnvironment=development
           VARS: .nais/dev-vars.yaml
           PRINT_PAYLOAD: true
 
@@ -69,7 +69,7 @@ jobs:
       - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: prod-gcp
-          RESOURCE: .nais/nais.yaml
-          VAR: image=${{ needs.build.outputs.image }}
+          RESOURCE: .nais/nais.yaml,.nais/unleash.yaml
+          VAR: image=${{ needs.build.outputs.image }},unleashEnvironment=production
           VARS: .nais/prod-vars.yaml
           PRINT_PAYLOAD: true
