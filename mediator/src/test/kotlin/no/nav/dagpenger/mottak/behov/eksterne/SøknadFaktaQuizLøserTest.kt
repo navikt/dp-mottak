@@ -46,6 +46,10 @@ internal class SøknadFaktaQuizLøserTest {
             "HelseTilAlleTyperJobb:true",
             "VilligTilÅBytteYrke:true",
             "JobbetUtenforNorge:false",
+            "Ordinær:false",
+            "Lønnsgaranti:false",
+            "Permittert:false",
+            "PermittertFiskeforedling:false",
         ],
         delimiter = ':',
     )
