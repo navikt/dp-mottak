@@ -12,7 +12,7 @@ internal object PostgresDataSourceBuilder {
     const val DB_HOST_KEY = "DB_HOST"
     const val DB_PORT_KEY = "DB_PORT"
 
-    private fun getOrThrow(key: String): String = OptionHelper.getEnv(key) ?: OptionHelper.getSystemProperty(key)
+    private fun getOrThrow(key: String): String = OptionHelper.getEnv(key) ?: OptionHelper.getSystemProperty(key) ?: throw IllegalArgumentException("Missing required environment variable $key")
 
     val dataSource by lazy {
         HikariDataSource().apply {

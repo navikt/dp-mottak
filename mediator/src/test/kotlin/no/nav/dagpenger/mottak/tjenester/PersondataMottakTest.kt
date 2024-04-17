@@ -63,6 +63,7 @@ class PersondataMottakTest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "Persondata"
@@ -87,6 +88,7 @@ class PersondataMottakTest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "Persondata"

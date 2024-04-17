@@ -40,6 +40,7 @@ internal class JournalpostMottakTest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@opprettet": "2021-05-07T14:19:03.105592",
           "@id": "ac432da1-2914-43cc-a92f-791da0544c49",
           "@behov": [

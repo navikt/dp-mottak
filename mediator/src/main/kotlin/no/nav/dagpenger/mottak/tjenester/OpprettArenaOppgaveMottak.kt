@@ -23,6 +23,7 @@ internal class OpprettArenaOppgaveMottak(
     init {
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
+            validate { it.requireValue("@final", true) }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
             validate {
                 it.demandAllOrAny(

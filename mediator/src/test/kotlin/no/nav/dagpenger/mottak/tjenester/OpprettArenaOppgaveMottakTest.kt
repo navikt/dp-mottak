@@ -42,6 +42,7 @@ internal class OpprettArenaOppgaveMottakTest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "$behov"
@@ -61,6 +62,7 @@ internal class OpprettArenaOppgaveMottakTest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "$behov"
