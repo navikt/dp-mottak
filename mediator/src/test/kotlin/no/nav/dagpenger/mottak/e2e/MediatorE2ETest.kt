@@ -5,6 +5,7 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
+import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -19,21 +20,8 @@ internal class MediatorE2ETest {
     var journalpostId: Long = 0L
 
     private val testRapid = TestRapid()
-    private val innsendingRepository =
-        InnsendingPostgresRepository(datasource = PostgresDataSourceBuilder.dataSource).also {
-            PostgresDataSourceBuilder.runMigration()
-        }
-    private val testObservatør = TestObservatør()
-    private val innsendingMediator =
-        InnsendingMediator(
-            innsendingRepository = innsendingRepository,
-            rapidsConnection = testRapid,
-            observatører = listOf(testObservatør),
-        )
 
-    init {
-        MottakMediator(innsendingMediator, testRapid)
-    }
+    private val testObservatør = TestObservatør()
 
     @BeforeEach
     fun setup() {
@@ -43,121 +31,155 @@ internal class MediatorE2ETest {
 
     @Test
     fun `Skal motta hendelser om ny søknad og sende ut behov`() {
-        håndterHendelse(joarkMelding())
-        assertBehov("Journalpost", 0)
-        håndterHendelse(journalpostMottattHendelse(brevkode = "NAV 04-01.03"))
-        assertBehov("Persondata", 1)
-        håndterHendelse(persondataMottattHendelse())
-        assertBehov("Søknadsdata", 2)
-        håndterHendelse(søknadsdataMottakHendelse())
-        assertBehov("MinsteinntektVurdering", 3)
-        håndterHendelse(minsteinntektVurderingMotattHendelse())
-        assertBehov("EksisterendeSaker", 4)
-        håndterHendelse(eksisterendeSakerMotattHendelse())
-        assertBehov("OpprettStartVedtakOppgave", 5)
-        håndterHendelse(opprettStartVedtakMotattHendelse())
-        assertBehov("OppdaterJournalpost", 6)
-        håndterHendelse(oppdatertJournalpostMotattHendelse())
-        assertBehov("FerdigstillJournalpost", 7)
-        håndterHendelse(ferdigstiltJournalpostMotattHendelse())
-        assertTrue(
-            testRapid.inspektør.size == 8,
-            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
-        )
-        assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        withMigratedDb {
+            settOppInfrastruktur()
+
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = "NAV 04-01.03"))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("Søknadsdata", 2)
+            håndterHendelse(søknadsdataMottakHendelse())
+            assertBehov("MinsteinntektVurdering", 3)
+            håndterHendelse(minsteinntektVurderingMotattHendelse())
+            assertBehov("EksisterendeSaker", 4)
+            håndterHendelse(eksisterendeSakerMotattHendelse())
+            assertBehov("OpprettStartVedtakOppgave", 5)
+            håndterHendelse(opprettStartVedtakMotattHendelse())
+            assertBehov("OppdaterJournalpost", 6)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertBehov("FerdigstillJournalpost", 7)
+            håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+            assertTrue(
+                testRapid.inspektør.size == 8,
+                "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
+            )
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        }
     }
 
     @Test
     fun `Skal motta hendelser om gjennopptak og sende ut behov`() {
-        håndterHendelse(joarkMelding())
-        assertBehov("Journalpost", 0)
-        håndterHendelse(journalpostMottattHendelse(brevkode = "NAV 04-16.03"))
-        assertBehov("Persondata", 1)
-        håndterHendelse(persondataMottattHendelse())
-        assertBehov("Søknadsdata", 2)
-        håndterHendelse(søknadsdataMottakHendelse())
-        assertBehov("OpprettVurderhenvendelseOppgave", 3)
-        håndterHendelse(opprettOpprettVurderhenvendelseHendelse())
-        assertBehov("OppdaterJournalpost", 4)
-        håndterHendelse(oppdatertJournalpostMotattHendelse())
-        assertBehov("FerdigstillJournalpost", 5)
-        håndterHendelse(ferdigstiltJournalpostMotattHendelse())
-        assertTrue(
-            testRapid.inspektør.size == 6,
-            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
-        )
-        assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        withMigratedDb {
+            settOppInfrastruktur()
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = "NAV 04-16.03"))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("Søknadsdata", 2)
+            håndterHendelse(søknadsdataMottakHendelse())
+            assertBehov("OpprettVurderhenvendelseOppgave", 3)
+            håndterHendelse(opprettOpprettVurderhenvendelseHendelse())
+            assertBehov("OppdaterJournalpost", 4)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertBehov("FerdigstillJournalpost", 5)
+            håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+            assertTrue(
+                testRapid.inspektør.size == 6,
+                "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
+            )
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        }
     }
 
     @Test
     fun `Skal motta hendelser om ny søknad der en ikke kan opprette oppgave i Arena`() {
-        håndterHendelse(joarkMelding())
-        assertBehov("Journalpost", 0)
-        håndterHendelse(journalpostMottattHendelse(brevkode = "NAV 04-01.03"))
-        assertBehov("Persondata", 1)
-        håndterHendelse(persondataMottattHendelse())
-        assertBehov("Søknadsdata", 2)
-        håndterHendelse(søknadsdataMottakHendelse())
-        assertBehov("MinsteinntektVurdering", 3)
-        håndterHendelse(minsteinntektVurderingMotattHendelse())
-        assertBehov("EksisterendeSaker", 4)
-        håndterHendelse(eksisterendeSakerMotattHendelse())
-        assertBehov("OpprettStartVedtakOppgave", 5)
-        håndterHendelse(opprettArenaOppgaveFeilet())
-        assertBehov("OpprettGosysoppgave", 6)
-        håndterHendelse(gosysOppgaveOpprettetHendelse())
-        assertBehov("OppdaterJournalpost", 7)
-        håndterHendelse(oppdatertJournalpostMotattHendelse())
-        assertTrue(
-            testRapid.inspektør.size == 8,
-            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
-        )
-        assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        withMigratedDb {
+            settOppInfrastruktur()
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = "NAV 04-01.03"))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("Søknadsdata", 2)
+            håndterHendelse(søknadsdataMottakHendelse())
+            assertBehov("MinsteinntektVurdering", 3)
+            håndterHendelse(minsteinntektVurderingMotattHendelse())
+            assertBehov("EksisterendeSaker", 4)
+            håndterHendelse(eksisterendeSakerMotattHendelse())
+            assertBehov("OpprettStartVedtakOppgave", 5)
+            håndterHendelse(opprettArenaOppgaveFeilet())
+            assertBehov("OpprettGosysoppgave", 6)
+            håndterHendelse(gosysOppgaveOpprettetHendelse())
+            assertBehov("OppdaterJournalpost", 7)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertTrue(
+                testRapid.inspektør.size == 8,
+                "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
+            )
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        }
     }
 
     @Test
     fun `Skal motta hendelser som fører til manuell behandling og sende ut behov`() {
-        håndterHendelse(joarkMelding())
-        assertBehov("Journalpost", 0)
-        håndterHendelse(journalpostMottattHendelse(brevkode = "ukjent"))
-        assertBehov("Persondata", 1)
-        håndterHendelse(persondataMottattHendelse())
-        assertBehov("OpprettGosysoppgave", 2)
-        håndterHendelse(gosysOppgaveOpprettetHendelse())
-        assertBehov("OppdaterJournalpost", 3)
-        håndterHendelse(oppdatertJournalpostMotattHendelse())
+        withMigratedDb {
+            settOppInfrastruktur()
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = "ukjent"))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("OpprettGosysoppgave", 2)
+            håndterHendelse(gosysOppgaveOpprettetHendelse())
+            assertBehov("OppdaterJournalpost", 3)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
 
-        assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        }
     }
 
     @Test
     fun `Skal motta hendelser som allerede er behandlet`() {
-        håndterHendelse(joarkMelding())
-        assertBehov("Journalpost", 0)
-        håndterHendelse(journalpostMottattHendelse(brevkode = "ukjent", journalstatus = "JOURNALFOERT"))
-        assertEquals(InnsendingTilstandType.AlleredeBehandletType, testObservatør.tilstander.last())
+        withMigratedDb {
+            settOppInfrastruktur()
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = "ukjent", journalstatus = "JOURNALFOERT"))
+            assertEquals(InnsendingTilstandType.AlleredeBehandletType, testObservatør.tilstander.last())
+        }
     }
 
     @Test
     fun `Skal motta generell henvendelse`() {
-        håndterHendelse(joarkMelding())
-        assertBehov("Journalpost", 0)
-        håndterHendelse(journalpostMottattHendelse(brevkode = "GENERELL_INNSENDING"))
-        assertBehov("Persondata", 1)
-        håndterHendelse(persondataMottattHendelse())
-        assertBehov("Søknadsdata", 2)
-        håndterHendelse(søknadsdataMottakHendelse())
-        assertBehov("OpprettVurderhenvendelseOppgave", 3)
-        håndterHendelse(opprettOpprettVurderhenvendelseHendelse())
-        assertBehov("OppdaterJournalpost", 4)
-        håndterHendelse(oppdatertJournalpostMotattHendelse())
-        assertBehov("FerdigstillJournalpost", 5)
-        håndterHendelse(ferdigstiltJournalpostMotattHendelse())
-        assertTrue(
-            testRapid.inspektør.size == 6,
-            "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
-        )
-        assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        withMigratedDb {
+            settOppInfrastruktur()
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = "GENERELL_INNSENDING"))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("Søknadsdata", 2)
+            håndterHendelse(søknadsdataMottakHendelse())
+            assertBehov("OpprettVurderhenvendelseOppgave", 3)
+            håndterHendelse(opprettOpprettVurderhenvendelseHendelse())
+            assertBehov("OppdaterJournalpost", 4)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertBehov("FerdigstillJournalpost", 5)
+            håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+            assertTrue(
+                testRapid.inspektør.size == 6,
+                "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
+            )
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        }
+    }
+
+    private fun settOppInfrastruktur() {
+        val innsendingRepository =
+            InnsendingPostgresRepository(datasource = PostgresDataSourceBuilder.dataSource).also {
+                PostgresDataSourceBuilder.runMigration()
+            }
+        val innsendingMediator =
+            InnsendingMediator(
+                innsendingRepository = innsendingRepository,
+                rapidsConnection = testRapid,
+                observatører = listOf(testObservatør),
+            )
+
+        MottakMediator(innsendingMediator, testRapid)
     }
 
     private fun assertBehov(
@@ -183,6 +205,7 @@ internal class MediatorE2ETest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "Journalpost"
@@ -228,6 +251,7 @@ internal class MediatorE2ETest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "Persondata"
@@ -267,6 +291,7 @@ internal class MediatorE2ETest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "Søknadsdata"
@@ -289,6 +314,7 @@ internal class MediatorE2ETest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "MinsteinntektVurdering"
@@ -308,6 +334,7 @@ internal class MediatorE2ETest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "MinsteinntektVurdering"
@@ -327,6 +354,7 @@ internal class MediatorE2ETest {
         """
         {
                   "@event_name": "behov",
+                  "@final": true,
                   "@id": "${UUID.randomUUID()}",
                   "@behov": [
                     "OpprettStartVedtakOppgave"
@@ -346,6 +374,7 @@ internal class MediatorE2ETest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "OpprettStartVedtakOppgave"
@@ -366,6 +395,7 @@ internal class MediatorE2ETest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "OpprettVurderhenvendelseOppgave"
@@ -386,6 +416,7 @@ internal class MediatorE2ETest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "OppdaterJournalpost"
@@ -405,6 +436,7 @@ internal class MediatorE2ETest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "FerdigstillJournalpost"
@@ -424,6 +456,7 @@ internal class MediatorE2ETest {
         """
         {
           "@event_name": "behov",
+          "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
             "OpprettGosysoppgave"

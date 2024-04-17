@@ -24,6 +24,7 @@ internal class SøknadsdataMottak(
     init {
         River(rapidsConnection).apply {
             validate { it.requireValue("@event_name", "behov") }
+            validate { it.requireValue("@final", true) }
             validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
             validate { it.requireKey(løsning) }
             validate { it.requireKey("journalpostId") }
