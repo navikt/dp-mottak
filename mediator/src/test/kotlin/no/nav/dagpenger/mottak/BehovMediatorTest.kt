@@ -71,6 +71,24 @@ internal class BehovMediatorTest {
     }
 
     @Test
+    fun `Legger på @final på pakker som bare har ett behov`() {
+        val hendelse = TestHendelse("Hendelse1", aktivitetslogg.barn())
+        hendelse.kontekst(innsending)
+
+        hendelse.behov(
+            Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata,
+            "Trenger personopplysninger",
+            mapOf(
+                "aktørId" to "12344",
+            ),
+        )
+        behovMediator.håndter(hendelse)
+        testRapid.inspektør.message(0).also {
+            assertEquals(true, it["@final"].asBoolean())
+        }
+    }
+
+    @Test
     internal fun `sjekker etter duplikatverdier`() {
         val hendelse = TestHendelse("Hendelse1", aktivitetslogg.barn())
         hendelse.kontekst(innsending)
@@ -100,12 +118,6 @@ internal class BehovMediatorTest {
         hendelse.behov(EksisterendeSaker, "Trenger EksisterendeSaker")
 
         assertThrows<IllegalArgumentException> { behovMediator.håndter(hendelse) }
-    }
-
-    private class Testkontekst(
-        private val melding: String,
-    ) : Aktivitetskontekst {
-        override fun toSpesifikkKontekst() = SpesifikkKontekst(melding, mapOf(melding to melding))
     }
 
     private class TestHendelse(

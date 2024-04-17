@@ -11,6 +11,10 @@ class BehovMediator(
     private val rapidsConnection: RapidsConnection,
     private val sikkerLogg: KLogger,
 ) {
+    private companion object {
+        val logger = KotlinLogging.logger { }
+    }
+
     internal fun håndter(hendelse: Hendelse) {
         hendelse.kontekster().forEach { if (!it.hasErrors()) håndter(hendelse, it.behov()) }
     }
@@ -19,27 +23,34 @@ class BehovMediator(
         hendelse: Hendelse,
         behov: List<Aktivitetslogg.Aktivitet.Behov>,
     ) {
-        behov.groupBy { it.kontekst() }.forEach { (kontekst, behov) ->
-            val behovsliste = mutableListOf<String>()
-
-            mutableMapOf<String, Any>().apply {
-                putAll(kontekst)
-                behov.forEach { behov ->
-                    require(behov.type.name !in behovsliste) { "Kan ikke produsere samme behov ${behov.type.name} på samme kontekst" }
-                    require(
-                        behov.detaljer().filterKeys { this.containsKey(it) && this[it] != behov.detaljer()[it] }
-                            .isEmpty(),
-                    ) { "Kan ikke produsere behov med duplikate detaljer" }
-                    behovsliste.add(behov.type.name)
-                    putAll(behov.detaljer())
-                }
+        behov
+            .groupBy { it.kontekst() }
+            .onEach { (_, behovMap) ->
+                require(
+                    behovMap.size ==
+                        behovMap.map { it.type.name }
+                            .toSet().size,
+                ) { "Kan ikke produsere samme behov på samme kontekst" }
             }
-                .let { JsonMessage.newNeed(behovsliste, it) }
-                .also { message ->
-                    sikkerLogg.info { "Sender behov for ${hendelse.journalpostId()} ${message.toJson()}" }
-                    rapidsConnection.publish(hendelse.journalpostId(), message.toJson())
-                    logg.info { "Sender behov ${behovsliste.joinToString { it }}" }
-                }
-        }
+            .forEach { (kontekst, behov) ->
+                val behovMap: Map<String, Map<String, Any>> =
+                    behov.associate { enkeltBehov -> enkeltBehov.type.name to enkeltBehov.detaljer() }
+                val behovParametere =
+                    behovMap.values.fold<Map<String, Any>, Map<String, Any>>(emptyMap()) { acc, map -> acc + map }
+                val final = erFinal(behovMap.size)
+                (kontekst + behovMap + behovParametere).let { JsonMessage.newNeed(behovMap.keys, it + final) }
+                    .also { message ->
+                        sikkerLogg.info("sender behov for {}:\n{}", behovMap.keys, message.toJson())
+                        rapidsConnection.publish(hendelse.journalpostId(), message.toJson())
+                        logger.info("Sender behov for {}", behovMap.keys)
+                    }
+            }
     }
+
+    private fun erFinal(antallBehov: Int) =
+        if (antallBehov == 1) {
+            mapOf("@final" to true)
+        } else {
+            emptyMap()
+        }
 }
