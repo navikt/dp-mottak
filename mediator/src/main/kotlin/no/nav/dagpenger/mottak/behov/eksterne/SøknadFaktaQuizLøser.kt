@@ -33,6 +33,10 @@ internal class SøknadFaktaQuizLøser(
             "VilligTilÅBytteYrke",
             "FortsattRettKorona",
             "JobbetUtenforNorge",
+            "Lønnsgaranti",
+            "PermittertFiskeforedling",
+            "Permittert",
+            "Ordinær",
         )
 
     init {
@@ -65,9 +69,7 @@ internal class SøknadFaktaQuizLøser(
                         val avsluttedeArbeidsforhold = søknad.avsluttetArbeidsforhold()
                         val reellArbeidsSøker = søknad.reellArbeidsSøker()
                         when (behov) {
-                            "ØnskerDagpengerFraDato" ->
-                                søknad.ønskerDagpengerFraDato()
-
+                            "ØnskerDagpengerFraDato" -> søknad.ønskerDagpengerFraDato()
                             "Verneplikt" -> søknad.avtjentVerneplikt()
                             "FangstOgFiske" -> søknad.fangstOgFisk()
                             "EØSArbeid" -> søknad.eøsArbeidsforhold()
@@ -77,6 +79,10 @@ internal class SøknadFaktaQuizLøser(
                             "HelseTilAlleTyperJobb" -> reellArbeidsSøker.helse
                             "VilligTilÅBytteYrke" -> reellArbeidsSøker.yrke
                             "JobbetUtenforNorge" -> jobbetUtenforNorge(avsluttedeArbeidsforhold)
+                            "Lønnsgaranti" -> avsluttedeArbeidsforhold.any { it.erLønnsgaranti() }
+                            "PermittertFiskeforedling" -> avsluttedeArbeidsforhold.any { it.erPermittertFiskeforedling() }
+                            "Permittert" -> avsluttedeArbeidsforhold.any { it.erPermittert() }
+                            "Ordinær" -> avsluttedeArbeidsforhold.any { it.erOrdinær() }
                             else -> throw IllegalArgumentException("Ukjent behov $behov")
                         }
                     }
@@ -101,16 +107,23 @@ internal fun jobbetUtenforNorge(avsluttedeArbeidsforhold: List<AvsluttetArbeidsf
 internal fun rettighetstypeUtregning(avsluttedeArbeidsforhold: List<AvsluttetArbeidsforhold>): List<Map<String, Boolean>> =
     avsluttedeArbeidsforhold.map {
         mapOf(
-            "Lønnsgaranti" to (it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS),
-            "PermittertFiskeforedling" to (it.fiskeforedling),
-            "Permittert" to (it.sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT && !it.fiskeforedling),
-            "Ordinær" to (
-                it.sluttårsak != AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT &&
-                    it.sluttårsak != AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS &&
-                    !it.fiskeforedling
-            ),
+            "Lønnsgaranti" to it.erLønnsgaranti(),
+            "PermittertFiskeforedling" to it.erPermittertFiskeforedling(),
+            "Permittert" to it.erPermittert(),
+            "Ordinær" to it.erOrdinær(),
         )
     }
+
+private fun AvsluttetArbeidsforhold.erOrdinær() =
+    sluttårsak != AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT &&
+        sluttårsak != AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS &&
+        !fiskeforedling
+
+private fun AvsluttetArbeidsforhold.erPermittert() = sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.PERMITTERT && !fiskeforedling
+
+private fun AvsluttetArbeidsforhold.erPermittertFiskeforedling() = fiskeforedling
+
+private fun AvsluttetArbeidsforhold.erLønnsgaranti() = sluttårsak == AvsluttetArbeidsforhold.Sluttårsak.ARBEIDSGIVER_KONKURS
 
 private fun JsonMessage.getInnsendtSøknadsId(): String {
     return this["InnsendtSøknadsId"]["urn"]
