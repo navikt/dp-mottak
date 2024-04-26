@@ -76,11 +76,6 @@ internal object Config {
             cachedTokenProvider.clientCredentials(properties[Key("DP_PROXY_SCOPE", stringType)]).accessToken
         }
     }
-    val Configuration.dpRegelApiTokenProvider: () -> String by lazy {
-        {
-            cachedTokenProvider.clientCredentials(properties[Key("DP_REGEL_API_SCOPE", stringType)]).accessToken
-        }
-    }
 
     val Configuration.pdlApiTokenProvider: () -> String by lazy {
         {
