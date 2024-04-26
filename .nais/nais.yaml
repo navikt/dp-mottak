@@ -56,7 +56,7 @@ spec:
       rules:
        - application: skjermede-personer-pip
          namespace: nom
-       - application: {{ oppgave.app }}
+       - application: {{ oppgave.ingress }}
          namespace: oppgavehandtering
       external:
         - host: {{dp_proxy.ingress}}
