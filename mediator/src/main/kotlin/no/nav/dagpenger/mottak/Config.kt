@@ -94,6 +94,12 @@ internal object Config {
         }
     }
 
+    val Configuration.dpGosysTokenProvider: () -> String by lazy {
+        {
+            cachedTokenProvider.clientCredentials(properties[Key("GOSYS_SCOPE", stringType)]).accessToken
+        }
+    }
+
     val kafkaProducerProperties: Properties by lazy {
         Properties().apply {
             put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, properties[Key("KAFKA_BROKERS", stringType)])
@@ -120,6 +126,8 @@ internal object Config {
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_HOST", stringType)].addHttprotocoll()
 
     fun Configuration.pdlApiUrl() = this[Key("PDL_API_HOST", stringType)].addHttprotocoll()
+
+    fun Configuration.gosysUrl(): String = TODO()
 
     fun asMap(): Map<String, String> =
         properties.list().reversed().fold(emptyMap()) { map, pair ->

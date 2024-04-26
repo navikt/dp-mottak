@@ -17,8 +17,8 @@ import no.nav.dagpenger.mottak.behov.person.SkjermingOppslag
 import no.nav.dagpenger.mottak.behov.person.createPersonOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaApiClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
-import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysProxyClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.OpprettGosysOppgaveLøser
+import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.UnleashGosysClient
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
 import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
@@ -35,7 +35,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val safClient = SafClient(Config.properties)
     private val arenaApiClient = ArenaApiClient(Config.properties)
     private val journalpostApiClient = JournalpostApiClient(tokenProvider = Config.properties.dokarkivTokenProvider)
-    private val gosysProxyClient = GosysProxyClient(Config.properties)
+    private val gosysOppslag = UnleashGosysClient(Config.properties)
     private val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(Config.kafkaProducerProperties)
 
     private val rapidsConnection =
@@ -75,7 +75,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
                 )
                 SøknadsdataBehovLøser(safClient, this)
                 ArenaBehovLøser(arenaApiClient, this)
-                OpprettGosysOppgaveLøser(gosysProxyClient, this)
+                OpprettGosysOppgaveLøser(gosysOppslag, this)
 
                 // Eksterne behovløsere
                 SøknadFaktaQuizLøser(PostgresSøknadQuizOppslag(PostgresDataSourceBuilder.dataSource), this)

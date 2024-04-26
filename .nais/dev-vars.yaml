@@ -13,3 +13,7 @@ pdl:
   ingress: pdl-api.dev-fss-pub.nais.io
 dokarkiv:
   ingress: dokarkiv.dev-fss-pub.nais.io
+oppgave:
+  ingress: oppgave-q1
+  scope: api://dev-fss.oppgavehandtering.oppgave-q1/.default
+
