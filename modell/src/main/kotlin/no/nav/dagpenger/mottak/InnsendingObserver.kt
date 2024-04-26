@@ -38,7 +38,6 @@ interface InnsendingObserver {
         val datoRegistrert: LocalDateTime,
         val søknadsData: JsonNode?,
         val behandlendeEnhet: String,
-        val oppfyllerMinsteinntektArbeidsinntekt: Boolean?,
         val tittel: String,
     )
 

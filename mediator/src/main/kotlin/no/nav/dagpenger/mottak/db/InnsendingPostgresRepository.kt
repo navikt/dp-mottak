@@ -40,8 +40,6 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                journalpost.registrertdato                as "registrertdato",
                arenasak.fagsakid                         as "fagsakId",
                arenasak.oppgaveId                        as "oppgaveId",
-               innsending_eksisterende_arena_saker.verdi as "harEksisterendeSaker",
-               innsending_oppfyller_minsteinntekt.verdi  as "oppfyllerMinsteArbeidsinntekt",
                soknad.data                               as "søknadsData",
                person_innsending.navn                    as "navn",
                person_innsending.diskresjonskode         as "diskresjonsKode",
@@ -54,10 +52,6 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                  left join journalpost_v1 journalpost on innsending.id = journalpost.id
                  left join aktivitetslogg_v1 aktivitetslogg on innsending.id = aktivitetslogg.id
                  left join arenasak_v1 arenasak on innsending.id = arenasak.id
-                 left join innsending_eksisterende_arena_saker_v1 innsending_eksisterende_arena_saker
-                           on innsending.id = innsending_eksisterende_arena_saker.id
-                 left join innsending_oppfyller_minsteinntekt_v1 innsending_oppfyller_minsteinntekt
-                           on innsending.id = innsending_oppfyller_minsteinntekt.id
                  left join soknad_v1 soknad on innsending.id = soknad.id
                  left join person_innsending_v1 person_innsending on innsending.id = person_innsending.id
                  left join person_v1 person on person_innsending.personid = person.id
@@ -91,8 +85,6 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                                     dokumenter = listOf(),
                                 )
                             },
-                        oppfyllerMinsteArbeidsinntekt = row.booleanOrNull("oppfyllerMinsteArbeidsinntekt"),
-                        eksisterendeSaker = row.booleanOrNull("harEksisterendeSaker"),
                         personData =
                             row.stringOrNull("ident")?.let {
                                 InnsendingData.PersonData(
@@ -252,36 +244,6 @@ internal class InnsendingPostgresRepository(private val datasource: DataSource =
                     ),
                 ),
             )
-        }
-
-        override fun visitInnsending(
-            oppfyllerMinsteArbeidsinntekt: Boolean?,
-            eksisterendeSaker: Boolean?,
-        ) {
-            oppfyllerMinsteArbeidsinntekt?.let {
-                lagreQueries.add(
-                    queryOf(
-                        //language=PostgreSQL
-                        "INSERT INTO innsending_oppfyller_minsteinntekt_v1(id,verdi) VALUES (:id, :verdi) ON CONFLICT DO NOTHING ",
-                        mapOf(
-                            "id" to internId,
-                            "verdi" to it,
-                        ),
-                    ),
-                )
-            }
-            eksisterendeSaker?.let {
-                lagreQueries.add(
-                    queryOf(
-                        //language=PostgreSQL
-                        "INSERT INTO innsending_eksisterende_arena_saker_v1(id,verdi) VALUES (:id, :verdi) ON CONFLICT DO NOTHING ",
-                        mapOf(
-                            "id" to internId,
-                            "verdi" to it,
-                        ),
-                    ),
-                )
-            }
         }
 
         override fun visitJournalpost(

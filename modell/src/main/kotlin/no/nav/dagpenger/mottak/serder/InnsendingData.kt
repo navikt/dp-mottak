@@ -15,8 +15,6 @@ data class InnsendingData(
     val journalpostId: String,
     val tilstand: TilstandData,
     val journalpostData: JournalpostData?,
-    val oppfyllerMinsteArbeidsinntekt: Boolean?,
-    val eksisterendeSaker: Boolean?,
     val personData: PersonData?,
     val arenaSakData: ArenaSakData?,
     val søknadsData: JsonNode?,
@@ -47,8 +45,6 @@ data class InnsendingData(
                     )
                 },
                 søknadsData?.let { rutingOppslag(it) },
-                oppfyllerMinsteArbeidsinntekt,
-                eksisterendeSaker,
                 personData?.let {
                     PersonInformasjon.Person(
                         it.navn,
@@ -75,8 +71,8 @@ data class InnsendingData(
                 InnsendingTilstandTypeData.AvventerPersondataType -> Innsending.AvventerPersondata
                 InnsendingTilstandTypeData.KategoriseringType -> Innsending.Kategorisering
                 InnsendingTilstandTypeData.AvventerSøknadsdataType -> Innsending.AvventerSøknadsdata
-                InnsendingTilstandTypeData.AvventerMinsteinntektVurderingType -> Innsending.AventerMinsteinntektVurdering
-                InnsendingTilstandTypeData.AvventerSvarOmEksisterendeSakerType -> Innsending.AvventerSvarOmEksisterendeSaker
+                InnsendingTilstandTypeData.AvventerMinsteinntektVurderingType -> Innsending.AventerArenaStartVedtak
+                InnsendingTilstandTypeData.AvventerSvarOmEksisterendeSakerType -> Innsending.AventerArenaStartVedtak
                 InnsendingTilstandTypeData.AventerArenaStartVedtakType -> Innsending.AventerArenaStartVedtak
                 InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType -> Innsending.AventerFerdigstill
                 InnsendingTilstandTypeData.InnsendingFerdigstiltType -> Innsending.InnsendingFerdigStilt

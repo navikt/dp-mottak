@@ -107,7 +107,6 @@ internal class FerdigstiltInnsendingObserverTest {
                     it.put("test", "test")
                 },
             behandlendeEnhet = "Tadda",
-            oppfyllerMinsteinntektArbeidsinntekt = false,
             tittel = "Tittel",
         )
 }

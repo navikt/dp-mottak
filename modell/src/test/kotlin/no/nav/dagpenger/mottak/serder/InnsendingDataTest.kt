@@ -48,8 +48,6 @@ internal class InnsendingDataTest {
                         registertDato = registrertdato,
                         dokumenter = dokumenter,
                     ),
-                oppfyllerMinsteArbeidsinntekt = true,
-                eksisterendeSaker = false,
                 personData =
                     PersonData(
                         navn = "Hubba Bubba",

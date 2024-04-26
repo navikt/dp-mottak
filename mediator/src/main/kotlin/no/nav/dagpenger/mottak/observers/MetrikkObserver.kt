@@ -13,9 +13,6 @@ internal class MetrikkObserver : InnsendingObserver {
 
     override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
         Metrics.jpFerdigStillInc(event.type.name, event.skjemaKode, event.behandlendeEnhet)
-        event.oppfyllerMinsteinntektArbeidsinntekt?.let {
-            Metrics.oppfyllerMinsteinntektArbeidsinntekt(it)
-        }
     }
 }
 

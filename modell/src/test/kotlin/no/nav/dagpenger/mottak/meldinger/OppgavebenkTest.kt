@@ -154,26 +154,6 @@ class OppgavebenkTest {
     }
 
     @Test
-    fun `Finn riktig oppgave beskrivelse og benk ved når en IKKE oppfyller minsteinntekt ved ordinær`() {
-        withSøknad {
-            val oppgaveBenk = jp.oppgaveBenk(person = person, rutingOppslag = it, oppfyllerMinsteArbeidsinntekt = false)
-            assertEquals("Minsteinntekt - mulig avslag\n", oppgaveBenk.beskrivelse)
-            assertEquals("4450", oppgaveBenk.id)
-        }
-    }
-
-    @Test
-    fun `Finn riktig oppgave beskrivelse og benk ved oppfyller minsteinntekt ved permittering   `() {
-        withSøknad {
-            val oppgaveBenk =
-                lagjournalpostData("NAV 04-01.04").kategorisertJournalpost()
-                    .oppgaveBenk(person = person, rutingOppslag = it, oppfyllerMinsteArbeidsinntekt = false)
-            assertEquals("Minsteinntekt - mulig avslag\n", oppgaveBenk.beskrivelse)
-            assertEquals("4450", oppgaveBenk.id)
-        }
-    }
-
-    @Test
     fun `Finn riktig oppgave beskrivelse og person ikke har norsk tilknytning ved permittering`() {
         withSøknad {
             val oppgaveBenk =
@@ -187,7 +167,7 @@ class OppgavebenkTest {
     @Test
     fun `Finner riktig benk for klage når behandlingstema er forskudd`() {
         val jp = lagjournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0451").kategorisertJournalpost()
-        jp.oppgaveBenk(person = person, rutingOppslag = null, oppfyllerMinsteArbeidsinntekt = null).also {
+        jp.oppgaveBenk(person = person, rutingOppslag = null).also {
             assertEquals("Klage - Forskudd\n", it.beskrivelse)
             assertEquals("4153", it.id)
         }
@@ -196,7 +176,7 @@ class OppgavebenkTest {
     @Test
     fun `Finner riktig benk for ettersending til klage når behandlingstema er forskudd`() {
         val jp = lagjournalpostData(brevkode = "NAVe 90-00.08 K", behandlingstema = "ab0451").kategorisertJournalpost()
-        jp.oppgaveBenk(person = person, rutingOppslag = null, oppfyllerMinsteArbeidsinntekt = null).also {
+        jp.oppgaveBenk(person = person, rutingOppslag = null).also {
             assertEquals("4153", it.id)
             assertEquals("Ettersending til klage - Forskudd\n", it.beskrivelse)
         }
@@ -205,7 +185,7 @@ class OppgavebenkTest {
     @Test
     fun `Finner riktig benk for anke når brevkode er klage `() {
         val jp = lagjournalpostData(brevkode = "NAV 90-00.08 K").kategorisertJournalpost()
-        jp.oppgaveBenk(person = person, rutingOppslag = null, oppfyllerMinsteArbeidsinntekt = null).also {
+        jp.oppgaveBenk(person = person, rutingOppslag = null).also {
             assertEquals("Klage\n", it.beskrivelse)
             assertEquals("4450", it.id)
         }
@@ -214,7 +194,7 @@ class OppgavebenkTest {
     @Test
     fun `Finner riktig benk for anke når brevkode er ettersendig klage `() {
         val jp = lagjournalpostData(brevkode = "NAVe 90-00.08 K").kategorisertJournalpost()
-        jp.oppgaveBenk(person = person, rutingOppslag = null, oppfyllerMinsteArbeidsinntekt = null).also {
+        jp.oppgaveBenk(person = person, rutingOppslag = null).also {
             assertEquals("Ettersending til klage\n", it.beskrivelse)
             assertEquals("4450", it.id)
         }
@@ -223,7 +203,7 @@ class OppgavebenkTest {
     @Test
     fun `Finner riktig benk for anke når brevkode er anke `() {
         val jp = lagjournalpostData(brevkode = "NAV 90-00.08 A").kategorisertJournalpost()
-        jp.oppgaveBenk(person = person, rutingOppslag = null, oppfyllerMinsteArbeidsinntekt = null).also {
+        jp.oppgaveBenk(person = person, rutingOppslag = null).also {
             assertEquals("Anke\n", it.beskrivelse)
             assertEquals("4270", it.id)
         }
@@ -232,7 +212,7 @@ class OppgavebenkTest {
     @Test
     fun `Finner riktig benk for anke når brevkode er ettersending til anke `() {
         val jp = lagjournalpostData(brevkode = "NAVe 90-00.08 A").kategorisertJournalpost()
-        jp.oppgaveBenk(person = person, rutingOppslag = null, oppfyllerMinsteArbeidsinntekt = null).also {
+        jp.oppgaveBenk(person = person, rutingOppslag = null).also {
             assertEquals("Ettersending til anke\n", it.beskrivelse)
             assertEquals("4270", it.id)
         }

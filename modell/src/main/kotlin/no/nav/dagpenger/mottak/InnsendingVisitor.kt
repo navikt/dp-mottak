@@ -51,11 +51,6 @@ interface InnsendingVisitor :
 
     fun visitTilstand(tilstandType: Innsending.Tilstand) {}
 
-    fun visitInnsending(
-        oppfyllerMinsteArbeidsinntekt: Boolean?,
-        eksisterendeSaker: Boolean?,
-    ) {}
-
     fun visitInnsendingAktivitetslogg(aktivitetslogg: Aktivitetslogg) {}
 
     fun postVisitInnsending(

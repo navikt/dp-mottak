@@ -22,8 +22,6 @@ class Innsending private constructor(
     private var tilstand: Tilstand,
     private var journalpost: Journalpost?,
     private var rutingOppslag: RutingOppslag?,
-    private var oppfyllerMinsteArbeidsinntekt: Boolean?,
-    private var eksisterendeSaker: Boolean?,
     private var person: Person?,
     private var arenaSak: ArenaSak?,
     internal val aktivitetslogg: Aktivitetslogg,
@@ -37,8 +35,6 @@ class Innsending private constructor(
         tilstand = Mottatt,
         journalpost = null,
         rutingOppslag = null,
-        oppfyllerMinsteArbeidsinntekt = null,
-        eksisterendeSaker = null,
         person = null,
         arenaSak = null,
         aktivitetslogg = Aktivitetslogg(),
@@ -386,55 +382,6 @@ class Innsending private constructor(
         }
     }
 
-    internal object AventerMinsteinntektVurdering : Tilstand {
-        override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.AvventerMinsteinntektVurderingType
-        override val timeout: Duration
-            get() = Duration.ofDays(1)
-
-        override fun entering(
-            innsending: Innsending,
-            hendelse: Hendelse,
-        ) {
-            innsending.trengerMinsteinntektVurdering(hendelse)
-        }
-
-        override fun håndter(
-            innsending: Innsending,
-            vurderminsteinntektData: MinsteinntektArbeidsinntektVurdert,
-        ) {
-            vurderminsteinntektData.info(
-                "Fikk minsteinntekt vurdering, vurderingen er ${vurderminsteinntektData.oppfyllerMinsteArbeidsinntekt()}",
-            )
-            innsending.oppfyllerMinsteArbeidsinntekt = vurderminsteinntektData.oppfyllerMinsteArbeidsinntekt()
-            innsending.tilstand(vurderminsteinntektData, AvventerSvarOmEksisterendeSaker)
-        }
-    }
-
-    // @todo: innsending.eksisterendeSaker er ikke i bruk - kan fjernes?
-    internal object AvventerSvarOmEksisterendeSaker : Tilstand {
-        override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.AvventerSvarOmEksisterendeSakerType
-        override val timeout: Duration
-            get() = Duration.ofDays(1)
-
-        override fun entering(
-            innsending: Innsending,
-            hendelse: Hendelse,
-        ) {
-            innsending.trengerEksisterendeSaker(hendelse)
-        }
-
-        override fun håndter(
-            innsending: Innsending,
-            eksisterendeSak: Eksisterendesaker,
-        ) {
-            eksisterendeSak.info("Fikk info om eksisterende saker: ${eksisterendeSak.harEksisterendeSaker()}")
-            innsending.eksisterendeSaker = eksisterendeSak.harEksisterendeSaker()
-            innsending.tilstand(eksisterendeSak, AventerArenaStartVedtak)
-        }
-    }
-
     internal object AventerArenaStartVedtak : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AventerArenaStartVedtakType
@@ -654,7 +601,7 @@ class Innsending private constructor(
         val journalpost = requireNotNull(journalpost).kategorisertJournalpost()
         val søknad = requireNotNull(rutingOppslag)
         val person = requireNotNull(person)
-        val oppgavebenk = journalpost.oppgaveBenk(person, søknad, oppfyllerMinsteArbeidsinntekt)
+        val oppgavebenk = journalpost.oppgaveBenk(person, søknad)
         val parametre =
             mapOf(
                 "fødselsnummer" to person.ident,
@@ -800,8 +747,7 @@ class Innsending private constructor(
             søknadsData = rutingOppslag?.data(),
             behandlendeEnhet =
                 jp.kategorisertJournalpost()
-                    .oppgaveBenk(person, rutingOppslag, oppfyllerMinsteArbeidsinntekt).id,
-            oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt,
+                    .oppgaveBenk(person, rutingOppslag).id,
             tittel = jp.hovedDokument().tittel,
         ).also { ferdig ->
             observers.forEach { it.innsendingFerdigstilt(ferdig) }
@@ -821,8 +767,7 @@ class Innsending private constructor(
             søknadsData = rutingOppslag?.data(),
             behandlendeEnhet =
                 jp.kategorisertJournalpost()
-                    .oppgaveBenk(person, rutingOppslag, oppfyllerMinsteArbeidsinntekt).id,
-            oppfyllerMinsteinntektArbeidsinntekt = oppfyllerMinsteArbeidsinntekt,
+                    .oppgaveBenk(person, rutingOppslag).id,
             tittel = jp.hovedDokument().tittel,
         ).also { mottatt ->
             observers.forEach { it.innsendingMottatt(mottatt) }
@@ -847,7 +792,6 @@ class Innsending private constructor(
     fun accept(visitor: InnsendingVisitor) {
         visitor.preVisitInnsending(this, journalpostId)
         visitor.visitTilstand(tilstand)
-        visitor.visitInnsending(oppfyllerMinsteArbeidsinntekt, eksisterendeSaker)
         journalpost?.accept(visitor)
         arenaSak?.accept(visitor)
         person?.accept(visitor)

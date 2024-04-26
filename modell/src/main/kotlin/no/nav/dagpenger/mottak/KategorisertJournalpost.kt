@@ -14,7 +14,6 @@ sealed class KategorisertJournalpost(
 
     protected open fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
-        oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?,
     ): OppgaveBenk = OppgaveBenk(behandlendeEnhet(person), henvendelseNavn(), journalpost.datoRegistrert(), tilleggsinformasjon())
 
@@ -31,9 +30,8 @@ sealed class KategorisertJournalpost(
     internal fun oppgaveBenk(
         person: Person?,
         rutingOppslag: RutingOppslag? = null,
-        oppfyllerMinsteArbeidsinntekt: Boolean? = null,
     ): OppgaveBenk {
-        val oppgaveBenk = finnOppgaveBenk(rutingOppslag, oppfyllerMinsteArbeidsinntekt, person)
+        val oppgaveBenk = finnOppgaveBenk(rutingOppslag, person)
 
         return when (person?.diskresjonskode) {
             true ->
@@ -106,11 +104,9 @@ data class NySøknad(
 
     override fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
-        oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?,
     ): OppgaveBenk {
         val konkurs = rutingOppslag?.avsluttetArbeidsforholdFraKonkurs() == true
-        val kanAvslåsPåMinsteinntekt = oppfyllerMinsteArbeidsinntekt == false
         val eøsBostedsland = rutingOppslag?.eøsBostedsland() == true
         val eøsArbeidsforhold = rutingOppslag?.eøsArbeidsforhold() == true
         val harAvtjentVerneplikt = rutingOppslag?.avtjentVerneplikt() == true
@@ -160,14 +156,6 @@ data class NySøknad(
                     tilleggsinformasjon(),
                 )
 
-            kanAvslåsPåMinsteinntekt ->
-                OppgaveBenk(
-                    "4450",
-                    "Minsteinntekt - mulig avslag\n",
-                    datoRegistrert,
-                    tilleggsinformasjon(),
-                )
-
             else ->
                 OppgaveBenk(
                     behandlendeEnhet(person),
@@ -186,9 +174,8 @@ data class Gjenopptak(
 
     override fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
-        oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?,
-    ) = super.finnOppgaveBenk(rutingOppslag, oppfyllerMinsteArbeidsinntekt, person)
+    ) = super.finnOppgaveBenk(rutingOppslag, person)
 }
 
 data class Generell(
@@ -230,7 +217,6 @@ data class Anke(
 
     override fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
-        oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?,
     ): OppgaveBenk {
         return OppgaveBenk(
@@ -253,7 +239,6 @@ data class KlageForskudd(
 
     override fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
-        oppfyllerMinsteArbeidsinntekt: Boolean?,
         person: Person?,
     ): OppgaveBenk {
         return OppgaveBenk(

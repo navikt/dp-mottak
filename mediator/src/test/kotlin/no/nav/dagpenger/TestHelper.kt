@@ -82,8 +82,6 @@ val innsendingData =
                 registertDato = registrertdato,
                 dokumenter = dokumenter,
             ),
-        oppfyllerMinsteArbeidsinntekt = true,
-        eksisterendeSaker = false,
         personData =
             InnsendingData.PersonData(
                 navn = "Hubba Bubba's",

@@ -114,8 +114,6 @@ internal class InnsendingPostgresRepositoryTest {
                 lagre(innsending)
                 lagre(innsending).also {
                     assertAntallRader("soknad_v1", 1)
-                    assertAntallRader("innsending_oppfyller_minsteinntekt_v1", 1)
-                    assertAntallRader("innsending_eksisterende_arena_saker_v1", 1)
                     assertAntallRader("person_innsending_v1", 1)
                     assertAntallRader("aktivitetslogg_v1", 1)
                     assertAntallRader("arenasak_v1", 1)
