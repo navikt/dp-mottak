@@ -48,6 +48,7 @@ internal object Config {
                 "DOKARKIV_SCOPE" to "api://prod-fss.teamdokumenthandtering.dokarkiv/.default",
                 "DOKARKIV_INGRESS" to "dokarkiv.prod-fss-pub.nais.io",
                 "DP_PROXY_SCOPE" to "api://prod-fss.teamdagpenger.dp-proxy/.default",
+                "PDL_API_SCOPE" to "api://prod-fss.pdl.pdl-api/.default",
                 "SKJERMING_API_SCOPE" to "api://prod-gcp.nom.skjermede-personer-pip/.default",
             ),
         )
