@@ -41,18 +41,14 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("MinsteinntektVurdering", 3)
-            håndterHendelse(minsteinntektVurderingMotattHendelse())
-            assertBehov("EksisterendeSaker", 4)
-            håndterHendelse(eksisterendeSakerMotattHendelse())
-            assertBehov("OpprettStartVedtakOppgave", 5)
+            assertBehov("OpprettStartVedtakOppgave", 3)
             håndterHendelse(opprettStartVedtakMotattHendelse())
-            assertBehov("OppdaterJournalpost", 6)
+            assertBehov("OppdaterJournalpost", 4)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
-            assertBehov("FerdigstillJournalpost", 7)
+            assertBehov("FerdigstillJournalpost", 5)
             håndterHendelse(ferdigstiltJournalpostMotattHendelse())
             assertTrue(
-                testRapid.inspektør.size == 8,
+                testRapid.inspektør.size == 6,
                 "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
             )
             assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
@@ -95,18 +91,14 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("MinsteinntektVurdering", 3)
-            håndterHendelse(minsteinntektVurderingMotattHendelse())
-            assertBehov("EksisterendeSaker", 4)
-            håndterHendelse(eksisterendeSakerMotattHendelse())
-            assertBehov("OpprettStartVedtakOppgave", 5)
+            assertBehov("OpprettStartVedtakOppgave", 3)
             håndterHendelse(opprettArenaOppgaveFeilet())
-            assertBehov("OpprettGosysoppgave", 6)
+            assertBehov("OpprettGosysoppgave", 4)
             håndterHendelse(gosysOppgaveOpprettetHendelse())
-            assertBehov("OppdaterJournalpost", 7)
+            assertBehov("OppdaterJournalpost", 5)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
             assertTrue(
-                testRapid.inspektør.size == 8,
+                testRapid.inspektør.size == 6,
                 "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
             )
             assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())

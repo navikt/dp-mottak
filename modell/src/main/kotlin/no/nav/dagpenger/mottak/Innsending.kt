@@ -377,7 +377,7 @@ class Innsending private constructor(
             innsending.rutingOppslag = søknadsdata.søknad()
 
             when (kategorisertJournalpost) {
-                is NySøknad -> innsending.tilstand(søknadsdata, AventerMinsteinntektVurdering)
+                is NySøknad -> innsending.tilstand(søknadsdata, AventerArenaStartVedtak)
                 is Gjenopptak -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
                 is Ettersending -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
                 is Generell -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
@@ -411,6 +411,7 @@ class Innsending private constructor(
         }
     }
 
+    // @todo: innsending.eksisterendeSaker er ikke i bruk - kan fjernes?
     internal object AvventerSvarOmEksisterendeSaker : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AvventerSvarOmEksisterendeSakerType
