@@ -96,7 +96,7 @@ internal object Config {
 
     val Configuration.dpGosysTokenProvider: () -> String by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("GOSYS_SCOPE", stringType)]).accessToken
+            cachedTokenProvider.clientCredentials(properties[Key("OPPGAVE_SCOPE", stringType)]).accessToken
         }
     }
 
@@ -127,7 +127,7 @@ internal object Config {
 
     fun Configuration.pdlApiUrl() = this[Key("PDL_API_HOST", stringType)].addHttprotocoll()
 
-    fun Configuration.gosysUrl(): String = TODO()
+    fun Configuration.gosysUrl(): String = this[Key("OPPGAVE_URL", stringType)].addHttprotocoll()
 
     fun asMap(): Map<String, String> =
         properties.list().reversed().fold(emptyMap()) { map, pair ->

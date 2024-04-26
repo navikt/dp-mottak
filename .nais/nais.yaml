@@ -47,8 +47,10 @@ spec:
       value: {{pdl.ingress}}
     - name: DOKARKIV_INGRESS
       value: {{dokarkiv.ingress}}
-    - name: GOSYS_SCOPE
-      value: {{gosys.scope}}
+    - name: OPPGAVE_SCOPE
+      value: {{oppgave.scope}}
+    - name: OPPGAVE_URL
+      value: {{oppgave.ingress}}
   envFrom:
     - secret: dp-mottak-unleash-api-token
   accessPolicy:
