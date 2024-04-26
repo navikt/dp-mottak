@@ -2,7 +2,6 @@ package no.nav.dagpenger.mottak.observers
 
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.InnsendingObserver
-import no.nav.dagpenger.mottak.unleash
 import no.nav.helse.rapids_rivers.JsonMessage
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer
@@ -39,7 +38,7 @@ internal class FerdigstiltInnsendingObserver internal constructor(private val pr
             val payload =
                 event.toPayload().also {
                     it["@event_name"] = "innsending_ferdigstilt"
-                    it["bruk-dp-behandling"] = unleash.isEnabled("bruk-dp-behandling")
+                    it["bruk-dp-behandling"] = true
                 }
 
             publish(
