@@ -7,11 +7,9 @@ internal class MottakMediator(mediator: InnsendingMediator, rapidsConnection: Ra
     init {
         JoarkMottak(mediator, rapidsConnection)
         JournalpostMottak(mediator, rapidsConnection)
-        EksisterendeSakerMottak(mediator, rapidsConnection)
         PersondataMottak(mediator, rapidsConnection)
         JournalpostOppdatertMottak(mediator, rapidsConnection)
         JournalpostFerdigstiltMottak(mediator, rapidsConnection)
-        MinsteinntektVurderingMottak(mediator, rapidsConnection)
         OpprettArenaOppgaveMottak(mediator, rapidsConnection)
         SøknadsdataMottak(mediator, rapidsConnection)
         GosysOppgaveOpprettetMottak(mediator, rapidsConnection)

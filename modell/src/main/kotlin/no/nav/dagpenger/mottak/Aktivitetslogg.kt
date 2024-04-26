@@ -206,7 +206,11 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
                 Journalpost,
                 Persondata,
                 Søknadsdata,
+
+                @Deprecated("MinsteinntektVurdering er deprekert men trengs for å rehyrdrere gammel aktivitetslogg")
                 MinsteinntektVurdering,
+
+                @Deprecated("EksisterendeSaker er deprekert men trengs for å rehyrdrere gammel aktivitetslogg")
                 EksisterendeSaker,
                 OpprettStartVedtakOppgave,
                 OpprettVurderhenvendelseOppgave,

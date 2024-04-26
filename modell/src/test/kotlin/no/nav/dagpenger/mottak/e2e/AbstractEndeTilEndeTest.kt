@@ -10,14 +10,12 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.ReplayFerdigstillEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.Journalpost.Bruker
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
-import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
@@ -134,14 +132,6 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(søknadsdata())
     }
 
-    protected fun håndterMinsteinntektVurderingData() {
-        innsending.håndter(minsteinntektVurderingData())
-    }
-
-    protected fun håndterEksisterendesakData() {
-        innsending.håndter(eksisterendesakData())
-    }
-
     protected fun håndterArenaOppgaveOpprettet() {
         innsending.håndter(arenaOppgaveOpprettet())
     }
@@ -183,20 +173,6 @@ abstract class AbstractEndeTilEndeTest {
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = JOURNALPOST_ID,
             oppgaveId = "1234567",
-        )
-
-    private fun eksisterendesakData(): Eksisterendesaker =
-        Eksisterendesaker(
-            aktivitetslogg = Aktivitetslogg(),
-            journalpostId = JOURNALPOST_ID,
-            harEksisterendeSak = false,
-        )
-
-    private fun minsteinntektVurderingData(): MinsteinntektArbeidsinntektVurdert =
-        MinsteinntektArbeidsinntektVurdert(
-            aktivitetslogg = Aktivitetslogg(),
-            journalpostId = JOURNALPOST_ID,
-            oppfyllerMinsteArbeidsinntekt = false,
         )
 
     private fun søknadsdata(): Søknadsdata =

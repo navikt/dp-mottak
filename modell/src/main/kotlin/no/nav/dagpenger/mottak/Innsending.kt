@@ -5,12 +5,10 @@ import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
-import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
-import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
@@ -79,18 +77,6 @@ class Innsending private constructor(
         if (journalpostId != søknadsdata.journalpostId()) return
         kontekst(søknadsdata, "Mottatt søknadsdata")
         tilstand.håndter(this, søknadsdata)
-    }
-
-    fun håndter(vurderminsteinntektData: MinsteinntektArbeidsinntektVurdert) {
-        if (journalpostId != vurderminsteinntektData.journalpostId()) return
-        kontekst(vurderminsteinntektData, "Mottatt informasjon vurdering om minste arbeidsinntekt")
-        tilstand.håndter(this, vurderminsteinntektData)
-    }
-
-    fun håndter(eksisterendeSak: Eksisterendesaker) {
-        if (journalpostId != eksisterendeSak.journalpostId()) return
-        kontekst(eksisterendeSak, "Mottatt informasjon om eksisterende saker")
-        tilstand.håndter(this, eksisterendeSak)
     }
 
     fun håndter(arenaOppgave: ArenaOppgaveOpprettet) {
@@ -170,20 +156,6 @@ class Innsending private constructor(
             søknadsdata: Søknadsdata,
         ) {
             søknadsdata.warn("Forventet ikke Søknadsdata i %s", type.name)
-        }
-
-        fun håndter(
-            innsending: Innsending,
-            vurderminsteinntektData: MinsteinntektArbeidsinntektVurdert,
-        ) {
-            vurderminsteinntektData.warn("Forventet ikke MinsteinntektVurderingData i %s", type.name)
-        }
-
-        fun håndter(
-            innsending: Innsending,
-            eksisterendeSak: Eksisterendesaker,
-        ) {
-            eksisterendeSak.warn("Forventet ikke Eksisterendesak i %s", type.name)
         }
 
         fun håndter(
@@ -570,30 +542,6 @@ class Innsending private constructor(
             mapOf(
                 "brukerId" to brukerId,
             ),
-        )
-    }
-
-    private fun trengerMinsteinntektVurdering(hendelse: Hendelse) {
-        val person =
-            requireNotNull(person) {
-                "Person må eksistere på innsending ved behov ${Behovtype.MinsteinntektVurdering.name}, journalpostId: ${journalpostId()}"
-            }
-        hendelse.behov(
-            Behovtype.MinsteinntektVurdering,
-            "Trenger vurdering av minste arbeidsinntekt",
-            mapOf(
-                "aktørId" to person.aktørId,
-            ),
-        )
-    }
-
-    private fun trengerEksisterendeSaker(hendelse: Hendelse) {
-        val person =
-            requireNotNull(person) { "Person må eksistere på innsending ved behov ${Behovtype.EksisterendeSaker.name}" }
-        hendelse.behov(
-            Behovtype.EksisterendeSaker,
-            "Trenger opplysninger om eksisterende saker",
-            mapOf("fnr" to person.ident),
         )
     }
 

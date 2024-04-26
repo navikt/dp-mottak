@@ -12,54 +12,7 @@ import no.nav.helse.rapids_rivers.withMDC
 
 internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: RapidsConnection) {
     init {
-        EksisterendeSakerBehovLøser(arenaOppslag, rapidsConnection)
         OpprettArenaOppgaveBehovLøser(arenaOppslag, rapidsConnection)
-    }
-
-    private class EksisterendeSakerBehovLøser(
-        private val arenaOppslag: ArenaOppslag,
-        rapidsConnection: RapidsConnection,
-    ) : River.PacketListener {
-        companion object {
-            private val logger = KotlinLogging.logger { }
-        }
-
-        init {
-            River(rapidsConnection).apply {
-                validate { it.demandValue("@event_name", "behov") }
-                validate { it.demandAllOrAny("@behov", listOf("EksisterendeSaker")) }
-                validate { it.rejectKey("@løsning") }
-                validate { it.requireKey("@behovId", "journalpostId") }
-                validate { it.requireKey("fnr") }
-            }.register(this)
-        }
-
-        override fun onPacket(
-            packet: JsonMessage,
-            context: MessageContext,
-        ) {
-            val journalpostId = packet["journalpostId"].asText()
-            val behovId = packet["@behovId"].asText()
-
-            withMDC(
-                mapOf(
-                    "behovId" to behovId,
-                    "journalpostId" to journalpostId,
-                ),
-            ) {
-                try {
-                    runBlocking(MDCContext()) {
-                        arenaOppslag.harEksisterendeSaker(packet["fnr"].asText()).also {
-                            packet["@løsning"] = mapOf("EksisterendeSaker" to mapOf("harEksisterendeSak" to it))
-                            context.publish(packet.toJson())
-                        }
-                    }
-                } catch (e: Exception) {
-                    logger.info { "Kunne ikke hente eksisterende saker for søknad med journalpostId $journalpostId" }
-                    throw e
-                }
-            }
-        }
     }
 
     private class OpprettArenaOppgaveBehovLøser(

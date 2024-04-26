@@ -302,46 +302,6 @@ internal class MediatorE2ETest {
         """.trimIndent()
 
     //language=JSON
-    private fun minsteinntektVurderingMotattHendelse(): String =
-        """
-        {
-          "@event_name": "behov",
-          "@final": true,
-          "@id": "${UUID.randomUUID()}",
-          "@behov": [
-            "MinsteinntektVurdering"
-          ],
-          "@opprettet" : "${now()}",
-          "journalpostId": "$journalpostId",
-          "@løsning": {
-            "MinsteinntektVurdering": {
-              "oppfyllerMinsteArbeidsinntekt": null
-            }
-          }
-        }
-        """.trimIndent()
-
-    //language=JSON
-    private fun eksisterendeSakerMotattHendelse(): String =
-        """
-        {
-          "@event_name": "behov",
-          "@final": true,
-          "@id": "${UUID.randomUUID()}",
-          "@behov": [
-            "MinsteinntektVurdering"
-          ],
-          "@opprettet" : "${now()}",
-          "journalpostId": "$journalpostId",
-          "@løsning": {
-            "EksisterendeSaker": {
-              "harEksisterendeSak": false
-            }
-          }
-        }
-        """.trimIndent()
-
-    //language=JSON
     private fun opprettArenaOppgaveFeilet(): String =
         """
         {

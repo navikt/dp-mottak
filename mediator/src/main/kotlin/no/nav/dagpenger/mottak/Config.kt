@@ -26,8 +26,6 @@ internal object Config {
                 "DB_PORT" to "5432",
                 "DB_USERNAME" to "username",
                 "DP_PROXY_SCOPE" to "api://dev-fss.teamdagpenger.dp-proxy/.default",
-                "DP_REGEL_API_SCOPE" to "api://dev-gcp.teamdagpenger.dp-regel-api/.default",
-                "DP_REGEL_API_URL" to "http://dp-regel-api.teamdagpenger",
                 "HTTP_PORT" to "8080",
                 "KAFKA_CONSUMER_GROUP_ID" to "dp-mottak-v1",
                 "KAFKA_EXTRA_TOPIC" to "teamdagpenger.mottak.v1,teamdagpenger.regel.v1",
@@ -50,8 +48,6 @@ internal object Config {
                 "DOKARKIV_SCOPE" to "api://prod-fss.teamdokumenthandtering.dokarkiv/.default",
                 "DOKARKIV_INGRESS" to "dokarkiv.prod-fss-pub.nais.io",
                 "DP_PROXY_SCOPE" to "api://prod-fss.teamdagpenger.dp-proxy/.default",
-                "DP_REGEL_API_SCOPE" to "api://prod-gcp.teamdagpenger.dp-regel-api/.default",
-                "PDL_API_SCOPE" to "api://prod-fss.pdl.pdl-api/.default",
                 "SKJERMING_API_SCOPE" to "api://prod-gcp.nom.skjermede-personer-pip/.default",
             ),
         )
@@ -126,8 +122,6 @@ internal object Config {
     fun Configuration.skjermingApiUrl() = this[Key("SKJERMING_API_URL", stringType)]
 
     fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_HOST", stringType)].addHttprotocoll()
-
-    fun Configuration.dpRegelApiUrl() = this[Key("DP_REGEL_API_URL", stringType)]
 
     fun Configuration.pdlApiUrl() = this[Key("PDL_API_HOST", stringType)].addHttprotocoll()
 

@@ -23,8 +23,6 @@ import java.time.Duration
 import java.time.LocalDate
 
 internal interface ArenaOppslag {
-    suspend fun harEksisterendeSaker(fnr: String): Boolean
-
     suspend fun opprettStartVedtakOppgave(
         journalpostId: String,
         parametere: OpprettArenaOppgaveParametere,
@@ -57,17 +55,6 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
                 register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
             }
         }
-
-    override suspend fun harEksisterendeSaker(fnr: String): Boolean {
-        sikkerlogg.info { "Forsøker å hente eksisterende saker fra arena for fnr $fnr" }
-        return proxyArenaClient.request("$baseUrl/sak/aktiv") {
-            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
-            header(HttpHeaders.ContentType, "application/json")
-            header(HttpHeaders.Accept, "application/json")
-            method = HttpMethod.Post
-            setBody(AktivSakRequest(fnr))
-        }.body<AktivSakResponse>().harAktivSak
-    }
 
     override suspend fun opprettStartVedtakOppgave(
         journalpostId: String,

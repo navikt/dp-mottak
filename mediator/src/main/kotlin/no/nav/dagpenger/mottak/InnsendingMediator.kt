@@ -4,13 +4,11 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.db.InnsendingRepository
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.Eksisterendesaker
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
-import no.nav.dagpenger.mottak.meldinger.MinsteinntektArbeidsinntektVurdert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
@@ -52,18 +50,6 @@ internal class InnsendingMediator(
     fun håndter(søknadsdata: Søknadsdata) {
         håndter(søknadsdata) { innsending ->
             innsending.håndter(søknadsdata)
-        }
-    }
-
-    fun håndter(minsteinntektVurdering: MinsteinntektArbeidsinntektVurdert) {
-        håndter(minsteinntektVurdering) { innsending ->
-            innsending.håndter(minsteinntektVurdering)
-        }
-    }
-
-    fun håndter(eksisterendeSaker: Eksisterendesaker) {
-        håndter(eksisterendeSaker) { innsending ->
-            innsending.håndter(eksisterendeSaker)
         }
     }
 

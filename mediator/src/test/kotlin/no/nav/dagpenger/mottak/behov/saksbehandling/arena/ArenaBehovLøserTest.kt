@@ -4,7 +4,6 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -18,7 +17,6 @@ internal class ArenaBehovLøserTest {
 
     private val arenaOppslagMock =
         mockk<ArenaOppslag>().also {
-            coEvery { it.harEksisterendeSaker(any()) } returns true
             coEvery { it.opprettStartVedtakOppgave(any(), any()) } returns
                 OpprettVedtakOppgaveResponse(
                     fagsakId = "123",
@@ -41,16 +39,6 @@ internal class ArenaBehovLøserTest {
     @BeforeEach
     fun `clear rapid`() {
         testRapid.reset()
-    }
-
-    @Test
-    fun `Løser eksisterende saker behov`() {
-        testRapid.sendTestMessage(eksisterendeSakerBehov())
-        with(testRapid.inspektør) {
-            assertEquals(1, size)
-            assertDoesNotThrow { field(0, "@løsning") }
-            assertTrue(field(0, "@løsning")["EksisterendeSaker"]["harEksisterendeSak"].asBoolean())
-        }
     }
 
     @Test
@@ -98,22 +86,6 @@ internal class ArenaBehovLøserTest {
             assertEquals("Kunne ikke opprettet Arena oppgave", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["@feil"].asText())
         }
     }
-
-    //language=JSON
-    private fun eksisterendeSakerBehov(): String =
-        """
-        {
-          "@event_name": "behov",
-          "@id": "${UUID.randomUUID()}",
-          "@behovId": "${UUID.randomUUID()}",
-          "@behov": [
-            "EksisterendeSaker"
-          ],
-          "@opprettet" : "${LocalDateTime.now()}",
-          "journalpostId": "$JOURNALPOST_ID",
-          "fnr": "12345678910"
-        }
-        """.trimIndent()
 
     //language=JSON
     private fun opprettStartVedtakBehov(): String =

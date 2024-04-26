@@ -2,7 +2,6 @@ package no.nav.dagpenger.mottak
 
 import com.fasterxml.jackson.databind.JsonNode
 import io.mockk.mockk
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.EksisterendeSaker
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -48,7 +47,7 @@ internal class BehovMediatorTest {
             ),
         )
         hendelse.behov(Aktivitetslogg.Aktivitet.Behov.Behovtype.Søknadsdata, "Trenger Søknadsdata")
-        hendelse.behov(EksisterendeSaker, "Trenger EksisterendeSaker")
+        hendelse.behov(Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettStartVedtakOppgave, "Trenger OpprettStartVedtakOppgave")
 
         behovMediator.håndter(hendelse)
 
@@ -63,7 +62,7 @@ internal class BehovMediatorTest {
             assertDoesNotThrow { UUID.fromString(it["@id"].asText()) }
             assertTrue(it.hasNonNull("@opprettet"))
             assertDoesNotThrow { LocalDateTime.parse(it["@opprettet"].asText()) }
-            assertEquals(listOf("Persondata", "Søknadsdata", "EksisterendeSaker"), it["@behov"].map(JsonNode::asText))
+            assertEquals(listOf("Persondata", "Søknadsdata", "OpprettStartVedtakOppgave"), it["@behov"].map(JsonNode::asText))
             assertEquals("behov", it["@event_name"].asText())
             assertEquals("12344", it["aktørId"].asText())
             assertEquals(JOURNALPOST_ID, it["journalpostId"].asText())
@@ -114,8 +113,8 @@ internal class BehovMediatorTest {
     internal fun `kan ikke produsere samme behov`() {
         val hendelse = TestHendelse("Hendelse1", aktivitetslogg.barn())
         hendelse.kontekst(innsending)
-        hendelse.behov(EksisterendeSaker, "Trenger EksisterendeSaker")
-        hendelse.behov(EksisterendeSaker, "Trenger EksisterendeSaker")
+        hendelse.behov(Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata, "Trenger Persondata")
+        hendelse.behov(Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata, "Trenger Persondata")
 
         assertThrows<IllegalArgumentException> { behovMediator.håndter(hendelse) }
     }
