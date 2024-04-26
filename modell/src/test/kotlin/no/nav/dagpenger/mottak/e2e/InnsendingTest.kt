@@ -1,9 +1,7 @@
 package no.nav.dagpenger.mottak.e2e
 
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.EksisterendeSaker
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.FerdigstillJournalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.MinsteinntektVurdering
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OppdaterJournalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettGosysoppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettStartVedtakOppgave
@@ -16,9 +14,7 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakTyp
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerFerdigstillJournalpostType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerGosysType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerJournalpostType
-import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerMinsteinntektVurderingType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerPersondataType
-import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerSvarOmEksisterendeSakerType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerSøknadsdataType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.InnsendingFerdigstiltType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
@@ -47,12 +43,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
         håndterSøknadsdata()
         assertBehovDetaljer(Søknadsdata, setOf("dokumentInfoId"))
-
-        håndterMinsteinntektVurderingData()
-        assertBehovDetaljer(MinsteinntektVurdering, setOf("aktørId"))
-
-        håndterEksisterendesakData()
-        assertBehovDetaljer(EksisterendeSaker, setOf("fnr"))
 
         håndterArenaOppgaveOpprettet()
         assertBehovDetaljer(
@@ -89,8 +79,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerPersondataType,
             KategoriseringType,
             AvventerSøknadsdataType,
-            AvventerMinsteinntektVurderingType,
-            AvventerSvarOmEksisterendeSakerType,
             AventerArenaStartVedtakType,
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType,
