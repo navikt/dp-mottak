@@ -1,0 +1,7 @@
+TRUNCATE TABLE innsending_oppfyller_minsteinntekt_v1;
+TRUNCATE TABLE innsending_eksisterende_arena_saker_v1;
+TRUNCATE TABLE minsteinntekt_vurdering_v1;
+
+DROP TABLE IF EXISTS innsending_eksisterende_arena_saker_v1;
+DROP TABLE IF EXISTS innsending_oppfyller_minsteinntekt_v1;
+DROP TABLE IF EXISTS minsteinntekt_vurdering_v1;
