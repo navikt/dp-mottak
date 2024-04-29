@@ -127,7 +127,7 @@ internal object Config {
 
     fun Configuration.pdlApiUrl() = this[Key("PDL_API_HOST", stringType)].addHttpsrotocoll()
 
-    fun Configuration.gosysUrl(): String = this[Key("GOSYS_URL", stringType)].addHttpsrotocoll()
+    fun Configuration.gosysUrl(): String = this[Key("OPPGAVE_URL", stringType)].addHttpsrotocoll()
 
     fun asMap(): Map<String, String> =
         properties.list().reversed().fold(emptyMap()) { map, pair ->
