@@ -12,8 +12,6 @@ import no.nav.dagpenger.oauth2.OAuth2Config
 import org.apache.kafka.clients.CommonClientConfigs
 import org.apache.kafka.common.config.SslConfigs
 import org.apache.kafka.common.security.auth.SecurityProtocol
-import java.net.InetAddress
-import java.net.UnknownHostException
 import java.util.Properties
 
 internal object Config {
@@ -133,13 +131,4 @@ internal object Config {
         properties.list().reversed().fold(emptyMap()) { map, pair ->
             map + pair.second
         }
-}
-
-private fun getHostname(): String {
-    return try {
-        val addr: InetAddress = InetAddress.getLocalHost()
-        addr.hostName
-    } catch (e: UnknownHostException) {
-        "unknown"
-    }
 }
