@@ -14,6 +14,7 @@ pdl:
 dokarkiv:
   ingress: dokarkiv.dev-fss-pub.nais.io
 oppgave:
-  ingress: oppgave-q1
+  app: oppgave-q1
+  ingress: http://oppgave-q1.oppgavehandtering.svc.nais.local
   scope: api://dev-fss.oppgavehandtering.oppgave-q1/.default
 
