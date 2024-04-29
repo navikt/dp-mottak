@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling.gosys
 
 import com.natpryce.konfig.Configuration
+import io.getunleash.Unleash
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.DefaultRequest
@@ -19,7 +20,6 @@ import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.Config.gosysUrl
 import no.nav.dagpenger.mottak.behov.JsonMapper
-import no.nav.dagpenger.mottak.unleash
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.minutes
 
@@ -43,7 +43,7 @@ internal data class GosysOppgaveRequest(
 
 internal data class GosysOppgaveResponse(val id: String)
 
-internal class UnleashGosysClient(config: Configuration) : GosysOppslag {
+internal class UnleashGosysClient(config: Configuration, private val unleash: Unleash) : GosysOppslag {
     private val gosysClient = GosysClient(config)
     private val proxyClient = GosysProxyClient(config)
 

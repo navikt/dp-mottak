@@ -35,7 +35,7 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val safClient = SafClient(Config.properties)
     private val arenaApiClient = ArenaApiClient(Config.properties)
     private val journalpostApiClient = JournalpostApiClient(tokenProvider = Config.properties.dokarkivTokenProvider)
-    private val gosysOppslag = UnleashGosysClient(Config.properties)
+    private val gosysOppslag = UnleashGosysClient(Config.properties, unleash)
     private val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(Config.kafkaProducerProperties)
 
     private val rapidsConnection =

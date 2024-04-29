@@ -13,7 +13,7 @@ import io.ktor.server.auth.jwt.JWTConfigureFunction
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.jwt.jwt
 import no.nav.dagpenger.mottak.Config
-import java.net.URL
+import java.net.URI
 import java.util.concurrent.TimeUnit
 
 internal fun AuthenticationContext.fnr(): String =
@@ -36,7 +36,7 @@ internal fun AuthenticationConfig.jwt(
 }
 
 private fun cachedJwkProvider(jwksUri: String): JwkProvider {
-    return JwkProviderBuilder(URL(jwksUri))
+    return JwkProviderBuilder(URI(jwksUri).toURL())
         .cached(10, 24, TimeUnit.HOURS) // cache up to 10 JWKs for 24 hours
         .rateLimited(
             10,
