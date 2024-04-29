@@ -13,5 +13,5 @@ dokarkiv:
   ingress: dokarkiv.prod-fss-pub.nais.io
 oppgave:
   app: oppgave
-  ingress: http://oppgave.oppgavehandtering.svc.nais.local
+  ingress: oppgave.prod-fss-pub.nais.io
   scope: api://prod-fss.oppgavehandtering.oppgave/.default
