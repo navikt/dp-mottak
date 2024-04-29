@@ -69,7 +69,7 @@ internal object Config {
         )
     }
 
-    internal fun String.addHttprotocoll(): String = "https://$this"
+    private fun String.addHttpsrotocoll(): String = "https://$this"
 
     val Configuration.dpProxyTokenProvider: () -> String by lazy {
         {
@@ -123,11 +123,11 @@ internal object Config {
 
     fun Configuration.skjermingApiUrl() = this[Key("SKJERMING_API_URL", stringType)]
 
-    fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_HOST", stringType)].addHttprotocoll()
+    fun Configuration.dpProxyUrl() = this[Key("DP_PROXY_HOST", stringType)].addHttpsrotocoll()
 
-    fun Configuration.pdlApiUrl() = this[Key("PDL_API_HOST", stringType)].addHttprotocoll()
+    fun Configuration.pdlApiUrl() = this[Key("PDL_API_HOST", stringType)].addHttpsrotocoll()
 
-    fun Configuration.gosysUrl(): String = this[Key("OPPGAVE_URL", stringType)].addHttprotocoll()
+    fun Configuration.gosysUrl(): String = this[Key("OPPGAVE_URL", stringType)].addHttpsrotocoll()
 
     fun asMap(): Map<String, String> =
         properties.list().reversed().fold(emptyMap()) { map, pair ->

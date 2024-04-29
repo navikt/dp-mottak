@@ -128,7 +128,7 @@ internal class GosysClient(config: Configuration) : GosysOppslag {
                 setBody(oppgave)
             }.body<GosysOppgaveResponse>().id
         } catch (e: Exception) {
-            logger.error { "Kunne ikke opprette gosys oppgave for journalpost med id ${oppgave.journalpostId}" }
+            logger.error(e) { "Kunne ikke opprette gosys oppgave for journalpost med id ${oppgave.journalpostId}" }
             throw e
         }
     }
