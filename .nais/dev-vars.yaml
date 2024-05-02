@@ -17,4 +17,8 @@ oppgave:
   app: oppgave-q1
   ingress: oppgave-q1.dev-fss-pub.nais.io
   scope: api://dev-fss.oppgavehandtering.oppgave-q1/.default
+saf:
+  app: saf-q1
+  ingress: saf.dev-fss-pub.nais.io
+  scope: api://dev-fss.oppgavehandtering.saf/.default
 

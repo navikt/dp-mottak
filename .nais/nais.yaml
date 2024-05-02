@@ -51,6 +51,10 @@ spec:
       value: {{oppgave.scope}}
     - name: OPPGAVE_URL
       value: {{oppgave.ingress}}
+    - name: SAF_URL
+      value: {{saf.ingress}}
+    - name: SAF_SCOPE
+      value: {{saf.scope}}
   envFrom:
     - secret: dp-mottak-unleash-api-token
   accessPolicy:
@@ -60,6 +64,8 @@ spec:
          namespace: nom
        - application: {{ oppgave.app }}
          namespace: oppgavehandtering
+       - application: {{ saf.app }}
+         namespace: teamdokumenthandtering
       external:
         - host: {{dp_proxy.ingress}}
         - host: {{pdl.ingress}}

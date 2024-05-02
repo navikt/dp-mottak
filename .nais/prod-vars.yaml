@@ -15,3 +15,7 @@ oppgave:
   app: oppgave
   ingress: oppgave.prod-fss-pub.nais.io
   scope: api://prod-fss.oppgavehandtering.oppgave/.default
+saf:
+  app: saf
+  ingress: saf.prod-fss-pub.nais.io
+  scope: api://prod-fss.oppgavehandtering.saf/.default

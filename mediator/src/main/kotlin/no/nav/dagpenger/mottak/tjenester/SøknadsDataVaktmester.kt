@@ -6,7 +6,7 @@ import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
 import mu.KotlinLogging
-import no.nav.dagpenger.mottak.behov.journalpost.SafClient
+import no.nav.dagpenger.mottak.behov.journalpost.SafProxyClient
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
 import org.postgresql.util.PGobject
 import javax.sql.DataSource
@@ -15,7 +15,7 @@ private val logger = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadsDataVaktmester")
 
 internal class SøknadsDataVaktmester(
-    private val safClient: SafClient,
+    private val safProxyClient: SafProxyClient,
     private val ds: DataSource = PostgresDataSourceBuilder.dataSource,
 ) {
     fun fixSoknadsData(jp: Int) {
@@ -24,7 +24,7 @@ internal class SøknadsDataVaktmester(
                 if (session.lås(jp)) {
                     val (innsendingId, dokumentinfoId) = session.innsendingIdOgDokumentinfoId(jp)
                     runBlocking {
-                        val data = safClient.hentSøknadsData(jp.toString(), dokumentinfoId.toString()).data.toString()
+                        val data = safProxyClient.hentSøknadsData(jp.toString(), dokumentinfoId.toString()).data.toString()
                         session.insertSøknadsData(innsendingId, data)
                         logger.info { "Oppdatert søknads data for journalpost id $jp" }
                         sikkerlogg.info { "Oppdatert søknads data for journalpost id $jp. Søknadsdata: $data" }

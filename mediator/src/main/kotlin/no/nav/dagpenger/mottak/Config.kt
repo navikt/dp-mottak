@@ -75,6 +75,12 @@ internal object Config {
         }
     }
 
+    val Configuration.safTokenProvider: () -> String by lazy {
+        {
+            cachedTokenProvider.clientCredentials(properties[Key("SAF_SCOPE", stringType)]).accessToken
+        }
+    }
+
     val Configuration.pdlApiTokenProvider: () -> String by lazy {
         {
             cachedTokenProvider.clientCredentials(properties[Key("PDL_API_SCOPE", stringType)]).accessToken
@@ -126,6 +132,8 @@ internal object Config {
     fun Configuration.pdlApiUrl() = this[Key("PDL_API_HOST", stringType)].addHttpsrotocoll()
 
     fun Configuration.gosysUrl(): String = this[Key("OPPGAVE_URL", stringType)].addHttpsrotocoll()
+
+    fun Configuration.safUrl(): String = this[Key("SAF_URL", stringType)].addHttpsrotocoll()
 
     fun asMap(): Map<String, String> =
         properties.list().reversed().fold(emptyMap()) { map, pair ->

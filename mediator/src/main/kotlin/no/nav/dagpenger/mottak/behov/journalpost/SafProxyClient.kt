@@ -11,29 +11,29 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import mu.KotlinLogging
-import no.nav.dagpenger.mottak.Config.safTokenProvider
-import no.nav.dagpenger.mottak.Config.safUrl
+import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
+import no.nav.dagpenger.mottak.Config.dpProxyUrl
 
-internal class SafClient(config: Configuration) : JournalpostArkiv, SøknadsArkiv {
+internal class SafProxyClient(config: Configuration) : JournalpostArkiv, SøknadsArkiv {
     companion object {
         private val logger = KotlinLogging.logger {}
     }
 
-    private val tokenProvider = config.safTokenProvider
-    private val safUrl = config.safUrl()
+    private val tokenProvider = config.dpProxyTokenProvider
+    private val dpProxyUrl = config.dpProxyUrl()
 
-    private val joarkClient =
+    private val proxyJoarkClient =
         HttpClient {
             expectSuccess = true
         }
 
-    private val søknadsDataClient =
+    private val proxySøknadsDataClient =
         HttpClient {
             expectSuccess = true
         }
 
     override suspend fun hentJournalpost(journalpostId: String): SafGraphQL.Journalpost =
-        joarkClient.request("$safUrl/graphql") {
+        proxyJoarkClient.request("$dpProxyUrl//proxy/v1/saf/graphql") {
             header("Content-Type", "application/json")
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
             method = HttpMethod.Post
@@ -47,7 +47,7 @@ internal class SafClient(config: Configuration) : JournalpostArkiv, SøknadsArki
         dokumentInfoId: String,
     ): SafGraphQL.SøknadsData =
         try {
-            søknadsDataClient.request("$safUrl/rest/hentdokument/$journalpostId/$dokumentInfoId/ORIGINAL") {
+            proxySøknadsDataClient.request("$dpProxyUrl/proxy/v1/saf/rest/hentdokument/$journalpostId/$dokumentInfoId/ORIGINAL") {
                 header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
                 method = HttpMethod.Get
             }.let {

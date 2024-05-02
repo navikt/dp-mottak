@@ -9,8 +9,8 @@ import no.nav.dagpenger.mottak.behov.journalpost.FerdigstillJournalpostBehovLøs
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApiClient
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.OppdaterJournalpostBehovLøser
-import no.nav.dagpenger.mottak.behov.journalpost.SafClient
 import no.nav.dagpenger.mottak.behov.journalpost.SøknadsdataBehovLøser
+import no.nav.dagpenger.mottak.behov.journalpost.UnleashSafClient
 import no.nav.dagpenger.mottak.behov.person.PdlPersondataOppslag
 import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.SkjermingOppslag
@@ -32,7 +32,7 @@ private val logg = KotlinLogging.logger {}
 
 internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.StatusListener {
     private val innsendingRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
-    private val safClient = SafClient(Config.properties)
+    private val safClient = UnleashSafClient(Config.properties, unleash)
     private val arenaApiClient = ArenaApiClient(Config.properties)
     private val journalpostApiClient = JournalpostApiClient(tokenProvider = Config.properties.dokarkivTokenProvider)
     private val gosysOppslag = GosysClient(Config.properties)
