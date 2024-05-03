@@ -20,5 +20,5 @@ oppgave:
 saf:
   app: saf-q1
   ingress: saf.dev-fss-pub.nais.io
-  scope: api://dev-fss.oppgavehandtering.saf/.default
+  scope: api://dev-fss.teamdokumenthandtering.saf-q1/.default
 

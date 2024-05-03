@@ -18,4 +18,4 @@ oppgave:
 saf:
   app: saf
   ingress: saf.prod-fss-pub.nais.io
-  scope: api://prod-fss.oppgavehandtering.saf/.default
+  scope: api://prod-fss.teamdokumenthandtering.saf/.default
