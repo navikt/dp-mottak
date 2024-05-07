@@ -7,8 +7,8 @@ import kotliquery.sessionOf
 import kotliquery.using
 import no.nav.dagpenger.innsendingData
 import no.nav.dagpenger.mottak.behov.JsonMapper
+import no.nav.dagpenger.mottak.behov.journalpost.SafClient
 import no.nav.dagpenger.mottak.behov.journalpost.SafGraphQL
-import no.nav.dagpenger.mottak.behov.journalpost.SafProxyClient
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
 import no.nav.dagpenger.mottak.db.PostgresTestHelper
@@ -24,8 +24,8 @@ class SøknadsDataVaktmesterTest {
             InnsendingPostgresRepository().lagre(innsending)
 
             SøknadsDataVaktmester(
-                safProxyClient =
-                    mockk<SafProxyClient>().also {
+                safClient =
+                    mockk<SafClient>().also {
                         coEvery {
                             it.hentSøknadsData(innsending.journalpostId(), "12345678")
                         } returns SafGraphQL.SøknadsData.fromJson("""{"hubba": "bubba"}""")
