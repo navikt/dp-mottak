@@ -185,6 +185,7 @@ internal class SøknadFaktaQuizLøserTest {
           "@opprettet": "2020-11-18T11:04:32.867824",
           "@id": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
           "@behovId": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
+          "bruk-søknad-orkestrator" : false,
           "identer":[{"id":"12345678910","type":"folkeregisterident","historisk":false}],
           "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
           "@behov": [
@@ -202,6 +203,7 @@ internal class SøknadFaktaQuizLøserTest {
           "@opprettet": "2020-11-18T11:04:32.867824",
           "@id": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
           "@behovId": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
+          "bruk-søknad-orkestrator": false,
           "identer":[{"id":"12345678910","type":"folkeregisterident","historisk":false}],
           "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
           "@behov": [
