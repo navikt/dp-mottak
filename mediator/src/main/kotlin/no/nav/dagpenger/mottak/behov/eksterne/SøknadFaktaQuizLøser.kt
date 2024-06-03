@@ -43,7 +43,6 @@ internal class SøknadFaktaQuizLøser(
         River(rapidsConnection).apply {
             validate { it.demandAny("@event_name", listOf("faktum_svar", "behov")) }
             validate { it.demandAllOrAny("@behov", løserBehov) }
-            validate { it.demandValue("bruk-søknad-orkestrator", false) }
             validate { it.rejectKey("@løsning") }
             validate {
                 it.require("InnsendtSøknadsId") { innsendtSøknad -> innsendtSøknad["urn"].asText().let { urn -> URN.rfc8141().parse(urn).namespaceSpecificString().toString() } }
