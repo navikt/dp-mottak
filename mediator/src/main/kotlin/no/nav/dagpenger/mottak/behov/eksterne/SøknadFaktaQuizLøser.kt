@@ -43,8 +43,8 @@ internal class SøknadFaktaQuizLøser(
         River(rapidsConnection).apply {
             validate { it.demandAny("@event_name", listOf("faktum_svar", "behov")) }
             validate { it.demandAllOrAny("@behov", løserBehov) }
-            validate { it.demandValue("bruk-søknad-orkestrator", false) }
             validate { it.rejectKey("@løsning") }
+            validate { it.interestedIn("bruk-søknad-orkestrator") }
             validate {
                 it.require("InnsendtSøknadsId") { innsendtSøknad -> innsendtSøknad["urn"].asText().let { urn -> URN.rfc8141().parse(urn).namespaceSpecificString().toString() } }
             }
@@ -62,41 +62,45 @@ internal class SøknadFaktaQuizLøser(
                 "behovId" to packet["@behovId"].asText(),
             ),
         ) {
-            try {
-                val innsendtSøknadsId = packet.getInnsendtSøknadsId()
-                val søknad = søknadQuizOppslag.hentSøknad(innsendtSøknadsId)
-                val løsning: Map<String, Any> =
-                    packet["@behov"].map { it.asText() }.filter { it in løserBehov }.associateWith { behov ->
-                        val avsluttedeArbeidsforhold = søknad.avsluttetArbeidsforhold()
-                        val reellArbeidsSøker = søknad.reellArbeidsSøker()
-                        when (behov) {
-                            "ØnskerDagpengerFraDato" -> søknad.ønskerDagpengerFraDato()
-                            "Verneplikt" -> søknad.avtjentVerneplikt()
-                            "FangstOgFiske" -> søknad.fangstOgFisk()
-                            "EØSArbeid" -> søknad.eøsArbeidsforhold()
-                            "Rettighetstype" -> rettighetstypeUtregning(avsluttedeArbeidsforhold)
-                            "KanJobbeDeltid" -> reellArbeidsSøker.deltid
-                            "KanJobbeHvorSomHelst" -> reellArbeidsSøker.geografi
-                            "HelseTilAlleTyperJobb" -> reellArbeidsSøker.helse
-                            "VilligTilÅBytteYrke" -> reellArbeidsSøker.yrke
-                            "JobbetUtenforNorge" -> jobbetUtenforNorge(avsluttedeArbeidsforhold)
-                            "Lønnsgaranti" -> avsluttedeArbeidsforhold.any { it.erLønnsgaranti() }
-                            "PermittertFiskeforedling" -> avsluttedeArbeidsforhold.any { it.erPermittertFiskeforedling() }
-                            "Permittert" -> avsluttedeArbeidsforhold.any { it.erPermittert() }
-                            "Ordinær" -> avsluttedeArbeidsforhold.any { it.erOrdinær() }
-                            else -> throw IllegalArgumentException("Ukjent behov $behov")
+            if (!packet["bruk-søknad-orkestrator"].asBoolean()) {
+                try {
+                    val innsendtSøknadsId = packet.getInnsendtSøknadsId()
+                    val søknad = søknadQuizOppslag.hentSøknad(innsendtSøknadsId)
+                    val løsning: Map<String, Any> =
+                        packet["@behov"].map { it.asText() }.filter { it in løserBehov }.associateWith { behov ->
+                            val avsluttedeArbeidsforhold = søknad.avsluttetArbeidsforhold()
+                            val reellArbeidsSøker = søknad.reellArbeidsSøker()
+                            when (behov) {
+                                "ØnskerDagpengerFraDato" -> søknad.ønskerDagpengerFraDato()
+                                "Verneplikt" -> søknad.avtjentVerneplikt()
+                                "FangstOgFiske" -> søknad.fangstOgFisk()
+                                "EØSArbeid" -> søknad.eøsArbeidsforhold()
+                                "Rettighetstype" -> rettighetstypeUtregning(avsluttedeArbeidsforhold)
+                                "KanJobbeDeltid" -> reellArbeidsSøker.deltid
+                                "KanJobbeHvorSomHelst" -> reellArbeidsSøker.geografi
+                                "HelseTilAlleTyperJobb" -> reellArbeidsSøker.helse
+                                "VilligTilÅBytteYrke" -> reellArbeidsSøker.yrke
+                                "JobbetUtenforNorge" -> jobbetUtenforNorge(avsluttedeArbeidsforhold)
+                                "Lønnsgaranti" -> avsluttedeArbeidsforhold.any { it.erLønnsgaranti() }
+                                "PermittertFiskeforedling" -> avsluttedeArbeidsforhold.any { it.erPermittertFiskeforedling() }
+                                "Permittert" -> avsluttedeArbeidsforhold.any { it.erPermittert() }
+                                "Ordinær" -> avsluttedeArbeidsforhold.any { it.erOrdinær() }
+                                else -> throw IllegalArgumentException("Ukjent behov $behov")
+                            }
                         }
-                    }
-                packet["@løsning"] = løsning
-                context.publish(packet.toJson())
-                logger.info("løste ${løsning.keys} behov for innsendt søknad med id $innsendtSøknadsId")
-            } catch (e: DateTimeParseException) {
-                logger.info(e) { "feil ved parsing av dato i søknadfakta-behov. Hopper over behovet" }
-                sikkerlogg.info(e) { "feil ved parsing av dato i søknadfakta-behov. Hopper over behovet \n packet: ${packet.toJson()}" }
-            } catch (e: Exception) {
-                logger.error(e) { "feil ved søknadfakta-behov" }
-                sikkerlogg.error(e) { "feil ved søknadfakta-behov. \n packet: ${packet.toJson()}" }
-                throw e
+                    packet["@løsning"] = løsning
+                    context.publish(packet.toJson())
+                    logger.info("løste ${løsning.keys} behov for innsendt søknad med id $innsendtSøknadsId")
+                } catch (e: DateTimeParseException) {
+                    logger.info(e) { "feil ved parsing av dato i søknadfakta-behov. Hopper over behovet" }
+                    sikkerlogg.info(e) { "feil ved parsing av dato i søknadfakta-behov. Hopper over behovet \n packet: ${packet.toJson()}" }
+                } catch (e: Exception) {
+                    logger.error(e) { "feil ved søknadfakta-behov" }
+                    sikkerlogg.error(e) { "feil ved søknadfakta-behov. \n packet: ${packet.toJson()}" }
+                    throw e
+                }
+            } else {
+                logger.info("ignorerer behov '${packet["@behov"]}' for søknad som er sendt til søknad-orkestrator")
             }
         }
     }

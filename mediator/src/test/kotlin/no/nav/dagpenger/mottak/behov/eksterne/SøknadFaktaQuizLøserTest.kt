@@ -170,6 +170,14 @@ internal class SøknadFaktaQuizLøserTest {
         }
     }
 
+    @Test
+    fun `ignorerer behov for søknad som er sendt til søknad-orkestrator`() {
+        testRapid.sendTestMessage(behovMelding("Verneplikt", brukSøknadOrkestrator = true))
+        with(testRapid.inspektør) {
+            assertEquals(0, size)
+        }
+    }
+
     fun Map<String, Boolean>.assertRettighetstype(nøkkel: String) {
         Assertions.assertTrue(this[nøkkel]!!)
         this.filterKeys { it != nøkkel }.values.forEach { value ->
@@ -178,14 +186,17 @@ internal class SøknadFaktaQuizLøserTest {
     }
 
     //language=JSON
-    private fun behovMelding(behovNavn: String) =
+    private fun behovMelding(
+        behovNavn: String,
+        brukSøknadOrkestrator: Boolean = false,
+    ) =
         """
         {
           "@event_name": "faktum_svar",
           "@opprettet": "2020-11-18T11:04:32.867824",
           "@id": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
           "@behovId": "930e2beb-d394-4024-b713-dbeb6ad3d4bf",
-          "bruk-søknad-orkestrator" : false,
+          "bruk-søknad-orkestrator" : $brukSøknadOrkestrator,
           "identer":[{"id":"12345678910","type":"folkeregisterident","historisk":false}],
           "søknad_uuid": "41621ac0-f5ee-4cce-b1f5-88a79f25f1a5",
           "@behov": [
