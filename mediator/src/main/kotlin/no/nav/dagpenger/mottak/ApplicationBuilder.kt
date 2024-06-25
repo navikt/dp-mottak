@@ -3,8 +3,6 @@ package no.nav.dagpenger.mottak
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dokarkivTokenProvider
 import no.nav.dagpenger.mottak.api.innsendingApi
-import no.nav.dagpenger.mottak.behov.eksterne.PostgresSøknadQuizOppslag
-import no.nav.dagpenger.mottak.behov.eksterne.SøknadFaktaQuizLøser
 import no.nav.dagpenger.mottak.behov.journalpost.FerdigstillJournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApiClient
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
@@ -30,7 +28,9 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 
 private val logg = KotlinLogging.logger {}
 
-internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.StatusListener {
+internal class ApplicationBuilder(
+    env: Map<String, String>,
+) : RapidsConnection.StatusListener {
     private val innsendingRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
     private val safClient = SafClient(Config.properties)
     private val arenaApiClient = ArenaApiClient(Config.properties)
@@ -39,18 +39,18 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
     private val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(Config.kafkaProducerProperties)
 
     private val rapidsConnection =
-        RapidApplication.Builder(
-            RapidApplication.RapidApplicationConfig.fromEnv(env),
-        )
-            .also { builder ->
+        RapidApplication
+            .Builder(
+                RapidApplication.RapidApplicationConfig.fromEnv(env),
+            ).also { builder ->
                 builder.withKtorModule {
                     innsendingApi(
                         innsendingRepository,
                         ferdigstiltInnsendingObserver,
                     )
                 }
-            }
-            .build().apply {
+            }.build()
+            .apply {
                 val mediator =
                     InnsendingMediator(
                         innsendingRepository = innsendingRepository,
@@ -76,9 +76,6 @@ internal class ApplicationBuilder(env: Map<String, String>) : RapidsConnection.S
                 SøknadsdataBehovLøser(safClient, this)
                 ArenaBehovLøser(arenaApiClient, this)
                 OpprettGosysOppgaveLøser(gosysOppslag, this)
-
-                // Eksterne behovløsere
-                SøknadFaktaQuizLøser(PostgresSøknadQuizOppslag(PostgresDataSourceBuilder.dataSource), this)
             }
 
     init {
