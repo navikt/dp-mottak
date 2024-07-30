@@ -19,7 +19,7 @@ dependencies {
     implementation(libs.dp.biblioteker.oauth2.klient)
 
     implementation(libs.rapids.and.rivers)
-    implementation("io.getunleash:unleash-client-java:9.2.3")
+    implementation("io.getunleash:unleash-client-java:9.2.4")
 
     implementation(libs.bundles.postgres)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.8.1")
