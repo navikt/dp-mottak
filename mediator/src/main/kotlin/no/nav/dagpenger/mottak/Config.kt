@@ -104,7 +104,7 @@ internal object Config {
         }
     }
 
-    private fun tokenfeil(): Nothing = throw RuntimeException("Unable to get token")
+    private fun tokenfeil(): Nothing = throw RuntimeException("Kunne opprettet token")
 
     val kafkaProducerProperties: Properties by lazy {
         Properties().apply {
