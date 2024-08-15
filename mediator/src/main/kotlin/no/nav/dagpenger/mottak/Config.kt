@@ -71,38 +71,40 @@ internal object Config {
 
     val Configuration.dpProxyTokenProvider: () -> String by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("DP_PROXY_SCOPE", stringType)]).accessToken
+            cachedTokenProvider.clientCredentials(properties[Key("DP_PROXY_SCOPE", stringType)]).accessToken ?: tokenfeil()
         }
     }
 
     val Configuration.safTokenProvider: () -> String by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("SAF_SCOPE", stringType)]).accessToken
+            cachedTokenProvider.clientCredentials(properties[Key("SAF_SCOPE", stringType)]).accessToken ?: tokenfeil()
         }
     }
 
     val Configuration.pdlApiTokenProvider: () -> String by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("PDL_API_SCOPE", stringType)]).accessToken
+            cachedTokenProvider.clientCredentials(properties[Key("PDL_API_SCOPE", stringType)]).accessToken ?: tokenfeil()
         }
     }
     val Configuration.skjermingApiTokenProvider: () -> String by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("SKJERMING_API_SCOPE", stringType)]).accessToken
+            cachedTokenProvider.clientCredentials(properties[Key("SKJERMING_API_SCOPE", stringType)]).accessToken ?: tokenfeil()
         }
     }
 
     val Configuration.dokarkivTokenProvider: () -> String by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("DOKARKIV_SCOPE", stringType)]).accessToken
+            cachedTokenProvider.clientCredentials(properties[Key("DOKARKIV_SCOPE", stringType)]).accessToken ?: tokenfeil()
         }
     }
 
     val Configuration.dpGosysTokenProvider: () -> String by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("OPPGAVE_SCOPE", stringType)]).accessToken
+            cachedTokenProvider.clientCredentials(properties[Key("OPPGAVE_SCOPE", stringType)]).accessToken ?: tokenfeil()
         }
     }
+
+    private fun tokenfeil(): Nothing = throw RuntimeException("Unable to get token")
 
     val kafkaProducerProperties: Properties by lazy {
         Properties().apply {
