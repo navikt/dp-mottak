@@ -1,13 +1,13 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.withMDC
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.withMDC
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -21,12 +21,13 @@ internal class JournalpostBehovLøser(
     }
 
     init {
-        River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "behov") }
-            validate { it.demandAllOrAny("@behov", listOf("Journalpost")) }
-            validate { it.rejectKey("@løsning") }
-            validate { it.requireKey("@behovId", "journalpostId") }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                validate { it.demandValue("@event_name", "behov") }
+                validate { it.demandAllOrAny("@behov", listOf("Journalpost")) }
+                validate { it.rejectKey("@løsning") }
+                validate { it.requireKey("@behovId", "journalpostId") }
+            }.register(this)
     }
 
     override fun onPacket(

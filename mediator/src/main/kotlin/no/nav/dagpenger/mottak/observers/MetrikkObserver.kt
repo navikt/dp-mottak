@@ -1,6 +1,6 @@
 package no.nav.dagpenger.mottak.observers
 
-import io.prometheus.client.Counter
+import io.prometheus.metrics.core.metrics.Counter
 import no.nav.dagpenger.mottak.InnsendingObserver
 
 internal class MetrikkObserver : InnsendingObserver {
@@ -21,9 +21,8 @@ internal object Metrics {
 
     private val jpFerdigstiltCounter =
         Counter
-            .build()
-            .namespace(DAGPENGER_NAMESPACE)
-            .name("journalpost_ferdigstilt")
+            .builder()
+            .name("${DAGPENGER_NAMESPACE}_journalpost_ferdigstilt")
             .labelNames("kategorisering", "skjema", "enhet")
             .help("Number of journal post processed succesfully")
             .register()
@@ -33,12 +32,14 @@ internal object Metrics {
         skjemaKode: String,
         enhet: String,
     ) = jpFerdigstiltCounter
-        .labels(kategorisertSom, skjemaKode, enhet)
+        .labelValues(kategorisertSom, skjemaKode, enhet)
         .inc()
 
     private val tilstandCounter =
         Counter
-            .build("dp_innsending_endret", "Antall tilstandsendringer")
+            .builder()
+            .name("${DAGPENGER_NAMESPACE}_dp_innsending_endret")
+            .help("Antall tilstandsendringer")
             .labelNames("tilstand", "forrigeTilstand")
             .register()
 
@@ -46,16 +47,16 @@ internal object Metrics {
         gjeldendeTilstand: String,
         forrigeTilstand: String,
     ) = tilstandCounter
-        .labels(gjeldendeTilstand, forrigeTilstand)
+        .labelValues(gjeldendeTilstand, forrigeTilstand)
         .inc()
 
     private val mottakskanalCounter =
         Counter
-            .build()
+            .builder()
             .name("dp_mottak_kanal")
             .help("Antall journalposter dom dp-mottak mottar sortert på mottakskanal")
             .labelNames("mottakskanal")
             .register()
 
-    fun mottakskanalInc(type: String) = mottakskanalCounter.labels(type).inc()
+    fun mottakskanalInc(type: String) = mottakskanalCounter.labelValues(type).inc()
 }

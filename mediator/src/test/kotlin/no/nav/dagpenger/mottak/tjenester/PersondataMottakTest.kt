@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.tjenester
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.mockk.CapturingSlot
 import io.mockk.Runs
 import io.mockk.every
@@ -10,7 +11,6 @@ import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.Before
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

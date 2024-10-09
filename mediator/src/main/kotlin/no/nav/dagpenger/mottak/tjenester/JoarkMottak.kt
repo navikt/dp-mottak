@@ -1,14 +1,14 @@
 package no.nav.dagpenger.mottak.tjenester
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.observers.Metrics
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
 
 internal class JoarkMottak(
     private val innsendingMediator: InnsendingMediator,
@@ -25,19 +25,20 @@ internal class JoarkMottak(
     }
 
     init {
-        River(rapidsConnection).apply {
-            validate { it.requireKey("journalpostId") }
-            validate { it.requireKey("journalpostStatus") }
-            validate { it.requireValue("temaNytt", "DAG") }
-            validate { it.requireAny("hendelsesType", listOf("MidlertidigJournalført", "JournalpostMottatt")) }
-            validate {
-                it.require("mottaksKanal") { mottaksKanal ->
-                    val kanal = mottaksKanal.asText()
-                    if (kanal in forbudteMottaksKanaler) throw IllegalArgumentException("Kan ikke håndtere '$kanal' mottakskanal")
+        River(rapidsConnection)
+            .apply {
+                validate { it.requireKey("journalpostId") }
+                validate { it.requireKey("journalpostStatus") }
+                validate { it.requireValue("temaNytt", "DAG") }
+                validate { it.requireAny("hendelsesType", listOf("MidlertidigJournalført", "JournalpostMottatt")) }
+                validate {
+                    it.require("mottaksKanal") { mottaksKanal ->
+                        val kanal = mottaksKanal.asText()
+                        if (kanal in forbudteMottaksKanaler) throw IllegalArgumentException("Kan ikke håndtere '$kanal' mottakskanal")
+                    }
                 }
-            }
-            validate { it.interestedIn("temaNytt", "hendelsesType", "mottaksKanal", "behandlingstema") }
-        }.register(this)
+                validate { it.interestedIn("temaNytt", "hendelsesType", "mottaksKanal", "behandlingstema") }
+            }.register(this)
     }
 
     override fun onPacket(
