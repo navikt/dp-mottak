@@ -17,7 +17,7 @@ application {
 dependencies {
     implementation(project(":modell"))
     implementation(libs.dp.biblioteker.oauth2.klient)
-
+    implementation("io.prometheus:prometheus-metrics-core:1.3.1")
     implementation(libs.rapids.and.rivers)
     implementation("io.getunleash:unleash-client-java:9.2.4")
 
