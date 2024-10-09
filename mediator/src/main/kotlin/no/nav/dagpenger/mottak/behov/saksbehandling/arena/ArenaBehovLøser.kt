@@ -1,16 +1,19 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling.arena
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
+import com.github.navikt.tbd_libs.rapids_and_rivers.withMDC
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.asLocalDateTime
-import no.nav.helse.rapids_rivers.withMDC
 
-internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: RapidsConnection) {
+internal class ArenaBehovLøser(
+    arenaOppslag: ArenaOppslag,
+    rapidsConnection: RapidsConnection,
+) {
     init {
         OpprettArenaOppgaveBehovLøser(arenaOppslag, rapidsConnection)
     }
@@ -24,27 +27,28 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
         }
 
         init {
-            River(rapidsConnection).apply {
-                validate { it.demandValue("@event_name", "behov") }
-                validate {
-                    it.demandAllOrAny(
-                        "@behov",
-                        listOf("OpprettStartVedtakOppgave", "OpprettVurderhenvendelseOppgave"),
-                    )
-                }
-                validate { it.rejectKey("@løsning") }
-                validate { it.rejectKey("@feil") }
-                validate { it.requireKey("@behovId", "journalpostId") }
-                validate {
-                    it.requireKey(
-                        "fødselsnummer",
-                        "behandlendeEnhetId",
-                        "oppgavebeskrivelse",
-                        "registrertDato",
-                        "tilleggsinformasjon",
-                    )
-                }
-            }.register(this)
+            River(rapidsConnection)
+                .apply {
+                    validate { it.demandValue("@event_name", "behov") }
+                    validate {
+                        it.demandAllOrAny(
+                            "@behov",
+                            listOf("OpprettStartVedtakOppgave", "OpprettVurderhenvendelseOppgave"),
+                        )
+                    }
+                    validate { it.rejectKey("@løsning") }
+                    validate { it.rejectKey("@feil") }
+                    validate { it.requireKey("@behovId", "journalpostId") }
+                    validate {
+                        it.requireKey(
+                            "fødselsnummer",
+                            "behandlendeEnhetId",
+                            "oppgavebeskrivelse",
+                            "registrertDato",
+                            "tilleggsinformasjon",
+                        )
+                    }
+                }.register(this)
         }
 
         override fun onPacket(
@@ -102,10 +106,9 @@ internal class ArenaBehovLøser(arenaOppslag: ArenaOppslag, rapidsConnection: Ra
                             packet["@løsning"] =
                                 mapOf(
                                     behovNavn to mapOf("@feil" to "Kunne ikke opprettet Arena oppgave"),
-                                )
-                                    .also {
-                                        logger.info { "Løste behov $behovNavn med feil $it" }
-                                    }
+                                ).also {
+                                    logger.info { "Løste behov $behovNavn med feil $it" }
+                                }
                         }
 
                         context.publish(packet.toJson())

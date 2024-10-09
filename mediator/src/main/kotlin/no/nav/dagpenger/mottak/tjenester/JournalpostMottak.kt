@@ -1,16 +1,16 @@
 package no.nav.dagpenger.mottak.tjenester
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.JsonMessageExtensions.getOrNull
 import no.nav.dagpenger.mottak.meldinger.Journalpost
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.asLocalDateTime
 import java.time.LocalDateTime
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype as Behov
 
@@ -24,13 +24,14 @@ internal class JournalpostMottak(
     private val løsning = "@løsning.${Behov.Journalpost.name}"
 
     init {
-        River(rapidsConnection).apply {
-            validate { it.requireValue("@event_name", "behov") }
-            validate { it.requireValue("@final", true) }
-            validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-            validate { it.requireKey(løsning) }
-            validate { it.requireKey("journalpostId") }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                validate { it.requireValue("@event_name", "behov") }
+                validate { it.requireValue("@final", true) }
+                validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
+                validate { it.requireKey(løsning) }
+                validate { it.requireKey("journalpostId") }
+            }.register(this)
     }
 
     override fun onPacket(
@@ -63,9 +64,12 @@ internal class JournalpostMottak(
                                 )
                             },
                         registrertDato =
-                            it["relevanteDatoer"].firstOrNull {
-                                it["datotype"].asText() == "DATO_REGISTRERT"
-                            }?.get("dato")?.asText().let { LocalDateTime.parse(it) } ?: LocalDateTime.now(),
+                            it["relevanteDatoer"]
+                                .firstOrNull {
+                                    it["datotype"].asText() == "DATO_REGISTRERT"
+                                }?.get("dato")
+                                ?.asText()
+                                .let { LocalDateTime.parse(it) } ?: LocalDateTime.now(),
                         behandlingstema = it["behandlingstema"].textValue(),
                     ).also {
                         logg.info {

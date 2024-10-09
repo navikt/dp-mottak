@@ -1,30 +1,32 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.withMDC
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApi.OppdaterJournalpostRequest
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.withMDC
 
 internal class OppdaterJournalpostBehovLøser(
     private val journalpostDokarkiv: JournalpostDokarkiv,
     rapidsConnection: RapidsConnection,
-) : River.PacketListener, JournalpostFeil {
+) : River.PacketListener,
+    JournalpostFeil {
     private companion object {
         val logger = KotlinLogging.logger { }
     }
 
     init {
-        River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "behov") }
-            validate { it.demandAllOrAny("@behov", listOf("OppdaterJournalpost")) }
-            validate { it.rejectKey("@løsning") }
-            validate { it.requireKey("@behovId", "journalpostId") }
-            validate { it.interestedIn("navn", "fødselsnummer", "tittel", "dokumenter", "fagsakId") }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                validate { it.demandValue("@event_name", "behov") }
+                validate { it.demandAllOrAny("@behov", listOf("OppdaterJournalpost")) }
+                validate { it.rejectKey("@løsning") }
+                validate { it.requireKey("@behovId", "journalpostId") }
+                validate { it.interestedIn("navn", "fødselsnummer", "tittel", "dokumenter", "fagsakId") }
+            }.register(this)
     }
 
     override fun onPacket(

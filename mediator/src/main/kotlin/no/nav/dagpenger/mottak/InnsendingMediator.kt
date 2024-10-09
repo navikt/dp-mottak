@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.db.InnsendingRepository
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
@@ -12,7 +13,6 @@ import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
-import no.nav.helse.rapids_rivers.RapidsConnection
 import org.slf4j.MDC
 
 private val log = KotlinLogging.logger {}

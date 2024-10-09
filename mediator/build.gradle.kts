@@ -17,7 +17,7 @@ application {
 dependencies {
     implementation(project(":modell"))
     implementation(libs.dp.biblioteker.oauth2.klient)
-
+    implementation("io.prometheus:prometheus-metrics-core:1.3.1")
     implementation(libs.rapids.and.rivers)
     implementation("io.getunleash:unleash-client-java:9.2.4")
 
@@ -36,6 +36,7 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.mock.oauth2.server)
     testImplementation(libs.bundles.postgres.test)
+    testImplementation(libs.rapids.and.rivers.test)
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation("io.ktor:ktor-client-mock-jvm:${libs.versions.ktor.get()}")
 }

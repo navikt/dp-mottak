@@ -1,7 +1,7 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -19,15 +19,14 @@ internal class SøknadsdataBehovLøserTest {
                     override suspend fun hentSøknadsData(
                         journalpostId: String,
                         dokumentInfoId: String,
-                    ): SafGraphQL.SøknadsData {
-                        return SafGraphQL.SøknadsData(
+                    ): SafGraphQL.SøknadsData =
+                        SafGraphQL.SøknadsData(
                             jacksonJsonAdapter.createObjectNode().apply {
                                 put("something", "something")
                                 put("something else", "something else")
                                 put("something entirely different", "something entirely different")
                             },
                         )
-                    }
                 },
         )
     }

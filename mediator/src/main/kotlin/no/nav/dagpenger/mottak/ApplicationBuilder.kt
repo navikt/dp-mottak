@@ -1,5 +1,7 @@
 package no.nav.dagpenger.mottak
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.KafkaRapid
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dokarkivTokenProvider
 import no.nav.dagpenger.mottak.api.innsendingApi
@@ -24,7 +26,6 @@ import no.nav.dagpenger.mottak.observers.InnsendingProbe
 import no.nav.dagpenger.mottak.observers.MetrikkObserver
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.helse.rapids_rivers.RapidsConnection
 
 private val logg = KotlinLogging.logger {}
 
@@ -40,17 +41,12 @@ internal class ApplicationBuilder(
 
     private val rapidsConnection =
         RapidApplication
-            .Builder(
-                RapidApplication.RapidApplicationConfig.fromEnv(env),
-            ).also { builder ->
-                builder.withKtorModule {
-                    innsendingApi(
-                        innsendingRepository,
-                        ferdigstiltInnsendingObserver,
-                    )
-                }
-            }.build()
-            .apply {
+            .create(env) { engine, rapidsConnection: KafkaRapid ->
+                engine.application.innsendingApi(
+                    innsendingRepository = innsendingRepository,
+                    observer = ferdigstiltInnsendingObserver,
+                )
+            }.apply {
                 val mediator =
                     InnsendingMediator(
                         innsendingRepository = innsendingRepository,

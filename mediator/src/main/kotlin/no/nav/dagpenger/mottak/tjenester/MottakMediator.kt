@@ -1,9 +1,12 @@
 package no.nav.dagpenger.mottak.tjenester
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.dagpenger.mottak.InnsendingMediator
-import no.nav.helse.rapids_rivers.RapidsConnection
 
-internal class MottakMediator(mediator: InnsendingMediator, rapidsConnection: RapidsConnection) {
+internal class MottakMediator(
+    mediator: InnsendingMediator,
+    rapidsConnection: RapidsConnection,
+) {
     init {
         JoarkMottak(mediator, rapidsConnection)
         JournalpostMottak(mediator, rapidsConnection)
