@@ -71,9 +71,6 @@ spec:
         - host: {{pdl.ingress}}
         - host: {{dokarkiv.ingress}}
         - host: teamdagpenger-unleash-api.nav.cloud.nais.io
-    inbound:
-      rules:
-        - application: dp-quiz-retting
   {{#if ingresses}}
   ingresses:
   {{#each ingresses as |url|}}
@@ -83,7 +80,7 @@ spec:
   gcp:
     sqlInstances:
       - name: dp-mottak
-        type: POSTGRES_12
+        type: POSTGRES_16
         tier:  {{db_tier}}
         diskType: SSD
         highAvailability: true

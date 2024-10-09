@@ -36,19 +36,6 @@ internal object Metrics {
         .labels(kategorisertSom, skjemaKode, enhet)
         .inc()
 
-    fun oppfyllerMinsteinntektArbeidsinntekt(boolean: Boolean) =
-        inngangsvilkårResultatTeller
-            .labels(boolean.toString())
-            .inc()
-
-    private val inngangsvilkårResultatTeller =
-        Counter
-            .build()
-            .name("inngangsvilkaar_resultat_journalfort")
-            .help("Antall søknader som oppfyller / ikke oppfyller inngangsvilkårene vi tester")
-            .labelNames("oppfyller")
-            .register()
-
     private val tilstandCounter =
         Counter
             .build("dp_innsending_endret", "Antall tilstandsendringer")
