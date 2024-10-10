@@ -10,6 +10,8 @@ import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
+import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak.KONTRAKT_UTGAATT
+import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
 
@@ -63,8 +65,18 @@ internal class SøknadsdataMottak(
                                 """.trimMargin()
                             }
 
-                            if (avtjentVerneplikt() && avsluttetArbeidsforhold().isEmpty() && !harBarn() && !harAndreYtelser()) {
-                                logg.info { "Søknad er en mulig Viggo." }
+                            if (!avtjentVerneplikt() &&
+                                !harBarn() &&
+                                !eøsArbeidsforhold() &&
+                                !eøsBostedsland() &&
+                                !harAndreYtelser() &&
+                                avsluttetArbeidsforhold().size == 1 &&
+                                (
+                                    avsluttetArbeidsforhold().single().sluttårsak == SAGT_OPP_AV_ARBEIDSGIVER ||
+                                        avsluttetArbeidsforhold().single().sluttårsak == KONTRAKT_UTGAATT
+                                )
+                            ) {
+                                logg.info { "Søknad er en mulig case for innvilgelse." }
                             }
                         }
                     }
