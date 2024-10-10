@@ -63,20 +63,20 @@ internal class SøknadsdataMottak(
                                 |  avsluttedeArbeidsforhold=${avsluttetArbeidsforhold().isEmpty()}
                                 |  rutingoppslag=${this.javaClass.simpleName}
                                 """.trimMargin()
-                            }
 
-                            if (!avtjentVerneplikt() &&
-                                !harBarn() &&
-                                !eøsArbeidsforhold() &&
-                                !eøsBostedsland() &&
-                                !harAndreYtelser() &&
-                                avsluttetArbeidsforhold().size == 1 &&
-                                (
-                                    avsluttetArbeidsforhold().single().sluttårsak == SAGT_OPP_AV_ARBEIDSGIVER ||
-                                        avsluttetArbeidsforhold().single().sluttårsak == KONTRAKT_UTGAATT
-                                )
-                            ) {
-                                logg.info { "Søknad er en mulig case for innvilgelse." }
+                                if (!avtjentVerneplikt() &&
+                                    !harBarn() &&
+                                    !eøsArbeidsforhold() &&
+                                    !eøsBostedsland() &&
+                                    !harAndreYtelser() &&
+                                    avsluttetArbeidsforhold().size == 1 &&
+                                    (
+                                        avsluttetArbeidsforhold().single().sluttårsak == SAGT_OPP_AV_ARBEIDSGIVER ||
+                                            avsluttetArbeidsforhold().single().sluttårsak == KONTRAKT_UTGAATT
+                                    )
+                                ) {
+                                    logg.info { "Søknad er en mulig case for innvilgelse." }
+                                }
                             }
                         }
                     }
