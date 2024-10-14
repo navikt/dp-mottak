@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak
 
-import mu.KotlinLogging
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import java.time.LocalDateTime
@@ -178,16 +177,18 @@ data class Gjenopptak(
         rutingOppslag: RutingOppslag?,
         person: Person?,
     ): OppgaveBenk {
-        logger.info {
-            val erPermittertFraFiskeforedling = rutingOppslag?.permittertFraFiskeForedling() == true
-            "Ruter søknad om gjenopptak med fisk=$erPermittertFraFiskeforedling. Søknadsdata=$rutingOppslag"
+        val erPermittertFraFiskeforedling = rutingOppslag?.permittertFraFiskeForedling() == true
+
+        if (erPermittertFraFiskeforedling) {
+            return OppgaveBenk(
+                "4454",
+                "GJENOPPTAK FISK\n",
+                journalpost.datoRegistrert(),
+                tilleggsinformasjon(),
+            )
         }
 
         return super.finnOppgaveBenk(rutingOppslag, person)
-    }
-
-    private companion object {
-        val logger = KotlinLogging.logger {}
     }
 }
 

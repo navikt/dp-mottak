@@ -154,6 +154,18 @@ class OppgavebenkTest {
     }
 
     @Test
+    fun `Finn riktig oppgave beskrivelse og benk når søker om gjenopptak av permittert fra fiskeforedling`() {
+        withSøknad(
+            erPermittertFraFiskeforedling = true,
+        ) {
+            val jp = lagjournalpostData("NAV 04-16.04").kategorisertJournalpost()
+            val oppgaveBenk = jp.oppgaveBenk(person = person, rutingOppslag = it)
+            assertEquals("GJENOPPTAK FISK\n", oppgaveBenk.beskrivelse)
+            assertEquals("4454", oppgaveBenk.id)
+        }
+    }
+
+    @Test
     fun `Finn riktig oppgave beskrivelse og person ikke har norsk tilknytning ved permittering`() {
         withSøknad {
             val oppgaveBenk =
@@ -216,6 +228,16 @@ class OppgavebenkTest {
         jp.oppgaveBenk(person = person, rutingOppslag = null).also {
             assertEquals("Ettersending til anke\n", it.beskrivelse)
             assertEquals("4270", it.id)
+        }
+    }
+
+    @Test
+    fun `Finn riktig oppgavebenk når søknad er gjenopptak `() {
+        withSøknad {
+            val jp = lagjournalpostData("NAV 04-16.04").kategorisertJournalpost()
+            val oppgaveBenk = jp.oppgaveBenk(person = person, rutingOppslag = it)
+            assertEquals("Gjenopptak\n", oppgaveBenk.beskrivelse)
+            assertEquals("4450", oppgaveBenk.id)
         }
     }
 
