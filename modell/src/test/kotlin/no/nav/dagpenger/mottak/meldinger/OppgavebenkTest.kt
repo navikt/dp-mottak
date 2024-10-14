@@ -149,7 +149,7 @@ class OppgavebenkTest {
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, rutingOppslag = it)
             assertEquals("FISK\n", oppgaveBenk.beskrivelse)
-            assertEquals("4450", oppgaveBenk.id)
+            assertEquals("4454", oppgaveBenk.id)
         }
     }
 
@@ -157,7 +157,8 @@ class OppgavebenkTest {
     fun `Finn riktig oppgave beskrivelse og person ikke har norsk tilknytning ved permittering`() {
         withSøknad {
             val oppgaveBenk =
-                lagjournalpostData("NAV 04-01.04").kategorisertJournalpost()
+                lagjournalpostData("NAV 04-01.04")
+                    .kategorisertJournalpost()
                     .oppgaveBenk(person = person.copy(norskTilknytning = false), rutingOppslag = it)
             assertEquals("Start Vedtaksbehandling - automatisk journalført.\n", oppgaveBenk.beskrivelse)
             assertEquals("4465", oppgaveBenk.id)

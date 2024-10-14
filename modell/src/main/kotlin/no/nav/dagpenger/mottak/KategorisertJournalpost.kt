@@ -39,6 +39,7 @@ sealed class KategorisertJournalpost(
                     id = "2103",
                     beskrivelse = henvendelseNavn(),
                 )
+
             else -> {
                 when (person?.egenAnsatt == true && oppgaveBenk.id == "4450") {
                     true -> oppgaveBenk.copy(id = "4483", beskrivelse = henvendelseNavn())
@@ -150,7 +151,7 @@ data class NySøknad(
 
             erPermittertFraFiskeforedling ->
                 OppgaveBenk(
-                    "4450",
+                    "4454",
                     "FISK\n",
                     datoRegistrert,
                     tilleggsinformasjon(),
@@ -171,11 +172,6 @@ data class Gjenopptak(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
     override fun henvendelseNavn(): String = "Gjenopptak\n"
-
-    override fun finnOppgaveBenk(
-        rutingOppslag: RutingOppslag?,
-        person: Person?,
-    ) = super.finnOppgaveBenk(rutingOppslag, person)
 }
 
 data class Generell(
@@ -218,14 +214,13 @@ data class Anke(
     override fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
         person: Person?,
-    ): OppgaveBenk {
-        return OppgaveBenk(
+    ): OppgaveBenk =
+        OppgaveBenk(
             id = "4270",
             beskrivelse = henvendelseNavn(),
             datoRegistrert = journalpost.datoRegistrert(),
             tilleggsinformasjon = tilleggsinformasjon(),
         )
-    }
 }
 
 data class KlageForskudd(
@@ -240,14 +235,13 @@ data class KlageForskudd(
     override fun finnOppgaveBenk(
         rutingOppslag: RutingOppslag?,
         person: Person?,
-    ): OppgaveBenk {
-        return OppgaveBenk(
+    ): OppgaveBenk =
+        OppgaveBenk(
             beskrivelse = henvendelseNavn(),
             id = "4153",
             datoRegistrert = journalpost.datoRegistrert(),
             tilleggsinformasjon = tilleggsinformasjon(),
         )
-    }
 }
 
 data class Ettersending(
