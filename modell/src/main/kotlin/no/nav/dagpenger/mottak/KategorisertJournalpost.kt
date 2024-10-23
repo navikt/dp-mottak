@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak
 
+import mu.KotlinLogging
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import java.time.LocalDateTime
@@ -168,6 +169,8 @@ data class NySøknad(
     }
 }
 
+private val logger = KotlinLogging.logger { }
+
 data class Gjenopptak(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
@@ -177,7 +180,9 @@ data class Gjenopptak(
         rutingOppslag: RutingOppslag?,
         person: Person?,
     ): OppgaveBenk {
+        logger.info { "Gjenopptak journalpostId=${journalpost.journalpostId()}, rutingOppslag=${rutingOppslag?.let { it::class.java.simpleName }}" }
         val erPermittertFraFiskeforedling = rutingOppslag?.permittertFraFiskeForedling() == true
+        logger.info { "erPermittertFraFiskeforedling=$erPermittertFraFiskeforedling" }
 
         if (erPermittertFraFiskeforedling) {
             return OppgaveBenk(
