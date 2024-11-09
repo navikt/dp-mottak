@@ -4,7 +4,7 @@ db_tier: db-custom-1-3840
 db_size: 20
 replicas_min: 2
 replicas_max: 2
-point_in_time_recovery_days: 2
+point_in_time_recovery_days: 7
 ingresses:
   - "https://dp-mottak.intern.dev.nav.no/"
 dp_proxy:
