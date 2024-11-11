@@ -19,7 +19,7 @@ spec:
     path: /metrics
   observability:
     autoInstrumentation:
-      enabled: true
+      enabled: false
       runtime: "java"
   replicas:
     min: {{replicas_min}}
