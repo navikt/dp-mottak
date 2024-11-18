@@ -35,10 +35,6 @@ internal class OppdaterJournalpostBehovLøser(
     ) {
         val journalpostId = packet["journalpostId"].asText()
         val behovId = packet["@behovId"].asText()
-        if (journalpostId in setOf("671706058")) {
-            logger.warn { "Journalpost med id $journalpostId er en testjournalpost og vil ikke bli oppdatert" }
-            return
-        }
         withMDC(
             mapOf(
                 "behovId" to behovId,
