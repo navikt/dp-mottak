@@ -19,7 +19,7 @@ dependencies {
     implementation(libs.dp.biblioteker.oauth2.klient)
     implementation("io.prometheus:prometheus-metrics-core:1.3.3")
     implementation(libs.rapids.and.rivers)
-    implementation("io.getunleash:unleash-client-java:9.2.4")
+    implementation("io.getunleash:unleash-client-java:9.2.5")
 
     implementation(libs.bundles.postgres)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.9.0")
