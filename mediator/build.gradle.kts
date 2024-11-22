@@ -16,7 +16,7 @@ application {
 
 dependencies {
     implementation(project(":modell"))
-    implementation(libs.dp.biblioteker.oauth2.klient)
+    implementation("no.nav.dagpenger:oauth2-klient:2024.10.31-15.02.1d4f08a38d24")
     implementation("io.prometheus:prometheus-metrics-core:1.3.3")
     implementation(libs.rapids.and.rivers)
     implementation("io.getunleash:unleash-client-java:9.2.5")
@@ -39,6 +39,7 @@ dependencies {
     testImplementation(libs.rapids.and.rivers.test)
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation("io.ktor:ktor-client-mock-jvm:${libs.versions.ktor.get()}")
+    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2024.11.19-09.27-9c591574")
 }
 
 tasks.withType<ShadowJar> {

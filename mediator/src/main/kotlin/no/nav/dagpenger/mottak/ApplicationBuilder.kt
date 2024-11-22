@@ -1,9 +1,9 @@
 package no.nav.dagpenger.mottak
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.KafkaRapid
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dokarkivTokenProvider
+import no.nav.dagpenger.mottak.Config.objectMapper
 import no.nav.dagpenger.mottak.api.innsendingApi
 import no.nav.dagpenger.mottak.behov.journalpost.FerdigstillJournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApiClient
@@ -41,7 +41,7 @@ internal class ApplicationBuilder(
 
     private val rapidsConnection =
         RapidApplication
-            .create(env) { engine, rapidsConnection: KafkaRapid ->
+            .create(env = env, objectMapper = objectMapper) { engine, _ ->
                 engine.application.innsendingApi(
                     innsendingRepository = innsendingRepository,
                     observer = ferdigstiltInnsendingObserver,
