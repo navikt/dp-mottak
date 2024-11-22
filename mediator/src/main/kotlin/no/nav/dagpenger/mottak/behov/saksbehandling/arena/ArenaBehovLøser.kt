@@ -5,7 +5,9 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
 import com.github.navikt.tbd_libs.rapids_and_rivers.withMDC
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
 import mu.KotlinLogging
@@ -29,15 +31,15 @@ internal class ArenaBehovLøser(
         init {
             River(rapidsConnection)
                 .apply {
-                    validate { it.demandValue("@event_name", "behov") }
-                    validate {
-                        it.demandAllOrAny(
+                    precondition { it.requireValue("@event_name", "behov") }
+                    precondition {
+                        it.requireAllOrAny(
                             "@behov",
                             listOf("OpprettStartVedtakOppgave", "OpprettVurderhenvendelseOppgave"),
                         )
                     }
-                    validate { it.rejectKey("@løsning") }
-                    validate { it.rejectKey("@feil") }
+                    precondition { it.forbid("@løsning") }
+                    precondition { it.forbid("@feil") }
                     validate { it.requireKey("@behovId", "journalpostId") }
                     validate {
                         it.requireKey(
@@ -54,6 +56,8 @@ internal class ArenaBehovLøser(
         override fun onPacket(
             packet: JsonMessage,
             context: MessageContext,
+            metadata: MessageMetadata,
+            meterRegistry: MeterRegistry,
         ) {
             val journalpostId = packet["journalpostId"].asText()
             val behovId = packet["@behovId"].asText()

@@ -5,7 +5,9 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
@@ -23,15 +25,15 @@ internal class OpprettArenaOppgaveMottak(
     init {
         River(rapidsConnection)
             .apply {
-                validate { it.requireValue("@event_name", "behov") }
-                validate { it.requireValue("@final", true) }
-                validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-                validate {
-                    it.demandAllOrAny(
+                precondition { it.requireValue("@event_name", "behov") }
+                precondition { it.requireValue("@final", true) }
+                precondition {
+                    it.requireAllOrAny(
                         "@behov",
                         listOf(Behovtype.OpprettStartVedtakOppgave.name, Behovtype.OpprettVurderhenvendelseOppgave.name),
                     )
                 }
+                validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
                 validate { it.requireKey("@løsning") }
                 validate { it.requireKey("journalpostId") }
             }.register(this)
@@ -40,6 +42,8 @@ internal class OpprettArenaOppgaveMottak(
     override fun onPacket(
         packet: JsonMessage,
         context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
     ) {
         val arenaLøsning = packet["@løsning"].first()
         val journalpostId = packet["journalpostId"].asText()
