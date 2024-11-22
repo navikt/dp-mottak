@@ -25,7 +25,9 @@ internal class JournalpostApi {
         val journalfoerendeEnhet: String = "9999",
     )
 
-    internal data class Sak(val fagsakId: String?) {
+    internal data class Sak(
+        val fagsakId: String?,
+    ) {
         val saksType: SaksType
         val fagsaksystem: String?
 
@@ -40,11 +42,20 @@ internal class JournalpostApi {
         }
     }
 
-    internal data class Avsender(val id: String, val idType: String = "FNR")
+    internal data class Avsender(
+        val id: String,
+        val idType: String = "FNR",
+    )
 
-    internal data class Bruker(val id: String, val idType: String = "FNR")
+    internal data class Bruker(
+        val id: String,
+        val idType: String = "FNR",
+    )
 
-    internal data class Dokument(val dokumentInfoId: String, val tittel: String)
+    internal data class Dokument(
+        val dokumentInfoId: String,
+        val tittel: String,
+    )
 
     internal enum class SaksType {
         GENERELL_SAK,

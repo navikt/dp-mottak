@@ -60,6 +60,5 @@ internal class JournalpostBehovLøser(
         }
     }
 
-    private fun SafGraphQL.Journalpost.harDokumentitlerLengreEnn(lengde: Int) =
-        dokumenter.mapNotNull { dokument -> dokument.tittel }.any { tittel -> tittel.length > lengde }
+    private fun SafGraphQL.Journalpost.harDokumentitlerLengreEnn(lengde: Int) = dokumenter.mapNotNull { dokument -> dokument.tittel }.any { tittel -> tittel.length > lengde }
 }

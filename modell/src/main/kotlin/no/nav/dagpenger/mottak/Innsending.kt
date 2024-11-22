@@ -203,14 +203,13 @@ class Innsending private constructor(
             hendelse: Hendelse,
         ) {}
 
-        override fun toSpesifikkKontekst(): SpesifikkKontekst {
-            return SpesifikkKontekst(
+        override fun toSpesifikkKontekst(): SpesifikkKontekst =
+            SpesifikkKontekst(
                 "Tilstand",
                 mapOf(
                     "tilstand" to type.name,
                 ),
             )
-        }
     }
 
     internal object Mottatt : Tilstand {
@@ -694,8 +693,10 @@ class Innsending private constructor(
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = rutingOppslag?.data(),
             behandlendeEnhet =
-                jp.kategorisertJournalpost()
-                    .oppgaveBenk(person, rutingOppslag).id,
+                jp
+                    .kategorisertJournalpost()
+                    .oppgaveBenk(person, rutingOppslag)
+                    .id,
             tittel = jp.hovedDokument().tittel,
         ).also { ferdig ->
             observers.forEach { it.innsendingFerdigstilt(ferdig) }
@@ -714,8 +715,10 @@ class Innsending private constructor(
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = rutingOppslag?.data(),
             behandlendeEnhet =
-                jp.kategorisertJournalpost()
-                    .oppgaveBenk(person, rutingOppslag).id,
+                jp
+                    .kategorisertJournalpost()
+                    .oppgaveBenk(person, rutingOppslag)
+                    .id,
             tittel = jp.hovedDokument().tittel,
         ).also { mottatt ->
             observers.forEach { it.innsendingMottatt(mottatt) }

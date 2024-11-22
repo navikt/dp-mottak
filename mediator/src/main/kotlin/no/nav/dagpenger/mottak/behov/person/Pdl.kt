@@ -26,7 +26,9 @@ import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 private val logg = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.Pdl")
 
-internal class PdlPersondataOppslag(config: Configuration) {
+internal class PdlPersondataOppslag(
+    config: Configuration,
+) {
     private val tokenProvider = config.pdlApiTokenProvider
     private val pdlClient =
         HttpClient {
@@ -44,23 +46,27 @@ internal class PdlPersondataOppslag(config: Configuration) {
         }
 
     suspend fun hentPerson(id: String): Pdl.Person? =
-        pdlClient.request {
-            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
-            method = HttpMethod.Post
-            setBody(PersonQuery(id).toJson().also { sikkerlogg.info { "Forsøker å hente person med id $id fra PDL" } })
-        }.bodyAsText().let { body ->
-            getWarnings(body).takeIf { it.isNotEmpty() }?.map { warnings ->
-                logg.warn { "Warnings ved henting av person fra PDL: $warnings" }
+        pdlClient
+            .request {
+                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+                method = HttpMethod.Post
+                setBody(PersonQuery(id).toJson().also { sikkerlogg.info { "Forsøker å hente person med id $id fra PDL" } })
+            }.bodyAsText()
+            .let { body ->
+                getWarnings(body).takeIf { it.isNotEmpty() }?.map { warnings ->
+                    logg.warn { "Warnings ved henting av person fra PDL: $warnings" }
+                }
+                if (hasError(body)) {
+                    throw PdlPersondataOppslagException(body)
+                } else {
+                    Pdl.Person.fromGraphQlJson(body)
+                }
             }
-            if (hasError(body)) {
-                throw PdlPersondataOppslagException(body)
-            } else {
-                Pdl.Person.fromGraphQlJson(body)
-            }
-        }
 }
 
-internal class PdlPersondataOppslagException(s: String) : RuntimeException(s)
+internal class PdlPersondataOppslagException(
+    s: String,
+) : RuntimeException(s)
 
 internal fun hasError(json: String): Boolean {
     val j = jacksonObjectMapper().readTree(json)
@@ -97,34 +103,36 @@ private fun harGraphqlErrors(json: JsonNode) = json["errors"] != null && !json["
 
 private fun ukjentPersonIdent(node: JsonNode) = node["errors"]?.any { it["message"].asText() == "Fant ikke person" } ?: false
 
-internal data class PersonQuery(val id: String) : GraphqlQuery(
-    //language=Graphql
-    query =
-        """
-        query(${'$'}ident: ID!) {
-            hentPerson(ident: ${'$'}ident) {
-                navn {
-                    fornavn,
-                    mellomnavn,
-                    etternavn
-                },
-                adressebeskyttelse{
-                    gradering
+internal data class PersonQuery(
+    val id: String,
+) : GraphqlQuery(
+        //language=Graphql
+        query =
+            """
+            query(${'$'}ident: ID!) {
+                hentPerson(ident: ${'$'}ident) {
+                    navn {
+                        fornavn,
+                        mellomnavn,
+                        etternavn
+                    },
+                    adressebeskyttelse{
+                        gradering
+                    }
                 }
-            }
-            hentGeografiskTilknytning(ident: ${'$'}ident){
-                gtLand
-            }
-            hentIdenter(ident: ${'$'}ident, grupper: [AKTORID,FOLKEREGISTERIDENT]) {
-                identer {
-                    ident,
-                    gruppe
+                hentGeografiskTilknytning(ident: ${'$'}ident){
+                    gtLand
                 }
-            }                
-        }
-        """.trimIndent(),
-    variables = mapOf("ident" to id),
-)
+                hentIdenter(ident: ${'$'}ident, grupper: [AKTORID,FOLKEREGISTERIDENT]) {
+                    identer {
+                        ident,
+                        gruppe
+                    }
+                }                
+            }
+            """.trimIndent(),
+        variables = mapOf("ident" to id),
+    )
 
 internal class Pdl {
     @JsonDeserialize(using = PersonDeserializer::class)
@@ -147,12 +155,10 @@ internal class Pdl {
 
         internal fun JsonNode.norskTilknyting(): Boolean = findValue("gtLand")?.isNull ?: false
 
-        internal fun JsonNode.diskresjonsKode(): String? {
-            return findValue("adressebeskyttelse").firstOrNull()?.path("gradering")?.asText(null)
-        }
+        internal fun JsonNode.diskresjonsKode(): String? = findValue("adressebeskyttelse").firstOrNull()?.path("gradering")?.asText(null)
 
-        internal fun JsonNode.personNavn(): String {
-            return findValue("navn").first().let { node ->
+        internal fun JsonNode.personNavn(): String =
+            findValue("navn").first().let { node ->
                 val fornavn = node.path("fornavn").asText()
                 val mellomnavn = node.path("mellomnavn").asText("")
                 val etternavn = node.path("etternavn").asText()
@@ -162,11 +168,8 @@ internal class Pdl {
                     else -> "$fornavn $mellomnavn $etternavn"
                 }
             }
-        }
 
-        private fun JsonNode.ident(type: String): String {
-            return findValue("identer").first { it.path("gruppe").asText() == type }.get("ident").asText()
-        }
+        private fun JsonNode.ident(type: String): String = findValue("identer").first { it.path("gruppe").asText() == type }.get("ident").asText()
 
         private fun JsonNode.harIdent(type: String): Boolean = findValue("identer").map { it["gruppe"].asText() }.contains(type)
 
@@ -176,27 +179,28 @@ internal class Pdl {
         ): Person? {
             val node: JsonNode = p.readValueAsTree()
 
-            return kotlin.runCatching {
-                Person(
-                    navn = node.personNavn(),
-                    aktørId = node.aktørId(),
-                    fødselsnummer = node.fødselsnummer(),
-                    norskTilknytning = node.norskTilknyting(),
-                    diskresjonskode = node.diskresjonsKode(),
+            return kotlin
+                .runCatching {
+                    Person(
+                        navn = node.personNavn(),
+                        aktørId = node.aktørId(),
+                        fødselsnummer = node.fødselsnummer(),
+                        norskTilknytning = node.norskTilknyting(),
+                        diskresjonskode = node.diskresjonsKode(),
+                    )
+                }.fold(
+                    onSuccess = {
+                        it
+                    },
+                    onFailure = {
+                        if (ukjentPersonIdent(node) || !node.harIdent("FOLKEREGISTERIDENT")) {
+                            return null
+                        } else {
+                            sikkerlogg.error(it) { "Feil ved deserialisering av PDL response: $node" }
+                            throw it
+                        }
+                    },
                 )
-            }.fold(
-                onSuccess = {
-                    it
-                },
-                onFailure = {
-                    if (ukjentPersonIdent(node) || !node.harIdent("FOLKEREGISTERIDENT")) {
-                        return null
-                    } else {
-                        sikkerlogg.error(it) { "Feil ved deserialisering av PDL response: $node" }
-                        throw it
-                    }
-                },
-            )
         }
     }
 }
