@@ -5,6 +5,8 @@ metadata:
   namespace: teamdagpenger
   labels:
     team: teamdagpenger
+  annotations:
+    config.linkerd.io/proxy-outbound-connect-timeout: 3000ms
 spec:
   image: {{image}}
   port: 8080
