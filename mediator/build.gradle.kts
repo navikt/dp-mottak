@@ -39,7 +39,7 @@ dependencies {
     testImplementation(libs.rapids.and.rivers.test)
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation("io.ktor:ktor-client-mock-jvm:${libs.versions.ktor.get()}")
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2024.11.22-10.18-e31c6051")
+    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2024.11.25-10.16-d75e0dd1")
 }
 
 tasks.withType<ShadowJar> {
