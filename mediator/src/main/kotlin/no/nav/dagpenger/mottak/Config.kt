@@ -35,7 +35,6 @@ internal object Config {
                 "PDL_API_SCOPE" to "api://dev-fss.pdl.pdl-api/.default",
                 "SKJERMING_API_SCOPE" to "api://dev-gcp.nom.skjermede-personer-pip/.default",
                 "SKJERMING_API_URL" to "http://skjermede-personer-pip.nom/skjermet",
-                "UNLEASH_URL" to "https://unleash.nais.io/api/",
                 "AZURE_OPENID_CONFIG_ISSUER" to "azureAd",
                 "AZURE_APP_CLIENT_ID" to "azureClientId",
                 "AZURE_OPENID_CONFIG_JWKS_URI" to "http://localhost:4443",

@@ -28,6 +28,7 @@ dependencies {
 
     implementation(libs.bundles.ktor.server)
     implementation(libs.bundles.ktor.client)
+    implementation("io.ktor:ktor-client-apache5:${libs.versions.ktor.get()}")
     implementation("io.ktor:ktor-client-logging-jvm:${libs.versions.ktor.get()}")
     implementation("de.slub-dresden:urnlib:2.0.1")
 

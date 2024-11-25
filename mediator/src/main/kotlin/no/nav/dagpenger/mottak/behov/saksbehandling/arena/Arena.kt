@@ -3,7 +3,7 @@ package no.nav.dagpenger.mottak.behov.saksbehandling.arena
 import com.natpryce.konfig.Configuration
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.apache5.Apache5
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -34,7 +34,9 @@ internal interface ArenaOppslag {
     ): OpprettVedtakOppgaveResponse?
 }
 
-internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
+internal class ArenaApiClient(
+    config: Configuration,
+) : ArenaOppslag {
     companion object {
         private val logger = KotlinLogging.logger {}
         private val sikkerlogg = KotlinLogging.logger("tjenestekall.ArenaApiClient")
@@ -44,7 +46,7 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
 
     private val baseUrl = "${config.dpProxyUrl()}/proxy/v1/arena"
     private val proxyArenaClient =
-        HttpClient(engine = CIO.create { requestTimeout = Long.MAX_VALUE }) {
+        HttpClient(engine = Apache5.create { connectionRequestTimeout = Long.MAX_VALUE }) {
             expectSuccess = true
             install(HttpTimeout) {
                 connectTimeoutMillis = Duration.ofSeconds(30).toMillis()
@@ -66,13 +68,14 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
         parametereBody: OpprettArenaOppgaveParametere,
     ): OpprettVedtakOppgaveResponse? =
         try {
-            proxyArenaClient.request(url) {
-                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
-                header(HttpHeaders.ContentType, "application/json")
-                header(HttpHeaders.Accept, "application/json")
-                method = HttpMethod.Post
-                setBody(parametereBody)
-            }.body()
+            proxyArenaClient
+                .request(url) {
+                    header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+                    header(HttpHeaders.ContentType, "application/json")
+                    header(HttpHeaders.Accept, "application/json")
+                    method = HttpMethod.Post
+                    setBody(parametereBody)
+                }.body()
         } catch (e: ClientRequestException) {
             val message = e.response.bodyAsText()
             if (e.response.status.value == 400) {
@@ -89,9 +92,13 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
     ): OpprettVedtakOppgaveResponse? = opprettArenaOppgave("$baseUrl/sak/henvendelse", parametere)
 }
 
-private data class AktivSakRequest(val fnr: String)
+private data class AktivSakRequest(
+    val fnr: String,
+)
 
-private data class AktivSakResponse(val harAktivSak: Boolean)
+private data class AktivSakResponse(
+    val harAktivSak: Boolean,
+)
 
 internal data class OpprettArenaOppgaveParametere(
     val naturligIdent: String,
