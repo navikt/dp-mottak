@@ -11,7 +11,7 @@ spec:
   image: {{image}}
   port: 8080
   strategy:
-    type: Recreate
+    type: RollingUpdate
   liveness:
     path: /isalive
   readiness:
