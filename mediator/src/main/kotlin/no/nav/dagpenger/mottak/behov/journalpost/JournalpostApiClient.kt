@@ -4,7 +4,7 @@ import com.natpryce.konfig.Key
 import com.natpryce.konfig.stringType
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.engine.apache5.Apache5
+import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
@@ -25,7 +25,7 @@ import no.nav.dagpenger.mottak.behov.JsonMapper
 import kotlin.time.Duration.Companion.minutes
 
 internal class JournalpostApiClient(
-    engine: HttpClientEngine = Apache5.create(),
+    engine: HttpClientEngine = CIO.create(),
     private val tokenProvider: () -> String,
     private val basePath: String = "rest/journalpostapi/v1",
 ) : JournalpostDokarkiv {
@@ -58,17 +58,16 @@ internal class JournalpostApiClient(
     ) {
         val feilmelding = "Kunne ikke oppdatere journalpost"
         try {
-            client
-                .put {
-                    url { encodedPath = "$basePath/journalpost/$journalpostId" }
-                    header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
-                    header(HttpHeaders.XRequestId, eksternReferanseId)
-                    header(HttpHeaders.ContentType, "application/json")
-                    header(HttpHeaders.Accept, "application/json")
-                    setBody(journalpost)
-                }.also {
-                    logger.info { "Oppdaterte journalpost $journalpostId" }
-                }
+            client.put {
+                url { encodedPath = "$basePath/journalpost/$journalpostId" }
+                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+                header(HttpHeaders.XRequestId, eksternReferanseId)
+                header(HttpHeaders.ContentType, "application/json")
+                header(HttpHeaders.Accept, "application/json")
+                setBody(journalpost)
+            }.also {
+                logger.info { "Oppdaterte journalpost $journalpostId" }
+            }
         } catch (e: ClientRequestException) {
             logger.error(e) { feilmelding }
             throw JournalpostFeil.JournalpostException(
@@ -106,7 +105,5 @@ internal class JournalpostApiClient(
         }
     }
 
-    private data class FerdigstillJournalpostRequest(
-        val journalfoerendeEnhet: String = "9999",
-    )
+    private data class FerdigstillJournalpostRequest(val journalfoerendeEnhet: String = "9999")
 }
