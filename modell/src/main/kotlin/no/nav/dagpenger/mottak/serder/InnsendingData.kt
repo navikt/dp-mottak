@@ -20,8 +20,9 @@ data class InnsendingData(
     val søknadsData: JsonNode?,
     val aktivitetslogg: AktivitetsloggData,
 ) {
-    fun createInnsending(): Innsending {
-        return Innsending::class.primaryConstructor!!
+    fun createInnsending(): Innsending =
+        Innsending::class
+            .primaryConstructor!!
             .apply { isAccessible = true }
             .call(
                 journalpostId,
@@ -33,6 +34,7 @@ data class InnsendingData(
                         journalpostStatus = journalpostData.journalpostStatus,
                         behandlingstema = journalpostData.behandlingstema,
                         registrertDato = journalpostData.registertDato,
+                        journalførendeEnhet = journalpostData.journalførendeEnhet,
                         dokumenter =
                             journalpostData.dokumenter.map {
                                 Journalpost.DokumentInfo(
@@ -55,11 +57,11 @@ data class InnsendingData(
                         it.egenAnsatt,
                     )
                 },
-                arenaSakData?.takeIf { it.fagsakId != null }
+                arenaSakData
+                    ?.takeIf { it.fagsakId != null }
                     ?.let { ArenaOppgaveOpprettet.ArenaSak(it.oppgaveId, it.fagsakId) },
                 aktivitetslogg.let(::konverterTilAktivitetslogg),
             )
-    }
 
     data class TilstandData(
         val type: InnsendingTilstandTypeData,
@@ -147,6 +149,7 @@ data class InnsendingData(
         val bruker: BrukerData?,
         val behandlingstema: String?,
         val registertDato: LocalDateTime,
+        val journalførendeEnhet: String?,
         val dokumenter: List<DokumentInfoData>,
     ) {
         enum class BrukerTypeData {

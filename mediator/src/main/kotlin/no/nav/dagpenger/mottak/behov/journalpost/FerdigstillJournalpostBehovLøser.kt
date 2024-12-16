@@ -22,9 +22,11 @@ internal class FerdigstillJournalpostBehovLøser(
     init {
         River(rapidsConnection)
             .apply {
-                validate { it.demandValue("@event_name", "behov") }
-                validate { it.demandAllOrAny("@behov", listOf("FerdigstillJournalpost")) }
-                validate { it.rejectKey("@løsning") }
+                precondition {
+                    it.requireValue("@event_name", "behov")
+                    it.requireAllOrAny("@behov", listOf("FerdigstillJournalpost"))
+                    it.forbid("@løsning")
+                }
                 validate { it.requireKey("@behovId", "journalpostId") }
             }.register(this)
     }

@@ -20,7 +20,7 @@ internal class JoarkMottak(
         private val logg = KotlinLogging.logger {}
 
         private val forbudteMottaksKanaler =
-            setOf<String>(
+            setOf(
                 "EESSI",
                 "NAV_NO_CHAT",
             )

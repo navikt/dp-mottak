@@ -9,6 +9,7 @@ interface JournalpostVisitor {
         journalpostStatus: String,
         bruker: Journalpost.Bruker?,
         behandlingstema: String?,
+        journalførendeEnhet: String?,
         registrertDato: LocalDateTime,
         dokumenter: List<Journalpost.DokumentInfo>,
     ) {

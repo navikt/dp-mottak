@@ -81,6 +81,7 @@ val innsendingData =
                 behandlingstema = "DAG",
                 registertDato = registrertdato,
                 dokumenter = dokumenter,
+                journalførendeEnhet = "ENHET",
             ),
         personData =
             InnsendingData.PersonData(

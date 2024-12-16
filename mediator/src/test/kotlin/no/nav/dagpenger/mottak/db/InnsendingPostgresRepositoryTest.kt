@@ -22,7 +22,9 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
 internal class InnsendingPostgresRepositoryTest {
-    class TestVisitor(innsending: Innsending) : InnsendingVisitor {
+    class TestVisitor(
+        innsending: Innsending,
+    ) : InnsendingVisitor {
         val forventetDokumenter = mutableListOf<Journalpost.DokumentInfo>()
 
         init {
@@ -34,6 +36,7 @@ internal class InnsendingPostgresRepositoryTest {
             journalpostStatus: String,
             bruker: Journalpost.Bruker?,
             behandlingstema: String?,
+            journalførendeEnhet: String?,
             registrertDato: LocalDateTime,
             dokumenter: List<Journalpost.DokumentInfo>,
         ) {
@@ -82,13 +85,14 @@ internal class InnsendingPostgresRepositoryTest {
                 )
             }
         val innsending2 =
-            innsendingData.copy(
-                aktivitetslogg = InnsendingData.AktivitetsloggData(nyLogg.toList()),
-                tilstand =
-                    InnsendingData.TilstandData(
-                        InnsendingData.TilstandData.InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType,
-                    ),
-            ).createInnsending()
+            innsendingData
+                .copy(
+                    aktivitetslogg = InnsendingData.AktivitetsloggData(nyLogg.toList()),
+                    tilstand =
+                        InnsendingData.TilstandData(
+                            InnsendingData.TilstandData.InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType,
+                        ),
+                ).createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending).also {
@@ -153,13 +157,14 @@ internal class InnsendingPostgresRepositoryTest {
         val innsending = innsendingData.createInnsending()
 
         val innsending2 =
-            innsendingData.copy(
-                journalpostId = "287689",
-                personData =
-                    innsendingData.personData!!.copy(
-                        fødselsnummer = dnr,
-                    ),
-            ).createInnsending()
+            innsendingData
+                .copy(
+                    journalpostId = "287689",
+                    personData =
+                        innsendingData.personData!!.copy(
+                            fødselsnummer = dnr,
+                        ),
+                ).createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending).also {
@@ -181,13 +186,14 @@ internal class InnsendingPostgresRepositoryTest {
     @Test
     fun `Lagring der arena sak er null`() {
         val innsending =
-            innsendingData.copy(
-                arenaSakData =
-                    InnsendingData.ArenaSakData(
-                        oppgaveId = "2234",
-                        fagsakId = null,
-                    ),
-            ).createInnsending()
+            innsendingData
+                .copy(
+                    arenaSakData =
+                        InnsendingData.ArenaSakData(
+                            oppgaveId = "2234",
+                            fagsakId = null,
+                        ),
+                ).createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending).also {
@@ -221,9 +227,10 @@ internal class InnsendingPostgresRepositoryTest {
         val faktiskeRader =
             using(sessionOf(PostgresDataSourceBuilder.dataSource)) { session ->
                 session.run(
-                    queryOf("select count(1) from $tabell").map { row ->
-                        row.int(1)
-                    }.asSingle,
+                    queryOf("select count(1) from $tabell")
+                        .map { row ->
+                            row.int(1)
+                        }.asSingle,
                 )
             }
         assertEquals(antallRader, faktiskeRader, "Feil antall rader for tabell: $tabell")
