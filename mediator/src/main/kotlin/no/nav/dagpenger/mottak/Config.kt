@@ -73,36 +73,36 @@ internal object Config {
 
     val Configuration.dpProxyTokenProvider: () -> String by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("DP_PROXY_SCOPE", stringType)]).accessToken ?: tokenfeil()
+            cachedTokenProvider.clientCredentials(properties[Key("DP_PROXY_SCOPE", stringType)]).access_token ?: tokenfeil()
         }
     }
 
     val Configuration.safTokenProvider: () -> String by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("SAF_SCOPE", stringType)]).accessToken ?: tokenfeil()
+            cachedTokenProvider.clientCredentials(properties[Key("SAF_SCOPE", stringType)]).access_token ?: tokenfeil()
         }
     }
 
     val Configuration.pdlApiTokenProvider: () -> String by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("PDL_API_SCOPE", stringType)]).accessToken ?: tokenfeil()
+            cachedTokenProvider.clientCredentials(properties[Key("PDL_API_SCOPE", stringType)]).access_token ?: tokenfeil()
         }
     }
     val Configuration.skjermingApiTokenProvider: () -> String by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("SKJERMING_API_SCOPE", stringType)]).accessToken ?: tokenfeil()
+            cachedTokenProvider.clientCredentials(properties[Key("SKJERMING_API_SCOPE", stringType)]).access_token ?: tokenfeil()
         }
     }
 
     val Configuration.dokarkivTokenProvider: () -> String by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("DOKARKIV_SCOPE", stringType)]).accessToken ?: tokenfeil()
+            cachedTokenProvider.clientCredentials(properties[Key("DOKARKIV_SCOPE", stringType)]).access_token ?: tokenfeil()
         }
     }
 
     val Configuration.dpGosysTokenProvider: () -> String by lazy {
         {
-            cachedTokenProvider.clientCredentials(properties[Key("OPPGAVE_SCOPE", stringType)]).accessToken ?: tokenfeil()
+            cachedTokenProvider.clientCredentials(properties[Key("OPPGAVE_SCOPE", stringType)]).access_token ?: tokenfeil()
         }
     }
 
