@@ -25,6 +25,7 @@ class Journalpost constructor(
     aktivitetslogg: Aktivitetslogg = Aktivitetslogg(),
     private val journalpostId: String,
     private val journalpostStatus: String,
+    private val journalførendeEnhet: String? = null,
     private val bruker: Bruker?,
     private val behandlingstema: String?,
     registrertDato: LocalDateTime,
@@ -96,6 +97,8 @@ class Journalpost constructor(
 
     fun dokumenter() = dokumenter
 
+    fun journalførendeEnhet() = journalførendeEnhet
+
     fun erEttersending() = hovedskjema().startsWith("NAVe")
 
     fun hovedskjema() = dokumenter.hovedDokument().brevkode
@@ -152,9 +155,7 @@ class Journalpost constructor(
         val type: BrukerType,
         val id: String,
     ) {
-        override fun toString(): String {
-            return "Bruker(type=$type, id='<REDACTED>')"
-        }
+        override fun toString(): String = "Bruker(type=$type, id='<REDACTED>')"
     }
 
     enum class BrukerType {
@@ -180,16 +181,13 @@ class Journalpost constructor(
         }
     }
 
-    private fun klageType(journalpost: Journalpost): KategorisertJournalpost {
-        return when (journalpost.behandlingstema) {
+    private fun klageType(journalpost: Journalpost): KategorisertJournalpost =
+        when (journalpost.behandlingstema) {
             "ab0451" -> KlageForskudd(journalpost)
             else -> Klage(journalpost)
         }
-    }
 
-    private fun ankeType(journalpost: Journalpost): KategorisertJournalpost {
-        return Anke(journalpost)
-    }
+    private fun ankeType(journalpost: Journalpost): KategorisertJournalpost = Anke(journalpost)
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst =
         SpesifikkKontekst(
@@ -200,6 +198,6 @@ class Journalpost constructor(
         )
 
     fun accept(visitor: JournalpostVisitor) {
-        visitor.visitJournalpost(journalpostId, journalpostStatus, bruker, behandlingstema, registrertDato, dokumenter)
+        visitor.visitJournalpost(journalpostId, journalpostStatus, bruker, behandlingstema, journalførendeEnhet, registrertDato, dokumenter)
     }
 }

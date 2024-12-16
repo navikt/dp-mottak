@@ -47,6 +47,7 @@ internal class InnsendingDataTest {
                         behandlingstema = "DAG",
                         registertDato = registrertdato,
                         dokumenter = dokumenter,
+                        journalførendeEnhet = "ENHET",
                     ),
                 personData =
                     PersonData(

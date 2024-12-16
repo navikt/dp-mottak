@@ -75,12 +75,14 @@ internal class JournalpostMottak(
                                 ?.asText()
                                 .let { LocalDateTime.parse(it) } ?: LocalDateTime.now(),
                         behandlingstema = it["behandlingstema"].textValue(),
+                        journalførendeEnhet = it["journalfoerendeEnhet"]?.asText(),
                     ).also {
                         logg.info {
                             """Mottok ny journalpost. 
                             |Antall dokumenter=${it.dokumenter().size}, 
                             |brevkode=${it.hovedDokument().brevkode}, 
                             |registrertDato=${it.datoRegistrert()}, 
+                            |journalførendeEnhet=${it.journalførendeEnhet()},
                             |behandlingstema=${packet[løsning]["behandlingstema"].textValue()}
                             """.trimMargin()
                         }
