@@ -1,6 +1,11 @@
 package no.nav.dagpenger.mottak
 
+import com.github.navikt.tbd_libs.naisful.naisApp
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.Clock
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import io.prometheus.metrics.model.registry.PrometheusRegistry
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dokarkivTokenProvider
 import no.nav.dagpenger.mottak.Config.objectMapper
@@ -41,12 +46,30 @@ internal class ApplicationBuilder(
 
     private val rapidsConnection =
         RapidApplication
-            .create(env = env, objectMapper = objectMapper) { engine, _ ->
-                engine.application.innsendingApi(
-                    innsendingRepository = innsendingRepository,
-                    observer = ferdigstiltInnsendingObserver,
-                )
-            }.apply {
+            .create(env = env, builder = {
+                withKtor { preStopHook, rapid ->
+                    naisApp(
+                        meterRegistry =
+                            PrometheusMeterRegistry(
+                                PrometheusConfig.DEFAULT,
+                                PrometheusRegistry.defaultRegistry,
+                                Clock.SYSTEM,
+                            ),
+                        objectMapper = objectMapper,
+                        applicationLogger = KotlinLogging.logger("ApplicationLogger"),
+                        callLogger = KotlinLogging.logger("CallLogger"),
+                        aliveCheck = rapid::isReady,
+                        readyCheck = rapid::isReady,
+                        preStopHook = preStopHook::handlePreStopRequest,
+                    ) {
+                        innsendingApi(
+                            innsendingRepository = innsendingRepository,
+                            observer = ferdigstiltInnsendingObserver,
+                        )
+                    }
+                }
+            })
+            .apply {
                 val mediator =
                     InnsendingMediator(
                         innsendingRepository = innsendingRepository,

@@ -4,13 +4,7 @@ import com.github.navikt.tbd_libs.naisful.test.TestContext
 import com.github.navikt.tbd_libs.naisful.test.naisfulTestApp
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
-import io.ktor.client.request.request
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.http.content.TextContent
 import io.ktor.server.application.Application
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
@@ -58,18 +52,4 @@ internal object TestApplication {
     internal fun HttpRequestBuilder.autentisert(token: String = azureAd) {
         this.header(HttpHeaders.Authorization, "Bearer $token")
     }
-
-    internal suspend fun TestContext.autentisert(
-        endepunkt: String,
-        token: String = azureAd,
-        httpMethod: HttpMethod = HttpMethod.Get,
-        body: String? = null,
-    ): HttpResponse =
-        client.request(endepunkt) {
-            this.method = httpMethod
-            body?.let { this.setBody(TextContent(it, ContentType.Application.Json)) }
-            this.header(HttpHeaders.Authorization, "Bearer $token")
-            this.header(HttpHeaders.Accept, ContentType.Application.Json.toString())
-            this.header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-        }
 }
