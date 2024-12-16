@@ -178,7 +178,7 @@ internal class MediatorE2ETest {
         expectedBehov: String,
         indexPåMelding: Int,
     ) {
-        assertTrue(testRapid.inspektør.size == indexPåMelding + 1, "Ingen melding på index $indexPåMelding")
+        assertTrue(testRapid.inspektør.size == indexPåMelding + 1, "Ingen melding på index $indexPåMelding, forventet $expectedBehov")
         testRapid.inspektør.message(indexPåMelding).also { jsonNode ->
             assertEquals(expectedBehov, jsonNode["@behov"].map { it.asText() }.first())
             assertEquals(journalpostId.toString(), jsonNode["journalpostId"].asText())

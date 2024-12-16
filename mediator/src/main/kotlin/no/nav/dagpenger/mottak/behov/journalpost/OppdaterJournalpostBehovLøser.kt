@@ -23,9 +23,11 @@ internal class OppdaterJournalpostBehovLøser(
     init {
         River(rapidsConnection)
             .apply {
-                validate { it.demandValue("@event_name", "behov") }
-                validate { it.demandAllOrAny("@behov", listOf("OppdaterJournalpost")) }
-                validate { it.rejectKey("@løsning") }
+                precondition {
+                    it.requireValue("@event_name", "behov")
+                    it.requireAllOrAny("@behov", listOf("OppdaterJournalpost"))
+                    it.forbid("@løsning")
+                }
                 validate { it.requireKey("@behovId", "journalpostId") }
                 validate { it.interestedIn("navn", "fødselsnummer", "tittel", "dokumenter", "fagsakId") }
             }.register(this)

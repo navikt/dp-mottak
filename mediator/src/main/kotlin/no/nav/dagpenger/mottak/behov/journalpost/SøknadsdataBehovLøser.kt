@@ -22,9 +22,11 @@ internal class SøknadsdataBehovLøser(
     init {
         River(rapidsConnection)
             .apply {
-                validate { it.demandValue("@event_name", "behov") }
-                validate { it.demandAllOrAny("@behov", listOf("Søknadsdata")) }
-                validate { it.rejectKey("@løsning") }
+                precondition {
+                    it.requireValue("@event_name", "behov")
+                    it.requireAllOrAny("@behov", listOf("Søknadsdata"))
+                    it.forbid("@løsning")
+                }
                 validate { it.requireKey("@behovId", "journalpostId") }
                 validate { it.requireKey("dokumentInfoId") }
             }.register(this)
