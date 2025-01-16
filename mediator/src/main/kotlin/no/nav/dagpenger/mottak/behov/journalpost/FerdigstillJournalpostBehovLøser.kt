@@ -48,6 +48,7 @@ internal class FerdigstillJournalpostBehovLøser(
         ) {
             if (journalpostId == "692264968") {
                 logger.warn { "Skipper journalpost. Avsender må oppdateres." }
+                return@withMDC
             }
             try {
                 runBlocking {
