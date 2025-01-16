@@ -15,7 +15,7 @@ internal interface JournalpostDokarkiv {
 
 internal class JournalpostApi {
     internal data class OppdaterJournalpostRequest(
-        val avsenderMottaker: Avsender,
+        val avsenderMottaker: Avsender? = null,
         val bruker: Bruker,
         val tittel: String,
         val sak: Sak,
