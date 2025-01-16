@@ -17,7 +17,7 @@ internal class FerdigstillJournalpostBehovLøser(
     JournalpostFeil {
     private companion object {
         val logger = KotlinLogging.logger { }
-        private val skipJournalpostIder = setOf("692264968", "692264967")
+        private val skipJournalpostIder = setOf("692264968", "692264967", "692264956")
     }
 
     init {
