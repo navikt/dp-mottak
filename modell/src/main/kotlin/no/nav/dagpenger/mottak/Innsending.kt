@@ -512,7 +512,7 @@ class Innsending private constructor(
             innsending: Innsending,
             oppdatertJournalpost: JournalpostOppdatert,
         ) {
-            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
+            innsending.ferdigstillJournalpost(oppdatertJournalpost)
         }
 
         override fun håndter(
