@@ -1,6 +1,8 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.slot
@@ -46,6 +48,32 @@ internal class OppdaterJournalpostBehovLøserTest {
                 assertEquals(fagsakId, it.sak.fagsakId)
                 assertEquals(JournalpostApi.SaksType.FAGSAK, it.sak.saksType)
                 assertEquals(fødselsnummer, it.bruker.id)
+            }
+        }
+    }
+
+    @Test
+    fun `Skal ikke oppdatere avsender hvis mottakskanal er NAV_NO`() {
+        testRapid.sendTestMessage(journalpostBehov("12345", mottakskanal = "NAV_NO"))
+        with(testRapid.inspektør) {
+            assertEquals(1, size)
+            assertNotNull(field(0, "@løsning")["OppdaterJournalpost"])
+            assertTrue(slot.isCaptured)
+            requireNotNull(slot.captured).also {
+                it.avsenderMottaker.shouldBeNull()
+            }
+        }
+    }
+
+    @Test
+    fun `Skal oppdatere avsender hvis mottakskanal er annet enn NAV_NO`() {
+        testRapid.sendTestMessage(journalpostBehov("12345", mottakskanal = "SKAN_IM"))
+        with(testRapid.inspektør) {
+            assertEquals(1, size)
+            assertNotNull(field(0, "@løsning")["OppdaterJournalpost"])
+            assertTrue(slot.isCaptured)
+            requireNotNull(slot.captured).also {
+                it.avsenderMottaker.shouldNotBeNull()
                 assertEquals(2, it.dokumenter.size)
                 assertEquals(fødselsnummer, it.avsenderMottaker?.id)
                 assertEquals("FNR", it.avsenderMottaker?.idType)
@@ -96,7 +124,10 @@ internal class OppdaterJournalpostBehovLøserTest {
     }
 
     //language=JSON
-    private fun journalpostBehov(journalpostId: String = "23456789"): String =
+    private fun journalpostBehov(
+        journalpostId: String = "23456789",
+        mottakskanal: String = "NAV_NO",
+    ): String =
         """
         {
           "@event_name": "behov",
@@ -109,6 +140,7 @@ internal class OppdaterJournalpostBehovLøserTest {
           "journalpostId": "$journalpostId",
           "fagsakId": "$fagsakId",
           "fødselsnummer": "$fødselsnummer",
+          "mottakskanal" : "$mottakskanal",
           "aktørId": "123474",
           "tittel": "Søknad om permittering",
           "dokumenter": [{"dokumentInfoId": 1234, "tittel": "Her er en dokumentttittel"},{"dokumentInfoId": 1234, "tittel": "Her er en dokumentttittel"}]

@@ -69,6 +69,7 @@ internal class JoarkMottak(
                 hendelseType = packet["hendelsesType"].asText(),
                 journalpostStatus = packet["journalpostStatus"].asText(),
                 behandlingstema = packet["behandlingstema"].asText() ?: null,
+                mottakskanal = packet["mottaksKanal"].asText(),
             )
 
         innsendingMediator.håndter(joarkHendelse)

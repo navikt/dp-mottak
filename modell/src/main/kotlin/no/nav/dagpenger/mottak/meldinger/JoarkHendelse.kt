@@ -9,6 +9,9 @@ class JoarkHendelse(
     private val hendelseType: String,
     private val journalpostStatus: String,
     private val behandlingstema: String? = null,
+    private val mottakskanal: String,
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId() = journalpostId
+
+    fun mottakskanal() = mottakskanal
 }

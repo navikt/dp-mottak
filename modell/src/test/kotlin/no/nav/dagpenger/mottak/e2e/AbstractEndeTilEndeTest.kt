@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak.e2e
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.Innsending
@@ -74,10 +75,9 @@ abstract class AbstractEndeTilEndeTest {
                 behov.type == type
             } ?: throw AssertionError("Fant ikke behov ${type.name} i etterspurte behov")
 
-        assertEquals(
-            detaljer + setOf("tilstand", "journalpostId"),
-            behov.detaljer().keys + behov.kontekster.flatMap { it.kontekstMap.keys },
-        )
+        val forventet = detaljer + setOf("tilstand", "journalpostId")
+        val faktisk = behov.detaljer().keys + behov.kontekster.flatMap { it.kontekstMap.keys }
+        forventet.shouldContainExactlyInAnyOrder(faktisk)
     }
 
     protected fun assertFerdigstilt(test: (InnsendingObserver.InnsendingEvent) -> Unit) {
@@ -228,5 +228,6 @@ abstract class AbstractEndeTilEndeTest {
             journalpostId = JOURNALPOST_ID,
             hendelseType = "MIDLERTIDIG",
             journalpostStatus = "MOTTATT",
+            mottakskanal = "NAV_NO",
         )
 }

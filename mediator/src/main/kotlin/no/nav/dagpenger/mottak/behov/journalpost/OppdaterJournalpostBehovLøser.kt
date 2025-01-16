@@ -29,7 +29,7 @@ internal class OppdaterJournalpostBehovLøser(
                     it.forbid("@løsning")
                 }
                 validate { it.requireKey("@behovId", "journalpostId") }
-                validate { it.interestedIn("navn", "fødselsnummer", "tittel", "dokumenter", "fagsakId") }
+                validate { it.interestedIn("navn", "fødselsnummer", "tittel", "dokumenter", "fagsakId", "mottakskanal") }
             }.register(this)
     }
 
@@ -55,16 +55,35 @@ internal class OppdaterJournalpostBehovLøser(
                 }
             }
             packet["@løsning"] = mapOf("OppdaterJournalpost" to mapOf("journalpostId" to journalpostId))
-            logger.info("løser behov OppdaterJournalpost for journalpost med id $journalpostId")
+            logger.info("løser behov OppdaterJournalpost (mottakskanal ${packet.oppdatereAvsender()})")
             context.publish(packet.toJson())
         }
     }
 }
 
-private fun JsonMessage.avsender(): JournalpostApi.Avsender =
-    JournalpostApi.Avsender(
-        id = this["fødselsnummer"].asText(),
-    )
+/***
+ * journalpostapi oppdaterJournalpost tillater ikke at avsender overskrives hvis journalpost er sendt inn digitalt
+ *
+ * Berørte tjenester/apper: dokarkiv journalpostapi (PUT oppdaterJournalpost)
+ * Miljø: Alle testmiljøer og produksjon
+ * Digitale innsendinger har god kvalitet på metadata om avsender. Avsender overskrives likevel av noen fagsystemer / fra noen arbeidsflater.
+ * Forsøk på å oppdatere avsender på en digitalt innsendt journalpost med en av kanalene NAV_NO, NAV_NO_CHAT, ALTINN, EESSI vil avvises med HTTP-status 400 Bad Request
+ *
+ */
+private fun JsonMessage.oppdatereAvsender() =
+    when (this["mottakskanal"].asText("ukjent")) {
+        "NAV_NO" -> false
+        else -> true
+    }
+
+private fun JsonMessage.avsender(): JournalpostApi.Avsender? =
+    if (oppdatereAvsender()) {
+        JournalpostApi.Avsender(
+            id = this["fødselsnummer"].asText(),
+        )
+    } else {
+        null
+    }
 
 private fun JsonMessage.tilJournalføringOppdaterRequest(): OppdaterJournalpostRequest =
     OppdaterJournalpostRequest(

@@ -23,6 +23,7 @@ class Innsending private constructor(
     private var rutingOppslag: RutingOppslag?,
     private var person: Person?,
     private var arenaSak: ArenaSak?,
+    private var mottakskanal: String? = null,
     internal val aktivitetslogg: Aktivitetslogg,
 ) : Aktivitetskontekst {
     private val observers = mutableSetOf<InnsendingObserver>()
@@ -40,6 +41,8 @@ class Innsending private constructor(
     )
 
     fun journalpostId(): String = journalpostId
+
+    fun mottakskanal(): String? = mottakskanal
 
     fun håndter(joarkHendelse: JoarkHendelse) {
         if (journalpostId != joarkHendelse.journalpostId()) return
@@ -236,6 +239,7 @@ class Innsending private constructor(
             innsending: Innsending,
             joarkHendelse: JoarkHendelse,
         ) {
+            innsending.mottakskanal = joarkHendelse.mottakskanal()
             innsending.trengerJournalpost(joarkHendelse)
             innsending.tilstand(joarkHendelse, AvventerJournalpost)
         }
@@ -619,12 +623,14 @@ class Innsending private constructor(
         val person = requireNotNull(person) { "Krever at person er satt her, $journalpostId" }
         val journalpost = requireNotNull(journalpost) { "Krever at journalpost her" }
         val arenaSakId = arenaSak?.fagsakId?.let { mapOf("fagsakId" to it) } ?: emptyMap()
+        val mottakskanal = mottakskanal() ?: "ukjent"
         val parametre =
             mapOf(
                 "aktørId" to person.aktørId,
                 "fødselsnummer" to person.ident,
                 "navn" to person.navn,
                 "tittel" to journalpost.tittel(),
+                "mottakskanal" to mottakskanal,
                 "dokumenter" to
                     journalpost.dokumenter().map {
                         mapOf(

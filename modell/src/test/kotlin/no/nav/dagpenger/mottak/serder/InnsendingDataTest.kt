@@ -64,6 +64,7 @@ internal class InnsendingDataTest {
                         fagsakId = "129678",
                     ),
                 søknadsData = søknadsjson,
+                mottakskanal = "NAV_NO",
                 aktivitetslogg = AktivitetsloggData(emptyList()),
             )
 
