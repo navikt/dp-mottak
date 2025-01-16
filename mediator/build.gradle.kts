@@ -22,7 +22,7 @@ dependencies {
     implementation("io.getunleash:unleash-client-java:9.2.6")
 
     implementation(libs.bundles.postgres)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.10.1")
 
     implementation("com.github.navikt.tbd-libs:naisful-app:2025.01.16-08.15-d17f6062")
 
