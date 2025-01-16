@@ -46,6 +46,9 @@ internal class FerdigstillJournalpostBehovLøser(
                 "journalpostId" to journalpostId,
             ),
         ) {
+            if (journalpostId == "692264968") {
+                logger.warn { "Skipper journalpost. Avsender må oppdateres." }
+            }
             try {
                 runBlocking {
                     journalpostDokarkiv.ferdigstill(journalpostId, behovId)
