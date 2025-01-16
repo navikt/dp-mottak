@@ -61,12 +61,18 @@ internal class OppdaterJournalpostBehovLøser(
     }
 }
 
+private fun JsonMessage.avsender(): JournalpostApi.Avsender =
+    JournalpostApi.Avsender(
+        id = this["fødselsnummer"].asText(),
+    )
+
 private fun JsonMessage.tilJournalføringOppdaterRequest(): OppdaterJournalpostRequest =
     OppdaterJournalpostRequest(
         bruker = this.bruker(),
         tittel = this["tittel"].asText(),
         sak = this.sak(),
         dokumenter = this.dokumenter(),
+        avsenderMottaker = this.avsender(),
     )
 
 private fun JsonMessage.dokumenter(): List<JournalpostApi.Dokument> =
