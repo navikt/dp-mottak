@@ -12,6 +12,7 @@ import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
+import no.nav.dagpenger.mottak.meldinger.RekjørHendelse
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
 import java.time.Duration
 
@@ -109,6 +110,12 @@ class Innsending private constructor(
         tilstand.håndter(this, gosysoppgaveopprettet)
     }
 
+    fun håndter(rekjørHendelse: RekjørHendelse) {
+        if (journalpostId != rekjørHendelse.journalpostId()) return
+        kontekst(rekjørHendelse, "Skal rekjøre hendelse")
+        tilstand.håndter(this, rekjørHendelse)
+    }
+
     private fun kontekst(
         hendelse: Hendelse,
         melding: String,
@@ -191,6 +198,13 @@ class Innsending private constructor(
             journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt,
         ) {
             journalpostferdigstilt.warn("Forventet ikke FerdigStilt i %s", type.name)
+        }
+
+        fun håndter(
+            innsending: Innsending,
+            rekjørHendelse: RekjørHendelse,
+        ) {
+            rekjørHendelse.warn("${rekjørHendelse.javaClass.simpleName} er ikke støttet i %s", type.name)
         }
 
         fun leaving(
@@ -485,6 +499,20 @@ class Innsending private constructor(
             hendelse: Hendelse,
         ) {
             innsending.ferdigstillJournalpost(hendelse)
+        }
+
+        override fun håndter(
+            innsending: Innsending,
+            rekjørHendelse: RekjørHendelse,
+        ) {
+            innsending.oppdatereJournalpost(rekjørHendelse)
+        }
+
+        override fun håndter(
+            innsending: Innsending,
+            oppdatertJournalpost: JournalpostOppdatert,
+        ) {
+            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
         }
 
         override fun håndter(

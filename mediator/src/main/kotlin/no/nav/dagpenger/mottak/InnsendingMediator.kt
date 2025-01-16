@@ -12,6 +12,7 @@ import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
+import no.nav.dagpenger.mottak.meldinger.RekjørHendelse
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
 import org.slf4j.MDC
 
@@ -86,6 +87,12 @@ internal class InnsendingMediator(
     fun håndter(arenaOppgaveFeilet: ArenaOppgaveFeilet) {
         håndter(arenaOppgaveFeilet) { innsending ->
             innsending.håndter(arenaOppgaveFeilet)
+        }
+    }
+
+    fun håndter(rekjørHendelse: RekjørHendelse) {
+        håndter(rekjørHendelse) { innsending ->
+            innsending.håndter(rekjørHendelse)
         }
     }
 

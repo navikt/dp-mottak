@@ -16,5 +16,6 @@ internal class MottakMediator(
         OpprettArenaOppgaveMottak(mediator, rapidsConnection)
         SøknadsdataMottak(mediator, rapidsConnection)
         GosysOppgaveOpprettetMottak(mediator, rapidsConnection)
+        RekjørMottak(mediator, rapidsConnection)
     }
 }
