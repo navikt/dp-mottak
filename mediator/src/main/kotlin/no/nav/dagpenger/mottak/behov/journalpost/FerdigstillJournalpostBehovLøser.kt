@@ -17,6 +17,7 @@ internal class FerdigstillJournalpostBehovLøser(
     JournalpostFeil {
     private companion object {
         val logger = KotlinLogging.logger { }
+        private val skipJournalpostIder = setOf("692264968", "692264967")
     }
 
     init {
@@ -46,8 +47,8 @@ internal class FerdigstillJournalpostBehovLøser(
                 "journalpostId" to journalpostId,
             ),
         ) {
-            if (journalpostId == "692264968") {
-                logger.warn { "Skipper journalpost. Avsender må oppdateres." }
+            if (skipJournalpostIder.contains(journalpostId)) {
+                logger.warn { "Skipper journalpost $journalpostId. Avsender må oppdateres." }
                 return@withMDC
             }
             try {
