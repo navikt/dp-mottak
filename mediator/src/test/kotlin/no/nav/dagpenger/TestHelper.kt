@@ -99,4 +99,5 @@ val innsendingData =
             ),
         søknadsData = søknadsjson,
         aktivitetslogg = aktivitetsloggData,
+        mottakskanal = "NAV_NO",
     )

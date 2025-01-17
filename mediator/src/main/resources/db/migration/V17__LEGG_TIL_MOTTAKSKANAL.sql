@@ -1,0 +1,1 @@
+ALTER TABLE innsending_v1 ADD COLUMN mottakskanal TEXT NULL;

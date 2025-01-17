@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.e2e
 
+import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.FerdigstillJournalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OppdaterJournalpost
@@ -66,9 +67,14 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "navn",
                 "fagsakId",
                 "tittel",
+                "mottakskanal",
                 "dokumenter",
             ),
         )
+
+        val behov =
+            inspektør.innsendingLogg.behov().find { it.type == OppdaterJournalpost }
+        behov!!.detaljer()["mottakskanal"] shouldBe "NAV_NO"
 
         håndterJournalpostFerdigstilt()
         assertBehovDetaljer(FerdigstillJournalpost)
@@ -144,6 +150,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "navn",
                 "fagsakId",
                 "tittel",
+                "mottakskanal",
                 "dokumenter",
             ),
         )
@@ -207,6 +214,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "fagsakId",
                 "navn",
                 "tittel",
+                "mottakskanal",
                 "dokumenter",
             ),
         )
@@ -267,6 +275,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "fødselsnummer",
                 "fagsakId",
                 "navn",
+                "mottakskanal",
                 "tittel",
                 "dokumenter",
             ),
@@ -330,6 +339,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "fagsakId",
                 "navn",
                 "tittel",
+                "mottakskanal",
                 "dokumenter",
             ),
         )

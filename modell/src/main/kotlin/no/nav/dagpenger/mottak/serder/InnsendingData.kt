@@ -18,6 +18,7 @@ data class InnsendingData(
     val personData: PersonData?,
     val arenaSakData: ArenaSakData?,
     val søknadsData: JsonNode?,
+    val mottakskanal: String?,
     val aktivitetslogg: AktivitetsloggData,
 ) {
     fun createInnsending(): Innsending =
@@ -60,6 +61,7 @@ data class InnsendingData(
                 arenaSakData
                     ?.takeIf { it.fagsakId != null }
                     ?.let { ArenaOppgaveOpprettet.ArenaSak(it.oppgaveId, it.fagsakId) },
+                mottakskanal,
                 aktivitetslogg.let(::konverterTilAktivitetslogg),
             )
 

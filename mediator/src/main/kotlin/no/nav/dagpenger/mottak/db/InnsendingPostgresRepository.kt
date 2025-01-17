@@ -49,6 +49,7 @@ internal class InnsendingPostgresRepository(
                person_innsending.egenansatt              as "egenansatt",
                person.ident                              as "ident",
                person.aktørid                            as "aktørid",
+               innsending.mottakskanal                   as "mottakskanal",
                aktivitetslogg.data                       as "aktivitetslogg"
         from innsending_v1 as innsending
                  left join journalpost_v1 journalpost on innsending.id = journalpost.id
@@ -111,6 +112,7 @@ internal class InnsendingPostgresRepository(
                                 row.binaryStreamOrNull("søknadsData")?.use {
                                     JsonMapper.jacksonJsonAdapter.readTree(it)
                                 },
+                            mottakskanal = row.stringOrNull("mottakskanal"),
                             aktivitetslogg =
                                 row.binaryStream("aktivitetslogg").use {
                                     JsonMapper.jacksonJsonAdapter.readValue(
@@ -214,10 +216,11 @@ internal class InnsendingPostgresRepository(
             internId = transactionalSession.run(
                 queryOf(
                     //language=PostgreSQL
-                    "INSERT INTO innsending_v1(journalpostId,tilstand) VALUES(:jpId, :tilstand) RETURNING id",
+                    "INSERT INTO innsending_v1(journalpostId,tilstand, mottakskanal) VALUES(:jpId, :tilstand, :mottakskanal) RETURNING id",
                     mapOf(
                         "jpId" to innsending.journalpostId().toLong(),
                         "tilstand" to tilstandType.type.name,
+                        "mottakskanal" to innsending.mottakskanal(),
                     ),
                 ).map { row ->
                     row.long("id")
@@ -227,7 +230,7 @@ internal class InnsendingPostgresRepository(
     }
 
     class InnsendingQueryVisitor(
-        innsending: Innsending,
+        private val innsending: Innsending,
         private val internId: Long,
     ) : InnsendingVisitor {
         val lagreQueries: MutableList<Query> = mutableListOf()
@@ -242,11 +245,12 @@ internal class InnsendingPostgresRepository(
                     //language=PostgreSQL
                     """
                     INSERT INTO innsending_v1(id,tilstand) VALUES(:id, :tilstand) 
-                    ON CONFLICT(id) DO UPDATE  set tilstand = :tilstand
+                    ON CONFLICT(id) DO UPDATE  set tilstand = :tilstand, mottakskanal = :mottakskanal
                     """.trimIndent(),
                     mapOf(
                         "id" to internId,
                         "tilstand" to tilstandType.type.name,
+                        "mottakskanal" to innsending.mottakskanal(),
                     ),
                 ),
             )

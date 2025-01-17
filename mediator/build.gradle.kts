@@ -39,6 +39,7 @@ dependencies {
     testImplementation(libs.mock.oauth2.server)
     testImplementation(libs.bundles.postgres.test)
     testImplementation(libs.rapids.and.rivers.test)
+    testImplementation(libs.kotest.assertions.core)
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation("io.ktor:ktor-client-mock-jvm:${libs.versions.ktor.get()}")
     testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.01.16-08.15-d17f6062")
