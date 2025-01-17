@@ -55,7 +55,7 @@ internal class OppdaterJournalpostBehovLøser(
                 }
             }
             packet["@løsning"] = mapOf("OppdaterJournalpost" to mapOf("journalpostId" to journalpostId))
-            logger.info("løser behov OppdaterJournalpost (mottakskanal ${packet.oppdatereAvsender()})")
+            logger.info("løser behov OppdaterJournalpost (mottakskanal ${packet.mottakskanal()})")
             context.publish(packet.toJson())
         }
     }
@@ -71,10 +71,12 @@ internal class OppdaterJournalpostBehovLøser(
  *
  */
 private fun JsonMessage.oppdatereAvsender() =
-    when (this["mottakskanal"].asText("ukjent")) {
+    when (mottakskanal()) {
         "NAV_NO" -> false
         else -> true
     }
+
+private fun JsonMessage.mottakskanal(): String? = this["mottakskanal"].asText("ukjent")
 
 private fun JsonMessage.avsender(): JournalpostApi.Avsender? =
     if (oppdatereAvsender()) {
