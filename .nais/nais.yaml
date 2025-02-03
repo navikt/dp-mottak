@@ -97,3 +97,8 @@ spec:
         cascadingDelete: false
         pointInTimeRecovery: true
         retainedBackups: {{point_in_time_recovery_days}}
+        flags:
+          - name: cloudsql.enable_pgaudit
+            value: "true"
+          - name: pgaudit.log
+            value: 'write'
