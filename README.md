@@ -15,8 +15,15 @@ Gradle brukes som byggverktøy og er bundlet inn.
 
 Skjemakoder og hvilke behandlende enhet (benk) en blir sendt til, se [tilstander](docs/arkitektur/tilstander)
 
-Databasediagram
-![databasediagram](docs/db/DB-layout-2020-05-21.png)
+
+## Arkitekturdiagram
+
+![Arkitekturdiagram](docs/arkitektur/dp-mottak.drawio.png)
+
+## Databasediagram
+
+![databasediagram](docs/db/DB-layout-2025-02-13.png)
+
 
 ## HOWTOS
 
