@@ -1,6 +1,7 @@
 # dp-mottak
 
-Ansvar for å håndtere journalføringhendelser på tema Dagpenger fra Joark (se også [dagpenger-joark-mottak](https://github.com/navikt/dagpenger-joark-mottak) ) og sørge for videre saksgang
+Ansvar for å håndterer [journalføringhendelser](https://confluence.adeo.no/pages/viewpage.action?pageId=432217859) på tema Dagpenger fra Joark (se også [dagpenger-joark-mottak](https://github.com/navikt/dagpenger-joark-mottak) ) og sørge for videre saksgang
+
 
 
 ## Komme i gang
