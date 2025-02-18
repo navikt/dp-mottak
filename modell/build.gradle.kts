@@ -11,6 +11,6 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-params:${libs.versions.junit.get()}")
     testImplementation(libs.mockk)
-    testImplementation("com.approvaltests:approvaltests:24.16.1")
+    testImplementation("com.approvaltests:approvaltests:24.17.0")
     testImplementation(libs.kotest.assertions.core)
 }
