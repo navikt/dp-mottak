@@ -19,7 +19,7 @@ dependencies {
     implementation("no.nav.dagpenger:oauth2-klient:2025.02.13-18.02.052b7c34baab")
     implementation("io.prometheus:prometheus-metrics-core:1.3.6")
     implementation(libs.rapids.and.rivers)
-    implementation("io.getunleash:unleash-client-java:10.0.1")
+    implementation("io.getunleash:unleash-client-java:10.0.2")
 
     implementation(libs.bundles.postgres)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.10.1")
