@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.db
 
-import io.ktor.utils.io.core.use
 import kotliquery.Query
 import kotliquery.Row
 import kotliquery.TransactionalSession
@@ -23,6 +22,7 @@ import no.nav.dagpenger.mottak.toMap
 import org.postgresql.util.PGobject
 import java.time.LocalDateTime
 import javax.sql.DataSource
+import kotlin.use
 
 internal class InnsendingPostgresRepository(
     private val datasource: DataSource = PostgresDataSourceBuilder.dataSource,
