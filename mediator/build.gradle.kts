@@ -42,7 +42,7 @@ dependencies {
     testImplementation(libs.kotest.assertions.core)
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation("io.ktor:ktor-client-mock-jvm:${libs.versions.ktor.get()}")
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.02.14-08.59-4f6db7fb")
+    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.02.25-08.21-6205bbfb")
 }
 
 tasks.withType<ShadowJar> {
