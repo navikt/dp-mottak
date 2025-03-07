@@ -32,7 +32,7 @@ internal object Config {
                 "KAFKA_EXTRA_TOPIC" to "teamdagpenger.mottak.v1,teamdagpenger.regel.v1",
                 "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
                 "KAFKA_RESET_POLICY" to "LATEST",
-                "PDL_API_SCOPE" to "api://dev-fss.pdl.pdl-api/.default",
+                "PDL_API_SCOPE" to "api://dev-fss.pdl.pdl-api-q1/.default",
                 "SKJERMING_API_SCOPE" to "api://dev-gcp.nom.skjermede-personer-pip/.default",
                 "SKJERMING_API_URL" to "http://skjermede-personer-pip.nom/skjermet",
                 "AZURE_OPENID_CONFIG_ISSUER" to "azureAd",
