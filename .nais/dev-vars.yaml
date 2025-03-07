@@ -10,7 +10,7 @@ ingresses:
 dp_proxy:
   ingress: dp-proxy.dev-fss-pub.nais.io
 pdl:
-  ingress: pdl-api.dev-fss-pub.nais.io
+  ingress: pdl-api-q1.dev-fss-pub.nais.io
 dokarkiv:
   ingress: dokarkiv.dev-fss-pub.nais.io
 oppgave:
