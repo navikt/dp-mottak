@@ -24,7 +24,7 @@ dependencies {
     implementation(libs.bundles.postgres)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.10.1")
 
-    implementation("com.github.navikt.tbd-libs:naisful-app:2025.03.06-15.24-78935db9")
+    implementation("com.github.navikt.tbd-libs:naisful-app:2025.03.10-19.50-d556269c")
 
     implementation(libs.bundles.jackson)
 
