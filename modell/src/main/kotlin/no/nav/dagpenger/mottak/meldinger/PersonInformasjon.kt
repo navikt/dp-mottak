@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.meldinger
 
-import no.bekk.bekkopen.person.FodselsnummerValidator
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.PersonVisitor
@@ -27,7 +26,14 @@ class PersonInformasjon(
             egenAnsatt = egenAnsatt,
         )
 
-    fun validate() = kotlin.runCatching { person() }.isSuccess
+    fun validate(): Boolean =
+        kotlin.runCatching { person() }.fold(
+            onSuccess = { true },
+            onFailure = {
+                this.warn("PersonInformasjon inneholder ugyldig data: ${it.message}")
+                false
+            },
+        )
 
     private fun harDiskresjonkode(diskresjonskode: String?): Boolean =
         when (diskresjonskode) {
@@ -44,30 +50,18 @@ class PersonInformasjon(
         val egenAnsatt: Boolean,
     ) {
         init {
-            require(FodselsnummerValidator.isValid(ident) || erSyntetiskTestIdent()) { "Ikke gyldig ident" }
+            require(ident.matches(Regex("\\d{11}"))) { "Ident må ha 11 siffer" }
         }
-
-        private companion object {
-            const val SYNTETISK_MÅNED_OFFSET = 80
-        }
-
-        fun erDnummer() = ident.substring(0, 1).toInt() in 4..7
 
         fun accept(visitor: PersonVisitor) {
             visitor.visitPerson(navn, aktørId, ident, norskTilknytning, diskresjonskode, egenAnsatt)
         }
-
-        private fun erSyntetiskTestIdent(): Boolean =
-            try {
-                val måned = ident.substring(2, 4).toInt()
-                (måned - SYNTETISK_MÅNED_OFFSET) in 1..12
-            } catch (err: NumberFormatException) {
-                false
-            }
     }
 }
 
-class PersonInformasjonIkkeFunnet(aktivitetslogg: Aktivitetslogg, private val journalpostId: String) :
-    Hendelse(aktivitetslogg) {
+class PersonInformasjonIkkeFunnet(
+    aktivitetslogg: Aktivitetslogg,
+    private val journalpostId: String,
+) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
 }
