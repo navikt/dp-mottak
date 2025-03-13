@@ -15,7 +15,7 @@ class VedtakFattetMottakTest {
     }
 
     @Test
-    fun `Skal slette Arena-oppgaver når vedtak er fattet i fagsystem "Dagpenger"`() {
+    fun `Skal slette Arena-oppgaver når vedtak er fattet i fagsystem Dagpenger`() {
         testRapid.sendTestMessage(vedtakFattetIDagpengerJson)
         coVerify(exactly = 1) { arenaOppgaveTjeneste.slettArenaOppgaver() }
     }
