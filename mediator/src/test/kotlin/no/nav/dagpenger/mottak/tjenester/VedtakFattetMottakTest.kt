@@ -19,6 +19,12 @@ class VedtakFattetMottakTest {
         testRapid.sendTestMessage(vedtakFattetIDagpengerJson)
         coVerify(exactly = 1) { arenaOppgaveTjeneste.slettArenaOppgaver() }
     }
+
+    @Test
+    fun `Skal ikke slette Arena-oppgaver når vedtak er fattet i fagsystem Arena`() {
+        testRapid.sendTestMessage(vedtakFattetIArenaJson)
+        coVerify(exactly = 0) { arenaOppgaveTjeneste.slettArenaOppgaver() }
+    }
 }
 
 private val vedtakFattetIDagpengerJson =
@@ -30,6 +36,19 @@ private val vedtakFattetIDagpengerJson =
         "behandlingId": "123e4567-e89b-12d3-a456-426614174001",
         "fagsakId": "12342",
         "fagsystem": "Dagpenger",
+        "automatisk": true
+    }
+    """.trimIndent()
+
+private val vedtakFattetIArenaJson =
+    """
+    {
+        "@event_name": "vedtak_fattet",
+        "ident": "12345678901",
+        "søknadId": "123e4567-e89b-12d3-a456-426614174000",
+        "behandlingId": "123e4567-e89b-12d3-a456-426614174001",
+        "fagsakId": "12342",
+        "fagsystem": "Arena",
         "automatisk": true
     }
     """.trimIndent()
