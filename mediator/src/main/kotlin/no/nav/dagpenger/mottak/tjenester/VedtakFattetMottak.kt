@@ -12,11 +12,16 @@ import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppgaveTjeneste
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.SlettArenaOppgaveParametere
+import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import java.util.UUID
 
 private val logger = KotlinLogging.logger {}
 
-internal class VedtakFattetMottak(rapidsConnection: RapidsConnection, private val arenaOppgaveTjeneste: ArenaOppgaveTjeneste) : River.PacketListener {
+internal class VedtakFattetMottak(
+    rapidsConnection: RapidsConnection,
+    private val arenaOppgaveTjeneste: ArenaOppgaveTjeneste,
+    private val innsendingMetadataRepository: InnsendingMetadataRepository,
+) : River.PacketListener {
     companion object {
         val rapidFilter: River.() -> Unit = {
             precondition {
@@ -40,16 +45,20 @@ internal class VedtakFattetMottak(rapidsConnection: RapidsConnection, private va
         val søknadId = packet["søknadId"].asUUID()
         val behandlingId = packet["behandlingId"].asUUID()
         val fagsakId = packet["fagsakId"].asText()
-        // TODO: Hent info om hvor vedtaket er fattet
+        val ident = packet["ident"].asText()
         withLoggingContext("søknadId" to "$søknadId", "behandlingId" to "$behandlingId") {
             logger.info { "Mottok vedtak_fattet hendelse" }
-
+            val oppgaverIder =
+                innsendingMetadataRepository.hentOppgaverIder(
+                    søknadId = søknadId,
+                    ident = ident,
+                )
             runBlocking {
                 arenaOppgaveTjeneste.slettArenaOppgaver(
                     SlettArenaOppgaveParametere(
                         fagsakId = fagsakId,
-                        oppgaveIder = emptyList()
-                    )
+                        oppgaveIder = oppgaverIder,
+                    ),
                 )
             }
         }
