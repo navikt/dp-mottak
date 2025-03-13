@@ -4,9 +4,11 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.mockk.coVerify
 import io.mockk.mockk
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppgaveTjeneste
+import no.nav.dagpenger.mottak.behov.saksbehandling.arena.SlettArenaOppgaveParametere
 import org.junit.jupiter.api.Test
 
-class VedtakFattetMottakTest {
+class
+VedtakFattetMottakTest {
     private val testRapid = TestRapid()
     private val arenaOppgaveTjeneste = mockk<ArenaOppgaveTjeneste>(relaxed = true)
 
@@ -17,7 +19,16 @@ class VedtakFattetMottakTest {
     @Test
     fun `Skal slette Arena-oppgaver når vedtak er fattet i fagsystem Dagpenger`() {
         testRapid.sendTestMessage(vedtakFattetIDagpengerJson)
-        coVerify(exactly = 1) { arenaOppgaveTjeneste.slettArenaOppgaver() }
+
+        coVerify(exactly = 1) {
+            arenaOppgaveTjeneste.slettArenaOppgaver(
+                slettArenaOppgaveParametere =
+                    SlettArenaOppgaveParametere(
+                        fagsakId = "123",
+                        oppgaveIder = listOf("1", "2", "3"),
+                    ),
+            )
+        }
     }
 
     @Test

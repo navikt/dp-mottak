@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import mu.withLoggingContext
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppgaveTjeneste
+import no.nav.dagpenger.mottak.behov.saksbehandling.arena.SlettArenaOppgaveParametere
 import java.util.UUID
 
 private val logger = KotlinLogging.logger {}
@@ -38,11 +39,18 @@ internal class VedtakFattetMottak(rapidsConnection: RapidsConnection, private va
     ) {
         val søknadId = packet["søknadId"].asUUID()
         val behandlingId = packet["behandlingId"].asUUID()
+        val fagsakId = packet["fagsakId"].asText()
         // TODO: Hent info om hvor vedtaket er fattet
         withLoggingContext("søknadId" to "$søknadId", "behandlingId" to "$behandlingId") {
             logger.info { "Mottok vedtak_fattet hendelse" }
+
             runBlocking {
-                arenaOppgaveTjeneste.slettArenaOppgaver()
+                arenaOppgaveTjeneste.slettArenaOppgaver(
+                    SlettArenaOppgaveParametere(
+                        fagsakId = fagsakId,
+                        oppgaveIder = emptyList()
+                    )
+                )
             }
         }
     }

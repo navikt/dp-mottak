@@ -35,7 +35,9 @@ internal interface ArenaOppslag {
 }
 
 internal interface ArenaOppgaveTjeneste {
-    suspend fun slettArenaOppgaver()
+    suspend fun slettArenaOppgaver(
+        slettArenaOppgaveParametere: SlettArenaOppgaveParametere,
+    )
 }
 
 internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
@@ -108,4 +110,9 @@ internal data class OpprettArenaOppgaveParametere(
 internal data class OpprettVedtakOppgaveResponse(
     val fagsakId: String?,
     val oppgaveId: String,
+)
+
+internal data class SlettArenaOppgaveParametere(
+    val fagsakId: String,
+    val oppgaveIder: List<String>,
 )
