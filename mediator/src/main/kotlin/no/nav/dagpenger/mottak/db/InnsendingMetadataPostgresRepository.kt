@@ -24,12 +24,12 @@ internal class InnsendingMetadataPostgresRepository(private val ds: DataSource =
                         JOIN      soknad_v1 sokn ON inns.id = sokn.id
                         JOIN      arenasak_v1 aren ON inns.id = aren.id
                         WHERE     pers.ident =  :ident
-                        AND       sokn.data ->> '@id' = ':søknadId'
+                        AND       sokn.data ->> '@id' = :soknad_id
                         """.trimIndent(),
                     paramMap =
                         mapOf(
                             "ident" to ident,
-                            "søknadId" to søknadId.toString(),
+                            "soknad_id" to søknadId.toString(),
                         ),
                 ).map { row ->
                     row.string("oppgaveid")

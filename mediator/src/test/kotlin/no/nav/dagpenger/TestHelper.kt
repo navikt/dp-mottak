@@ -11,7 +11,7 @@ internal val journalpostStatus = "aktiv"
 internal val fnr = GENERERT_FØDSELSNUMMER
 internal val dnr = GENERERT_DNUMMER
 internal val registrertdato = LocalDateTime.now()
-private val dokumenter =
+internal val søknadDokumenter =
     listOf(
         InnsendingData.JournalpostData.DokumentInfoData(
             tittel = "Fin tittel",
@@ -30,6 +30,15 @@ private val dokumenter =
             brevkode = "T6",
             dokumentInfoId = "12366732",
             hovedDokument = false,
+        ),
+    )
+internal val ettersendingDokumenter =
+    listOf(
+        InnsendingData.JournalpostData.DokumentInfoData(
+            tittel = "Fin tittel",
+            brevkode = "NAVe 04-01.03",
+            dokumentInfoId = "123455555",
+            hovedDokument = true,
         ),
     )
 
@@ -80,7 +89,7 @@ val innsendingData =
                 bruker = InnsendingData.JournalpostData.BrukerData(InnsendingData.JournalpostData.BrukerTypeData.FNR, fnr),
                 behandlingstema = "DAG",
                 registertDato = registrertdato,
-                dokumenter = dokumenter,
+                dokumenter = søknadDokumenter,
                 journalførendeEnhet = "ENHET",
             ),
         personData =
