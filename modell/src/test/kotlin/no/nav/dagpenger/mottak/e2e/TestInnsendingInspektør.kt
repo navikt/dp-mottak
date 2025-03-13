@@ -33,9 +33,7 @@ class PlantUmlObservatør() : InnsendingObserver {
     private val innsendingdetaljer = mutableListOf<String>()
 
     private companion object {
-        val path = "${
-            Paths.get("").toAbsolutePath().toString().substringBeforeLast("/")
-        }/docs/arkitektur/"
+        val path = Paths.get("").toAbsolutePath().parent.resolve("docs/arkitektur").toString()
         val options =
             Options()
                 .forFile()
