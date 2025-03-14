@@ -40,22 +40,24 @@ internal class VedtakFattetMottak(
     ) {
         val søknadId = packet["søknadId"].asUUID()
         val behandlingId = packet["behandlingId"].asUUID()
-        //val fagsakId = packet["fagsakId"].asText()
+        // val fagsakId = packet["fagsakId"].asText()
         val ident = packet["ident"].asText()
         withLoggingContext("søknadId" to "$søknadId", "behandlingId" to "$behandlingId") {
             logger.info { "Mottok vedtak_fattet hendelse" }
-            val oppgaverIder =
-                innsendingMetadataRepository.hentOppgaverIder(
+            val arenaSak =
+                innsendingMetadataRepository.hentArenaSak(
                     søknadId = søknadId,
                     ident = ident,
                 )
-            val arenaFagsakId = innsendingMetadataRepository.hentArenaFagsakId(søknadId)
+            val oppgaverIder = arenaSak.map { it.oppgaveId }
+            // todo bedre feilhåndtering
+            val arenaFagsakId: String = arenaSak.single { it.fagsakId != null }.fagsakId ?: throw RuntimeException("Kunne ikke hente arena fagsakid")
             val message =
                 JsonMessage.newNeed(
                     behov = listOf("slett_arena_oppgaver"),
                     map =
                         mapOf(
-                            "fagsakId" to fagsakId,
+                            "fagsakId" to arenaFagsakId,
                             "oppgaveIder" to oppgaverIder,
                         ),
                 ).toJson()

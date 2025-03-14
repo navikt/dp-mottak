@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
+import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -13,14 +14,19 @@ VedtakFattetMottakTest {
     private val søknadId = UUID.randomUUID()
     private val fagsakId = "12342"
     private val testPersonIdent = "12345678901"
-    private val testOppgaver = listOf("1", "2", "3")
+    private val testOppgaver =
+        listOf(
+            ArenaSak("søknad1", fagsakId),
+            ArenaSak("ettersending1", null),
+            ArenaSak("ettersending2", null),
+        )
 
     private val testRapid = TestRapid()
 
     private val innsendingMetadataRepository =
         mockk<InnsendingMetadataRepository>().also {
             every {
-                it.hentOppgaverIder(
+                it.hentArenaSak(
                     søknadId = søknadId,
                     ident = testPersonIdent,
                 )
@@ -44,7 +50,7 @@ VedtakFattetMottakTest {
                 message["@event_name"].asText() shouldBe "behov"
                 message["@behov"].map { it.asText() }.single() shouldBe "slett_arena_oppgaver"
                 message["fagsakId"].asText() shouldBe fagsakId
-                message["oppgaveIder"].map { it.asText() } shouldBe testOppgaver
+                message["oppgaveIder"].map { it.asText() } shouldBe listOf("søknad1", "ettersending1", "ettersending2")
             }
         }
     }

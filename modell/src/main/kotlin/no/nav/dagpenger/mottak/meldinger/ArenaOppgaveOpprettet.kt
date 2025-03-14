@@ -14,7 +14,7 @@ class ArenaOppgaveOpprettet(
 
     fun arenaSak(): ArenaSak = ArenaSak(oppgaveId, fagsakId)
 
-    class ArenaSak(
+    data class ArenaSak(
         val oppgaveId: String,
         val fagsakId: String?,
     ) {
