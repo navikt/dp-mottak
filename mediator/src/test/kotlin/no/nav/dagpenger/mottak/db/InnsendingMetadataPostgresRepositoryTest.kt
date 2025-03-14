@@ -5,7 +5,6 @@ import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.fnr
 import no.nav.dagpenger.innsendingData
 import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
-import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.serder.InnsendingData
 import org.junit.jupiter.api.Test
 import java.util.UUID
@@ -48,16 +47,18 @@ class InnsendingMetadataPostgresRepositoryTest {
             }
 
             InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
-                val arenaSaker = hentArenaSak(søknadId, fnr)
+                val arenaSaker = hentArenaOppgaver(søknadId, fnr)
                 arenaSaker shouldBe
                     listOf(
-                        ArenaOppgaveOpprettet.ArenaSak(
+                        ArenaOppgave(
                             oppgaveId = "søknad",
                             fagsakId = "fagsakid",
+                            journalpostId = 1,
                         ),
-                        ArenaOppgaveOpprettet.ArenaSak(
+                        ArenaOppgave(
                             oppgaveId = "ettersending",
                             fagsakId = null,
+                            journalpostId = 2,
                         ),
                     )
             }

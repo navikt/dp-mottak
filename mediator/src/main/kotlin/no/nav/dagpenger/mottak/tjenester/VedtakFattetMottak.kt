@@ -45,11 +45,14 @@ internal class VedtakFattetMottak(
         withLoggingContext("søknadId" to "$søknadId", "behandlingId" to "$behandlingId") {
             logger.info { "Mottok vedtak_fattet hendelse" }
             val arenaSak =
-                innsendingMetadataRepository.hentArenaSak(
+                innsendingMetadataRepository.hentArenaOppgaver(
                     søknadId = søknadId,
                     ident = ident,
                 )
             val oppgaverIder = arenaSak.map { it.oppgaveId }
+
+            // knytt til riktig joarksak
+
             // todo bedre feilhåndtering
             val arenaFagsakId: String = arenaSak.single { it.fagsakId != null }.fagsakId ?: throw RuntimeException("Kunne ikke hente arena fagsakid")
             val message =

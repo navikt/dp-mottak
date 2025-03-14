@@ -4,8 +4,8 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.dagpenger.mottak.db.ArenaOppgave
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
-import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -16,9 +16,9 @@ VedtakFattetMottakTest {
     private val testPersonIdent = "12345678901"
     private val testOppgaver =
         listOf(
-            ArenaSak("søknad1", fagsakId),
-            ArenaSak("ettersending1", null),
-            ArenaSak("ettersending2", null),
+            ArenaOppgave(1, "søknad1", fagsakId),
+            ArenaOppgave(2, "ettersending1", null),
+            ArenaOppgave(3, "ettersending2", null),
         )
 
     private val testRapid = TestRapid()
@@ -26,7 +26,7 @@ VedtakFattetMottakTest {
     private val innsendingMetadataRepository =
         mockk<InnsendingMetadataRepository>().also {
             every {
-                it.hentArenaSak(
+                it.hentArenaOppgaver(
                     søknadId = søknadId,
                     ident = testPersonIdent,
                 )

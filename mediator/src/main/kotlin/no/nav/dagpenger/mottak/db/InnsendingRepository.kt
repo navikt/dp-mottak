@@ -3,7 +3,6 @@ package no.nav.dagpenger.mottak.db
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingPeriode
 import no.nav.dagpenger.mottak.api.Periode
-import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import java.util.UUID
 
 interface InnsendingRepository {
@@ -15,8 +14,14 @@ interface InnsendingRepository {
 }
 
 interface InnsendingMetadataRepository {
-    fun hentArenaSak(
+    fun hentArenaOppgaver(
         søknadId: UUID,
         ident: String,
-    ): List<ArenaOppgaveOpprettet.ArenaSak>
+    ): List<ArenaOppgave>
 }
+
+data class ArenaOppgave(
+    val journalpostId: Int,
+    val oppgaveId: String,
+    val fagsakId: String?,
+)
