@@ -7,8 +7,10 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import mu.withLoggingContext
+import no.nav.dagpenger.mottak.behov.journalpost.JournalpostDokarkiv
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import java.util.UUID
 
@@ -17,6 +19,7 @@ private val logger = KotlinLogging.logger {}
 internal class VedtakFattetMottak(
     rapidsConnection: RapidsConnection,
     private val innsendingMetadataRepository: InnsendingMetadataRepository,
+    private val journalpostDokarkiv: JournalpostDokarkiv,
 ) : River.PacketListener {
     companion object {
         val rapidFilter: River.() -> Unit = {
@@ -40,7 +43,6 @@ internal class VedtakFattetMottak(
     ) {
         val søknadId = packet["søknadId"].asUUID()
         val behandlingId = packet["behandlingId"].asUUID()
-        // val fagsakId = packet["fagsakId"].asText()
         val ident = packet["ident"].asText()
         withLoggingContext("søknadId" to "$søknadId", "behandlingId" to "$behandlingId") {
             logger.info { "Mottok vedtak_fattet hendelse" }
@@ -50,9 +52,19 @@ internal class VedtakFattetMottak(
                     ident = ident,
                 )
 
-            // todo bedre feilhåndtering
             val oppgaverIder = arenaOppgaver.map { it.oppgaveId }
             val arenaFagsakId: String = arenaOppgaver.single { it.fagsakId != null }.fagsakId ?: throw RuntimeException("Kunne ikke hente arena fagsakid")
+
+            runBlocking {
+                arenaOppgaver.forEach {
+                    journalpostDokarkiv.knyttJounalPostTilNySak(
+                        journalpostId = it.journalpostId,
+                        fagsakId = arenaFagsakId,
+                        ident = ident,
+                    )
+                }
+            }
+
             val message =
                 JsonMessage.newNeed(
                     behov = listOf("slett_arena_oppgaver"),

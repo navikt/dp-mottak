@@ -105,5 +105,13 @@ internal class JournalpostApiClient(
         }
     }
 
+    override suspend fun knyttJounalPostTilNySak(
+        journalpostId: Int,
+        fagsakId: String,
+        ident: String,
+    ) {
+        TODO("Not yet implemented")
+    }
+
     private data class FerdigstillJournalpostRequest(val journalfoerendeEnhet: String = "9999")
 }

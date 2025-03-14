@@ -2,8 +2,11 @@ package no.nav.dagpenger.mottak.tjenester
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.dagpenger.mottak.behov.journalpost.JournalpostDokarkiv
 import no.nav.dagpenger.mottak.db.ArenaOppgave
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import org.junit.jupiter.api.Test
@@ -33,10 +36,18 @@ VedtakFattetMottakTest {
             } returns testOppgaver
         }
 
+    private val journalpostDokarkiv =
+        mockk<JournalpostDokarkiv>().also {
+            coEvery {
+                it.knyttJounalPostTilNySak(any(), any(), any())
+            } returns Unit
+        }
+
     init {
         VedtakFattetMottak(
             rapidsConnection = testRapid,
             innsendingMetadataRepository = innsendingMetadataRepository,
+            journalpostDokarkiv = journalpostDokarkiv,
         )
     }
 
@@ -52,6 +63,11 @@ VedtakFattetMottakTest {
                 message["fagsakId"].asText() shouldBe fagsakId
                 message["oppgaveIder"].map { it.asText() } shouldBe listOf("søknad1", "ettersending1", "ettersending2")
             }
+        }
+        coVerify(exactly = 1) {
+            journalpostDokarkiv.knyttJounalPostTilNySak(1, fagsakId, testPersonIdent)
+            journalpostDokarkiv.knyttJounalPostTilNySak(2, fagsakId, testPersonIdent)
+            journalpostDokarkiv.knyttJounalPostTilNySak(3, fagsakId, testPersonIdent)
         }
     }
 
