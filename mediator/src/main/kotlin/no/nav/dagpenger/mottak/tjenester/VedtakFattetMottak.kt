@@ -40,7 +40,7 @@ internal class VedtakFattetMottak(
     ) {
         val søknadId = packet["søknadId"].asUUID()
         val behandlingId = packet["behandlingId"].asUUID()
-        val fagsakId = packet["fagsakId"].asText()
+        //val fagsakId = packet["fagsakId"].asText()
         val ident = packet["ident"].asText()
         withLoggingContext("søknadId" to "$søknadId", "behandlingId" to "$behandlingId") {
             logger.info { "Mottok vedtak_fattet hendelse" }
@@ -49,6 +49,7 @@ internal class VedtakFattetMottak(
                     søknadId = søknadId,
                     ident = ident,
                 )
+            val arenaFagsakId = innsendingMetadataRepository.hentArenaFagsakId(søknadId)
             val message =
                 JsonMessage.newNeed(
                     behov = listOf("slett_arena_oppgaver"),
