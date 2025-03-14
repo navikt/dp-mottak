@@ -49,18 +49,16 @@ internal class VedtakFattetMottak(
                     søknadId = søknadId,
                     ident = ident,
                 )
-            // TODO
-//            val message =
-//                JsonMessage.newNeed(
-//                    behov = listOf("slett_arena_oppgaver"),
-//                    map =
-//                        mapOf(
-//                            "fagsakId" to slettArenaOppgaveParametere.fagsakId,
-//                            "oppgaveIder" to slettArenaOppgaveParametere.oppgaveIder,
-//                        ),
-//                ).toJson().also {
-//                    no.nav.dagpenger.mottak.behov.saksbehandling.arena.logger.info { "Publiserer behov: $it" }
-//                }
+            val message =
+                JsonMessage.newNeed(
+                    behov = listOf("slett_arena_oppgaver"),
+                    map =
+                        mapOf(
+                            "fagsakId" to fagsakId,
+                            "oppgaveIder" to oppgaverIder,
+                        ),
+                ).toJson()
+            context.publish(ident, message)
         }
     }
 }

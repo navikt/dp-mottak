@@ -37,7 +37,16 @@ VedtakFattetMottakTest {
     @Test
     fun `Skal sende ut behov for sletting av Arena-oppgaver når vedtak er fattet i fagsystem Dagpenger`() {
         testRapid.sendTestMessage(vedtakFattetIDagpengerJson)
-        testRapid.inspektør.size shouldBe 1
+        testRapid.inspektør.let { inspektør ->
+            inspektør.size shouldBe 1
+            inspektør.key(0) shouldBe testPersonIdent
+            inspektør.message(0).let { message ->
+                message["@event_name"].asText() shouldBe "behov"
+                message["@behov"].map { it.asText() }.single() shouldBe "slett_arena_oppgaver"
+                message["fagsakId"].asText() shouldBe fagsakId
+                message["oppgaveIder"].map { it.asText() } shouldBe testOppgaver
+            }
+        }
     }
 
     @Test
