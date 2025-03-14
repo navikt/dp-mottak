@@ -39,7 +39,7 @@ dependencies {
     testImplementation(libs.mock.oauth2.server)
     testImplementation(libs.bundles.postgres.test)
     testImplementation(libs.rapids.and.rivers.test)
-    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.bundles.kotest.assertions)
     testImplementation("no.bekk.bekkopen:nocommons:0.16.0")
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation("io.ktor:ktor-client-mock-jvm:${libs.versions.ktor.get()}")

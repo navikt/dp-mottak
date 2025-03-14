@@ -19,9 +19,9 @@ VedtakFattetMottakTest {
     private val testPersonIdent = "12345678901"
     private val testOppgaver =
         listOf(
-            ArenaOppgave(1, "søknad1", fagsakId),
-            ArenaOppgave(2, "ettersending1", null),
-            ArenaOppgave(3, "ettersending2", null),
+            ArenaOppgave("1", "søknad1", fagsakId),
+            ArenaOppgave("2", "ettersending1", null),
+            ArenaOppgave("3", "ettersending2", null),
         )
 
     private val testRapid = TestRapid()
@@ -40,7 +40,7 @@ VedtakFattetMottakTest {
         mockk<JournalpostDokarkiv>().also {
             coEvery {
                 it.knyttJounalPostTilNySak(any(), any(), any())
-            } returns Unit
+            } returns "12"
         }
 
     init {
@@ -65,9 +65,9 @@ VedtakFattetMottakTest {
             }
         }
         coVerify(exactly = 1) {
-            journalpostDokarkiv.knyttJounalPostTilNySak(1, fagsakId, testPersonIdent)
-            journalpostDokarkiv.knyttJounalPostTilNySak(2, fagsakId, testPersonIdent)
-            journalpostDokarkiv.knyttJounalPostTilNySak(3, fagsakId, testPersonIdent)
+            journalpostDokarkiv.knyttJounalPostTilNySak("1", fagsakId, testPersonIdent)
+            journalpostDokarkiv.knyttJounalPostTilNySak("2", fagsakId, testPersonIdent)
+            journalpostDokarkiv.knyttJounalPostTilNySak("3", fagsakId, testPersonIdent)
         }
     }
 

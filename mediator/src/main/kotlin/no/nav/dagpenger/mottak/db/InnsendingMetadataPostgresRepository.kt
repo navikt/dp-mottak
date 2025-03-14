@@ -35,7 +35,7 @@ internal class InnsendingMetadataPostgresRepository(private val ds: DataSource =
                     ArenaOppgave(
                         oppgaveId = row.string(columnLabel = "oppgaveid"),
                         fagsakId = row.stringOrNull(columnLabel = "fagsakid"),
-                        journalpostId = row.int(columnLabel = "journalpostid"),
+                        journalpostId = row.int(columnLabel = "journalpostid").toString(),
                     )
                 }.asList,
             )

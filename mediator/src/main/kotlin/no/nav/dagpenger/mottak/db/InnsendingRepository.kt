@@ -21,7 +21,7 @@ interface InnsendingMetadataRepository {
 }
 
 data class ArenaOppgave(
-    val journalpostId: Int,
+    val journalpostId: String,
     val oppgaveId: String,
     val fagsakId: String?,
 )

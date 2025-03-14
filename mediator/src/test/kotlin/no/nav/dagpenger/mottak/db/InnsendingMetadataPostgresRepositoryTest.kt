@@ -53,12 +53,12 @@ class InnsendingMetadataPostgresRepositoryTest {
                         ArenaOppgave(
                             oppgaveId = "søknad",
                             fagsakId = "fagsakid",
-                            journalpostId = 1,
+                            journalpostId = "1",
                         ),
                         ArenaOppgave(
                             oppgaveId = "ettersending",
                             fagsakId = null,
-                            journalpostId = 2,
+                            journalpostId = "2",
                         ),
                     )
             }
