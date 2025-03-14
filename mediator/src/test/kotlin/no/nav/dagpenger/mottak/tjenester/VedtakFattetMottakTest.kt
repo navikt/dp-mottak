@@ -1,11 +1,9 @@
 package no.nav.dagpenger.mottak.tjenester
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
-import io.mockk.coVerify
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppgaveTjeneste
-import no.nav.dagpenger.mottak.behov.saksbehandling.arena.SlettArenaOppgaveParametere
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import org.junit.jupiter.api.Test
 import java.util.UUID
@@ -18,7 +16,7 @@ VedtakFattetMottakTest {
     private val testOppgaver = listOf("1", "2", "3")
 
     private val testRapid = TestRapid()
-    private val arenaOppgaveTjeneste = mockk<ArenaOppgaveTjeneste>(relaxed = true)
+
     private val innsendingMetadataRepository =
         mockk<InnsendingMetadataRepository>().also {
             every {
@@ -32,29 +30,20 @@ VedtakFattetMottakTest {
     init {
         VedtakFattetMottak(
             rapidsConnection = testRapid,
-            arenaOppgaveTjeneste = arenaOppgaveTjeneste,
             innsendingMetadataRepository = innsendingMetadataRepository,
         )
     }
 
     @Test
-    fun `Skal slette Arena-oppgaver når vedtak er fattet i fagsystem Dagpenger`() {
+    fun `Skal sende ut behov for sletting av Arena-oppgaver når vedtak er fattet i fagsystem Dagpenger`() {
         testRapid.sendTestMessage(vedtakFattetIDagpengerJson)
-        coVerify(exactly = 1) {
-            arenaOppgaveTjeneste.slettArenaOppgaver(
-                slettArenaOppgaveParametere =
-                    SlettArenaOppgaveParametere(
-                        fagsakId = fagsakId,
-                        oppgaveIder = testOppgaver,
-                    ),
-            )
-        }
+        testRapid.inspektør.size shouldBe 1
     }
 
     @Test
-    fun `Skal ikke slette Arena-oppgaver når vedtak er fattet i fagsystem Arena`() {
+    fun `Skal ikke sende ut behov for sletting av Arena-oppgaver når vedtak er fattet i fagsystem Arena`() {
         testRapid.sendTestMessage(vedtakFattetIArenaJson)
-        coVerify(exactly = 0) { arenaOppgaveTjeneste.slettArenaOppgaver(any()) }
+        testRapid.inspektør.size shouldBe 0
     }
 
     private val vedtakFattetIDagpengerJson =

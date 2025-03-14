@@ -7,11 +7,8 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import mu.withLoggingContext
-import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppgaveTjeneste
-import no.nav.dagpenger.mottak.behov.saksbehandling.arena.SlettArenaOppgaveParametere
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import java.util.UUID
 
@@ -19,7 +16,6 @@ private val logger = KotlinLogging.logger {}
 
 internal class VedtakFattetMottak(
     rapidsConnection: RapidsConnection,
-    private val arenaOppgaveTjeneste: ArenaOppgaveTjeneste,
     private val innsendingMetadataRepository: InnsendingMetadataRepository,
 ) : River.PacketListener {
     companion object {
@@ -53,14 +49,18 @@ internal class VedtakFattetMottak(
                     søknadId = søknadId,
                     ident = ident,
                 )
-            runBlocking {
-                arenaOppgaveTjeneste.slettArenaOppgaver(
-                    SlettArenaOppgaveParametere(
-                        fagsakId = fagsakId,
-                        oppgaveIder = oppgaverIder,
-                    ),
-                )
-            }
+            // TODO
+//            val message =
+//                JsonMessage.newNeed(
+//                    behov = listOf("slett_arena_oppgaver"),
+//                    map =
+//                        mapOf(
+//                            "fagsakId" to slettArenaOppgaveParametere.fagsakId,
+//                            "oppgaveIder" to slettArenaOppgaveParametere.oppgaveIder,
+//                        ),
+//                ).toJson().also {
+//                    no.nav.dagpenger.mottak.behov.saksbehandling.arena.logger.info { "Publiserer behov: $it" }
+//                }
         }
     }
 }
