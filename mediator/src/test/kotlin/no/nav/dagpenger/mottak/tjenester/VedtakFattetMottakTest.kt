@@ -15,6 +15,7 @@ import java.util.UUID
 class
 VedtakFattetMottakTest {
     private val søknadId = UUID.randomUUID()
+    private val behandlingId = UUID.randomUUID()
     private val fagsakId = "12342"
     private val testPersonIdent = "12345678901"
     private val testOppgaver =
@@ -61,6 +62,7 @@ VedtakFattetMottakTest {
                 message["@event_name"].asText() shouldBe "behov"
                 message["@behov"].map { it.asText() }.single() shouldBe "slett_arena_oppgaver"
                 message["fagsakId"].asText() shouldBe fagsakId
+                message["behandlingId"].asUUID() shouldBe behandlingId
                 message["oppgaveIder"].map { it.asText() } shouldBe listOf("søknad1", "ettersending1", "ettersending2")
             }
         }
@@ -83,7 +85,7 @@ VedtakFattetMottakTest {
             "@event_name": "vedtak_fattet",
             "ident": "$testPersonIdent",
             "søknadId": "$søknadId",
-            "behandlingId": "123e4567-e89b-12d3-a456-426614174001",
+            "behandlingId": "$behandlingId",
             "fagsakId": "$fagsakId",
             "fagsystem": "Dagpenger",
             "automatisk": true
@@ -96,7 +98,7 @@ VedtakFattetMottakTest {
             "@event_name": "vedtak_fattet",
             "ident": "$testPersonIdent",
             "søknadId": "$søknadId",
-            "behandlingId": "123e4567-e89b-12d3-a456-426614174001",
+            "behandlingId": "$behandlingId",
             "fagsakId": "$fagsakId",
             "fagsystem": "Arena",
             "automatisk": true

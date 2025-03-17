@@ -70,6 +70,7 @@ internal class VedtakFattetMottak(
                     behov = listOf("slett_arena_oppgaver"),
                     map =
                         mapOf(
+                            "behandlingId" to behandlingId,
                             "fagsakId" to arenaFagsakId,
                             "oppgaveIder" to oppgaverIder,
                         ),
