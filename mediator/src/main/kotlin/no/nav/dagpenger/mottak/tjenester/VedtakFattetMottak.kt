@@ -52,14 +52,15 @@ internal class VedtakFattetMottak(
                     ident = ident,
                 )
 
-            val oppgaverIder = arenaOppgaver.map { it.oppgaveId }
+            val oppgaveIder = arenaOppgaver.map { it.oppgaveId }
             val arenaFagsakId: String = arenaOppgaver.single { it.fagsakId != null }.fagsakId ?: throw RuntimeException("Kunne ikke hente arena fagsakid")
+            val dagpengerFagsakId = packet["fagsakId"].asUUID()
 
             runBlocking {
                 arenaOppgaver.forEach {
                     journalpostDokarkiv.knyttJounalPostTilNySak(
                         journalpostId = it.journalpostId,
-                        fagsakId = arenaFagsakId,
+                        dagpengerFagsakId = dagpengerFagsakId.toString(),
                         ident = ident,
                     )
                 }
@@ -71,8 +72,8 @@ internal class VedtakFattetMottak(
                     map =
                         mapOf(
                             "behandlingId" to behandlingId,
-                            "fagsakId" to arenaFagsakId,
-                            "oppgaveIder" to oppgaverIder,
+                            "arenaFagsakId" to arenaFagsakId,
+                            "oppgaveIder" to oppgaveIder,
                         ),
                 ).toJson()
             context.publish(ident, message)

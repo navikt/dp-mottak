@@ -16,11 +16,12 @@ class
 VedtakFattetMottakTest {
     private val søknadId = UUID.randomUUID()
     private val behandlingId = UUID.randomUUID()
-    private val fagsakId = "12342"
+    private val arenaFagsakId = "12342"
+    private val dagpengerFagsakId = UUID.randomUUID()
     private val testPersonIdent = "12345678901"
     private val testOppgaver =
         listOf(
-            ArenaOppgave("1", "søknad1", fagsakId),
+            ArenaOppgave("1", "søknad1", arenaFagsakId),
             ArenaOppgave("2", "ettersending1", null),
             ArenaOppgave("3", "ettersending2", null),
         )
@@ -61,15 +62,15 @@ VedtakFattetMottakTest {
             inspektør.message(0).let { message ->
                 message["@event_name"].asText() shouldBe "behov"
                 message["@behov"].map { it.asText() }.single() shouldBe "slett_arena_oppgaver"
-                message["fagsakId"].asText() shouldBe fagsakId
+                message["arenaFagsakId"].asText() shouldBe arenaFagsakId
                 message["behandlingId"].asUUID() shouldBe behandlingId
                 message["oppgaveIder"].map { it.asText() } shouldBe listOf("søknad1", "ettersending1", "ettersending2")
             }
         }
         coVerify(exactly = 1) {
-            journalpostDokarkiv.knyttJounalPostTilNySak("1", fagsakId, testPersonIdent)
-            journalpostDokarkiv.knyttJounalPostTilNySak("2", fagsakId, testPersonIdent)
-            journalpostDokarkiv.knyttJounalPostTilNySak("3", fagsakId, testPersonIdent)
+            journalpostDokarkiv.knyttJounalPostTilNySak("1", dagpengerFagsakId.toString(), testPersonIdent)
+            journalpostDokarkiv.knyttJounalPostTilNySak("2", dagpengerFagsakId.toString(), testPersonIdent)
+            journalpostDokarkiv.knyttJounalPostTilNySak("3", dagpengerFagsakId.toString(), testPersonIdent)
         }
     }
 
@@ -86,7 +87,7 @@ VedtakFattetMottakTest {
             "ident": "$testPersonIdent",
             "søknadId": "$søknadId",
             "behandlingId": "$behandlingId",
-            "fagsakId": "$fagsakId",
+            "fagsakId": "$dagpengerFagsakId",
             "fagsystem": "Dagpenger",
             "automatisk": true
         }
@@ -99,7 +100,7 @@ VedtakFattetMottakTest {
             "ident": "$testPersonIdent",
             "søknadId": "$søknadId",
             "behandlingId": "$behandlingId",
-            "fagsakId": "$fagsakId",
+            "fagsakId": "$arenaFagsakId",
             "fagsystem": "Arena",
             "automatisk": true
         }

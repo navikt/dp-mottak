@@ -79,7 +79,7 @@ class JournalpostApiClientTest {
             val journalpostApi = JournalpostApiClient(engine = mockHttpEngine, { "token" })
             journalpostApi.knyttJounalPostTilNySak(
                 journalpostId = gammelJournalpostId,
-                fagsakId = "fagsakId",
+                dagpengerFagsakId = "fagsakId",
                 ident = "ident",
             ) shouldEqualJson
                 //language=json

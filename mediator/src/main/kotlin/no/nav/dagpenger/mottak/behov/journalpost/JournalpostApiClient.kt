@@ -110,7 +110,7 @@ internal class JournalpostApiClient(
 
     override suspend fun knyttJounalPostTilNySak(
         journalpostId: String,
-        fagsakId: String,
+        dagpengerFagsakId: String,
         ident: String,
     ): String {
         return client.put("/$basePath/journalpost/$journalpostId/knyttTilAnnenSak") {
@@ -119,7 +119,7 @@ internal class JournalpostApiClient(
             header(HttpHeaders.Accept, "application/json")
             setBody(
                 KnyttTilAnnenSakRequest(
-                    fagsakId = fagsakId,
+                    fagsakId = dagpengerFagsakId,
                     bruker = Bruker(id = ident),
                 ),
             )

@@ -14,7 +14,7 @@ internal interface JournalpostDokarkiv {
 
     suspend fun knyttJounalPostTilNySak(
         journalpostId: String,
-        fagsakId: String,
+        dagpengerFagsakId: String,
         ident: String,
     ): String
 }
