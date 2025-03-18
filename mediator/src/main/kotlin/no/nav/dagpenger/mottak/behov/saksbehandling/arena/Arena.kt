@@ -36,6 +36,13 @@ internal interface ArenaOppslag {
     ): OpprettVedtakOppgaveResponse?
 }
 
+internal interface ArenaKlient {
+    suspend fun slettOppgaver(
+        fagsakId: String,
+        oppgaveIder: List<String>,
+    )
+}
+
 internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
     companion object {
         private val logger = KotlinLogging.logger {}
