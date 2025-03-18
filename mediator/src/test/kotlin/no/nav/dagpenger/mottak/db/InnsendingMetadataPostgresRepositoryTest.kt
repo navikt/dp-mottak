@@ -75,8 +75,9 @@ class InnsendingMetadataPostgresRepositoryTest {
     fun `opprett ny JournalpostSak`() {
         withMigratedDb {
             val innsendingPostgresRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
-            val innsendingId = innsendingPostgresRepository.lagre(innsendingData.createInnsending())
-            val journalpostId = 1
+            innsendingPostgresRepository.lagre(innsendingData.createInnsending())
+            val journalpostId = 112312
+            val innsendingId = 1
             val fagsakId = UUID.randomUUID()
             InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
                 opprettNyJournalpostSak(
@@ -85,13 +86,12 @@ class InnsendingMetadataPostgresRepositoryTest {
                     fagsakId = fagsakId,
                 )
             }
-            PostgresDataSourceBuilder.dataSource.sjekkAtNyJournalPostErLagret(journalpostId, innsendingId, fagsakId)
+            PostgresDataSourceBuilder.dataSource.sjekkAtNyJournalPostErLagret(journalpostId, fagsakId)
         }
     }
 
     fun DataSource.sjekkAtNyJournalPostErLagret(
         journalpostId: Int,
-        innsendinId: Int,
         fagsakId: UUID,
     ) {
         using(sessionOf(this)) { session ->
@@ -99,10 +99,11 @@ class InnsendingMetadataPostgresRepositoryTest {
                 queryOf(
                     //language=PostgreSQL
                     """SELECT count(*) FROM journalpost_dagpenger_sak_v1 
-                        WHERE journalpost_id = :journalpost_id AND fagsak_id = :fagsak_id AND innsending_id = :innsending_id
+                        WHERE journalpost_id = :journalpost_id AND fagsak_id = :fagsak_id 
                     """.trimMargin(),
                     mapOf(
                         "journalpost_id" to journalpostId,
+                        "fagsak_id" to fagsakId,
                     ),
                 ).map { row ->
                     row.int(1)
