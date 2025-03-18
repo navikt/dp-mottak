@@ -57,11 +57,17 @@ internal class VedtakFattetMottak(
             val dagpengerFagsakId = packet["fagsakId"].asUUID()
 
             runBlocking {
-                arenaOppgaver.forEach {
-                    journalpostDokarkiv.knyttJounalPostTilNySak(
-                        journalpostId = it.journalpostId,
-                        dagpengerFagsakId = dagpengerFagsakId.toString(),
-                        ident = ident,
+                arenaOppgaver.forEach { oppgave ->
+                    val nyJournalPostId =
+                        journalpostDokarkiv.knyttJounalPostTilNySak(
+                            journalpostId = oppgave.journalpostId,
+                            dagpengerFagsakId = dagpengerFagsakId.toString(),
+                            ident = ident,
+                        )
+                    innsendingMetadataRepository.opprettNyJournalpostSak(
+                        jounalpostId = nyJournalPostId.toInt(),
+                        innsendingId = oppgave.innsendingId,
+                        fagsakId = dagpengerFagsakId,
                     )
                 }
             }

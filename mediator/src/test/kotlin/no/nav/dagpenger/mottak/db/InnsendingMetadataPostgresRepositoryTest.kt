@@ -2,12 +2,16 @@ package no.nav.dagpenger.mottak.db
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.shouldBe
+import kotliquery.queryOf
+import kotliquery.sessionOf
+import kotliquery.using
 import no.nav.dagpenger.fnr
 import no.nav.dagpenger.innsendingData
 import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
 import no.nav.dagpenger.mottak.serder.InnsendingData
 import org.junit.jupiter.api.Test
 import java.util.UUID
+import javax.sql.DataSource
 
 class InnsendingMetadataPostgresRepositoryTest {
     private val søknadId = UUID.randomUUID()
@@ -51,18 +55,60 @@ class InnsendingMetadataPostgresRepositoryTest {
                 arenaSaker shouldBe
                     listOf(
                         ArenaOppgave(
+                            journalpostId = "1",
                             oppgaveId = "søknad",
                             fagsakId = "fagsakid",
-                            journalpostId = "1",
+                            innsendingId = 1,
                         ),
                         ArenaOppgave(
+                            journalpostId = "2",
                             oppgaveId = "ettersending",
                             fagsakId = null,
-                            journalpostId = "2",
+                            innsendingId = 2,
                         ),
                     )
             }
         }
+    }
+
+    @Test
+    fun `opprett ny JournalpostSak`() {
+        withMigratedDb {
+            val innsendingPostgresRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
+            val innsendingId = innsendingPostgresRepository.lagre(innsendingData.createInnsending())
+            val journalpostId = 1
+            val fagsakId = UUID.randomUUID()
+            InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
+                opprettNyJournalpostSak(
+                    jounalpostId = journalpostId,
+                    innsendingId = innsendingId,
+                    fagsakId = fagsakId,
+                )
+            }
+            PostgresDataSourceBuilder.dataSource.sjekkAtNyJournalPostErLagret(journalpostId, innsendingId, fagsakId)
+        }
+    }
+
+    fun DataSource.sjekkAtNyJournalPostErLagret(
+        journalpostId: Int,
+        innsendinId: Int,
+        fagsakId: UUID,
+    ) {
+        using(sessionOf(this)) { session ->
+            session.run(
+                queryOf(
+                    //language=PostgreSQL
+                    """SELECT count(*) FROM journalpost_dagpenger_sak_v1 
+                        WHERE journalpost_id = :journalpost_id AND fagsak_id = :fagsak_id AND innsending_id = :innsending_id
+                    """.trimMargin(),
+                    mapOf(
+                        "journalpost_id" to journalpostId,
+                    ),
+                ).map { row ->
+                    row.int(1)
+                }.asSingle,
+            )
+        } shouldBe 1
     }
 
     private val søknadsData =

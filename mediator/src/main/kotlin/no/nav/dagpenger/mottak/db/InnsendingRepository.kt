@@ -18,10 +18,17 @@ interface InnsendingMetadataRepository {
         søknadId: UUID,
         ident: String,
     ): List<ArenaOppgave>
+
+    fun opprettNyJournalpostSak(
+        jounalpostId: Int,
+        innsendingId: Int,
+        fagsakId: UUID,
+    )
 }
 
 data class ArenaOppgave(
     val journalpostId: String,
     val oppgaveId: String,
     val fagsakId: String?,
+    val innsendingId: Int,
 )

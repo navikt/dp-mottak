@@ -21,9 +21,24 @@ VedtakFattetMottakTest {
     private val testPersonIdent = "12345678901"
     private val testOppgaver =
         listOf(
-            ArenaOppgave("1", "søknad1", arenaFagsakId),
-            ArenaOppgave("2", "ettersending1", null),
-            ArenaOppgave("3", "ettersending2", null),
+            ArenaOppgave(
+                "1",
+                "søknad1",
+                arenaFagsakId,
+                1,
+            ),
+            ArenaOppgave(
+                "2",
+                "ettersending1",
+                null,
+                2,
+            ),
+            ArenaOppgave(
+                "3",
+                "ettersending2",
+                null,
+                3,
+            ),
         )
 
     private val testRapid = TestRapid()
