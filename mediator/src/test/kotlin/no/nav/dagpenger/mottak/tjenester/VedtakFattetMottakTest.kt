@@ -2,10 +2,13 @@ package no.nav.dagpenger.mottak.tjenester
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
+import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostDokarkiv
 import no.nav.dagpenger.mottak.db.ArenaOppgave
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
@@ -17,8 +20,9 @@ VedtakFattetMottakTest {
     private val søknadId = UUID.randomUUID()
     private val behandlingId = UUID.randomUUID()
     private val arenaFagsakId = "12342"
-    private val dagpengerFagsakId = "dagpengerFagsakId"
+    private val dagpengerFagsakId = UUID.randomUUID()
     private val testPersonIdent = "12345678901"
+    private val nyJournalpostId = 12
     private val testOppgaver =
         listOf(
             ArenaOppgave(
@@ -51,13 +55,21 @@ VedtakFattetMottakTest {
                     ident = testPersonIdent,
                 )
             } returns testOppgaver
+
+            every {
+                it.opprettNyJournalpostSak(
+                    jounalpostId = any(),
+                    innsendingId = any(),
+                    fagsakId = any(),
+                )
+            } just Runs
         }
 
     private val journalpostDokarkiv =
         mockk<JournalpostDokarkiv>().also {
             coEvery {
                 it.knyttJounalPostTilNySak(any(), any(), any())
-            } returns "12"
+            } returns nyJournalpostId.toString()
         }
 
     init {
@@ -86,6 +98,12 @@ VedtakFattetMottakTest {
             journalpostDokarkiv.knyttJounalPostTilNySak("1", dagpengerFagsakId.toString(), testPersonIdent)
             journalpostDokarkiv.knyttJounalPostTilNySak("2", dagpengerFagsakId.toString(), testPersonIdent)
             journalpostDokarkiv.knyttJounalPostTilNySak("3", dagpengerFagsakId.toString(), testPersonIdent)
+        }
+
+        verify {
+            innsendingMetadataRepository.opprettNyJournalpostSak(nyJournalpostId, 1, dagpengerFagsakId)
+            innsendingMetadataRepository.opprettNyJournalpostSak(nyJournalpostId, 2, dagpengerFagsakId)
+            innsendingMetadataRepository.opprettNyJournalpostSak(nyJournalpostId, 3, dagpengerFagsakId)
         }
     }
 
