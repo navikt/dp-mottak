@@ -17,7 +17,7 @@ VedtakFattetMottakTest {
     private val søknadId = UUID.randomUUID()
     private val behandlingId = UUID.randomUUID()
     private val arenaFagsakId = "12342"
-    private val dagpengerFagsakId = UUID.randomUUID()
+    private val dagpengerFagsakId = "dagpengerFagsakId"
     private val testPersonIdent = "12345678901"
     private val testOppgaver =
         listOf(
