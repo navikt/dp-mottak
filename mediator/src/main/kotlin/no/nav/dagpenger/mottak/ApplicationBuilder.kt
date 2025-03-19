@@ -9,7 +9,9 @@ import io.prometheus.metrics.model.registry.PrometheusRegistry
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dokarkivTokenProvider
 import no.nav.dagpenger.mottak.Config.objectMapper
+import no.nav.dagpenger.mottak.api.authenticatedRoutes
 import no.nav.dagpenger.mottak.api.innsendingApi
+import no.nav.dagpenger.mottak.api.journalpostRoutes
 import no.nav.dagpenger.mottak.behov.journalpost.FerdigstillJournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApiClient
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
@@ -62,10 +64,10 @@ internal class ApplicationBuilder(
                         readyCheck = rapid::isReady,
                         preStopHook = preStopHook::handlePreStopRequest,
                     ) {
-                        innsendingApi(
-                            innsendingRepository = innsendingRepository,
-                            observer = ferdigstiltInnsendingObserver,
-                        )
+                        authenticatedRoutes {
+                            journalpostRoutes()
+                            innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver)
+                        }
                     }
                 }
             })

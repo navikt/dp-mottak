@@ -5,7 +5,7 @@ import com.github.navikt.tbd_libs.naisful.test.naisfulTestApp
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
-import io.ktor.server.application.Application
+import io.ktor.server.routing.Route
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.nav.dagpenger.mottak.Config
@@ -30,7 +30,7 @@ internal object TestApplication {
     }
 
     internal fun withMockAuthServerAndTestApplication(
-        moduleFunction: Application.() -> Unit,
+        moduleFunction: Route.() -> Unit,
         test: suspend TestContext.() -> Unit,
     ) {
         try {
@@ -38,7 +38,9 @@ internal object TestApplication {
             System.setProperty("AZURE_OPENID_CONFIG_ISSUER", "${mockOAuth2Server.issuerUrl(Config.AzureAd.NAME)}")
             return naisfulTestApp(
                 {
-                    apply { moduleFunction() }
+                    this.authenticatedRoutes {
+                        moduleFunction()
+                    }
                 },
                 Config.objectMapper,
                 PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
