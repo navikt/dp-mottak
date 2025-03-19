@@ -13,7 +13,12 @@ paths:
     get:
       summary: Hent alle journalposter for en gitt søknad
       description: Henter mottak
-
+      parameters:
+        - name: soknadId
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Vellykket respons med en liste av journalpostIder
