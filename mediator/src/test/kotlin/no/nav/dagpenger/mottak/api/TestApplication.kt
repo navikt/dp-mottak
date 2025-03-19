@@ -38,7 +38,7 @@ internal object TestApplication {
             System.setProperty("AZURE_OPENID_CONFIG_ISSUER", "${mockOAuth2Server.issuerUrl(Config.AzureAd.NAME)}")
             return naisfulTestApp(
                 {
-                    this.authenticatedRoutes {
+                    this.installPlugins {
                         moduleFunction()
                     }
                 },
