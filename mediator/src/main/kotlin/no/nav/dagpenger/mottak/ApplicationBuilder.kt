@@ -12,6 +12,7 @@ import no.nav.dagpenger.mottak.Config.objectMapper
 import no.nav.dagpenger.mottak.api.innsendingApi
 import no.nav.dagpenger.mottak.api.installPlugins
 import no.nav.dagpenger.mottak.api.journalpostRoute
+import no.nav.dagpenger.mottak.api.statusPages
 import no.nav.dagpenger.mottak.behov.journalpost.FerdigstillJournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApiClient
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
@@ -66,6 +67,9 @@ internal class ApplicationBuilder(
                         aliveCheck = rapid::isReady,
                         readyCheck = rapid::isReady,
                         preStopHook = preStopHook::handlePreStopRequest,
+                        statusPagesConfig = {
+                            statusPages()
+                        },
                     ) {
                         installPlugins {
                             journalpostRoute(innsendingMetadataRepository)

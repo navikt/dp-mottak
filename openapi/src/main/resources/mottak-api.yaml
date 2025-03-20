@@ -9,16 +9,16 @@ servers:
   - url: https://dp-mottak # Service discovery internt i clusteret
     description: prod
 paths:
-  /v1/journalpost/{soknadId}:
-    get:
-      summary: Hent alle journalposter for en gitt søknad
-      description: Henter mottak
-      parameters:
-        - name: soknadId
-          in: path
-          required: true
-          schema:
-            type: string
+  /v1/journalpost/sok:
+    post:
+      summary: Hent alle journalposterIder for en gitt søknad
+      description: Henter journalpostIder for en gitt søknad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JournalpostSok'
       responses:
         '200':
           description: Vellykket respons med en liste av journalpostIder
@@ -34,6 +34,16 @@ paths:
                 $ref: '#/components/schemas/HttpProblem'
 components:
   schemas:
+    JournalpostSok:
+      type: object
+      properties:
+        soknadId:
+          type: string
+        ident:
+          type: string
+      required:
+        - soknadId
+        - ident
     JournalpostIder:
       type: object
       properties:

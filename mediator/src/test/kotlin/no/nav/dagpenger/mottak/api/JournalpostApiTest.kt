@@ -3,13 +3,19 @@ package no.nav.dagpenger.mottak.api
 import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.mottak.api.TestApplication.autentisert
 import no.nav.dagpenger.mottak.api.TestApplication.withMockAuthServerAndTestApplication
+import no.nav.dagpenger.mottak.db.ArenaOppgave
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -24,22 +30,61 @@ class JournalpostApiTest {
         }
     }
 
+    @Disabled
     @Test
-    fun `Skal kunen henter journalposter for en søknadId og eventuelle ettersendinger`() {
+    fun `Skal svare med HttpProblem ved feil input og interne feil`() {
+        val søknadId = "MikkeMus"
+
+        withMockAuthServerAndTestApplication({ journalpostRoute(mockk()) }) {
+            client.post("v1/journalpost/sok") {
+                autentisert()
+                contentType(ContentType.Application.Json)
+                setBody("""{"soknadId": "$søknadId", "ident": "$testIdent"}""")
+            }.let { response ->
+                response.status shouldBe HttpStatusCode.BadRequest
+                response.bodyAsText() shouldEqualJson
+                    //language=json
+                    """
+                    {
+                        "journalpostIder": ["123456789" , "987654321"]
+                    }
+                    """.trimMargin()
+            }
+        }
+    }
+
+    @Test
+    fun `Skal kunne hente journalposter for en søknadId og eventuelle ettersendinger`() {
         val søknadId = UUID.randomUUID()
         val repository =
             mockk<InnsendingMetadataRepository>().also {
-                every { it.hentArenaOppgaver(søknadId, testIdent) } returns listOf()
+                every { it.hentArenaOppgaver(søknadId, testIdent) } returns
+                    listOf(
+                        ArenaOppgave(
+                            journalpostId = "123456789",
+                            oppgaveId = "oppgave1",
+                            fagsakId = "arenaFagsak",
+                            innsendingId = 1,
+                        ),
+                        ArenaOppgave(
+                            journalpostId = "987654321",
+                            oppgaveId = "oppgave2",
+                            fagsakId = "arenaFagsak",
+                            innsendingId = 2,
+                        ),
+                    )
             }
         withMockAuthServerAndTestApplication({ journalpostRoute(repository) }) {
-            client.get("v1/journalpost/$søknadId") {
+            client.post("v1/journalpost/sok") {
                 autentisert()
+                contentType(ContentType.Application.Json)
+                setBody("""{"soknadId": "$søknadId", "ident": "$testIdent"}""")
             }.let { response ->
                 response.status shouldBe HttpStatusCode.OK
                 response.headers["Content-Type"] shouldBe "application/json; charset=UTF-8"
                 response.bodyAsText() shouldEqualJson
-                        //language=json
-                        """
+                    //language=json
+                    """
                     {
                         "journalpostIder": ["123456789" , "987654321"]
                     }
