@@ -26,7 +26,10 @@ class JournalpostApiTest {
     @Test
     fun `Endepunkt for henting av journalpost krever autentisering`() {
         withMockAuthServerAndTestApplication({ journalpostRoute(mockk()) }) {
-            client.get("v1/journalpost/$søknadId").status shouldBe HttpStatusCode.Unauthorized
+            client.post("v1/journalpost/sok") {
+                contentType(ContentType.Application.Json)
+                setBody("""{"soknadId": "$søknadId", "ident": "$testIdent"}""")
+            }.status shouldBe HttpStatusCode.Unauthorized
         }
     }
 
