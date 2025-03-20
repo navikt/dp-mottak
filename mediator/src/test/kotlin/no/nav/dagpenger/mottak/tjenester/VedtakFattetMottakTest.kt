@@ -57,7 +57,7 @@ VedtakFattetMottakTest {
             } returns testOppgaver
 
             every {
-                it.opprettNyJournalpostSak(
+                it.opprettKoblingTilNyJournalpostForSak(
                     jounalpostId = any(),
                     innsendingId = any(),
                     fagsakId = any(),
@@ -101,9 +101,9 @@ VedtakFattetMottakTest {
         }
 
         verify {
-            innsendingMetadataRepository.opprettNyJournalpostSak(nyJournalpostId, 1, dagpengerFagsakId)
-            innsendingMetadataRepository.opprettNyJournalpostSak(nyJournalpostId, 2, dagpengerFagsakId)
-            innsendingMetadataRepository.opprettNyJournalpostSak(nyJournalpostId, 3, dagpengerFagsakId)
+            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(nyJournalpostId, 1, dagpengerFagsakId)
+            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(nyJournalpostId, 2, dagpengerFagsakId)
+            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(nyJournalpostId, 3, dagpengerFagsakId)
         }
     }
 

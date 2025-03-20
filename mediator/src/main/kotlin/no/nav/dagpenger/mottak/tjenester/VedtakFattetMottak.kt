@@ -64,7 +64,7 @@ internal class VedtakFattetMottak(
                             dagpengerFagsakId = dagpengerFagsakId.toString(),
                             ident = ident,
                         )
-                    innsendingMetadataRepository.opprettNyJournalpostSak(
+                    innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(
                         jounalpostId = nyJournalPostId.toInt(),
                         innsendingId = oppgave.innsendingId,
                         fagsakId = dagpengerFagsakId,

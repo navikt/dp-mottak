@@ -80,13 +80,75 @@ class InnsendingMetadataPostgresRepositoryTest {
             val innsendingId = 1
             val fagsakId = UUID.randomUUID()
             InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
-                opprettNyJournalpostSak(
+                opprettKoblingTilNyJournalpostForSak(
                     jounalpostId = journalpostId,
                     innsendingId = innsendingId,
                     fagsakId = fagsakId,
                 )
             }
             PostgresDataSourceBuilder.dataSource.sjekkAtNyJournalPostErLagret(journalpostId, fagsakId)
+        }
+    }
+
+    @Test
+    fun `hent journalposter for en søknad avhengig av om journalpost er knyttet til ny sak i Dagpenger eller kun til Arena sak`() {
+        val søknad =
+            innsendingData.copy(
+                id = 1,
+                søknadsData = søknadsData,
+                arenaSakData =
+                    InnsendingData.ArenaSakData(
+                        oppgaveId = "søknad",
+                        fagsakId = "fagsakid",
+                    ),
+                journalpostId = "1",
+                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+            )
+
+        val ettersending =
+            innsendingData.copy(
+                id = 2,
+                søknadsData = søknadsData,
+                arenaSakData =
+                    InnsendingData.ArenaSakData(
+                        oppgaveId = "ettersending",
+                        fagsakId = null,
+                    ),
+                journalpostId = "2",
+                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+            )
+
+        withMigratedDb {
+            val innsendingPostgresRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
+            innsendingPostgresRepository.apply {
+                lagre(søknad.createInnsending())
+                lagre(ettersending.createInnsending())
+            }
+
+            InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
+                val arenaJournalpostIder = hentJournalpostIder(søknadId, fnr)
+                arenaJournalpostIder shouldBe listOf("1", "2")
+
+                val nyJournalpostIdSøknad = 111
+                val nyJournalpostIdEttersending = 222
+                val nyDagpengerFagsakId = UUID.randomUUID()
+//                InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
+                opprettKoblingTilNyJournalpostForSak(
+                    jounalpostId = nyJournalpostIdSøknad,
+                    innsendingId = søknad.id.toInt(),
+                    fagsakId = nyDagpengerFagsakId,
+                )
+                opprettKoblingTilNyJournalpostForSak(
+                    jounalpostId = nyJournalpostIdEttersending,
+                    innsendingId = ettersending.id.toInt(),
+                    fagsakId = nyDagpengerFagsakId,
+                )
+
+                PostgresDataSourceBuilder.dataSource.sjekkAtNyJournalPostErLagret(nyJournalpostIdSøknad, nyDagpengerFagsakId)
+                PostgresDataSourceBuilder.dataSource.sjekkAtNyJournalPostErLagret(nyJournalpostIdEttersending, nyDagpengerFagsakId)
+                val dagpengerJournalpostIder = hentJournalpostIder(søknadId, fnr)
+                dagpengerJournalpostIder shouldBe listOf("111", "222")
+            }
         }
     }
 

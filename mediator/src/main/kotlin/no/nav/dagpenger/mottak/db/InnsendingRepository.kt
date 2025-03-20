@@ -19,7 +19,12 @@ interface InnsendingMetadataRepository {
         ident: String,
     ): List<ArenaOppgave>
 
-    fun opprettNyJournalpostSak(
+    fun hentJournalpostIder(
+        søknadId: UUID,
+        ident: String,
+    ): List<String>
+
+    fun opprettKoblingTilNyJournalpostForSak(
         jounalpostId: Int,
         innsendingId: Int,
         fagsakId: UUID,
