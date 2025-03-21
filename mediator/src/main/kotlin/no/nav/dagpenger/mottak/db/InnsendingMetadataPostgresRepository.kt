@@ -79,7 +79,7 @@ internal class InnsendingMetadataPostgresRepository(private val ds: DataSource =
         ident: String,
     ): List<String> {
         val dagpengerJournalpostIder = hentDagpengerJournalpostIder(søknadId = søknadId, ident = ident)
-        if (dagpengerJournalpostIder.size == 0) {
+        if (dagpengerJournalpostIder.isEmpty()) {
             return hentArenaOppgaver(søknadId = søknadId, ident = ident).map { it.journalpostId }
         }
         return dagpengerJournalpostIder
