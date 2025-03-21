@@ -13,7 +13,6 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.mottak.api.TestApplication.autentisert
 import no.nav.dagpenger.mottak.api.TestApplication.withMockAuthServerAndTestApplication
-import no.nav.dagpenger.mottak.db.ArenaOppgave
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -61,21 +60,7 @@ class JournalpostApiTest {
         val søknadId = UUID.randomUUID()
         val repository =
             mockk<InnsendingMetadataRepository>().also {
-                every { it.hentArenaOppgaver(søknadId, testIdent) } returns
-                    listOf(
-                        ArenaOppgave(
-                            journalpostId = "123456789",
-                            oppgaveId = "oppgave1",
-                            fagsakId = "arenaFagsak",
-                            innsendingId = 1,
-                        ),
-                        ArenaOppgave(
-                            journalpostId = "987654321",
-                            oppgaveId = "oppgave2",
-                            fagsakId = "arenaFagsak",
-                            innsendingId = 2,
-                        ),
-                    )
+                every { it.hentJournalpostIder(søknadId, testIdent) } returns listOf("123456789", "987654321")
             }
         withMockAuthServerAndTestApplication({ journalpostRoute(repository) }) {
             client.post("v1/journalpost/sok") {

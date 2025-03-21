@@ -13,9 +13,14 @@ import java.util.UUID
 internal fun Route.journalpostRoute(repository: InnsendingMetadataRepository) {
     post("v1/journalpost/sok") {
         call.receive<JournalpostSokDTO>().let {
+            val journalpostIder =
+                repository.hentJournalpostIder(
+                    søknadId = UUID.fromString(it.soknadId),
+                    ident = it.ident,
+                )
             call.respond(
                 status = HttpStatusCode.OK,
-                message = JournalpostIderDTO(journalpostIder = repository.hentArenaOppgaver(søknadId = UUID.fromString(it.soknadId), ident = it.ident).map { it.journalpostId }),
+                message = JournalpostIderDTO(journalpostIder = journalpostIder),
             )
         }
     }
