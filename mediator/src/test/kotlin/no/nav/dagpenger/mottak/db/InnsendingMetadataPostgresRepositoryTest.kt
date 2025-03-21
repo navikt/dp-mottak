@@ -132,7 +132,6 @@ class InnsendingMetadataPostgresRepositoryTest {
                 val nyJournalpostIdSøknad = 111
                 val nyJournalpostIdEttersending = 222
                 val nyDagpengerFagsakId = UUID.randomUUID()
-//                InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
                 opprettKoblingTilNyJournalpostForSak(
                     jounalpostId = nyJournalpostIdSøknad,
                     innsendingId = søknad.id.toInt(),
@@ -178,7 +177,7 @@ class InnsendingMetadataPostgresRepositoryTest {
         jacksonObjectMapper().readTree(
             """
             {
-                "@id": "$søknadId"
+                "søknad_uuid": "$søknadId"
             }
             """.trimIndent(),
         )

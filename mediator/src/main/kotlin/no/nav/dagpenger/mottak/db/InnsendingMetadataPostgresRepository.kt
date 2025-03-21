@@ -24,7 +24,7 @@ internal class InnsendingMetadataPostgresRepository(private val ds: DataSource =
                         JOIN      soknad_v1 sokn            ON inns.id = sokn.id
                         JOIN      arenasak_v1 aren          ON inns.id = aren.id
                         WHERE     pers.ident =  :ident
-                        AND       sokn.data ->> '@id' = :soknad_id
+                        AND       sokn.data ->> 'søknad_uuid' = :soknad_id
                         """.trimIndent(),
                     paramMap =
                         mapOf(
@@ -60,7 +60,7 @@ internal class InnsendingMetadataPostgresRepository(private val ds: DataSource =
                         JOIN      soknad_v1 sokn                    ON sokn.id = inns.id
                         JOIN      journalpost_dagpenger_sak_v1 jour ON jour.innsending_id = inns.id 
                         WHERE     pers.ident =  :ident
-                        AND       sokn.data ->> '@id' = :soknad_id
+                        AND       sokn.data ->> 'søknad_uuid' = :soknad_id
                         """.trimIndent(),
                     paramMap =
                         mapOf(
