@@ -1,0 +1,74 @@
+openapi: 3.0.3
+info:
+  title: Mottak API
+  version: 1.0.0
+  description: Et API for å hente informasjon fra mottaket.
+servers:
+  - url: https://dp-mottak.intern.dev.nav.no
+    description: dev
+  - url: https://dp-mottak # Service discovery internt i clusteret
+    description: prod
+paths:
+  /v1/journalpost/sok:
+    post:
+      summary: Hent alle journalposterIder for en gitt søknad
+      description: Henter journalpostIder for en gitt søknad
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JournalpostSok'
+      responses:
+        '200':
+          description: Vellykket respons med en liste av journalpostIder
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalpostIder'
+        default:
+          description: Feil
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/HttpProblem'
+components:
+  schemas:
+    JournalpostSok:
+      type: object
+      properties:
+        soknadId:
+          type: string
+        ident:
+          type: string
+      required:
+        - soknadId
+        - ident
+    JournalpostIder:
+      type: object
+      properties:
+        journalpostIder:
+          type: array
+          items:
+            type: string
+      required:
+        - journalpostIder
+    HttpProblem:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+      required:
+        - type
+        - title
+        - status
+        - instance

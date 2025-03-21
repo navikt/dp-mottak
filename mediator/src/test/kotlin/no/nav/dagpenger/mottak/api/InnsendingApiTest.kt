@@ -5,12 +5,12 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
 import io.ktor.client.request.get
 import io.ktor.client.request.put
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.innsendingData
-import no.nav.dagpenger.journalpostId
 import no.nav.dagpenger.mottak.InnsendingPeriode
 import no.nav.dagpenger.mottak.api.TestApplication.autentisert
 import no.nav.dagpenger.mottak.api.TestApplication.withMockAuthServerAndTestApplication
@@ -54,6 +54,7 @@ internal class InnsendingApiTest {
                     autentisert()
                 }.let { response ->
                     assertEquals(HttpStatusCode.OK, response.status)
+                    assertEquals("text/plain; charset=UTF-8", response.headers[HttpHeaders.ContentType])
                     verify(exactly = 1) { innsendingRepository.hent(journalpostId) }
                     assertEquals(1, mockProducer.history().size)
                 }
@@ -109,6 +110,7 @@ internal class InnsendingApiTest {
                 }.let { response ->
                     assertEquals(HttpStatusCode.OK, response.status)
                     verify(exactly = 1) { innsendingRepository.forPeriode(any()) }
+                    assertEquals("application/json; charset=UTF-8", response.headers[HttpHeaders.ContentType])
                     val bodyAsText = response.bodyAsText()
                     val innsendinger = objectMapper.readTree(bodyAsText)
                     assertEquals(1, innsendinger.size())

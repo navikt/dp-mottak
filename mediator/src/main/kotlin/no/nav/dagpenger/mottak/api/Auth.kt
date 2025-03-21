@@ -2,11 +2,6 @@ package no.nav.dagpenger.mottak.api
 
 import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
-import com.fasterxml.jackson.databind.DeserializationFeature
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.get
-import io.ktor.serialization.jackson.jackson
 import io.ktor.server.auth.AuthenticationConfig
 import io.ktor.server.auth.AuthenticationContext
 import io.ktor.server.auth.jwt.JWTConfigureFunction
@@ -19,7 +14,7 @@ import java.util.concurrent.TimeUnit
 internal fun AuthenticationContext.fnr(): String =
     principal<JWTPrincipal>()?.subject ?: throw IllegalArgumentException("Fant ikke subject(fødselsnummer) i JWT")
 
-internal fun AuthenticationConfig.jwt(
+internal fun AuthenticationConfig.jwtBuilder(
     name: String,
     configure: JWTConfigureFunction = {},
 ) {
@@ -45,12 +40,3 @@ private fun cachedJwkProvider(jwksUri: String): JwkProvider {
         ) // if not cached, only allow max 10 different keys per minute to be fetched from external provider
         .build()
 }
-
-private val httpClient =
-    HttpClient {
-        install(ContentNegotiation) {
-            jackson {
-                configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            }
-        }
-    }

@@ -22,6 +22,9 @@ import io.ktor.serialization.jackson.JacksonConverter
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.behov.JsonMapper
+import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApi.Bruker
+import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApi.SaksType
+import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApi.SaksType.FAGSAK
 import kotlin.time.Duration.Companion.minutes
 
 internal class JournalpostApiClient(
@@ -103,6 +106,34 @@ internal class JournalpostApiClient(
             logger.error(e) { feilmelding }
             throw e
         }
+    }
+
+    override suspend fun knyttJounalPostTilNySak(
+        journalpostId: String,
+        dagpengerFagsakId: String,
+        ident: String,
+    ): String {
+        return client.put("/$basePath/journalpost/$journalpostId/knyttTilAnnenSak") {
+            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+            header(HttpHeaders.ContentType, "application/json")
+            header(HttpHeaders.Accept, "application/json")
+            setBody(
+                KnyttTilAnnenSakRequest(
+                    fagsakId = dagpengerFagsakId,
+                    bruker = Bruker(id = ident),
+                ),
+            )
+        }.bodyAsText()
+    }
+
+    private data class KnyttTilAnnenSakRequest(
+        val fagsakId: String,
+        val bruker: Bruker,
+    ) {
+        val sakstype: SaksType = FAGSAK
+        val fagsaksystem: String = "DAGPENGER"
+        val tema: String = "DAG"
+        val journalfoerendeEnhet: String = "9999"
     }
 
     private data class FerdigstillJournalpostRequest(val journalfoerendeEnhet: String = "9999")

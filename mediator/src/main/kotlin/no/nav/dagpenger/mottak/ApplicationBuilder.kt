@@ -10,6 +10,9 @@ import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dokarkivTokenProvider
 import no.nav.dagpenger.mottak.Config.objectMapper
 import no.nav.dagpenger.mottak.api.innsendingApi
+import no.nav.dagpenger.mottak.api.installPlugins
+import no.nav.dagpenger.mottak.api.journalpostRoute
+import no.nav.dagpenger.mottak.api.statusPages
 import no.nav.dagpenger.mottak.behov.journalpost.FerdigstillJournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApiClient
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
@@ -24,6 +27,8 @@ import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaApiClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.OpprettGosysOppgaveLøser
+import no.nav.dagpenger.mottak.db.InnsendingMetadataPostgresRepository
+import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
 import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
@@ -38,6 +43,7 @@ internal class ApplicationBuilder(
     env: Map<String, String>,
 ) : RapidsConnection.StatusListener {
     private val innsendingRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
+    private val innsendingMetadataRepository: InnsendingMetadataRepository = InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource)
     private val safClient = SafClient(Config.properties)
     private val arenaApiClient = ArenaApiClient(Config.properties)
     private val journalpostApiClient = JournalpostApiClient(tokenProvider = Config.properties.dokarkivTokenProvider)
@@ -61,11 +67,14 @@ internal class ApplicationBuilder(
                         aliveCheck = rapid::isReady,
                         readyCheck = rapid::isReady,
                         preStopHook = preStopHook::handlePreStopRequest,
+                        statusPagesConfig = {
+                            statusPages()
+                        },
                     ) {
-                        innsendingApi(
-                            innsendingRepository = innsendingRepository,
-                            observer = ferdigstiltInnsendingObserver,
-                        )
+                        installPlugins {
+                            journalpostRoute(innsendingMetadataRepository)
+                            innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver)
+                        }
                     }
                 }
             })

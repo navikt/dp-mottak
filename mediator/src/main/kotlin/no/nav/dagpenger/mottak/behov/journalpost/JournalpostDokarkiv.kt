@@ -11,6 +11,12 @@ internal interface JournalpostDokarkiv {
         journalpostId: String,
         eksternReferanseId: String,
     )
+
+    suspend fun knyttJounalPostTilNySak(
+        journalpostId: String,
+        dagpengerFagsakId: String,
+        ident: String,
+    ): String
 }
 
 internal class JournalpostApi {
