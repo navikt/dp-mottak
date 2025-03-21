@@ -62,7 +62,7 @@ internal class ArenaBehovLøser(
             val journalpostId = packet["journalpostId"].asText()
             val behovId = packet["@behovId"].asText()
 
-            if (listOf("690892727").contains(journalpostId)) {
+            if (listOf("690892729", "690892705", "690892728").contains(journalpostId)) {
                 logger.warn { "SKipper $journalpostId" }
                 return
             }
