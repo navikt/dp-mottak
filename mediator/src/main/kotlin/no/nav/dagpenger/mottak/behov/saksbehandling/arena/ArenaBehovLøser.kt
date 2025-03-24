@@ -98,11 +98,11 @@ internal class ArenaBehovLøser(
                             packet["@løsning"] =
                                 mapOf(
                                     behovNavn to
-                                            mapOf(
-                                                "journalpostId" to journalpostId,
-                                                "fagsakId" to oppgaveResponse.fagsakId,
-                                                "oppgaveId" to oppgaveResponse.oppgaveId,
-                                            ),
+                                        mapOf(
+                                            "journalpostId" to journalpostId,
+                                            "fagsakId" to oppgaveResponse.fagsakId,
+                                            "oppgaveId" to oppgaveResponse.oppgaveId,
+                                        ),
                                 ).also {
                                     logger.info { "Løste behov $behovNavn med løsning $it" }
                                 }
