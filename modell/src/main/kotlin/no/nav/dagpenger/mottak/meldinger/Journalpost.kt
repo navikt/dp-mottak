@@ -18,6 +18,22 @@ import no.nav.dagpenger.mottak.Utdanning
 import no.nav.dagpenger.mottak.UtenBruker
 import no.nav.dagpenger.mottak.meldinger.Journalpost.DokumentInfo.Companion.hovedDokument
 import no.nav.dagpenger.mottak.meldinger.Journalpost.DokumentInfo.Companion.vedlegg
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.ANKE
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.ANKE_ETTERSENDING
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.Companion.tilSkjemaType
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_GJENOPPTAK_ORDINÆR
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_GJENOPPTAK_ORDINÆR_ETTERSENDING
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_GJENOPPTAK_PERMITTERT
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_GJENOPPTAK_PERMITTERT_ETTERSENDING
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_ORDINÆR
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_ORDINÆR_ETTERSENDING
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_PERMITTERT
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_PERMITTERT_ETTERSENDING
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_UTDANNING
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.GENERELL
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.KLAGE
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.KLAGE_ETTERSENDING
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.KLAGE_OG_ANKE
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -33,65 +49,65 @@ class Journalpost constructor(
 ) : Hendelse(aktivitetslogg) {
     private val registrertDato: LocalDateTime = registrertDato.truncatedTo(ChronoUnit.MILLIS)
 
-    internal companion object {
-        /**
-         * Oversikt over skjemakoder kan en finne på https://www.nav.no/soknader/api/sanity/skjemautlisting
-         *
-         */
-        val kjenteSkjemaer =
-            mapOf(
-                "GENERELL_INNSENDING" to "Generell innsending",
-                "K1" to "Dokumentasjon av andre ytelser",
-                "M6" to "Timelister",
-                "M7" to " Brev fra bobestyrer/konkursforvalter",
-                "N2" to "Kopi av søknad",
-                "N5" to "Kopi av undersøkelsesresultat",
-                "NAV 04-01.03" to "Søknad om dagpenger (ikke permittert)",
-                "NAV 04-01.04" to "Søknad om dagpenger ved permittering",
-                "NAV 04-02.01" to "Søknad om utstedelse av attest PD U2",
-                "NAV 04-02.03" to "Bekreftelse på ansettelsesforhold",
-                "NAV 04-02.05" to "Søknad om attest PD U1/N-301 til bruk ved overføring av dagpengerettigheter",
-                "NAV 04-03.07" to "Egenerklæring - overdragelse av lønnskrav",
-                "NAV 04-03.08" to "Oversikt over arbeidstimer",
-                "NAV 04-06.05" to "Søknad om godkjenning av utdanning med rett til dagpenger",
-                "NAV 04-06.08" to "Søknad om dagpenger under etablering av egen virksomhet",
-                "NAV 04-08.03" to "Bekreftelse på sluttårsak/nedsatt arbeidstid (ikke permittert)",
-                "NAV 04-08.04" to "Bekreftelse på arbeidsforhold og permittering",
-                "NAV 04-13.01" to "Egenerklæringsskjema for fastsettelse av grensearbeiderstatus",
-                "NAV 04-16.03" to "Søknad om gjenopptak av dagpenger",
-                "NAV 04-16.04" to "Søknad om gjenopptak av dagpenger ved permittering",
-                "NAV 90-00.08" to "Klage og anke",
-                "NAVe 04-01.03" to "Ettersendelse til søknad om dagpenger ved arbeidsledighet (ikke permittert)",
-                "NAVe 04-01.04" to "Ettersendelse til søknad om dagpenger ved permittering",
-                "NAVe 04-02.01" to "Ettersendelse til søknad om attest PD U2",
-                "NAVe 04-02.05" to "Ettersendelse til søknad om attest PD U1/N-301 til bruk ved overføring av dagpengerettigheter",
-                "NAVe 04-03.07" to "Ettersendelse til egenerklæring - overdragelse av lønnskrav ved konkurs mv",
-                "NAVe 04-03.08" to "Ettersendelse til oversikt over arbeidstimer",
-                "NAVe 04-06.05" to "Ettersendelse til søknad om godkjenning av utdanning med rett til dagpenger",
-                "NAVe 04-06.08" to "Ettersendelse til søknad om dagpenger under etablering av egen virksomhet",
-                "NAVe 04-08.03" to "Ettersendelse til bekreftelse på sluttårsak/nedsatt arbeidstid (ikke permittert)",
-                "NAVe 04-08.04" to "Ettersendelse til bekreftelse på arbeidsforhold og permittering",
-                "NAVe 04-16.03" to "Ettersendelse til søknad om gjenopptak av dagpenger (ikke permittert)",
-                "NAVe 04-16.04" to "Ettersendelse til søknad om gjenopptak av dagpenger ved permittering",
-                "O2" to "Arbeidsavtale",
-                "O9" to "Bekreftelse fra studiested/skole",
-                "S6" to "Dokumentasjon av sluttårsak",
-                "S7" to "Kopi av arbeidsavtale/sluttårsak",
-                "S8" to "Sjøfartsbok/hyreavregning",
-                "T1" to "Elevdokumentasjon fra lærested",
-                "T2" to "Dokumentasjon av sluttdato",
-                "T3" to "Tjenestebevis",
-                "T4" to "Oppholds- og arbeidstillatelse, eller registreringsbevis for EØS-borgere",
-                "T5" to "SED U006 Familieinformasjon",
-                "T6" to "Permitteringsvarsel",
-                "T8" to "Dokumentasjon av arbeidsforhold",
-                "T9" to "Dokumentasjon av helse og funksjonsnivå",
-                "U1" to "U1 Perioder av betydning for retten til dagpenger",
-                "V6" to "Kopi av sluttavtale",
-                "X8" to "Fødselsattest/bostedsbevis for barn under 18 år",
-                "XY" to "Uttalelse eller vurdering fra kompetent fagpersonell",
-            )
-    }
+//    internal companion object {
+//        /**
+//         * Oversikt over skjemakoder kan en finne på https://www.nav.no/soknader/api/sanity/skjemautlisting
+//         *
+//         */
+//        val kjenteSkjemaer =
+//            mapOf(
+//                "GENERELL_INNSENDING" to "Generell innsending",
+//                "K1" to "Dokumentasjon av andre ytelser",
+//                "M6" to "Timelister",
+//                "M7" to " Brev fra bobestyrer/konkursforvalter",
+//                "N2" to "Kopi av søknad",
+//                "N5" to "Kopi av undersøkelsesresultat",
+//                "NAV 04-01.03" to "Søknad om dagpenger (ikke permittert)",
+//                "NAV 04-01.04" to "Søknad om dagpenger ved permittering",
+//                "NAV 04-02.01" to "Søknad om utstedelse av attest PD U2",
+//                "NAV 04-02.03" to "Bekreftelse på ansettelsesforhold",
+//                "NAV 04-02.05" to "Søknad om attest PD U1/N-301 til bruk ved overføring av dagpengerettigheter",
+//                "NAV 04-03.07" to "Egenerklæring - overdragelse av lønnskrav",
+//                "NAV 04-03.08" to "Oversikt over arbeidstimer",
+//                "NAV 04-06.05" to "Søknad om godkjenning av utdanning med rett til dagpenger",
+//                "NAV 04-06.08" to "Søknad om dagpenger under etablering av egen virksomhet",
+//                "NAV 04-08.03" to "Bekreftelse på sluttårsak/nedsatt arbeidstid (ikke permittert)",
+//                "NAV 04-08.04" to "Bekreftelse på arbeidsforhold og permittering",
+//                "NAV 04-13.01" to "Egenerklæringsskjema for fastsettelse av grensearbeiderstatus",
+//                "NAV 04-16.03" to "Søknad om gjenopptak av dagpenger",
+//                "NAV 04-16.04" to "Søknad om gjenopptak av dagpenger ved permittering",
+//                "NAV 90-00.08" to "Klage og anke",
+//                "NAVe 04-01.03" to "Ettersendelse til søknad om dagpenger ved arbeidsledighet (ikke permittert)",
+//                "NAVe 04-01.04" to "Ettersendelse til søknad om dagpenger ved permittering",
+//                "NAVe 04-02.01" to "Ettersendelse til søknad om attest PD U2",
+//                "NAVe 04-02.05" to "Ettersendelse til søknad om attest PD U1/N-301 til bruk ved overføring av dagpengerettigheter",
+//                "NAVe 04-03.07" to "Ettersendelse til egenerklæring - overdragelse av lønnskrav ved konkurs mv",
+//                "NAVe 04-03.08" to "Ettersendelse til oversikt over arbeidstimer",
+//                "NAVe 04-06.05" to "Ettersendelse til søknad om godkjenning av utdanning med rett til dagpenger",
+//                "NAVe 04-06.08" to "Ettersendelse til søknad om dagpenger under etablering av egen virksomhet",
+//                "NAVe 04-08.03" to "Ettersendelse til bekreftelse på sluttårsak/nedsatt arbeidstid (ikke permittert)",
+//                "NAVe 04-08.04" to "Ettersendelse til bekreftelse på arbeidsforhold og permittering",
+//                "NAVe 04-16.03" to "Ettersendelse til søknad om gjenopptak av dagpenger (ikke permittert)",
+//                "NAVe 04-16.04" to "Ettersendelse til søknad om gjenopptak av dagpenger ved permittering",
+//                "O2" to "Arbeidsavtale",
+//                "O9" to "Bekreftelse fra studiested/skole",
+//                "S6" to "Dokumentasjon av sluttårsak",
+//                "S7" to "Kopi av arbeidsavtale/sluttårsak",
+//                "S8" to "Sjøfartsbok/hyreavregning",
+//                "T1" to "Elevdokumentasjon fra lærested",
+//                "T2" to "Dokumentasjon av sluttdato",
+//                "T3" to "Tjenestebevis",
+//                "T4" to "Oppholds- og arbeidstillatelse, eller registreringsbevis for EØS-borgere",
+//                "T5" to "SED U006 Familieinformasjon",
+//                "T6" to "Permitteringsvarsel",
+//                "T8" to "Dokumentasjon av arbeidsforhold",
+//                "T9" to "Dokumentasjon av helse og funksjonsnivå",
+//                "U1" to "U1 Perioder av betydning for retten til dagpenger",
+//                "V6" to "Kopi av sluttavtale",
+//                "X8" to "Fødselsattest/bostedsbevis for barn under 18 år",
+//                "XY" to "Uttalelse eller vurdering fra kompetent fagpersonell",
+//            )
+//    }
 
     override fun journalpostId(): String = journalpostId
 
@@ -127,7 +143,11 @@ class Journalpost constructor(
             if (tittelHvisTilgjengelig != null && tittelHvisTilgjengelig != "null") {
                 tittelHvisTilgjengelig
             } else {
-                kjenteSkjemaer[brevkode] ?: "Ukjent dokumenttittel"
+                try {
+                    brevkode.tilSkjemaType().tittel
+                } catch (e: UkjentSkjemaException) {
+                    "Ukjent dokumenttittel"
+                }
             }
 
         companion object {
@@ -169,14 +189,21 @@ class Journalpost constructor(
             return UtenBruker(this)
         }
         return when (this.hovedskjema()) {
-            in setOf("NAV 04-01.03", "NAV 04-01.04") -> NySøknad(this)
-            in setOf("NAV 04-16.03", "NAV 04-16.04") -> Gjenopptak(this)
-            in setOf("NAV 04-06.05") -> Utdanning(this)
-            in setOf("NAV 04-06.08") -> Etablering(this)
-            in setOf("NAV 90-00.08", "NAV 90-00.08 K", "NAVe 90-00.08 K") -> klageType(this)
-            in setOf("NAV 90-00.08 A", "NAVe 90-00.08 A") -> ankeType(this)
-            in setOf("NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04") -> Ettersending(this)
-            in setOf("GENERELL_INNSENDING") -> Generell(this)
+            in setOf(DAGPENGESØKNAD_ORDINÆR.skjemakode, DAGPENGESØKNAD_PERMITTERT.skjemakode) -> NySøknad(this)
+            in setOf(DAGPENGESØKNAD_GJENOPPTAK_ORDINÆR.skjemakode, DAGPENGESØKNAD_GJENOPPTAK_PERMITTERT.skjemakode) -> Gjenopptak(this)
+            in setOf(DAGPENGESØKNAD_UTDANNING.skjemakode) -> Utdanning(this)
+            in setOf(SkjemaType.DAGPENGESØKNAD_ETABLERING.skjemakode) -> Etablering(this)
+            in setOf(KLAGE_OG_ANKE.skjemakode, KLAGE.skjemakode, KLAGE_ETTERSENDING.skjemakode) -> klageType(this)
+            in setOf(ANKE.skjemakode, ANKE_ETTERSENDING.skjemakode) -> ankeType(this)
+            in
+            setOf(
+                DAGPENGESØKNAD_GJENOPPTAK_ORDINÆR_ETTERSENDING.skjemakode,
+                DAGPENGESØKNAD_GJENOPPTAK_PERMITTERT_ETTERSENDING.skjemakode,
+                DAGPENGESØKNAD_ORDINÆR_ETTERSENDING.skjemakode,
+                DAGPENGESØKNAD_PERMITTERT_ETTERSENDING.skjemakode,
+            ),
+            -> Ettersending(this)
+            in setOf(GENERELL.skjemakode) -> Generell(this)
             else -> UkjentSkjemaKode(this)
         }
     }

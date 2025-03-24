@@ -1,7 +1,11 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
+import io.kotest.assertions.json.shouldEqualJson
+import io.kotest.assertions.json.shouldEqualSpecifiedJson
+import io.kotest.matchers.shouldBe
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.toByteArray
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.URLProtocol
@@ -57,6 +61,54 @@ class JournalpostApiClientTest {
             assertEquals("Bearer token", requestData.headers["Authorization"])
             assertEquals("eksternReferanseId", requestData.headers["X-Request-ID"])
         }
+
+    @Test
+    fun `skal kunne knytte en journalpost til en annen fagsak`() {
+        runBlocking {
+            val gammelJournalpostId = "123"
+            val nyJournalpostId = "456"
+            val mockHttpEngine =
+                MockEngine { request ->
+                    respond(
+                        //language=json
+                        content = """{"nyJournalpostId": "$nyJournalpostId"}""",
+                        status = HttpStatusCode.OK,
+                        headers = headersOf(HttpHeaders.ContentType, "application/json"),
+                    )
+                }
+            val journalpostApi = JournalpostApiClient(engine = mockHttpEngine, { "token" })
+            journalpostApi.knyttJounalPostTilNySak(
+                journalpostId = gammelJournalpostId,
+                dagpengerFagsakId = "fagsakId",
+                ident = "ident",
+            ) shouldEqualJson
+                //language=json
+                """
+                {"nyJournalpostId": "$nyJournalpostId"}
+                """.trimIndent()
+
+            mockHttpEngine.requestHistory.single().let { request ->
+                request.method.value shouldBe "PUT"
+                request.url.encodedPathAndQuery shouldBe "/rest/journalpostapi/v1/journalpost/$gammelJournalpostId/knyttTilAnnenSak"
+                request.headers["Authorization"] shouldBe "Bearer token"
+                request.body.toByteArray().decodeToString() shouldEqualSpecifiedJson
+                    //language=json
+                    """
+                    {
+                      "fagsakId": "fagsakId",
+                      "bruker": {
+                        "id": "ident",
+                        "idType": "FNR"
+                      },
+                      "sakstype": "FAGSAK",
+                      "fagsaksystem": "DAGPENGER",
+                      "tema": "DAG",
+                      "journalfoerendeEnhet": "9999"
+                    }
+                    """.trimIndent()
+            }
+        }
+    }
 
     @Test
     fun `kaster feil videre hvis en ikke kan oppdatere journalpost`() =

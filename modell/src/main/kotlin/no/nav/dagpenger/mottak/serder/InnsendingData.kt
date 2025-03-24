@@ -58,9 +58,7 @@ data class InnsendingData(
                         it.egenAnsatt,
                     )
                 },
-                arenaSakData
-                    ?.takeIf { it.fagsakId != null }
-                    ?.let { ArenaOppgaveOpprettet.ArenaSak(it.oppgaveId, it.fagsakId) },
+                arenaSakData?.let { ArenaOppgaveOpprettet.ArenaSak(it.oppgaveId, it.fagsakId) },
                 mottakskanal,
                 aktivitetslogg.let(::konverterTilAktivitetslogg),
             )

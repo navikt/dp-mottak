@@ -63,6 +63,9 @@ spec:
   envFrom:
     - secret: dp-mottak-unleash-api-token
   accessPolicy:
+    inbound:
+      rules:
+        - application: dp-saksbehandling
     outbound:
       rules:
        - application: skjermede-personer-pip

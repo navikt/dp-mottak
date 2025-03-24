@@ -22,6 +22,8 @@ import no.nav.dagpenger.mottak.behov.JsonMapper
 import java.time.Duration
 import java.time.LocalDate
 
+private val logger = KotlinLogging.logger {}
+
 internal interface ArenaOppslag {
     suspend fun opprettStartVedtakOppgave(
         journalpostId: String,
@@ -32,6 +34,13 @@ internal interface ArenaOppslag {
         journalpostId: String,
         parametere: OpprettArenaOppgaveParametere,
     ): OpprettVedtakOppgaveResponse?
+}
+
+internal interface ArenaKlient {
+    suspend fun slettOppgaver(
+        fagsakId: String,
+        oppgaveIder: List<String>,
+    )
 }
 
 internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
@@ -104,4 +113,9 @@ internal data class OpprettArenaOppgaveParametere(
 internal data class OpprettVedtakOppgaveResponse(
     val fagsakId: String?,
     val oppgaveId: String,
+)
+
+internal data class SlettArenaOppgaveParametere(
+    val fagsakId: String,
+    val oppgaveIder: List<String>,
 )

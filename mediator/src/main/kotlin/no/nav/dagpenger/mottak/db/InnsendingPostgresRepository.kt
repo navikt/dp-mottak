@@ -102,10 +102,10 @@ internal class InnsendingPostgresRepository(
                                     )
                                 },
                             arenaSakData =
-                                row.stringOrNull("fagsakId")?.let {
+                                row.stringOrNull("oppgaveId")?.let {
                                     InnsendingData.ArenaSakData(
-                                        oppgaveId = row.string("oppgaveId"),
-                                        fagsakId = it,
+                                        oppgaveId = it,
+                                        fagsakId = row.stringOrNull("fagsakId"),
                                     )
                                 },
                             søknadsData =
