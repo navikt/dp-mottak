@@ -62,7 +62,7 @@ internal class ArenaBehovLøser(
             val journalpostId = packet["journalpostId"].asText()
             val behovId = packet["@behovId"].asText()
 
-            if (listOf("690892729", "690892705", "690892728").contains(journalpostId)) {
+            if (emptyList<String>().contains(journalpostId)) {
                 logger.warn { "SKipper $journalpostId" }
                 return
             }
@@ -98,11 +98,11 @@ internal class ArenaBehovLøser(
                             packet["@løsning"] =
                                 mapOf(
                                     behovNavn to
-                                        mapOf(
-                                            "journalpostId" to journalpostId,
-                                            "fagsakId" to oppgaveResponse.fagsakId,
-                                            "oppgaveId" to oppgaveResponse.oppgaveId,
-                                        ),
+                                            mapOf(
+                                                "journalpostId" to journalpostId,
+                                                "fagsakId" to oppgaveResponse.fagsakId,
+                                                "oppgaveId" to oppgaveResponse.oppgaveId,
+                                            ),
                                 ).also {
                                     logger.info { "Løste behov $behovNavn med løsning $it" }
                                 }
