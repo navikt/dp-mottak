@@ -16,12 +16,12 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall.mottak.journalpostRo
 internal fun Route.journalpostRoute(repository: InnsendingMetadataRepository) {
     post("v1/journalpost/sok") {
         call.receive<JournalpostSokDTO>().let {
-            sikkerlogg.info { "Henter journalpostIder for søknadId: ${it.soknadId} og ident: ${it.ident}" }
             val journalpostIder =
                 repository.hentJournalpostIder(
                     søknadId = UUID.fromString(it.soknadId),
                     ident = it.ident,
                 )
+            sikkerlogg.info { "Henter journalpostIder for søknadId: ${it.soknadId} og ident: ${it.ident}. Med resultat: $journalpostIder" }
             call.respond(
                 status = HttpStatusCode.OK,
                 message = JournalpostIderDTO(journalpostIder = journalpostIder),
