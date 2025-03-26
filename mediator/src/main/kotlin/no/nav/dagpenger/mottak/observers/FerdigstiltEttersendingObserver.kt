@@ -18,6 +18,8 @@ class FerdigstiltEttersendingObserver internal constructor(
     private val gosysClient: GosysClient,
 ) : InnsendingObserver {
     override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
+
+        sikkerlogg.info { "FerdigstiltEttersendingObserver innsending $event" }
         val skjemaType = event.skjemaKode.tilSkjemaType()
         if (skjemaType != SkjemaType.DAGPENGESØKNAD_ORDINÆR_ETTERSENDING && skjemaType != SkjemaType.DAGPENGESØKNAD_PERMITTERT_ETTERSENDING) {
             return
