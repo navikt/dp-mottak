@@ -31,10 +31,12 @@ import no.nav.dagpenger.mottak.db.InnsendingMetadataPostgresRepository
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
+import no.nav.dagpenger.mottak.observers.FerdigstiltEttersendingObserver
 import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
 import no.nav.dagpenger.mottak.observers.InnsendingProbe
 import no.nav.dagpenger.mottak.observers.MetrikkObserver
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
+import no.nav.dagpenger.mottak.tjenester.SaksbehandlingHttpKlient
 import no.nav.helse.rapids_rivers.RapidApplication
 
 private val logg = KotlinLogging.logger {}
@@ -86,6 +88,14 @@ internal class ApplicationBuilder(
                         observatører =
                             listOf(
                                 ferdigstiltInnsendingObserver,
+                                FerdigstiltEttersendingObserver(
+                                    saksbehandlingKlient =
+                                        SaksbehandlingHttpKlient(
+                                            dpSaksbehandlingUrl = Config.dpSaksbehandlingUrl,
+                                            tokenProvider = Config.dpSaksbehandlingTokenProvider,
+                                        ),
+                                    gosysClient = gosysOppslag,
+                                ),
                                 MetrikkObserver(),
                                 InnsendingProbe,
                             ),
