@@ -8,13 +8,13 @@ import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysOppgaveRequest
 import no.nav.dagpenger.mottak.meldinger.SkjemaType
 import no.nav.dagpenger.mottak.meldinger.SkjemaType.Companion.tilSkjemaType
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.QuizSøknadFormat
-import no.nav.dagpenger.mottak.tjenester.Saksbehandling
+import no.nav.dagpenger.mottak.tjenester.SaksbehandlingHttpKlient
 import java.time.LocalDate
 
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.FerdigstiltEttersendingObserver")
 
 class FerdigstiltEttersendingObserver internal constructor(
-    private val saksbehandlingKlient: Saksbehandling,
+    private val saksbehandlingKlient: SaksbehandlingHttpKlient,
     private val gosysClient: GosysClient,
 ) : InnsendingObserver {
     override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
@@ -32,7 +32,7 @@ class FerdigstiltEttersendingObserver internal constructor(
         val ident: String = requireNotNull(event.fødselsnummer)
         val aktørId: String = requireNotNull(event.aktørId)
         runBlocking {
-            when (saksbehandlingKlient.finnesSøknadTilBehandling(søknadId = søknadId, ident = ident)) {
+            when (saksbehandlingKlient.skalVarsleOmEttersending(søknadId = søknadId, ident = ident)) {
                 true ->
                     runBlocking {
                         gosysClient.opprettOppgave(

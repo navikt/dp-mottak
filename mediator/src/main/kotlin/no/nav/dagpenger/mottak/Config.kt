@@ -40,6 +40,8 @@ internal object Config {
                 "AZURE_OPENID_CONFIG_JWKS_URI" to "http://localhost:4443",
                 "DOKARKIV_SCOPE" to "api://dev-fss.teamdokumenthandtering.dokarkiv-q1/.default",
                 "DOKARKIV_INGRESS" to "dokarkiv.dev-fss-pub.nais.io",
+                "DP_SAKSBEHANDLING_URL" to "http://dp-saksbehandling/person/skal-varsle-om-ettersending",
+                "DP_SAKSBEHANDLING_SCOPE" to "api://dev-gcp.teamdagpenger.dp-saksbehandling/.default",
             ),
         )
     private val prodProperties =
@@ -50,6 +52,7 @@ internal object Config {
                 "DP_PROXY_SCOPE" to "api://prod-fss.teamdagpenger.dp-proxy/.default",
                 "PDL_API_SCOPE" to "api://prod-fss.pdl.pdl-api/.default",
                 "SKJERMING_API_SCOPE" to "api://prod-gcp.nom.skjermede-personer-pip/.default",
+                "DP_SAKSBEHANDLING_SCOPE" to "api://prod-gcp.teamdagpenger.dp-saksbehandling/.default",
             ),
         )
 
@@ -59,6 +62,9 @@ internal object Config {
             "prod-gcp" -> systemAndEnvProperties overriding prodProperties overriding defaultProperties
             else -> systemAndEnvProperties overriding defaultProperties
         }
+    }
+    val dpSaksbehandlingUrl: String by lazy {
+        properties[Key("DP_SAKSBEHANDLING_URL", stringType)]
     }
 
     private val cachedTokenProvider by lazy {
@@ -71,6 +77,11 @@ internal object Config {
 
     private fun String.addHttpsrotocoll(): String = "https://$this"
 
+    val dpSaksbehandlingTokenProvider: () -> String by lazy {
+        {
+            cachedTokenProvider.clientCredentials(properties[Key("DP_SAKSBEHANDLING_SCOPE", stringType)]).access_token ?: tokenfeil()
+        }
+    }
     val Configuration.dpProxyTokenProvider: () -> String by lazy {
         {
             cachedTokenProvider.clientCredentials(properties[Key("DP_PROXY_SCOPE", stringType)]).access_token ?: tokenfeil()
