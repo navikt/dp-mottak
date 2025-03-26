@@ -35,6 +35,7 @@ class FerdigstiltEttersendingObserver internal constructor(
             when (saksbehandlingKlient.skalVarsleOmEttersending(søknadId = søknadId, ident = ident)) {
                 true ->
                     runBlocking {
+                        sikkerlogg.info { "Oppretter gosys oppgave for søknaId: $søknadId og ident: $ident" }
                         gosysClient.opprettOppgave(
                             oppgave =
                                 GosysOppgaveRequest(
@@ -45,8 +46,13 @@ class FerdigstiltEttersendingObserver internal constructor(
                                     aktivDato = LocalDate.now(),
                                     beskrivelse = "Ettersending til dagpengesøknad i ny løsning",
                                 ),
-                        )
+                        ).also {
+                            sikkerlogg.info { "Opprettet gosys oppgave for søknaId: $søknadId og ident: $ident og gosys id: $it " }
+
+                        }
+
                     }
+
                 else -> {}
             }
         }
