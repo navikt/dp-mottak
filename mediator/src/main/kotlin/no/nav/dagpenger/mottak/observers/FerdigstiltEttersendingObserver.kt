@@ -8,13 +8,13 @@ import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysOppgaveRequest
 import no.nav.dagpenger.mottak.meldinger.SkjemaType
 import no.nav.dagpenger.mottak.meldinger.SkjemaType.Companion.tilSkjemaType
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.QuizSøknadFormat
-import no.nav.dagpenger.mottak.tjenester.SaksbehandlingHttpKlient
+import no.nav.dagpenger.mottak.tjenester.SaksbehandlingKlient
 import java.time.LocalDate
 
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.FerdigstiltEttersendingObserver")
 
 class FerdigstiltEttersendingObserver internal constructor(
-    private val saksbehandlingKlient: SaksbehandlingHttpKlient,
+    private val saksbehandlingKlient: SaksbehandlingKlient,
     private val gosysClient: GosysClient,
 ) : InnsendingObserver {
     override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
