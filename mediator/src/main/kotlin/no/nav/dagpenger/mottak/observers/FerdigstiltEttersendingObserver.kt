@@ -40,10 +40,10 @@ class FerdigstiltEttersendingObserver internal constructor(
                             GosysOppgaveRequest(
                                 journalpostId = event.journalpostId,
                                 aktoerId = aktørId,
-                                // TODO: Skal denne settes til en ny enhet?
                                 tildeltEnhetsnr = event.behandlendeEnhet,
                                 aktivDato = LocalDate.now(),
-                                beskrivelse = "Ettersending til dagpengesøknad i ny løsning",
+                                beskrivelse = "Ettersendelse til dagpengesøknad i ny løsning",
+                                oppgavetype = "ETTERSEND_MOTT",
                             )
                         sikkerlogg.info { "Oppretter gosys oppgave: $oppgave for søknaId: $søknadId og ident: $ident" }
                         gosysClient.opprettOppgave(

@@ -52,7 +52,8 @@ class FerdigstiltEttersendingObserverTest {
             it.journalpostId shouldBe "journalpostId"
             it.aktoerId shouldBe "aktørId"
             it.tildeltEnhetsnr shouldBe "tildeleEnhetsnr"
-            it.beskrivelse shouldBe "Ettersending til dagpengesøknad i ny løsning"
+            it.beskrivelse shouldBe "Ettersendelse til dagpengesøknad i ny løsning"
+            it.oppgavetype shouldBe "ETTERSEND_MOTT"
         }
     }
 
