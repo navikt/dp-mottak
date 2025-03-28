@@ -26,8 +26,12 @@ internal class VedtakFattetMottak(
             precondition {
                 it.requireValue("@event_name", "vedtak_fattet")
                 it.requireValue("fagsystem", "Dagpenger")
+                it.requireValue("behandletHendelse.type", "Søknad")
             }
-            validate { it.requireKey("ident", "søknadId", "behandlingId", "fagsakId", "automatisk") }
+            validate {
+                it.requireKey("ident", "behandlingId", "fagsakId", "automatisk")
+                it.interestedIn("behandletHendelse")
+            }
         }
     }
 
@@ -41,7 +45,7 @@ internal class VedtakFattetMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val søknadId = packet["søknadId"].asUUID()
+        val søknadId = packet.søknadId()
         val behandlingId = packet["behandlingId"].asUUID()
         val ident = packet["ident"].asText()
         withLoggingContext("søknadId" to "$søknadId", "behandlingId" to "$behandlingId") {
@@ -86,5 +90,7 @@ internal class VedtakFattetMottak(
         }
     }
 }
+
+private fun JsonMessage.søknadId(): UUID = this["behandletHendelse"]["id"].asUUID()
 
 fun JsonNode.asUUID(): UUID = this.asText().let { UUID.fromString(it) }

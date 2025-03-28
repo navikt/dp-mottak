@@ -118,7 +118,11 @@ VedtakFattetMottakTest {
         {
             "@event_name": "vedtak_fattet",
             "ident": "$testPersonIdent",
-            "søknadId": "$søknadId",
+            "behandletHendelse": {
+              "datatype": "UUID",
+              "id": "$søknadId",
+              "type": "Søknad"
+            },
             "behandlingId": "$behandlingId",
             "fagsakId": "$dagpengerFagsakId",
             "fagsystem": "Dagpenger",
@@ -131,7 +135,11 @@ VedtakFattetMottakTest {
         {
             "@event_name": "vedtak_fattet",
             "ident": "$testPersonIdent",
-            "søknadId": "$søknadId",
+            "behandletHendelse": {
+              "datatype": "UUID",
+              "id": "$søknadId",
+              "type": "Søknad"
+            },
             "behandlingId": "$behandlingId",
             "fagsakId": "$arenaFagsakId",
             "fagsystem": "Arena",
