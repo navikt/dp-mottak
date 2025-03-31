@@ -44,7 +44,7 @@ dependencies {
     testImplementation("no.bekk.bekkopen:nocommons:0.16.0")
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation("io.ktor:ktor-client-mock-jvm:${libs.versions.ktor.get()}")
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.03.27-18.30-c228796d")
+    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.03.30-13.02-f7cb11ef")
 }
 
 tasks.withType<ShadowJar> {
