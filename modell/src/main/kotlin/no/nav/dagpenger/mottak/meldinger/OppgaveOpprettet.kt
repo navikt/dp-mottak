@@ -1,7 +1,6 @@
 package no.nav.dagpenger.mottak.meldinger
 
 import no.nav.dagpenger.mottak.Aktivitetslogg
-import no.nav.dagpenger.mottak.ArenaSakVisitor
 import no.nav.dagpenger.mottak.Hendelse
 import java.util.UUID
 

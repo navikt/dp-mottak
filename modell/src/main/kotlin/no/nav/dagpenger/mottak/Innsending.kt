@@ -8,9 +8,10 @@ import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
+import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet.*
+import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet.Sak
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
@@ -92,6 +93,12 @@ class Innsending private constructor(
         tilstand.håndter(this, arenaOppgave)
     }
 
+    fun håndter(oppgaveOpprettet: OppgaveOpprettet) {
+        if (journalpostId != oppgaveOpprettet.journalpostId()) return
+        kontekst(oppgaveOpprettet, "Mottatt informasjon om opprettet oppgave")
+        tilstand.håndter(this, oppgaveOpprettet)
+    }
+
     fun håndter(arenaOppgaveFeilet: ArenaOppgaveFeilet) {
         if (journalpostId != arenaOppgaveFeilet.journalpostId()) return
         kontekst(arenaOppgaveFeilet, "Mottatt informasjon om oppgaveopprettelse mot Arena feilet")
@@ -104,7 +111,7 @@ class Innsending private constructor(
         tilstand.håndter(this, oppdatertJournalpost)
     }
 
-    fun håndter(journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt) {
+    fun håndter(journalpostferdigstilt: JournalpostFerdigstilt) {
         if (journalpostId != journalpostferdigstilt.journalpostId()) return
         kontekst(journalpostferdigstilt, "Mottatt informasjon om ferdigstilt journalpost")
         tilstand.håndter(this, journalpostferdigstilt)
@@ -208,7 +215,7 @@ class Innsending private constructor(
 
         fun håndter(
             innsending: Innsending,
-            journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt,
+            journalpostferdigstilt: JournalpostFerdigstilt,
         ) {
             journalpostferdigstilt.warn("Forventet ikke FerdigStilt i %s", type.name)
         }
@@ -577,7 +584,7 @@ class Innsending private constructor(
 
         override fun håndter(
             innsending: Innsending,
-            journalpostferdigstilt: no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt,
+            journalpostferdigstilt: JournalpostFerdigstilt,
         ) {
             journalpostferdigstilt.info("Ferdigstilte journalpost ${innsending.journalpostId}")
             innsending.tilstand(journalpostferdigstilt, InnsendingFerdigStilt)
@@ -702,12 +709,13 @@ class Innsending private constructor(
         val person = requireNotNull(person) { "Krever at person er satt her, $journalpostId" }
         val journalpost = requireNotNull(journalpost) { "Krever at journalpost her" }
         val arenaSakId = arenaSak?.fagsakId?.let { mapOf("fagsakId" to it) } ?: emptyMap()
-        val sak = sak?.let {
-            mapOf(
-                "fagsakId" to it.sakId,
-                "oppgaveId" to it.oppgaveId,
-            )
-        } ?: emptyMap()
+        val sak =
+            sak?.let {
+                mapOf(
+                    "fagsakId" to it.sakId,
+                    "oppgaveId" to it.oppgaveId,
+                )
+            } ?: emptyMap()
 
         val mottakskanal = mottakskanal() ?: "ukjent"
         val parametre =
@@ -718,12 +726,12 @@ class Innsending private constructor(
                 "tittel" to journalpost.tittel(),
                 "mottakskanal" to mottakskanal,
                 "dokumenter" to
-                        journalpost.dokumenter().map {
-                            mapOf(
-                                "tittel" to it.tittel,
-                                "dokumentInfoId" to it.dokumentInfoId,
-                            )
-                        },
+                    journalpost.dokumenter().map {
+                        mapOf(
+                            "tittel" to it.tittel,
+                            "dokumentInfoId" to it.dokumentInfoId,
+                        )
+                    },
             ) + arenaSakId + sak
 
         hendelse.behov(
@@ -803,13 +811,17 @@ class Innsending private constructor(
 
     private fun emitFerdigstilt() {
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
+        val fagsakId: String? =
+            arenaSak?.fagsakId
+                ?: sak?.sakId.toString()
+
         InnsendingEvent(
             type = mapToHendelseType(jp),
             skjemaKode = jp.hovedskjema(),
             journalpostId = journalpostId,
             aktørId = person?.aktørId,
             fødselsnummer = person?.ident,
-            fagsakId = arenaSak?.fagsakId,
+            fagsakId = fagsakId,
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = rutingOppslag?.data(),
             behandlendeEnhet =
@@ -878,10 +890,10 @@ class Innsending private constructor(
 
     private fun erFerdigBehandlet() =
         this.tilstand.type in
-                setOf(
-                    InnsendingTilstandType.InnsendingFerdigstiltType,
-                    InnsendingTilstandType.AlleredeBehandletType,
-                )
+            setOf(
+                InnsendingTilstandType.InnsendingFerdigstiltType,
+                InnsendingTilstandType.AlleredeBehandletType,
+            )
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst =
         SpesifikkKontekst(

@@ -26,7 +26,6 @@ internal interface OppgaveKlient {
         ident: String,
         skjemaKategori: String,
     ): UUID
-
 }
 
 internal class OppgaveBehovLøser(
@@ -60,7 +59,6 @@ internal class OppgaveBehovLøser(
             }.register(this)
     }
 
-
     override fun onPacket(
         packet: JsonMessage,
         context: MessageContext,
@@ -75,34 +73,37 @@ internal class OppgaveBehovLøser(
         // Vi får sak fra et eller annet sted
         val sakId = UUID.randomUUID()
         if (env == "dev") {
-            val oppgaveId = this.oppgaveKlient.opprettOppgave(
-                sakId = sakId,
-                journalpostId = journalpostId,
-                opprettetTidspunkt = registrertTidspunkt,
-                ident = packet["fødselsnummer"].asText(),
-                skjemaKategori = packet["skjemaKategori"].asText(),
-            )
-            OppgaveOpprettet.Sak(
-                oppgaveId = oppgaveId,
-                sakId = sakId,
-            )
-
+            runBlocking {
+                val oppgaveId =
+                    oppgaveKlient.opprettOppgave(
+                        sakId = sakId,
+                        journalpostId = journalpostId,
+                        opprettetTidspunkt = registrertTidspunkt,
+                        ident = packet["fødselsnummer"].asText(),
+                        skjemaKategori = packet["skjemaKategori"].asText(),
+                    )
+                OppgaveOpprettet.Sak(
+                    oppgaveId = oppgaveId,
+                    sakId = sakId,
+                )
+            }
         } else {
             val behovNavn = "OpprettVurderhenvendelseOppgave"
             runBlocking {
-                val oppgaveResponse = arenaOppslag.opprettVurderHenvendelsOppgave(
-                    journalpostId,
-                    packet.arenaOppgaveParametre(),
-                )
+                val oppgaveResponse =
+                    arenaOppslag.opprettVurderHenvendelsOppgave(
+                        journalpostId,
+                        packet.arenaOppgaveParametre(),
+                    )
                 if (oppgaveResponse != null) {
                     packet["@løsning"] =
                         mapOf(
                             behovNavn to
-                                    mapOf(
-                                        "journalpostId" to journalpostId,
-                                        "fagsakId" to oppgaveResponse.fagsakId,
-                                        "oppgaveId" to oppgaveResponse.oppgaveId,
-                                    ),
+                                mapOf(
+                                    "journalpostId" to journalpostId,
+                                    "fagsakId" to oppgaveResponse.fagsakId,
+                                    "oppgaveId" to oppgaveResponse.oppgaveId,
+                                ),
                         ).also {
                             logger.info { "Løste behov $behovNavn med løsning $it" }
                         }
