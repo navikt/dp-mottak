@@ -9,7 +9,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import no.nav.dagpenger.mottak.Aktivitetslogg
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettOppgave
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.arenaOppgaveParametre
 import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
@@ -40,7 +40,7 @@ internal class OppgaveBehovLøser(
                 precondition {
                     it.requireAllOrAny(
                         "@behov",
-                        listOf(Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettOppgave.name),
+                        listOf(OpprettOppgave.name),
                     )
                 }
                 precondition { it.forbid("@løsning") }
@@ -69,6 +69,7 @@ internal class OppgaveBehovLøser(
         val behovId = packet["@behovId"].asText()
         val registrertTidspunkt = packet["registrertDato"].asLocalDateTime()
 
+        // TODO fikse env
         val env = "dev"
         // Vi får sak fra et eller annet sted
         val sakId = UUID.randomUUID()
