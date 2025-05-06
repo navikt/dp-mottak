@@ -126,7 +126,7 @@ internal class ArenaBehovLøser(
     }
 }
 
-private fun JsonMessage.arenaOppgaveParametre(): OpprettArenaOppgaveParametere =
+internal fun JsonMessage.arenaOppgaveParametre(): OpprettArenaOppgaveParametere =
     OpprettArenaOppgaveParametere(
         naturligIdent = this["fødselsnummer"].asText(),
         behandlendeEnhetId = this["behandlendeEnhetId"].asText(),
