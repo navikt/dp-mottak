@@ -111,7 +111,7 @@ internal object Config {
             .registerModule(JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
-    private fun tokenfeil(): Nothing = throw RuntimeException("Kunne opprettet token")
+    private fun tokenfeil(): Nothing = throw RuntimeException("Kunne ikke opprette token")
 
     val kafkaProducerProperties: Properties by lazy {
         Properties().apply {

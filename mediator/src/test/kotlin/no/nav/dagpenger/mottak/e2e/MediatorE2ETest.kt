@@ -315,7 +315,7 @@ internal class MediatorE2ETest {
                   "journalpostId": "$journalpostId",
                   "@løsning": {
                     "OpprettStartVedtakOppgave": {
-                      "@feil" : "Kunne ikke opprettet arenaoppgave"
+                      "@feil" : "Kunne ikke opprette Arena oppgave"
                     }
                   }
         }

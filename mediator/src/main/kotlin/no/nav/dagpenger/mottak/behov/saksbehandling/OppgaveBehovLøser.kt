@@ -89,28 +89,37 @@ internal class OppgaveBehovLøser(
             when (system) {
                 FagSystem.DAGPENGER -> {
                     runBlocking {
-                        val oppgaveId =
-                            oppgaveKlient.opprettOppgave(
-                                fagsakId = sakId,
-                                journalpostId = journalpostId,
-                                opprettetTidspunkt = registrertTidspunkt,
-                                ident = packet["fødselsnummer"].asText(),
-                                skjemaKategori = packet["skjemaKategori"].asText(),
-                            )
-                        val løsning =
-                            mapOf(
-                                "journalpostId" to journalpostId,
-                                "fagsakId" to sakId,
-                                "oppgaveId" to oppgaveId,
-                                "fagsystem" to system.name,
-                            )
+                        try {
+                            val oppgaveId =
+                                oppgaveKlient.opprettOppgave(
+                                    fagsakId = sakId,
+                                    journalpostId = journalpostId,
+                                    opprettetTidspunkt = registrertTidspunkt,
+                                    ident = packet["fødselsnummer"].asText(),
+                                    skjemaKategori = packet["skjemaKategori"].asText(),
+                                )
+                            val løsning =
+                                mapOf(
+                                    "journalpostId" to journalpostId,
+                                    "fagsakId" to sakId,
+                                    "oppgaveId" to oppgaveId,
+                                    "fagsystem" to system.name,
+                                )
 
-                        packet["@løsning"] =
-                            mapOf(
-                                behovNavn to løsning,
-                            ).also {
-                                logger.info { "Løste behov $behovNavn med løsning $it" }
-                            }
+                            packet["@løsning"] =
+                                mapOf(
+                                    behovNavn to løsning,
+                                ).also {
+                                    logger.info { "Løste behov $behovNavn med løsning $it" }
+                                }
+                        } catch (e: Exception) {
+                            packet["@løsning"] =
+                                mapOf(
+                                    behovNavn to mapOf("@feil" to "Kunne ikke opprette oppgave i Dagpenger"),
+                                ).also {
+                                    logger.info { "Løste behov $behovNavn med feil $it" }
+                                }
+                        }
                         context.publish(packet.toJson())
                     }
                 }
@@ -138,7 +147,7 @@ internal class OppgaveBehovLøser(
                         } else {
                             packet["@løsning"] =
                                 mapOf(
-                                    behovNavn to mapOf("@feil" to "Kunne ikke opprettet Arena oppgave"),
+                                    behovNavn to mapOf("@feil" to "Kunne ikke opprette Arena oppgave"),
                                 ).also {
                                     logger.info { "Løste behov $behovNavn med feil $it" }
                                 }
