@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak.behov.saksbehandling
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.every
@@ -120,7 +121,7 @@ internal class OppgaveBehovLøserTest {
     }
 
     @Test
-    fun `Skal håndtere feil ved oppretting av oppgave i DAGPENGER`() {
+    fun `Kaster exception når feil oppstår ved oppretting av oppgave i DAGPENGER`() {
         OppgaveBehovLøser(
             arenaOppslag = mockk(),
             oppgaveKlient =
@@ -142,12 +143,7 @@ internal class OppgaveBehovLøserTest {
             rapidsConnection = testRapid,
         )
 
-        testRapid.sendTestMessage(opprettOppgaveBehov())
-        with(testRapid.inspektør) {
-            size shouldBe 1
-            shouldNotThrowAny { field(0, "@løsning") }
-            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["@feil"].asText() shouldBe "Kunne ikke opprette oppgave i Dagpenger"
-        }
+        shouldThrow<RuntimeException> { testRapid.sendTestMessage(opprettOppgaveBehov()) }
     }
 
     @Language("JSON")
