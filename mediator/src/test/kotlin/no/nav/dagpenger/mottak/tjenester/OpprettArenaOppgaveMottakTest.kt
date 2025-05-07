@@ -6,8 +6,6 @@ import io.mockk.verify
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.fail
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import java.time.LocalDateTime
@@ -19,11 +17,6 @@ internal class OpprettArenaOppgaveMottakTest {
 
     init {
         OpprettArenaOppgaveMottak(innsendingMediator, testRapid)
-    }
-
-    @Test
-    fun `Skal motta og håndtere OpprettOppgave(med løsning) der løsningens fagsystem er Arena`() {
-        fail { "Feil" }
     }
 
     @ParameterizedTest

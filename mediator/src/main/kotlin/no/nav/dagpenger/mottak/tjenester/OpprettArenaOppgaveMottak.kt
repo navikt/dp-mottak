@@ -30,12 +30,11 @@ internal class OpprettArenaOppgaveMottak(
                 precondition {
                     it.requireAllOrAny(
                         "@behov",
-                        listOf(Behovtype.OpprettStartVedtakOppgave.name, Behovtype.OpprettVurderhenvendelseOppgave.name, Behovtype.OpprettOppgave.name),
+                        listOf(Behovtype.OpprettStartVedtakOppgave.name, Behovtype.OpprettVurderhenvendelseOppgave.name),
                     )
                 }
-                precondition { it.requireKey("@løsning") }
-                precondition { it.forbidValue("@løsning.OpprettOppgave.fagsystem", "DAGPENGER") }
                 validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
+                validate { it.requireKey("@løsning") }
                 validate { it.requireKey("journalpostId") }
             }.register(this)
     }
