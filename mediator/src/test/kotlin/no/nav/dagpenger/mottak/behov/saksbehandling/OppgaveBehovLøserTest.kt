@@ -12,6 +12,7 @@ import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.OpprettVedtakOppgaveResponse
 import no.nav.dagpenger.mottak.tjenester.asUUID
 import org.intellij.lang.annotations.Language
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.UUID
@@ -19,14 +20,13 @@ import java.util.UUID
 internal class OppgaveBehovLøserTest {
     private val testRapid = TestRapid()
     private val journalpostId = "2345678"
-    private val sakId = UUID.randomUUID()
     private val oppgaveId = UUID.randomUUID()
     private val ident = "12345678910"
     private val oppgaveKlientMock =
         mockk<OppgaveKlient>().also {
             coEvery {
                 it.opprettOppgave(
-                    sakId = sakId,
+                    fagsakId = any(),
                     journalpostId = journalpostId,
                     opprettetTidspunkt = any(),
                     ident = ident,
@@ -50,6 +50,11 @@ internal class OppgaveBehovLøserTest {
                 )
         }
 
+    @BeforeEach
+    fun `clear rapid`() {
+        testRapid.reset()
+    }
+
     @Test
     fun `Skal rute til ARENA dersom oppgaverutingen tilsier det`() {
         OppgaveBehovLøser(
@@ -65,9 +70,10 @@ internal class OppgaveBehovLøserTest {
         testRapid.sendTestMessage(opprettOppgaveBehov())
         with(testRapid.inspektør) {
             size shouldBe 1
-            field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["fagsakId"].isNull shouldBe true
-            field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["oppgaveId"].asText() shouldBe "123"
-            field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["journalpostId"].asText() shouldBe journalpostId
+            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["fagsakId"].isNull shouldBe true
+            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["fagsystem"].asText() shouldBe OppgaveRuting.FagSystem.ARENA.name
+            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["oppgaveId"].asText() shouldBe "123"
+            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["journalpostId"].asText() shouldBe journalpostId
         }
     }
 
@@ -86,9 +92,12 @@ internal class OppgaveBehovLøserTest {
         testRapid.sendTestMessage(opprettOppgaveBehov())
         with(testRapid.inspektør) {
             size shouldBe 1
-            shouldNotThrowAny { field(0, "@løsning")["Oppgave"]["fagsakId"].asUUID() }
-            field(0, "@løsning")["Oppgave"]["oppgaveId"].asText() shouldBe oppgaveId
-            field(0, "@løsning")["Oppgave"]["journalpostId"].asText() shouldBe journalpostId
+            shouldNotThrowAny {
+                field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["fagsakId"].asUUID()
+            }
+            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["fagsystem"].asText() shouldBe OppgaveRuting.FagSystem.DAGPENGER.name
+            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["oppgaveId"].asUUID() shouldBe oppgaveId
+            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["journalpostId"].asText() shouldBe journalpostId
         }
     }
 

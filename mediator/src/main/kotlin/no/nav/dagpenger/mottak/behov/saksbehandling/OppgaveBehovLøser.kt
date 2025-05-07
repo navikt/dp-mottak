@@ -29,7 +29,7 @@ internal interface OppgaveRuting {
 
 internal interface OppgaveKlient {
     suspend fun opprettOppgave(
-        sakId: UUID,
+        fagsakId: UUID,
         journalpostId: String,
         opprettetTidspunkt: LocalDateTime,
         ident: String,
@@ -43,6 +43,10 @@ internal class OppgaveBehovLøser(
     private val oppgaveRuting: OppgaveRuting,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
+    companion object {
+        val behovNavn: String = OpprettOppgave.name
+    }
+
     init {
         River(rapidsConnection)
             .apply {
@@ -84,11 +88,10 @@ internal class OppgaveBehovLøser(
         oppgaveRuting.ruteOpgave().let { system ->
             when (system) {
                 FagSystem.DAGPENGER -> {
-                    val behovNavn = "Oppgave"
                     runBlocking {
                         val oppgaveId =
                             oppgaveKlient.opprettOppgave(
-                                sakId = sakId,
+                                fagsakId = sakId,
                                 journalpostId = journalpostId,
                                 opprettetTidspunkt = registrertTidspunkt,
                                 ident = packet["fødselsnummer"].asText(),
@@ -99,16 +102,20 @@ internal class OppgaveBehovLøser(
                                 "journalpostId" to journalpostId,
                                 "fagsakId" to sakId,
                                 "oppgaveId" to oppgaveId,
+                                "fagsystem" to system.name,
                             )
+
                         packet["@løsning"] =
-                            løsning.also {
+                            mapOf(
+                                behovNavn to løsning,
+                            ).also {
                                 logger.info { "Løste behov $behovNavn med løsning $it" }
                             }
+                        context.publish(packet.toJson())
                     }
                 }
 
                 FagSystem.ARENA -> {
-                    val behovNavn = "OpprettVurderhenvendelseOppgave"
                     runBlocking {
                         val oppgaveResponse =
                             arenaOppslag.opprettVurderHenvendelsOppgave(
@@ -123,6 +130,7 @@ internal class OppgaveBehovLøser(
                                             "journalpostId" to journalpostId,
                                             "fagsakId" to oppgaveResponse.fagsakId,
                                             "oppgaveId" to oppgaveResponse.oppgaveId,
+                                            "fagsystem" to system.name,
                                         ),
                                 ).also {
                                     logger.info { "Løste behov $behovNavn med løsning $it" }
