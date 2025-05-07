@@ -11,7 +11,7 @@ import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
 import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet.Sak
+import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet.OppgaveSak
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
@@ -27,7 +27,7 @@ class Innsending private constructor(
     private var person: Person?,
     private var arenaSak: ArenaSak?,
     private var mottakskanal: String? = null,
-    private var sak: Sak? = null,
+    private var oppgaveSak: OppgaveSak? = null,
     internal val aktivitetslogg: Aktivitetslogg,
 ) : Aktivitetskontekst {
     private val observers = mutableSetOf<InnsendingObserver>()
@@ -494,7 +494,7 @@ class Innsending private constructor(
             innsending: Innsending,
             oppgaveOpprettet: OppgaveOpprettet,
         ) {
-            innsending.sak = oppgaveOpprettet.sak()
+            innsending.oppgaveSak = oppgaveOpprettet.oppgaveSak()
             innsending.oppdatereJournalpost(oppgaveOpprettet)
         }
 
@@ -710,7 +710,7 @@ class Innsending private constructor(
         val journalpost = requireNotNull(journalpost) { "Krever at journalpost her" }
         val arenaSakId = arenaSak?.fagsakId?.let { mapOf("fagsakId" to it) } ?: emptyMap()
         val sak =
-            sak?.let {
+            oppgaveSak?.let {
                 mapOf(
                     "fagsakId" to it.sakId,
                     "oppgaveId" to it.oppgaveId,
@@ -813,7 +813,7 @@ class Innsending private constructor(
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
         val fagsakId: String? =
             arenaSak?.fagsakId
-                ?: sak?.sakId.toString()
+                ?: oppgaveSak?.sakId.toString()
 
         InnsendingEvent(
             type = mapToHendelseType(jp),

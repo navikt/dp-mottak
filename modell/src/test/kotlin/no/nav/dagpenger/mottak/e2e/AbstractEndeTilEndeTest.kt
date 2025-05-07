@@ -179,7 +179,7 @@ abstract class AbstractEndeTilEndeTest {
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = JOURNALPOST_ID,
             oppgaveId = UUID.randomUUID(),
-            fagsakId = UUID.randomUUID(),
+            sakId = UUID.randomUUID(),
         )
 
     private fun gosysOppgaveOpprettet(): GosysOppgaveOpprettet =

@@ -83,7 +83,7 @@ internal class OppgaveBehovLøser(
                         ident = packet["fødselsnummer"].asText(),
                         skjemaKategori = packet["skjemaKategori"].asText(),
                     )
-                OppgaveOpprettet.Sak(
+                OppgaveOpprettet.OppgaveSak(
                     oppgaveId = oppgaveId,
                     sakId = sakId,
                 )

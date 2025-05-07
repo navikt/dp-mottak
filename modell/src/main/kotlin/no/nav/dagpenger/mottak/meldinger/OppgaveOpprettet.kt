@@ -8,13 +8,13 @@ class OppgaveOpprettet(
     aktivitetslogg: Aktivitetslogg,
     private val journalpostId: String,
     private val oppgaveId: UUID,
-    private val fagsakId: UUID,
+    private val sakId: UUID,
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
 
-    fun sak(): Sak = Sak(oppgaveId, fagsakId)
+    fun oppgaveSak(): OppgaveSak = OppgaveSak(oppgaveId, sakId)
 
-    data class Sak(
+    data class OppgaveSak(
         val oppgaveId: UUID,
         val sakId: UUID,
     )

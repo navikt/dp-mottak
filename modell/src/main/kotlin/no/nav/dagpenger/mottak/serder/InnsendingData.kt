@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Journalpost
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet.Sak
+import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet.OppgaveSak
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.rutingOppslag
 import java.time.LocalDateTime
@@ -20,7 +20,7 @@ data class InnsendingData(
     val arenaSakData: ArenaSakData?,
     val søknadsData: JsonNode?,
     val mottakskanal: String?,
-    val sak: Sak? = null,
+    val oppgaveSak: OppgaveSak? = null,
     val aktivitetslogg: AktivitetsloggData,
 ) {
     fun createInnsending(): Innsending =
@@ -62,7 +62,7 @@ data class InnsendingData(
                 },
                 arenaSakData?.let { ArenaOppgaveOpprettet.ArenaSak(it.oppgaveId, it.fagsakId) },
                 mottakskanal,
-                sak,
+                oppgaveSak,
                 aktivitetslogg.let(::konverterTilAktivitetslogg),
             )
 
