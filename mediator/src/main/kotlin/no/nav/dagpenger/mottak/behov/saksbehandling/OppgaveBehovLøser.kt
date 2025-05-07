@@ -99,7 +99,6 @@ internal class OppgaveBehovLøser(
                             )
                         val løsning =
                             mapOf(
-                                "journalpostId" to journalpostId,
                                 "fagsakId" to sakId,
                                 "oppgaveId" to oppgaveId,
                                 "fagsystem" to system.name,
@@ -138,7 +137,11 @@ internal class OppgaveBehovLøser(
                         } else {
                             packet["@løsning"] =
                                 mapOf(
-                                    behovNavn to mapOf("@feil" to "Kunne ikke opprette Arena oppgave"),
+                                    behovNavn to
+                                        mapOf(
+                                            "@feil" to "Kunne ikke opprette Arena oppgave",
+                                            "fagsystem" to system.name,
+                                        ),
                                 ).also {
                                     logger.info { "Løste behov $behovNavn med feil $it" }
                                 }

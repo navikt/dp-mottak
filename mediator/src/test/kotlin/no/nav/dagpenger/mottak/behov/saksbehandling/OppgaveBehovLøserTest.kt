@@ -93,7 +93,6 @@ internal class OppgaveBehovLøserTest {
             }
             field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["fagsystem"].asText() shouldBe DAGPENGER.name
             field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["oppgaveId"].asUUID() shouldBe oppgaveId
-            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["journalpostId"].asText() shouldBe journalpostId
         }
     }
 
