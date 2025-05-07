@@ -10,6 +10,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettOppgave
+import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveRuting.FagSystem
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.arenaOppgaveParametre
 import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
@@ -17,6 +18,15 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 private val logger = KotlinLogging.logger { }
+
+internal interface OppgaveRuting {
+    fun ruteOpgave(): FagSystem
+
+    enum class FagSystem {
+        DAGPENGER,
+        ARENA,
+    }
+}
 
 internal interface OppgaveKlient {
     suspend fun opprettOppgave(
@@ -31,6 +41,7 @@ internal interface OppgaveKlient {
 internal class OppgaveBehovLøser(
     private val arenaOppslag: ArenaOppslag,
     private val oppgaveKlient: OppgaveKlient,
+    private val oppgaveRuting: OppgaveRuting,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
     init {
@@ -69,52 +80,57 @@ internal class OppgaveBehovLøser(
         val behovId = packet["@behovId"].asText()
         val registrertTidspunkt = packet["registrertDato"].asLocalDateTime()
 
-        // TODO fikse env
-        val env = "dev"
         // Vi får sak fra et eller annet sted
         val sakId = UUID.randomUUID()
-        if (env == "dev") {
-            runBlocking {
-                val oppgaveId =
-                    oppgaveKlient.opprettOppgave(
-                        sakId = sakId,
-                        journalpostId = journalpostId,
-                        opprettetTidspunkt = registrertTidspunkt,
-                        ident = packet["fødselsnummer"].asText(),
-                        skjemaKategori = packet["skjemaKategori"].asText(),
-                    )
-                OppgaveOpprettet.OppgaveSak(
-                    oppgaveId = oppgaveId,
-                    sakId = sakId,
-                )
-            }
-        } else {
-            val behovNavn = "OpprettVurderhenvendelseOppgave"
-            runBlocking {
-                val oppgaveResponse =
-                    arenaOppslag.opprettVurderHenvendelsOppgave(
-                        journalpostId,
-                        packet.arenaOppgaveParametre(),
-                    )
-                if (oppgaveResponse != null) {
-                    packet["@løsning"] =
-                        mapOf(
-                            behovNavn to
+        oppgaveRuting.ruteOpgave().let { system ->
+            when (system) {
+                FagSystem.DAGPENGER -> {
+                    runBlocking {
+                        val oppgaveId =
+                            oppgaveKlient.opprettOppgave(
+                                sakId = sakId,
+                                journalpostId = journalpostId,
+                                opprettetTidspunkt = registrertTidspunkt,
+                                ident = packet["fødselsnummer"].asText(),
+                                skjemaKategori = packet["skjemaKategori"].asText(),
+                            )
+                        OppgaveOpprettet.OppgaveSak(
+                            oppgaveId = oppgaveId,
+                            sakId = sakId,
+                        )
+                    }
+                }
+
+                FagSystem.ARENA -> {
+                    val behovNavn = "OpprettVurderhenvendelseOppgave"
+                    runBlocking {
+                        val oppgaveResponse =
+                            arenaOppslag.opprettVurderHenvendelsOppgave(
+                                journalpostId,
+                                packet.arenaOppgaveParametre(),
+                            )
+                        if (oppgaveResponse != null) {
+                            packet["@løsning"] =
                                 mapOf(
-                                    "journalpostId" to journalpostId,
-                                    "fagsakId" to oppgaveResponse.fagsakId,
-                                    "oppgaveId" to oppgaveResponse.oppgaveId,
-                                ),
-                        ).also {
-                            logger.info { "Løste behov $behovNavn med løsning $it" }
+                                    behovNavn to
+                                        mapOf(
+                                            "journalpostId" to journalpostId,
+                                            "fagsakId" to oppgaveResponse.fagsakId,
+                                            "oppgaveId" to oppgaveResponse.oppgaveId,
+                                        ),
+                                ).also {
+                                    logger.info { "Løste behov $behovNavn med løsning $it" }
+                                }
+                        } else {
+                            packet["@løsning"] =
+                                mapOf(
+                                    behovNavn to mapOf("@feil" to "Kunne ikke opprettet Arena oppgave"),
+                                ).also {
+                                    logger.info { "Løste behov $behovNavn med feil $it" }
+                                }
                         }
-                } else {
-                    packet["@løsning"] =
-                        mapOf(
-                            behovNavn to mapOf("@feil" to "Kunne ikke opprettet Arena oppgave"),
-                        ).also {
-                            logger.info { "Løste behov $behovNavn med feil $it" }
-                        }
+                    }
+                    context.publish(packet.toJson())
                 }
             }
         }
