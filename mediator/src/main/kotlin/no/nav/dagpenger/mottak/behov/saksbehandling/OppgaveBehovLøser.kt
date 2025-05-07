@@ -13,7 +13,6 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettO
 import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveRuting.FagSystem
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.arenaOppgaveParametre
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -85,6 +84,7 @@ internal class OppgaveBehovLøser(
         oppgaveRuting.ruteOpgave().let { system ->
             when (system) {
                 FagSystem.DAGPENGER -> {
+                    val behovNavn = "Oppgave"
                     runBlocking {
                         val oppgaveId =
                             oppgaveKlient.opprettOppgave(
@@ -94,10 +94,16 @@ internal class OppgaveBehovLøser(
                                 ident = packet["fødselsnummer"].asText(),
                                 skjemaKategori = packet["skjemaKategori"].asText(),
                             )
-                        OppgaveOpprettet.OppgaveSak(
-                            oppgaveId = oppgaveId,
-                            sakId = sakId,
-                        )
+                        val løsning =
+                            mapOf(
+                                "journalpostId" to journalpostId,
+                                "fagsakId" to sakId,
+                                "oppgaveId" to oppgaveId,
+                            )
+                        packet["@løsning"] =
+                            løsning.also {
+                                logger.info { "Løste behov $behovNavn med løsning $it" }
+                            }
                     }
                 }
 

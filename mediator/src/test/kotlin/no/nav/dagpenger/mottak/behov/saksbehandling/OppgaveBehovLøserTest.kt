@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.every
@@ -9,6 +10,7 @@ import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveRuting.FagSystem.AREN
 import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveRuting.FagSystem.DAGPENGER
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.OpprettVedtakOppgaveResponse
+import no.nav.dagpenger.mottak.tjenester.asUUID
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
@@ -17,6 +19,22 @@ import java.util.UUID
 internal class OppgaveBehovLøserTest {
     private val testRapid = TestRapid()
     private val journalpostId = "2345678"
+    private val sakId = UUID.randomUUID()
+    private val oppgaveId = UUID.randomUUID()
+    private val ident = "12345678910"
+    private val oppgaveKlientMock =
+        mockk<OppgaveKlient>().also {
+            coEvery {
+                it.opprettOppgave(
+                    sakId = sakId,
+                    journalpostId = journalpostId,
+                    opprettetTidspunkt = any(),
+                    ident = ident,
+                    skjemaKategori = "Klage",
+                )
+            } returns
+                oppgaveId
+        }
 
     private val arenaOppslagMock =
         mockk<ArenaOppslag>().also {
@@ -57,7 +75,7 @@ internal class OppgaveBehovLøserTest {
     fun `Skal rute til DAGPENGER dersom oppgaverutingen tilsier det`() {
         OppgaveBehovLøser(
             arenaOppslag = arenaOppslagMock,
-            oppgaveKlient = mockk(),
+            oppgaveKlient = oppgaveKlientMock,
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
                     every { it.ruteOpgave() } returns DAGPENGER
@@ -68,9 +86,9 @@ internal class OppgaveBehovLøserTest {
         testRapid.sendTestMessage(opprettOppgaveBehov())
         with(testRapid.inspektør) {
             size shouldBe 1
-            field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["fagsakId"].isNull shouldBe true
-            field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["oppgaveId"].asText() shouldBe "123"
-            field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["journalpostId"].asText() shouldBe journalpostId
+            shouldNotThrowAny { field(0, "@løsning")["Oppgave"]["fagsakId"].asUUID() }
+            field(0, "@løsning")["Oppgave"]["oppgaveId"].asText() shouldBe oppgaveId
+            field(0, "@løsning")["Oppgave"]["journalpostId"].asText() shouldBe journalpostId
         }
     }
 
@@ -86,7 +104,7 @@ internal class OppgaveBehovLøserTest {
           ],
           "@opprettet" : "${LocalDateTime.now()}",
           "journalpostId": "$journalpostId",
-          "fødselsnummer": "12345678910",
+          "fødselsnummer": "$ident",
           "behandlendeEnhetId": "1235",
           "oppgavebeskrivelse": "beskrivende beskrivelse",
           "registrertDato": "${LocalDateTime.now()}",
