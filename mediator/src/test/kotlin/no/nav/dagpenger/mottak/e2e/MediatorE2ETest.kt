@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.util.UUID
 import kotlin.random.Random
@@ -153,6 +154,29 @@ internal class MediatorE2ETest {
             håndterHendelse(ferdigstiltJournalpostMotattHendelse())
             assertTrue(
                 testRapid.inspektør.size == 6,
+                "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
+            )
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        }
+    }
+
+    @Test
+    fun `Skal motta klage i DAGPENGER`() {
+        withMigratedDb {
+            settOppInfrastruktur()
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = "NAV 90-00.08 K"))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("OpprettOppgave", 2)
+            håndterHendelse(opprettDagpengerOppgaveHendelse())
+            assertBehov("OppdaterJournalpost", 3)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertBehov("FerdigstillJournalpost", 4)
+            håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+            assertTrue(
+                testRapid.inspektør.size == 4,
                 "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
             )
             assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
@@ -419,6 +443,28 @@ internal class MediatorE2ETest {
             "OpprettGosysoppgave": {
               "journalpostId": "$journalpostId",
               "oppgaveId": "123456"
+            }
+          }
+        }
+        """.trimIndent()
+
+//language=JSON
+    private fun opprettDagpengerOppgaveHendelse(): String =
+        """
+        {
+          "@event_name": "behov",
+          "@final": true,
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "OpprettOppgave"
+          ],
+          "@opprettet" : "${LocalDateTime.now()}",
+          "journalpostId": "$journalpostId",
+          "@løsning": {
+            "OpprettOppgave": {
+                "fagsakId": "${UUID.randomUUID()}",
+                "oppgaveId": "${UUID.randomUUID()}",
+                "fagsystem": "DAGPENGER"
             }
           }
         }
