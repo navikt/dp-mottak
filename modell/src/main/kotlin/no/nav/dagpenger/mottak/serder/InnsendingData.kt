@@ -4,10 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Journalpost
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet.OppgaveSak
+import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.rutingOppslag
 import java.time.LocalDateTime
+import java.util.UUID
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 
@@ -20,7 +21,7 @@ data class InnsendingData(
     val arenaSakData: ArenaSakData?,
     val søknadsData: JsonNode?,
     val mottakskanal: String?,
-    val oppgaveSak: OppgaveSak? = null,
+    val oppgaveSakData: OppgaveSakData? = null,
     val aktivitetslogg: AktivitetsloggData,
 ) {
     fun createInnsending(): Innsending =
@@ -60,9 +61,9 @@ data class InnsendingData(
                         it.egenAnsatt,
                     )
                 },
-                arenaSakData?.let { ArenaOppgaveOpprettet.ArenaSak(it.oppgaveId, it.fagsakId) },
+                arenaSakData?.let { ArenaOppgaveOpprettet.ArenaSak(oppgaveId = it.oppgaveId, fagsakId = it.fagsakId) },
                 mottakskanal,
-                oppgaveSak,
+                oppgaveSakData?.let { OppgaveOpprettet.OppgaveSak(oppgaveId = it.oppgaveId, fagsakId = it.fagsakId) },
                 aktivitetslogg.let(::konverterTilAktivitetslogg),
             )
 
@@ -137,6 +138,11 @@ data class InnsendingData(
     data class ArenaSakData(
         val oppgaveId: String,
         val fagsakId: String?,
+    )
+
+    data class OppgaveSakData(
+        val oppgaveId: UUID,
+        val fagsakId: UUID,
     )
 
     data class PersonData(
