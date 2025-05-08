@@ -10,32 +10,12 @@ import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettOppgave
-import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveRuting.FagSystem
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.arenaOppgaveParametre
-import java.time.LocalDateTime
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
 import java.util.UUID
 
 private val logger = KotlinLogging.logger { }
-
-internal interface OppgaveRuting {
-    fun ruteOpgave(): FagSystem
-
-    enum class FagSystem {
-        DAGPENGER,
-        ARENA,
-    }
-}
-
-internal interface OppgaveKlient {
-    suspend fun opprettOppgave(
-        fagsakId: UUID,
-        journalpostId: String,
-        opprettetTidspunkt: LocalDateTime,
-        ident: String,
-        skjemaKategori: String,
-    ): UUID
-}
 
 internal class OppgaveBehovLøser(
     private val arenaOppslag: ArenaOppslag,
@@ -85,9 +65,9 @@ internal class OppgaveBehovLøser(
 
         // Vi får sak fra et eller annet sted
         val sakId = UUID.randomUUID()
-        oppgaveRuting.ruteOpgave().let { system ->
+        oppgaveRuting.ruteOppgave().let { system ->
             when (system) {
-                FagSystem.DAGPENGER -> {
+                OppgaveRuting.FagSystem.DAGPENGER -> {
                     runBlocking {
                         val oppgaveId =
                             oppgaveKlient.opprettOppgave(
@@ -114,7 +94,7 @@ internal class OppgaveBehovLøser(
                     }
                 }
 
-                FagSystem.ARENA -> {
+                OppgaveRuting.FagSystem.ARENA -> {
                     runBlocking {
                         val oppgaveResponse =
                             arenaOppslag.opprettVurderHenvendelsOppgave(

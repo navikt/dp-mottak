@@ -27,6 +27,7 @@ internal object Config {
                 "DB_PORT" to "5432",
                 "DB_USERNAME" to "username",
                 "DP_PROXY_SCOPE" to "api://dev-fss.teamdagpenger.dp-proxy/.default",
+                "DP_SAKSBEHANDLING_URL" to "http://dp-saksbehandling",
                 "HTTP_PORT" to "8080",
                 "KAFKA_CONSUMER_GROUP_ID" to "dp-mottak-v1",
                 "KAFKA_EXTRA_TOPIC" to "teamdagpenger.mottak.v1,teamdagpenger.regel.v1",
@@ -59,6 +60,14 @@ internal object Config {
             "prod-gcp" -> systemAndEnvProperties overriding prodProperties overriding defaultProperties
             else -> systemAndEnvProperties overriding defaultProperties
         }
+    }
+
+    val env by lazy {
+        properties.getOrElse(Key("NAIS_CLUSTER_NAME", stringType)) { "prod-gcp" }
+    }
+
+    val dpSaksbehandlingBaseUrl by lazy {
+        properties[Key("DP_SAKSBEHANDLING_URL", stringType)]
     }
 
     private val cachedTokenProvider by lazy {

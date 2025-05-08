@@ -7,10 +7,11 @@ import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveRuting.FagSystem.ARENA
-import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveRuting.FagSystem.DAGPENGER
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.OpprettVedtakOppgaveResponse
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting.FagSystem.ARENA
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting.FagSystem.DAGPENGER
 import no.nav.dagpenger.mottak.tjenester.asUUID
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.BeforeEach
@@ -58,7 +59,7 @@ internal class OppgaveBehovLøserTest {
             oppgaveKlient = mockk(),
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    every { it.ruteOpgave() } returns ARENA
+                    every { it.ruteOppgave() } returns ARENA
                 },
             rapidsConnection = testRapid,
         )
@@ -80,7 +81,7 @@ internal class OppgaveBehovLøserTest {
             oppgaveKlient = oppgaveKlientMock,
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    every { it.ruteOpgave() } returns DAGPENGER
+                    every { it.ruteOppgave() } returns DAGPENGER
                 },
             rapidsConnection = testRapid,
         )
@@ -106,7 +107,7 @@ internal class OppgaveBehovLøserTest {
             oppgaveKlient = mockk(),
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    every { it.ruteOpgave() } returns ARENA
+                    every { it.ruteOppgave() } returns ARENA
                 },
             rapidsConnection = testRapid,
         )
@@ -137,7 +138,7 @@ internal class OppgaveBehovLøserTest {
                 },
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    every { it.ruteOpgave() } returns DAGPENGER
+                    every { it.ruteOppgave() } returns DAGPENGER
                 },
             rapidsConnection = testRapid,
         )

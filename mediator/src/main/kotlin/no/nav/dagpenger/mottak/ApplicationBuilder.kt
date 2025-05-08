@@ -23,10 +23,12 @@ import no.nav.dagpenger.mottak.behov.person.PdlPersondataOppslag
 import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.SkjermingOppslag
 import no.nav.dagpenger.mottak.behov.person.createPersonOppslag
+import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaApiClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.OpprettGosysOppgaveLøser
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.MiljøBasertRuting
 import no.nav.dagpenger.mottak.db.InnsendingMetadataPostgresRepository
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
@@ -104,6 +106,12 @@ internal class ApplicationBuilder(
                 SøknadsdataBehovLøser(safClient, this)
                 ArenaBehovLøser(arenaApiClient, this)
                 OpprettGosysOppgaveLøser(gosysOppslag, this)
+                OppgaveBehovLøser(
+                    arenaOppslag = arenaApiClient,
+                    oppgaveKlient = TODO(),
+                    oppgaveRuting = MiljøBasertRuting(),
+                    rapidsConnection = this,
+                )
             }
 
     init {

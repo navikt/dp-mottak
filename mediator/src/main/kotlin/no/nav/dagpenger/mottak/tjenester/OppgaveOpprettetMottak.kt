@@ -14,7 +14,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.JsonMessageExtensions.getOrNull
-import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveRuting
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting.FagSystem
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
@@ -50,10 +50,10 @@ internal class OppgaveOpprettetMottak(
 
         logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId" }
 
-        val fagsystem = løsning["fagsystem"].asText().let { OppgaveRuting.FagSystem.valueOf(it) }
+        val fagsystem = løsning["fagsystem"].asText().let { FagSystem.valueOf(it) }
 
         when (fagsystem) {
-            OppgaveRuting.FagSystem.DAGPENGER -> {
+            FagSystem.DAGPENGER -> {
                 val oppgaveId = løsning["oppgaveId"].asUUID()
                 val fagsakId = løsning["fagsakId"].asUUID()
                 innsendingMediator.håndter(
@@ -65,8 +65,7 @@ internal class OppgaveOpprettetMottak(
                     ),
                 )
             }
-
-            OppgaveRuting.FagSystem.ARENA -> {
+            FagSystem.ARENA -> {
                 if (løsning.has("@feil")) {
                     innsendingMediator.håndter(
                         ArenaOppgaveFeilet(
