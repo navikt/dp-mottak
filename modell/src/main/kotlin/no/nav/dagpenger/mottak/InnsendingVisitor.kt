@@ -2,6 +2,7 @@ package no.nav.dagpenger.mottak
 
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import java.time.LocalDateTime
+import java.util.UUID
 
 interface JournalpostVisitor {
     fun visitJournalpost(
@@ -39,11 +40,19 @@ interface ArenaSakVisitor {
     ) {}
 }
 
+interface OppgaveSakVisitor {
+    fun visitOppgaveSak(
+        oppgaveId: UUID,
+        fagsakId: UUID,
+    ) {}
+}
+
 interface InnsendingVisitor :
     JournalpostVisitor,
     SøknadVisitor,
     PersonVisitor,
     ArenaSakVisitor,
+    OppgaveSakVisitor,
     AktivitetsloggVisitor {
     fun preVisitInnsending(
         innsending: Innsending,

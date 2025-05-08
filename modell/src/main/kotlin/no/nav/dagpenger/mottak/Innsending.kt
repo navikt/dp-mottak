@@ -712,7 +712,7 @@ class Innsending private constructor(
         val sak =
             oppgaveSak?.let {
                 mapOf(
-                    "fagsakId" to it.sakId,
+                    "fagsakId" to it.fagsakId,
                     "oppgaveId" to it.oppgaveId,
                 )
             } ?: emptyMap()
@@ -813,7 +813,7 @@ class Innsending private constructor(
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
         val fagsakId: String? =
             arenaSak?.fagsakId
-                ?: oppgaveSak?.sakId.toString()
+                ?: oppgaveSak?.fagsakId.toString()
 
         InnsendingEvent(
             type = mapToHendelseType(jp),
@@ -877,6 +877,7 @@ class Innsending private constructor(
         visitor.visitTilstand(tilstand)
         journalpost?.accept(visitor)
         arenaSak?.accept(visitor)
+        oppgaveSak?.accept(visitor)
         person?.accept(visitor)
         rutingOppslag?.accept(visitor)
         visitor.visitInnsendingAktivitetslogg(aktivitetslogg)
