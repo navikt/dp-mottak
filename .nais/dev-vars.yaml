@@ -20,7 +20,7 @@ oppgave:
   ingress: oppgave-q1.dev-fss-pub.nais.io
   scope: api://dev-fss.oppgavehandtering.oppgave-q1/.default
 saf:
-  app: saf-q2
+  app: saf
   ingress: saf-q2.dev-fss-pub.nais.io
-  scope: api://dev-fss.teamdokumenthandtering.saf-q2/.default
+  scope: api://dev-fss.teamdokumenthandtering.saf/.default
 
