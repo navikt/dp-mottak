@@ -17,6 +17,7 @@ import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.Journalpost.Bruker
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
+import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
@@ -27,6 +28,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDateTime
+import java.util.UUID
 
 abstract class AbstractEndeTilEndeTest {
     protected companion object {
@@ -144,6 +146,10 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(journalpostOppdatert())
     }
 
+    protected fun håndterOppgaveOpprettet() {
+        innsending.håndter(oppgaveOpprettet())
+    }
+
     protected fun håndterJournalpostFerdigstilt() {
         innsending.håndter(journalpostFerdigstilt())
     }
@@ -166,6 +172,14 @@ abstract class AbstractEndeTilEndeTest {
             journalpostId = JOURNALPOST_ID,
             oppgaveId = "1234",
             fagsakId = "9867541",
+        )
+
+    private fun oppgaveOpprettet(): OppgaveOpprettet =
+        OppgaveOpprettet(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+            oppgaveId = UUID.randomUUID(),
+            fagsakId = UUID.randomUUID(),
         )
 
     private fun gosysOppgaveOpprettet(): GosysOppgaveOpprettet =

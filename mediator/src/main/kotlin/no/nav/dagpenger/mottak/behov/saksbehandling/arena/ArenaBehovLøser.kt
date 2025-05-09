@@ -109,7 +109,7 @@ internal class ArenaBehovLøser(
                         } else {
                             packet["@løsning"] =
                                 mapOf(
-                                    behovNavn to mapOf("@feil" to "Kunne ikke opprettet Arena oppgave"),
+                                    behovNavn to mapOf("@feil" to "Kunne ikke opprette Arena oppgave"),
                                 ).also {
                                     logger.info { "Løste behov $behovNavn med feil $it" }
                                 }
@@ -126,7 +126,7 @@ internal class ArenaBehovLøser(
     }
 }
 
-private fun JsonMessage.arenaOppgaveParametre(): OpprettArenaOppgaveParametere =
+internal fun JsonMessage.arenaOppgaveParametre(): OpprettArenaOppgaveParametere =
     OpprettArenaOppgaveParametere(
         naturligIdent = this["fødselsnummer"].asText(),
         behandlendeEnhetId = this["behandlendeEnhetId"].asText(),

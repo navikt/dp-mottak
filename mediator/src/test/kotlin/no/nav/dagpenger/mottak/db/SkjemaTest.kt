@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test
 
 internal class SkjemaTest {
     @Test
-    fun `riktig anntall migreringer`() {
+    fun `riktig antall migreringer`() {
         withCleanDb {
-            assertEquals(18, PostgresDataSourceBuilder.runMigration())
+            assertEquals(19, PostgresDataSourceBuilder.runMigration())
         }
     }
 }

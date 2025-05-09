@@ -72,7 +72,7 @@ internal class ArenaBehovLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
-            assertEquals("Kunne ikke opprettet Arena oppgave", field(0, "@løsning")["OpprettStartVedtakOppgave"]["@feil"].asText())
+            assertEquals("Kunne ikke opprette Arena oppgave", field(0, "@løsning")["OpprettStartVedtakOppgave"]["@feil"].asText())
         }
     }
 
@@ -83,7 +83,7 @@ internal class ArenaBehovLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
-            assertEquals("Kunne ikke opprettet Arena oppgave", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["@feil"].asText())
+            assertEquals("Kunne ikke opprette Arena oppgave", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["@feil"].asText())
         }
     }
 

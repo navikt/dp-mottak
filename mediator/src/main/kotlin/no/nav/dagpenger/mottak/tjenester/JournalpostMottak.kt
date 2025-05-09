@@ -75,11 +75,12 @@ internal class JournalpostMottak(
                                 },
                             registrertDato =
                                 it["relevanteDatoer"]
-                                    .firstOrNull {
-                                        it["datotype"].asText() == "DATO_REGISTRERT"
+                                    .firstOrNull { relevantDato ->
+                                        relevantDato["datotype"].asText() == "DATO_REGISTRERT"
                                     }?.get("dato")
                                     ?.asText()
-                                    .let { LocalDateTime.parse(it) } ?: LocalDateTime.now(),
+                                    ?.let { relevantDato -> LocalDateTime.parse(relevantDato) }
+                                    ?: LocalDateTime.now(),
                             behandlingstema = it["behandlingstema"].textValue(),
                             journalførendeEnhet = it["journalfoerendeEnhet"]?.asText(),
                         ).also {

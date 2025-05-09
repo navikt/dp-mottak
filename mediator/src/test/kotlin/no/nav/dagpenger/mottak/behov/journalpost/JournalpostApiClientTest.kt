@@ -35,7 +35,7 @@ class JournalpostApiClientTest {
                 requestData.url.encodedPathAndQuery,
             )
             assertEquals(URLProtocol.HTTPS, requestData.url.protocol)
-            assertEquals("dokarkiv.dev-fss-pub.nais.io", requestData.url.host)
+            assertEquals("dokarkiv-q2.dev-fss-pub.nais.io", requestData.url.host)
             assertEquals("Bearer token", requestData.headers["Authorization"])
             assertEquals("eksternReferanseId", requestData.headers["X-Request-ID"])
         }
@@ -56,7 +56,7 @@ class JournalpostApiClientTest {
                 "/rest/journalpostapi/v1/journalpost/123/ferdigstill",
                 requestData.url.encodedPathAndQuery,
             )
-            assertEquals("dokarkiv.dev-fss-pub.nais.io", requestData.url.host)
+            assertEquals("dokarkiv-q2.dev-fss-pub.nais.io", requestData.url.host)
 
             assertEquals("Bearer token", requestData.headers["Authorization"])
             assertEquals("eksternReferanseId", requestData.headers["X-Request-ID"])

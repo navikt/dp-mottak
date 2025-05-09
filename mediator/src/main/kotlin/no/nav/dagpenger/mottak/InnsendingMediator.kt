@@ -10,6 +10,7 @@ import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
+import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.RekjørHendelse
@@ -63,6 +64,12 @@ internal class InnsendingMediator(
     fun håndter(arenaOppgaveOpprettetData: ArenaOppgaveOpprettet) {
         håndter(arenaOppgaveOpprettetData) { innsending ->
             innsending.håndter(arenaOppgaveOpprettetData)
+        }
+    }
+
+    fun håndter(oppgaveOpprettet: OppgaveOpprettet) {
+        håndter(oppgaveOpprettet) { innsending ->
+            innsending.håndter(oppgaveOpprettet)
         }
     }
 

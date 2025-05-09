@@ -36,6 +36,9 @@ internal interface JournalpostFeil {
                     }
                 }
             }
+            else -> {
+                throw journalpostException
+            }
         }
     }
 }

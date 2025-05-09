@@ -9,6 +9,8 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
 import io.ktor.client.request.patch
 import io.ktor.client.request.put
@@ -41,6 +43,9 @@ internal class JournalpostApiClient(
             expectSuccess = true
             install(HttpTimeout) {
                 requestTimeoutMillis = 2.minutes.inWholeMilliseconds
+            }
+            install(Logging) {
+                level = LogLevel.INFO
             }
             install(DefaultRequest) {
                 header("X-Nav-Consumer", "dp-mottak")

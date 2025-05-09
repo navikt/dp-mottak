@@ -5,6 +5,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Ferdigst
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OppdaterJournalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettGosysoppgave
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettOppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettStartVedtakOppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettVurderhenvendelseOppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata
@@ -15,6 +16,7 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakTyp
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerFerdigstillJournalpostType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerGosysType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerJournalpostType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerOppgaveType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerPersondataType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerSøknadsdataType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.InnsendingFerdigstiltType
@@ -188,8 +190,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["NAV 04-06.08", "NAV 90-00.08", "NAV 04-06.05"])
-    fun `skal håndtere joark hendelsene etablering, klage&anke og utdanning`(brevkode: String) {
+    @ValueSource(strings = ["NAV 04-06.08", "NAV 04-06.05"])
+    fun `skal håndtere joark hendelsene etablering og utdanning`(brevkode: String) {
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
@@ -237,7 +239,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         }
 
         assertFerdigstilt {
-            val expected = setOf("Etablering", "Klage", "Utdanning")
+            val expected = setOf("Etablering", "Utdanning")
             assertTrue(it.type.name in expected, "Forventet at ${it.type.name} var en av $expected")
             assertNotNull(it.fagsakId)
             assertNotNull(it.aktørId)
@@ -246,6 +248,71 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         }
 
         assertPuml(brevkode)
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["NAV 90-00.08", "NAV 90-00.08 K", "NAVe 90-00.08 K"])
+    fun `skal håndtere joark hendelsene for klage og anke, klage og ettersending`(brevkode: String) {
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode)
+        håndterPersonInformasjon()
+        håndterOppgaveOpprettet()
+        assertBehovDetaljer(
+            OpprettOppgave,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "behandlendeEnhetId",
+                "oppgavebeskrivelse",
+                "registrertDato",
+                "tilleggsinformasjon",
+                "skjemaKategori",
+            ),
+        )
+        håndterJournalpostOppdatert()
+        assertBehovDetaljer(
+            OppdaterJournalpost,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "fagsakId",
+                "oppgaveId",
+                "navn",
+                "tittel",
+                "mottakskanal",
+                "dokumenter",
+            ),
+        )
+        håndterJournalpostFerdigstilt()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            AvventerOppgaveType,
+            AvventerFerdigstillJournalpostType,
+            InnsendingFerdigstiltType,
+        )
+
+        inspektør.also {
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+        }
+
+        assertFerdigstilt {
+            val expected = setOf("Klage")
+            assertTrue(it.type.name in expected, "Forventet at ${it.type.name} var en av $expected")
+            assertNotNull(it.fagsakId)
+            assertNotNull(it.aktørId)
+            assertNotNull(it.fødselsnummer)
+            assertNotNull(it.datoRegistrert)
+        }
+
+        if (brevkode == "NAV 90-00.08") {
+            assertPuml(brevkode)
+        }
     }
 
     @ParameterizedTest

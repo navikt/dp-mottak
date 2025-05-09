@@ -111,7 +111,7 @@ internal class InnsendingPostgresRepositoryTest {
     }
 
     @Test
-    fun `Dobbelagrer ikke verdier som skal være unike`() {
+    fun `Dobbellagrer ikke verdier som skal være unike`() {
         val innsending = innsendingData.createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
