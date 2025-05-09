@@ -76,6 +76,7 @@ spec:
          namespace: oppgavehandtering
        - application: {{ saf.app }}
          namespace: teamdokumenthandtering
+       - application: dp-saksbehandling
       external:
         - host: {{dp_proxy.ingress}}
         - host: {{pdl.ingress}}
