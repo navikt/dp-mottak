@@ -26,7 +26,6 @@ internal object Config {
                 "DB_PASSWORD" to "password",
                 "DB_PORT" to "5432",
                 "DB_USERNAME" to "username",
-                "DP_PROXY_SCOPE" to "api://dev-fss.teamdagpenger.dp-proxy/.default",
                 "DP_SAKSBEHANDLING_URL" to "http://dp-saksbehandling",
                 "DP_SAKSBEHANDLING_SCOPE" to "api://dev-gcp.teamdagpenger.dp-saksbehandling/.default",
                 "HTTP_PORT" to "8080",

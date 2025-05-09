@@ -48,7 +48,7 @@ spec:
   env:
     - name: DP_PROXY_HOST
       value: {{dp_proxy.ingress}}
-    - name: DP_SAKSBEHANDLING_SCOE
+    - name: DP_SAKSBEHANDLING_SCOPE
       value: {{dp_saksbehandling.scope}}
     - name: PDL_API_HOST
       value: {{pdl.ingress}}

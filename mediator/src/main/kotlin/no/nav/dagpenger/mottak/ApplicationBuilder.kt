@@ -8,6 +8,7 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.prometheus.metrics.model.registry.PrometheusRegistry
 import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dokarkivTokenProvider
+import no.nav.dagpenger.mottak.Config.dpSaksbehandlingTokenProvider
 import no.nav.dagpenger.mottak.Config.objectMapper
 import no.nav.dagpenger.mottak.api.innsendingApi
 import no.nav.dagpenger.mottak.api.installPlugins
@@ -24,6 +25,7 @@ import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.SkjermingOppslag
 import no.nav.dagpenger.mottak.behov.person.createPersonOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveBehovLøser
+import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveHttpKlient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaApiClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
@@ -108,7 +110,10 @@ internal class ApplicationBuilder(
                 OpprettGosysOppgaveLøser(gosysOppslag, this)
                 OppgaveBehovLøser(
                     arenaOppslag = arenaApiClient,
-                    oppgaveKlient = TODO(),
+                    oppgaveKlient =  OppgaveHttpKlient(
+                        dpSaksbehandlingBaseUrl = Config.dpSaksbehandlingBaseUrl,
+                        tokenProvider = Config.properties.dpSaksbehandlingTokenProvider
+                    ),
                     oppgaveRuting = MiljøBasertRuting(),
                     rapidsConnection = this,
                 )
