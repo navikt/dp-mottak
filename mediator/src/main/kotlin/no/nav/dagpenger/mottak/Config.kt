@@ -28,6 +28,7 @@ internal object Config {
                 "DB_USERNAME" to "username",
                 "DP_PROXY_SCOPE" to "api://dev-fss.teamdagpenger.dp-proxy/.default",
                 "DP_SAKSBEHANDLING_URL" to "http://dp-saksbehandling",
+                "DP_SAKSBEHANDLING_SCOPE" to "api://dev-gcp.teamdagpenger.dp-saksbehandling/.default",
                 "HTTP_PORT" to "8080",
                 "KAFKA_CONSUMER_GROUP_ID" to "dp-mottak-v1",
                 "KAFKA_EXTRA_TOPIC" to "teamdagpenger.mottak.v1,teamdagpenger.regel.v1",
@@ -112,6 +113,12 @@ internal object Config {
     val Configuration.dpGosysTokenProvider: () -> String by lazy {
         {
             cachedTokenProvider.clientCredentials(properties[Key("OPPGAVE_SCOPE", stringType)]).access_token ?: tokenfeil()
+        }
+    }
+
+    val Configuration.dpSaksbehandlingTokenProvider: () -> String by lazy {
+        {
+            cachedTokenProvider.clientCredentials(properties[Key("DP_SAKSBEHANDLING_SCOPE", stringType)]).access_token ?: tokenfeil()
         }
     }
 

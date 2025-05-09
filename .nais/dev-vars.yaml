@@ -9,6 +9,8 @@ ingresses:
   - "https://dp-mottak.intern.dev.nav.no/"
 dp_proxy:
   ingress: dp-proxy.dev-fss-pub.nais.io
+dp_saksbehandling:
+  scope: api://dev-gcp.teamdagpenger.dp-saksbehandling/.default
 pdl:
   ingress: pdl-api-q1.dev-fss-pub.nais.io
 dokarkiv:
