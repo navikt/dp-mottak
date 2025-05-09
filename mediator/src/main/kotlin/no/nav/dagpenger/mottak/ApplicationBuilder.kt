@@ -110,10 +110,11 @@ internal class ApplicationBuilder(
                 OpprettGosysOppgaveLøser(gosysOppslag, this)
                 OppgaveBehovLøser(
                     arenaOppslag = arenaApiClient,
-                    oppgaveKlient =  OppgaveHttpKlient(
-                        dpSaksbehandlingBaseUrl = Config.dpSaksbehandlingBaseUrl,
-                        tokenProvider = Config.properties.dpSaksbehandlingTokenProvider
-                    ),
+                    oppgaveKlient =
+                        OppgaveHttpKlient(
+                            dpSaksbehandlingBaseUrl = Config.dpSaksbehandlingBaseUrl,
+                            tokenProvider = Config.properties.dpSaksbehandlingTokenProvider,
+                        ),
                     oppgaveRuting = MiljøBasertRuting(),
                     rapidsConnection = this,
                 )
