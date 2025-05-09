@@ -40,7 +40,7 @@ internal object Config {
                 "AZURE_OPENID_CONFIG_ISSUER" to "azureAd",
                 "AZURE_APP_CLIENT_ID" to "azureClientId",
                 "AZURE_OPENID_CONFIG_JWKS_URI" to "http://localhost:4443",
-                "DOKARKIV_SCOPE" to "api://dev-fss.teamdokumenthandtering.dokarkiv-q1/.default",
+                "DOKARKIV_SCOPE" to "api://dev-fss.teamdokumenthandtering.dokarkiv/.default",
                 "DOKARKIV_INGRESS" to "dokarkiv-q2.dev-fss-pub.nais.io",
             ),
         )
