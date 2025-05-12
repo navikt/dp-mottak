@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import java.time.LocalDateTime.now
 import java.util.UUID
 import kotlin.random.Random
@@ -167,13 +169,14 @@ internal class MediatorE2ETest {
         }
     }
 
-    @Test
-    fun `Skal motta klage i DAGPENGER`() {
+    @ParameterizedTest
+    @ValueSource(strings = ["NAV 90-00.08", "NAV 90-00.08 K", "NAVe 90-00.08 K", "NAV 90-00.08 A", "NAVe 90-00.08 A"])
+    fun `Skal motta klage og anke i DAGPENGER`(brevkode: String) {
         withMigratedDb {
             settOppInfrastruktur()
             håndterHendelse(joarkMelding())
             assertBehov("Journalpost", 0)
-            håndterHendelse(journalpostMottattHendelse(brevkode = "NAV 90-00.08 K"))
+            håndterHendelse(journalpostMottattHendelse(brevkode = brevkode))
             assertBehov("Persondata", 1)
             håndterHendelse(persondataMottattHendelse())
             assertBehov("OpprettOppgave", 2)

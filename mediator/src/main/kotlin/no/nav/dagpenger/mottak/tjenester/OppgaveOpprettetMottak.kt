@@ -48,9 +48,8 @@ internal class OppgaveOpprettetMottak(
         val løsning = packet["@løsning"].first()
         val journalpostId = packet["journalpostId"].asText()
 
-        logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId" }
-
         val fagsystem = løsning["fagsystem"].asText().let { FagSystem.valueOf(it) }
+        logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId. Løst av $fagsystem" }
 
         when (fagsystem) {
             FagSystem.DAGPENGER -> {

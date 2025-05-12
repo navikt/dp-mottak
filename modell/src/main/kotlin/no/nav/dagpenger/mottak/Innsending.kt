@@ -341,7 +341,7 @@ class Innsending private constructor(
                 is Utdanning -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is Etablering -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is Klage -> innsending.tilstand(hendelse, AvventerOppgave)
-                is Anke -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
+                is Anke -> innsending.tilstand(hendelse, AvventerOppgave)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
                 is KlageForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)

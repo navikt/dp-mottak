@@ -66,6 +66,7 @@ internal class OppgaveBehovLøser(
         // Vi får sak fra et eller annet sted
         val sakId = UUID.randomUUID()
         oppgaveRuting.ruteOppgave().let { system ->
+            logger.info { "Skal løse behov $behovNavn i fagsystem $system" }
             when (system) {
                 OppgaveRuting.FagSystem.DAGPENGER -> {
                     runBlocking {
