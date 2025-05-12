@@ -48,6 +48,8 @@ spec:
   env:
     - name: DP_PROXY_HOST
       value: {{dp_proxy.ingress}}
+    - name: DP_SAKSBEHANDLING_SCOPE
+      value: {{dp_saksbehandling.scope}}
     - name: PDL_API_HOST
       value: {{pdl.ingress}}
     - name: DOKARKIV_INGRESS
@@ -74,6 +76,7 @@ spec:
          namespace: oppgavehandtering
        - application: {{ saf.app }}
          namespace: teamdokumenthandtering
+       - application: dp-saksbehandling
       external:
         - host: {{dp_proxy.ingress}}
         - host: {{pdl.ingress}}

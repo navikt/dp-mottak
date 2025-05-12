@@ -7,6 +7,8 @@ replicas_max: 6
 point_in_time_recovery_days: 14
 dp_proxy:
   ingress: dp-proxy.prod-fss-pub.nais.io
+dp_saksbehandling:
+  scope: api://prod-gcp.teamdagpenger.dp-saksbehandling/.default
 pdl:
   ingress: pdl-api.prod-fss-pub.nais.io
 dokarkiv:

@@ -21,6 +21,7 @@ import no.nav.dagpenger.mottak.serder.InnsendingData.TilstandData
 import no.nav.dagpenger.mottak.toMap
 import org.postgresql.util.PGobject
 import java.time.LocalDateTime
+import java.util.UUID
 import javax.sql.DataSource
 import kotlin.use
 
@@ -40,8 +41,10 @@ internal class InnsendingPostgresRepository(
                journalpost.behandlingstema               as "behandlingstema",
                journalpost.registrertdato                as "registrertdato",
                journalpost.journalforendeEnhet           as "journalforendeEnhet",
-               arenasak.fagsakid                         as "fagsakId",
-               arenasak.oppgaveId                        as "oppgaveId",
+               arenasak.fagsakid                         as "fagsak_id_arena",
+               arenasak.oppgaveId                        as "oppgave_id_arena",
+               oppgave_sak.fagsak_id                     as "fagsak_id_dagpenger",
+               oppgave_sak.oppgave_id                    as "oppgave_id_dagpenger",
                soknad.data                               as "søknadsData",
                person_innsending.navn                    as "navn",
                person_innsending.diskresjonskode         as "diskresjonsKode",
@@ -55,6 +58,7 @@ internal class InnsendingPostgresRepository(
                  left join journalpost_v1 journalpost on innsending.id = journalpost.id
                  left join aktivitetslogg_v1 aktivitetslogg on innsending.id = aktivitetslogg.id
                  left join arenasak_v1 arenasak on innsending.id = arenasak.id
+                 left join oppgave_sak_v1 oppgave_sak on innsending.id = oppgave_sak.id
                  left join soknad_v1 soknad on innsending.id = soknad.id
                  left join person_innsending_v1 person_innsending on innsending.id = person_innsending.id
                  left join person_v1 person on person_innsending.personid = person.id
@@ -102,10 +106,17 @@ internal class InnsendingPostgresRepository(
                                     )
                                 },
                             arenaSakData =
-                                row.stringOrNull("oppgaveId")?.let {
+                                row.stringOrNull("oppgave_id_arena")?.let {
                                     InnsendingData.ArenaSakData(
                                         oppgaveId = it,
-                                        fagsakId = row.stringOrNull("fagsakId"),
+                                        fagsakId = row.stringOrNull("fagsak_id_arena"),
+                                    )
+                                },
+                            oppgaveSakData =
+                                row.uuidOrNull("oppgave_id_dagpenger")?.let {
+                                    InnsendingData.OppgaveSakData(
+                                        oppgaveId = it,
+                                        fagsakId = row.uuid("fagsak_id_dagpenger"),
                                     )
                                 },
                             søknadsData =
@@ -388,6 +399,26 @@ internal class InnsendingPostgresRepository(
                         "id" to internId,
                         "fagsakId" to fagsakId,
                         "oppgaveId" to oppgaveId,
+                    ),
+                ),
+            )
+        }
+
+        override fun visitOppgaveSak(
+            oppgaveId: UUID,
+            fagsakId: UUID,
+        ) {
+            lagreQueries.add(
+                queryOf(
+                    //language=PostgreSQL
+                    """
+                        INSERT INTO oppgave_sak_v1(fagsak_id, oppgave_id, id) VALUES (:fagsak_id, :oppgave_id, :id) 
+                        ON CONFLICT(id) DO NOTHING 
+                        """,
+                    mapOf(
+                        "id" to internId,
+                        "fagsak_id" to fagsakId,
+                        "oppgave_id" to oppgaveId,
                     ),
                 ),
             )
