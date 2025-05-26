@@ -95,7 +95,7 @@ spec:
         tier:  "{{db_tier}}"
         diskType: SSD
         highAvailability: true
-        diskSize: "{{db_size}}"
+        diskSize: {{db_size}}
         diskAutoresize: true
         autoBackupHour: 3
         databases:
@@ -105,7 +105,7 @@ spec:
               - name: bqconn_dataanalyse
         cascadingDelete: false
         pointInTimeRecovery: true
-        retainedBackups: "{{point_in_time_recovery_days}}"
+        retainedBackups: {{point_in_time_recovery_days}}
         flags:
           - name: cloudsql.enable_pgaudit
             value: "true"
