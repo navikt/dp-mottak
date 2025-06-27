@@ -63,7 +63,7 @@ internal class ArenaBehovLøser(
             val behovId = packet["@behovId"].asText()
 
             if (emptyList<String>().contains(journalpostId)) {
-                logger.warn { "Skipper journalpost $journalpostId fra OpprettArenaOppgaveBehovLøser" }
+                logger.warn { "Skipper journalpost $journalpostId fra ArenaBehovLøser" }
                 return
             }
 
