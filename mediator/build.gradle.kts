@@ -20,12 +20,12 @@ dependencies {
     implementation("no.nav.dagpenger:oauth2-klient:2025.04.26-14.51.bbf9ece5f5ec")
     implementation("io.prometheus:prometheus-metrics-core:1.3.6")
     implementation(libs.rapids.and.rivers)
-    implementation("io.getunleash:unleash-client-java:10.2.2")
+    implementation("io.getunleash:unleash-client-java:11.0.0")
 
     implementation(libs.bundles.postgres)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.10.2")
 
-    implementation("com.github.navikt.tbd-libs:naisful-app:2025.04.04-09.18-7cc3badf")
+    implementation("com.github.navikt.tbd-libs:naisful-app:2025.06.20-13.05-40af2647")
 
     implementation(libs.bundles.jackson)
 
@@ -44,7 +44,7 @@ dependencies {
     testImplementation("no.bekk.bekkopen:nocommons:0.16.0")
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation("io.ktor:ktor-client-mock-jvm:${libs.versions.ktor.get()}")
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.04.04-09.18-7cc3badf")
+    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.06.20-13.05-40af2647")
 }
 
 tasks.withType<ShadowJar> {

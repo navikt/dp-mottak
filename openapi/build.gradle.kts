@@ -1,5 +1,5 @@
 plugins {
-    id("org.openapi.generator") version "7.13.0"
+    id("org.openapi.generator") version "7.14.0"
     id("common")
     `java-library`
 }
@@ -32,7 +32,7 @@ ktlint {
 }
 
 dependencies {
-    implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.0")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.19.1")
 }
 
 openApiGenerate {
