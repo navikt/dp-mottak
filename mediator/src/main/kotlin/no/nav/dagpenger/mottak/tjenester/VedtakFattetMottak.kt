@@ -24,13 +24,10 @@ internal class VedtakFattetMottak(
     companion object {
         val rapidFilter: River.() -> Unit = {
             precondition {
-                it.requireValue("@event_name", "vedtak_fattet")
-                it.requireValue("fagsystem", "Dagpenger")
-                it.requireValue("behandletHendelse.type", "Søknad")
+                it.requireValue("@event_name", "vedtak_fattet_utenfor_arena")
             }
             validate {
-                it.requireKey("ident", "behandlingId", "fagsakId", "automatisk")
-                it.interestedIn("behandletHendelse")
+                it.requireKey("behandlingId", "søknadId", "ident", "sakId")
             }
         }
     }
@@ -45,11 +42,12 @@ internal class VedtakFattetMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val søknadId = packet.søknadId()
+        val søknadId = packet["søknadId"].asUUID()
         val behandlingId = packet["behandlingId"].asUUID()
         val ident = packet["ident"].asText()
+        val dagpengerFagsakId = packet["sakId"].asUUID()
         withLoggingContext("søknadId" to "$søknadId", "behandlingId" to "$behandlingId") {
-            logger.info { "Mottok vedtak_fattet hendelse" }
+            logger.info { "Mottok vedtak_fattet_utenfor_arena" }
             val arenaOppgaver =
                 innsendingMetadataRepository.hentArenaOppgaver(
                     søknadId = søknadId,
@@ -58,7 +56,6 @@ internal class VedtakFattetMottak(
 
             val oppgaveIder = arenaOppgaver.map { it.oppgaveId }
             val arenaFagsakId: String = arenaOppgaver.single { it.fagsakId != null }.fagsakId ?: throw RuntimeException("Kunne ikke hente arena fagsakid")
-            val dagpengerFagsakId = packet["fagsakId"].asUUID()
 
             runBlocking {
                 arenaOppgaver.forEach { oppgave ->
@@ -68,6 +65,7 @@ internal class VedtakFattetMottak(
                             dagpengerFagsakId = dagpengerFagsakId.toString(),
                             ident = ident,
                         )
+
                     innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(
                         jounalpostId = nyJournalPostId.toInt(),
                         innsendingId = oppgave.innsendingId,
@@ -90,7 +88,5 @@ internal class VedtakFattetMottak(
         }
     }
 }
-
-private fun JsonMessage.søknadId(): UUID = this["behandletHendelse"]["id"].asUUID()
 
 fun JsonNode.asUUID(): UUID = this.asText().let { UUID.fromString(it) }

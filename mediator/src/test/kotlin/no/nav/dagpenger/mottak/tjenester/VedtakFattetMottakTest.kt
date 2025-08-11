@@ -107,43 +107,14 @@ VedtakFattetMottakTest {
         }
     }
 
-    @Test
-    fun `Skal ikke sende ut behov for sletting av Arena-oppgaver når vedtak er fattet i fagsystem Arena`() {
-        testRapid.sendTestMessage(vedtakFattetIArenaJson)
-        testRapid.inspektør.size shouldBe 0
-    }
-
     private val vedtakFattetIDagpengerJson =
         """
         {
-            "@event_name": "vedtak_fattet",
-            "ident": "$testPersonIdent",
-            "behandletHendelse": {
-              "datatype": "UUID",
-              "id": "$søknadId",
-              "type": "Søknad"
-            },
+            "@event_name": "vedtak_fattet_utenfor_arena",
             "behandlingId": "$behandlingId",
-            "fagsakId": "$dagpengerFagsakId",
-            "fagsystem": "Dagpenger",
-            "automatisk": true
-        }
-        """.trimIndent()
-
-    private val vedtakFattetIArenaJson =
-        """
-        {
-            "@event_name": "vedtak_fattet",
+            "søknadId": "$søknadId",
             "ident": "$testPersonIdent",
-            "behandletHendelse": {
-              "datatype": "UUID",
-              "id": "$søknadId",
-              "type": "Søknad"
-            },
-            "behandlingId": "$behandlingId",
-            "fagsakId": "$arenaFagsakId",
-            "fagsystem": "Arena",
-            "automatisk": true
+            "sakId": "$dagpengerFagsakId"
         }
         """.trimIndent()
 }
