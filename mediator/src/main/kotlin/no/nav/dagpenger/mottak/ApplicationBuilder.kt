@@ -112,7 +112,7 @@ internal class ApplicationBuilder(
                 VedtakFattetMottak(
                     rapidsConnection = this,
                     innsendingMetadataRepository = innsendingMetadataRepository,
-                    journalpostDokarkiv = journalpostApiClient
+                    journalpostDokarkiv = journalpostApiClient,
                 )
                 OppgaveBehovLøser(
                     arenaOppslag = arenaApiClient,
