@@ -39,6 +39,7 @@ import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
 import no.nav.dagpenger.mottak.observers.InnsendingProbe
 import no.nav.dagpenger.mottak.observers.MetrikkObserver
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
+import no.nav.dagpenger.mottak.tjenester.VedtakFattetMottak
 import no.nav.helse.rapids_rivers.RapidApplication
 
 private val logg = KotlinLogging.logger {}
@@ -108,6 +109,11 @@ internal class ApplicationBuilder(
                 SøknadsdataBehovLøser(safClient, this)
                 ArenaBehovLøser(arenaApiClient, this)
                 OpprettGosysOppgaveLøser(gosysOppslag, this)
+                VedtakFattetMottak(
+                    rapidsConnection = this,
+                    innsendingMetadataRepository = innsendingMetadataRepository,
+                    journalpostDokarkiv = journalpostApiClient
+                )
                 OppgaveBehovLøser(
                     arenaOppslag = arenaApiClient,
                     oppgaveKlient =
