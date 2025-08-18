@@ -32,7 +32,7 @@ dependencies {
     implementation(libs.bundles.ktor.server)
     implementation(libs.bundles.ktor.client)
     implementation("io.ktor:ktor-client-logging-jvm:${libs.versions.ktor.get()}")
-    implementation("de.slub-dresden:urnlib:2.0.1")
+    implementation("de.slub-dresden:urnlib:3.0.0")
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter-params:${libs.versions.junit.get()}")
