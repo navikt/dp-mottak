@@ -92,6 +92,7 @@ VedtakFattetMottakTest {
                 message["arenaFagsakId"].asText() shouldBe arenaFagsakId
                 message["behandlingId"].asUUID() shouldBe behandlingId
                 message["oppgaveIder"].map { it.asText() } shouldBe listOf("søknad1", "ettersending1", "ettersending2")
+                message["ident"].asText() shouldBe testPersonIdent
             }
         }
         coVerify(exactly = 1) {

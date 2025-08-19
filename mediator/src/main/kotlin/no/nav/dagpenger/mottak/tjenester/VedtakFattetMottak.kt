@@ -82,6 +82,7 @@ internal class VedtakFattetMottak(
                             "behandlingId" to behandlingId,
                             "arenaFagsakId" to arenaFagsakId,
                             "oppgaveIder" to oppgaveIder,
+                            "ident" to ident,
                         ),
                 ).toJson()
             context.publish(ident, message)
