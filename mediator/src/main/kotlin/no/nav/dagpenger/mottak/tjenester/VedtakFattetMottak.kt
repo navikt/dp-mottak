@@ -59,7 +59,7 @@ internal class VedtakFattetMottak(
 
             runBlocking {
                 arenaOppgaver.forEach { oppgave ->
-                    val nyJournalPostId =
+                    val knyttJounalPostTilNySakResponse =
                         journalpostDokarkiv.knyttJounalPostTilNySak(
                             journalpostId = oppgave.journalpostId,
                             dagpengerFagsakId = dagpengerFagsakId.toString(),
@@ -67,7 +67,7 @@ internal class VedtakFattetMottak(
                         )
 
                     innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(
-                        jounalpostId = nyJournalPostId.toInt(),
+                        jounalpostId = knyttJounalPostTilNySakResponse.nyJournalpostId,
                         innsendingId = oppgave.innsendingId,
                         fagsakId = dagpengerFagsakId,
                     )

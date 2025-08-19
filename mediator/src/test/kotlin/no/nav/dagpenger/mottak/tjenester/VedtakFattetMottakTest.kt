@@ -10,6 +10,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostDokarkiv
+import no.nav.dagpenger.mottak.behov.journalpost.KnyttJounalPostTilNySakResponse
 import no.nav.dagpenger.mottak.db.ArenaOppgave
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import org.junit.jupiter.api.Test
@@ -22,7 +23,7 @@ VedtakFattetMottakTest {
     private val arenaFagsakId = "12342"
     private val dagpengerFagsakId = UUID.randomUUID()
     private val testPersonIdent = "12345678901"
-    private val nyJournalpostId = 12
+    private val knyttJounalPostTilNySakResponse = KnyttJounalPostTilNySakResponse(12)
     private val testOppgaver =
         listOf(
             ArenaOppgave(
@@ -69,7 +70,7 @@ VedtakFattetMottakTest {
         mockk<JournalpostDokarkiv>().also {
             coEvery {
                 it.knyttJounalPostTilNySak(any(), any(), any())
-            } returns nyJournalpostId.toString()
+            } returns knyttJounalPostTilNySakResponse
         }
 
     init {
@@ -102,9 +103,9 @@ VedtakFattetMottakTest {
         }
 
         verify {
-            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(nyJournalpostId, 1, dagpengerFagsakId)
-            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(nyJournalpostId, 2, dagpengerFagsakId)
-            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(nyJournalpostId, 3, dagpengerFagsakId)
+            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(knyttJounalPostTilNySakResponse.nyJournalpostId, 1, dagpengerFagsakId)
+            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(knyttJounalPostTilNySakResponse.nyJournalpostId, 2, dagpengerFagsakId)
+            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(knyttJounalPostTilNySakResponse.nyJournalpostId, 3, dagpengerFagsakId)
         }
     }
 

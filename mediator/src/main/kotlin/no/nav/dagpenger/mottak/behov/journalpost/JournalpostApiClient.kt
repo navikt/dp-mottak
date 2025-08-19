@@ -3,6 +3,7 @@ package no.nav.dagpenger.mottak.behov.journalpost
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.stringType
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.ClientRequestException
@@ -117,7 +118,7 @@ internal class JournalpostApiClient(
         journalpostId: String,
         dagpengerFagsakId: String,
         ident: String,
-    ): String {
+    ): KnyttJounalPostTilNySakResponse {
         return client.put("/$basePath/journalpost/$journalpostId/knyttTilAnnenSak") {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
             header(HttpHeaders.ContentType, "application/json")
@@ -128,7 +129,7 @@ internal class JournalpostApiClient(
                     bruker = Bruker(id = ident),
                 ),
             )
-        }.bodyAsText()
+        }.body()
     }
 
     private data class KnyttTilAnnenSakRequest(
