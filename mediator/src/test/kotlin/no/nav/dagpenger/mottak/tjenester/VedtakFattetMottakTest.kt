@@ -20,7 +20,6 @@ class
 VedtakFattetMottakTest {
     private val søknadId = UUID.randomUUID()
     private val behandlingId = UUID.randomUUID()
-    private val arenaFagsakId = "12342"
     private val dagpengerFagsakId = UUID.randomUUID()
     private val testPersonIdent = "12345678901"
     private val knyttJounalPostTilNySakResponse = KnyttJounalPostTilNySakResponse(12)
@@ -29,7 +28,7 @@ VedtakFattetMottakTest {
             ArenaOppgave(
                 "1",
                 "søknad1",
-                arenaFagsakId,
+                "12342",
                 1,
             ),
             ArenaOppgave(
@@ -90,7 +89,6 @@ VedtakFattetMottakTest {
             inspektør.message(0).let { message ->
                 message["@event_name"].asText() shouldBe "behov"
                 message["@behov"].map { it.asText() }.single() shouldBe "slett_arena_oppgaver"
-                message["arenaFagsakId"].asText() shouldBe arenaFagsakId
                 message["behandlingId"].asUUID() shouldBe behandlingId
                 message["oppgaveIder"].map { it.asText() } shouldBe listOf("søknad1", "ettersending1", "ettersending2")
                 message["ident"].asText() shouldBe testPersonIdent

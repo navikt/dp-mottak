@@ -55,7 +55,6 @@ internal class VedtakFattetMottak(
                 )
 
             val oppgaveIder = arenaOppgaver.map { it.oppgaveId }
-            val arenaFagsakId: String = arenaOppgaver.single { it.fagsakId != null }.fagsakId ?: throw RuntimeException("Kunne ikke hente arena fagsakid")
 
             runBlocking {
                 arenaOppgaver.forEach { oppgave ->
@@ -80,7 +79,6 @@ internal class VedtakFattetMottak(
                     map =
                         mapOf(
                             "behandlingId" to behandlingId,
-                            "arenaFagsakId" to arenaFagsakId,
                             "oppgaveIder" to oppgaveIder,
                             "ident" to ident,
                         ),
