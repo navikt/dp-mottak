@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling.gosys
 
 import com.natpryce.konfig.Configuration
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.DefaultRequest
@@ -13,7 +14,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.jackson.JacksonConverter
-import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpGosysTokenProvider
 import no.nav.dagpenger.mottak.Config.gosysUrl
 import no.nav.dagpenger.mottak.behov.JsonMapper

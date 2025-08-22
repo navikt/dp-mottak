@@ -1,11 +1,11 @@
 package no.nav.dagpenger.mottak.tjenester
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
 import kotliquery.Session
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
-import mu.KotlinLogging
 import no.nav.dagpenger.mottak.behov.journalpost.SafClient
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
 import org.postgresql.util.PGobject

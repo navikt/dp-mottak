@@ -1,11 +1,11 @@
 package no.nav.dagpenger.mottak.api
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.plugins.BadRequestException
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.put
-import mu.KotlinLogging
 import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.ReplayFerdigstillEvent
 import no.nav.dagpenger.mottak.db.InnsendingRepository

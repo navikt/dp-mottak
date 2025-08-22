@@ -1,9 +1,9 @@
 package no.nav.dagpenger.mottak.behov.person
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import mu.KotlinLogging
 
 private val logg = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.mottak.personoppslag")
