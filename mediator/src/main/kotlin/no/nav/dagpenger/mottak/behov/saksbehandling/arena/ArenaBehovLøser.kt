@@ -79,17 +79,24 @@ internal class ArenaBehovLøser(
 
                         val oppgaveResponse =
                             when (behovNavn) {
-                                "OpprettVurderhenvendelseOppgave" ->
+                                "OpprettVurderhenvendelseOppgave" -> {
+                                    logger.info { "Oppretter oppgave i Arena (vurder henvendelse) for journalpostId $journalpostId" }
                                     arenaOppslag.opprettVurderHenvendelsOppgave(
-                                        journalpostId,
-                                        packet.arenaOppgaveParametre(),
+                                        journalpostId = journalpostId,
+                                        parametere = packet.arenaOppgaveParametre(),
                                     )
+                                    logger.info { "Oppgave opprettet i Arena for journalpostId $journalpostId" }
+                                }
 
-                                "OpprettStartVedtakOppgave" ->
+                                "OpprettStartVedtakOppgave" -> {
+                                    logger.info { "Oppretter oppgave i Arena (start vedtaksbehandling) for journalpostId $journalpostId" }
+
                                     arenaOppslag.opprettStartVedtakOppgave(
                                         journalpostId,
                                         packet.arenaOppgaveParametre(),
                                     )
+                                    logger.info { "Oppgave opprettet i Arena for journalpostId $journalpostId" }
+                                }
 
                                 else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
                             }
