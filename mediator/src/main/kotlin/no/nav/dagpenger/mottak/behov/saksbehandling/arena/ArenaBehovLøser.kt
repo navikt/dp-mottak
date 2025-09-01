@@ -81,21 +81,24 @@ internal class ArenaBehovLøser(
                             when (behovNavn) {
                                 "OpprettVurderhenvendelseOppgave" -> {
                                     logger.info { "Oppretter oppgave i Arena (vurder henvendelse) for journalpostId $journalpostId" }
-                                    arenaOppslag.opprettVurderHenvendelsOppgave(
-                                        journalpostId = journalpostId,
-                                        parametere = packet.arenaOppgaveParametre(),
-                                    )
+                                    val arenaOppslagResponse =
+                                        arenaOppslag.opprettVurderHenvendelsOppgave(
+                                            journalpostId = journalpostId,
+                                            parametere = packet.arenaOppgaveParametre(),
+                                        )
                                     logger.info { "Oppgave opprettet i Arena for journalpostId $journalpostId" }
+                                    arenaOppslagResponse
                                 }
 
                                 "OpprettStartVedtakOppgave" -> {
                                     logger.info { "Oppretter oppgave i Arena (start vedtaksbehandling) for journalpostId $journalpostId" }
-
-                                    arenaOppslag.opprettStartVedtakOppgave(
-                                        journalpostId,
-                                        packet.arenaOppgaveParametre(),
-                                    )
+                                    val arenaOppslagResponse =
+                                        arenaOppslag.opprettStartVedtakOppgave(
+                                            journalpostId,
+                                            packet.arenaOppgaveParametre(),
+                                        )
                                     logger.info { "Oppgave opprettet i Arena for journalpostId $journalpostId" }
+                                    arenaOppslagResponse
                                 }
 
                                 else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
