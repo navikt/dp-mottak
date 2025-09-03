@@ -42,8 +42,7 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag
                     land = it.faktaSvar("faktum.arbeidsforhold.land").asText(),
                 )
             }.onFailure { exception ->
-                logger.error { "Klarte ikke å finne AvsluttetArbeidsforhold (se sikkerlogg)" }
-                sikkerlogg.error(exception) { "Klarte ikke å finne AvsluttetArbeidsforhold" }
+                logger.info(exception) { "Klarte ikke å finne AvsluttetArbeidsforhold" }
             }.getOrNull()
         }
     }
