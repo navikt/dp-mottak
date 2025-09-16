@@ -25,7 +25,7 @@ dependencies {
     implementation(libs.bundles.postgres)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.10.2")
 
-    implementation("com.github.navikt.tbd-libs:naisful-app:2025.08.16-09.21-71db7cad")
+    implementation("com.github.navikt.tbd-libs:naisful-app:2025.09.15-16.10-ac41dc5c")
 
     implementation(libs.bundles.jackson)
 
@@ -44,7 +44,7 @@ dependencies {
     testImplementation("no.bekk.bekkopen:nocommons:0.16.0")
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation("io.ktor:ktor-client-mock-jvm:${libs.versions.ktor.get()}")
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.08.16-09.21-71db7cad")
+    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.09.15-16.10-ac41dc5c")
 }
 
 tasks.withType<ShadowJar> {
