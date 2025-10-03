@@ -16,8 +16,10 @@ internal interface JournalpostDokarkiv {
         journalpostId: String,
         dagpengerFagsakId: String,
         ident: String,
-    ): String
+    ): KnyttJounalPostTilNySakResponse
 }
+
+internal data class KnyttJounalPostTilNySakResponse(val nyJournalpostId: Int)
 
 internal class JournalpostApi {
     internal data class OppdaterJournalpostRequest(

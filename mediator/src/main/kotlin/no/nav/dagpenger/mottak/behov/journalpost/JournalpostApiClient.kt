@@ -2,13 +2,17 @@ package no.nav.dagpenger.mottak.behov.journalpost
 
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.stringType
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.header
 import io.ktor.client.request.patch
 import io.ktor.client.request.put
@@ -19,7 +23,6 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.URLProtocol
 import io.ktor.http.encodedPath
 import io.ktor.serialization.jackson.JacksonConverter
-import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApi.Bruker
@@ -41,6 +44,9 @@ internal class JournalpostApiClient(
             expectSuccess = true
             install(HttpTimeout) {
                 requestTimeoutMillis = 2.minutes.inWholeMilliseconds
+            }
+            install(Logging) {
+                level = LogLevel.INFO
             }
             install(DefaultRequest) {
                 header("X-Nav-Consumer", "dp-mottak")
@@ -112,7 +118,7 @@ internal class JournalpostApiClient(
         journalpostId: String,
         dagpengerFagsakId: String,
         ident: String,
-    ): String {
+    ): KnyttJounalPostTilNySakResponse {
         return client.put("/$basePath/journalpost/$journalpostId/knyttTilAnnenSak") {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
             header(HttpHeaders.ContentType, "application/json")
@@ -123,7 +129,7 @@ internal class JournalpostApiClient(
                     bruker = Bruker(id = ident),
                 ),
             )
-        }.bodyAsText()
+        }.body()
     }
 
     private data class KnyttTilAnnenSakRequest(

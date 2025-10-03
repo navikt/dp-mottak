@@ -27,6 +27,8 @@ internal object Config {
                 "DB_PORT" to "5432",
                 "DB_USERNAME" to "username",
                 "DP_PROXY_SCOPE" to "api://dev-fss.teamdagpenger.dp-proxy/.default",
+                "DP_SAKSBEHANDLING_URL" to "http://dp-saksbehandling",
+                "DP_SAKSBEHANDLING_SCOPE" to "api://dev-gcp.teamdagpenger.dp-saksbehandling/.default",
                 "HTTP_PORT" to "8080",
                 "KAFKA_CONSUMER_GROUP_ID" to "dp-mottak-v1",
                 "KAFKA_EXTRA_TOPIC" to "teamdagpenger.mottak.v1,teamdagpenger.regel.v1",
@@ -64,6 +66,14 @@ internal object Config {
         }
     }
     val dpSaksbehandlingUrl: String by lazy {
+        properties[Key("DP_SAKSBEHANDLING_URL", stringType)]
+    }
+
+    val env by lazy {
+        properties.getOrElse(Key("NAIS_CLUSTER_NAME", stringType)) { "prod-gcp" }
+    }
+
+    val dpSaksbehandlingBaseUrl by lazy {
         properties[Key("DP_SAKSBEHANDLING_URL", stringType)]
     }
 
@@ -117,12 +127,18 @@ internal object Config {
         }
     }
 
+    val Configuration.dpSaksbehandlingTokenProvider: () -> String by lazy {
+        {
+            cachedTokenProvider.clientCredentials(properties[Key("DP_SAKSBEHANDLING_SCOPE", stringType)]).access_token ?: tokenfeil()
+        }
+    }
+
     internal val objectMapper =
         jacksonObjectMapper()
             .registerModule(JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
-    private fun tokenfeil(): Nothing = throw RuntimeException("Kunne opprettet token")
+    private fun tokenfeil(): Nothing = throw RuntimeException("Kunne ikke opprette token")
 
     val kafkaProducerProperties: Properties by lazy {
         Properties().apply {

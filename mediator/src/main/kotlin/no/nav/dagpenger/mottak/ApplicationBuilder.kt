@@ -2,12 +2,13 @@ package no.nav.dagpenger.mottak
 
 import com.github.navikt.tbd_libs.naisful.naisApp
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.Clock
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.prometheus.metrics.model.registry.PrometheusRegistry
-import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dokarkivTokenProvider
+import no.nav.dagpenger.mottak.Config.dpSaksbehandlingTokenProvider
 import no.nav.dagpenger.mottak.Config.objectMapper
 import no.nav.dagpenger.mottak.api.innsendingApi
 import no.nav.dagpenger.mottak.api.installPlugins
@@ -23,10 +24,13 @@ import no.nav.dagpenger.mottak.behov.person.PdlPersondataOppslag
 import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.SkjermingOppslag
 import no.nav.dagpenger.mottak.behov.person.createPersonOppslag
+import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveBehovLøser
+import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveHttpKlient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaApiClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.OpprettGosysOppgaveLøser
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.MiljøBasertRuting
 import no.nav.dagpenger.mottak.db.InnsendingMetadataPostgresRepository
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
@@ -37,7 +41,9 @@ import no.nav.dagpenger.mottak.observers.InnsendingProbe
 import no.nav.dagpenger.mottak.observers.MetrikkObserver
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import no.nav.dagpenger.mottak.tjenester.SaksbehandlingHttpKlient
+import no.nav.dagpenger.mottak.tjenester.VedtakFattetMottak
 import no.nav.helse.rapids_rivers.RapidApplication
+import org.slf4j.LoggerFactory
 
 private val logg = KotlinLogging.logger {}
 
@@ -64,8 +70,8 @@ internal class ApplicationBuilder(
                                 Clock.SYSTEM,
                             ),
                         objectMapper = objectMapper,
-                        applicationLogger = KotlinLogging.logger("ApplicationLogger"),
-                        callLogger = KotlinLogging.logger("CallLogger"),
+                        applicationLogger = LoggerFactory.getLogger("ApplicationLogger"),
+                        callLogger = LoggerFactory.getLogger("CallLogger"),
                         aliveCheck = rapid::isReady,
                         readyCheck = rapid::isReady,
                         preStopHook = preStopHook::handlePreStopRequest,
@@ -114,6 +120,21 @@ internal class ApplicationBuilder(
                 SøknadsdataBehovLøser(safClient, this)
                 ArenaBehovLøser(arenaApiClient, this)
                 OpprettGosysOppgaveLøser(gosysOppslag, this)
+                VedtakFattetMottak(
+                    rapidsConnection = this,
+                    innsendingMetadataRepository = innsendingMetadataRepository,
+                    journalpostDokarkiv = journalpostApiClient,
+                )
+                OppgaveBehovLøser(
+                    arenaOppslag = arenaApiClient,
+                    oppgaveKlient =
+                        OppgaveHttpKlient(
+                            dpSaksbehandlingBaseUrl = Config.dpSaksbehandlingBaseUrl,
+                            tokenProvider = Config.properties.dpSaksbehandlingTokenProvider,
+                        ),
+                    oppgaveRuting = MiljøBasertRuting(),
+                    rapidsConnection = this,
+                )
             }
 
     init {

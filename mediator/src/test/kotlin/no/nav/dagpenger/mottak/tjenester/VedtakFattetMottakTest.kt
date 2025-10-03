@@ -10,6 +10,7 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostDokarkiv
+import no.nav.dagpenger.mottak.behov.journalpost.KnyttJounalPostTilNySakResponse
 import no.nav.dagpenger.mottak.db.ArenaOppgave
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import org.junit.jupiter.api.Test
@@ -19,16 +20,15 @@ class
 VedtakFattetMottakTest {
     private val søknadId = UUID.randomUUID()
     private val behandlingId = UUID.randomUUID()
-    private val arenaFagsakId = "12342"
     private val dagpengerFagsakId = UUID.randomUUID()
     private val testPersonIdent = "12345678901"
-    private val nyJournalpostId = 12
+    private val knyttJounalPostTilNySakResponse = KnyttJounalPostTilNySakResponse(12)
     private val testOppgaver =
         listOf(
             ArenaOppgave(
                 "1",
                 "søknad1",
-                arenaFagsakId,
+                "12342",
                 1,
             ),
             ArenaOppgave(
@@ -69,7 +69,7 @@ VedtakFattetMottakTest {
         mockk<JournalpostDokarkiv>().also {
             coEvery {
                 it.knyttJounalPostTilNySak(any(), any(), any())
-            } returns nyJournalpostId.toString()
+            } returns knyttJounalPostTilNySakResponse
         }
 
     init {
@@ -89,9 +89,9 @@ VedtakFattetMottakTest {
             inspektør.message(0).let { message ->
                 message["@event_name"].asText() shouldBe "behov"
                 message["@behov"].map { it.asText() }.single() shouldBe "slett_arena_oppgaver"
-                message["arenaFagsakId"].asText() shouldBe arenaFagsakId
                 message["behandlingId"].asUUID() shouldBe behandlingId
                 message["oppgaveIder"].map { it.asText() } shouldBe listOf("søknad1", "ettersending1", "ettersending2")
+                message["ident"].asText() shouldBe testPersonIdent
             }
         }
         coVerify(exactly = 1) {
@@ -101,41 +101,20 @@ VedtakFattetMottakTest {
         }
 
         verify {
-            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(nyJournalpostId, 1, dagpengerFagsakId)
-            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(nyJournalpostId, 2, dagpengerFagsakId)
-            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(nyJournalpostId, 3, dagpengerFagsakId)
+            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(knyttJounalPostTilNySakResponse.nyJournalpostId, 1, dagpengerFagsakId)
+            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(knyttJounalPostTilNySakResponse.nyJournalpostId, 2, dagpengerFagsakId)
+            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(knyttJounalPostTilNySakResponse.nyJournalpostId, 3, dagpengerFagsakId)
         }
-    }
-
-    @Test
-    fun `Skal ikke sende ut behov for sletting av Arena-oppgaver når vedtak er fattet i fagsystem Arena`() {
-        testRapid.sendTestMessage(vedtakFattetIArenaJson)
-        testRapid.inspektør.size shouldBe 0
     }
 
     private val vedtakFattetIDagpengerJson =
         """
         {
-            "@event_name": "vedtak_fattet",
-            "ident": "$testPersonIdent",
-            "søknadId": "$søknadId",
+            "@event_name": "vedtak_fattet_utenfor_arena",
             "behandlingId": "$behandlingId",
-            "fagsakId": "$dagpengerFagsakId",
-            "fagsystem": "Dagpenger",
-            "automatisk": true
-        }
-        """.trimIndent()
-
-    private val vedtakFattetIArenaJson =
-        """
-        {
-            "@event_name": "vedtak_fattet",
-            "ident": "$testPersonIdent",
             "søknadId": "$søknadId",
-            "behandlingId": "$behandlingId",
-            "fagsakId": "$arenaFagsakId",
-            "fagsystem": "Arena",
-            "automatisk": true
+            "ident": "$testPersonIdent",
+            "sakId": "$dagpengerFagsakId"
         }
         """.trimIndent()
 }

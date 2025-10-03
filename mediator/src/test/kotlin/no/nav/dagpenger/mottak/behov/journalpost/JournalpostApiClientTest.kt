@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
-import io.kotest.assertions.json.shouldEqualJson
 import io.kotest.assertions.json.shouldEqualSpecifiedJson
 import io.kotest.matchers.shouldBe
 import io.ktor.client.engine.mock.MockEngine
@@ -66,7 +65,7 @@ class JournalpostApiClientTest {
     fun `skal kunne knytte en journalpost til en annen fagsak`() {
         runBlocking {
             val gammelJournalpostId = "123"
-            val nyJournalpostId = "456"
+            val nyJournalpostId = 456
             val mockHttpEngine =
                 MockEngine { request ->
                     respond(
@@ -81,11 +80,7 @@ class JournalpostApiClientTest {
                 journalpostId = gammelJournalpostId,
                 dagpengerFagsakId = "fagsakId",
                 ident = "ident",
-            ) shouldEqualJson
-                //language=json
-                """
-                {"nyJournalpostId": "$nyJournalpostId"}
-                """.trimIndent()
+            ) shouldBe KnyttJounalPostTilNySakResponse(nyJournalpostId = nyJournalpostId)
 
             mockHttpEngine.requestHistory.single().let { request ->
                 request.method.value shouldBe "PUT"

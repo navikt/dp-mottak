@@ -7,10 +7,10 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.withMDC
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
-import mu.KotlinLogging
 
 internal class ArenaBehovLøser(
     arenaOppslag: ArenaOppslag,
@@ -63,7 +63,7 @@ internal class ArenaBehovLøser(
             val behovId = packet["@behovId"].asText()
 
             if (emptyList<String>().contains(journalpostId)) {
-                logger.warn { "SKipper $journalpostId" }
+                logger.warn { "Skipper journalpost $journalpostId fra ArenaBehovLøser" }
                 return
             }
 
@@ -79,17 +79,27 @@ internal class ArenaBehovLøser(
 
                         val oppgaveResponse =
                             when (behovNavn) {
-                                "OpprettVurderhenvendelseOppgave" ->
-                                    arenaOppslag.opprettVurderHenvendelsOppgave(
-                                        journalpostId,
-                                        packet.arenaOppgaveParametre(),
-                                    )
+                                "OpprettVurderhenvendelseOppgave" -> {
+                                    logger.info { "Oppretter oppgave i Arena (vurder henvendelse) for journalpostId $journalpostId" }
+                                    val arenaOppslagResponse =
+                                        arenaOppslag.opprettVurderHenvendelsOppgave(
+                                            journalpostId = journalpostId,
+                                            parametere = packet.arenaOppgaveParametre(),
+                                        )
+                                    logger.info { "Oppgave opprettet i Arena for journalpostId $journalpostId" }
+                                    arenaOppslagResponse
+                                }
 
-                                "OpprettStartVedtakOppgave" ->
-                                    arenaOppslag.opprettStartVedtakOppgave(
-                                        journalpostId,
-                                        packet.arenaOppgaveParametre(),
-                                    )
+                                "OpprettStartVedtakOppgave" -> {
+                                    logger.info { "Oppretter oppgave i Arena (start vedtaksbehandling) for journalpostId $journalpostId" }
+                                    val arenaOppslagResponse =
+                                        arenaOppslag.opprettStartVedtakOppgave(
+                                            journalpostId,
+                                            packet.arenaOppgaveParametre(),
+                                        )
+                                    logger.info { "Oppgave opprettet i Arena for journalpostId $journalpostId" }
+                                    arenaOppslagResponse
+                                }
 
                                 else -> throw IllegalArgumentException("Uventet behov: $behovNavn")
                             }
@@ -109,7 +119,7 @@ internal class ArenaBehovLøser(
                         } else {
                             packet["@løsning"] =
                                 mapOf(
-                                    behovNavn to mapOf("@feil" to "Kunne ikke opprettet Arena oppgave"),
+                                    behovNavn to mapOf("@feil" to "Kunne ikke opprette Arena oppgave"),
                                 ).also {
                                     logger.info { "Løste behov $behovNavn med feil $it" }
                                 }
@@ -126,7 +136,7 @@ internal class ArenaBehovLøser(
     }
 }
 
-private fun JsonMessage.arenaOppgaveParametre(): OpprettArenaOppgaveParametere =
+internal fun JsonMessage.arenaOppgaveParametre(): OpprettArenaOppgaveParametere =
     OpprettArenaOppgaveParametere(
         naturligIdent = this["fødselsnummer"].asText(),
         behandlendeEnhetId = this["behandlendeEnhetId"].asText(),

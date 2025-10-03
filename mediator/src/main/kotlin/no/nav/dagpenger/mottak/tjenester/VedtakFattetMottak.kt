@@ -6,10 +6,10 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
-import mu.KotlinLogging
-import mu.withLoggingContext
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostDokarkiv
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import java.util.UUID
@@ -24,10 +24,11 @@ internal class VedtakFattetMottak(
     companion object {
         val rapidFilter: River.() -> Unit = {
             precondition {
-                it.requireValue("@event_name", "vedtak_fattet")
-                it.requireValue("fagsystem", "Dagpenger")
+                it.requireValue("@event_name", "vedtak_fattet_utenfor_arena")
             }
-            validate { it.requireKey("ident", "søknadId", "behandlingId", "fagsakId", "automatisk") }
+            validate {
+                it.requireKey("behandlingId", "søknadId", "ident", "sakId")
+            }
         }
     }
 
@@ -44,8 +45,14 @@ internal class VedtakFattetMottak(
         val søknadId = packet["søknadId"].asUUID()
         val behandlingId = packet["behandlingId"].asUUID()
         val ident = packet["ident"].asText()
+        val dagpengerFagsakId = packet["sakId"].asUUID()
+        val skipSet = setOf("0198cb75-5f7d-789c-ab1f-72998e1d5492")
         withLoggingContext("søknadId" to "$søknadId", "behandlingId" to "$behandlingId") {
-            logger.info { "Mottok vedtak_fattet hendelse" }
+            logger.info { "Mottok vedtak_fattet_utenfor_arena" }
+            if (behandlingId.toString() in skipSet) {
+                logger.info { "Skipper behandlingId $behandlingId fra mottak vedtak_fattet_utenfor_arena" }
+                return
+            }
             val arenaOppgaver =
                 innsendingMetadataRepository.hentArenaOppgaver(
                     søknadId = søknadId,
@@ -53,19 +60,18 @@ internal class VedtakFattetMottak(
                 )
 
             val oppgaveIder = arenaOppgaver.map { it.oppgaveId }
-            val arenaFagsakId: String = arenaOppgaver.single { it.fagsakId != null }.fagsakId ?: throw RuntimeException("Kunne ikke hente arena fagsakid")
-            val dagpengerFagsakId = packet["fagsakId"].asUUID()
 
             runBlocking {
                 arenaOppgaver.forEach { oppgave ->
-                    val nyJournalPostId =
+                    val knyttJounalPostTilNySakResponse =
                         journalpostDokarkiv.knyttJounalPostTilNySak(
                             journalpostId = oppgave.journalpostId,
                             dagpengerFagsakId = dagpengerFagsakId.toString(),
                             ident = ident,
                         )
+
                     innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(
-                        jounalpostId = nyJournalPostId.toInt(),
+                        jounalpostId = knyttJounalPostTilNySakResponse.nyJournalpostId,
                         innsendingId = oppgave.innsendingId,
                         fagsakId = dagpengerFagsakId,
                     )
@@ -78,8 +84,8 @@ internal class VedtakFattetMottak(
                     map =
                         mapOf(
                             "behandlingId" to behandlingId,
-                            "arenaFagsakId" to arenaFagsakId,
                             "oppgaveIder" to oppgaveIder,
+                            "ident" to ident,
                         ),
                 ).toJson()
             context.publish(ident, message)

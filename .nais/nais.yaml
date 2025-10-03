@@ -8,7 +8,7 @@ metadata:
   annotations:
     config.linkerd.io/proxy-outbound-connect-timeout: 3000ms
 spec:
-  image: {{image}}
+  image: "{{image}}"
   port: 8080
   strategy:
     type: RollingUpdate # Bruk kun Recreate når vi deployer store/ukompatible migreringer
@@ -23,6 +23,10 @@ spec:
     enabled: true
     path: /metrics
   observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
     autoInstrumentation:
       enabled: false
       runtime: "java"
@@ -38,7 +42,7 @@ spec:
   secureLogs:
     enabled: true
   kafka:
-    pool: {{kafka_pool}}
+    pool: "{{kafka_pool}}"
   azure:
     application:
       enabled: true
@@ -47,19 +51,21 @@ spec:
           - id: "4edb2ce5-4f0e-4f6f-9b82-b8e75e9dd09e"
   env:
     - name: DP_PROXY_HOST
-      value: {{dp_proxy.ingress}}
+      value: "{{dp_proxy.ingress}}"
+    - name: DP_SAKSBEHANDLING_SCOPE
+      value: "{{dp_saksbehandling.scope}}"
     - name: PDL_API_HOST
-      value: {{pdl.ingress}}
+      value: "{{pdl.ingress}}"
     - name: DOKARKIV_INGRESS
-      value: {{dokarkiv.ingress}}
+      value: "{{dokarkiv.ingress}}"
     - name: OPPGAVE_SCOPE
-      value: {{oppgave.scope}}
+      value: "{{oppgave.scope}}"
     - name: OPPGAVE_URL
-      value: {{oppgave.ingress}}
+      value: "{{oppgave.ingress}}"
     - name: SAF_URL
-      value: {{saf.ingress}}
+      value: "{{saf.ingress}}"
     - name: SAF_SCOPE
-      value: {{saf.scope}}
+      value: "{{saf.scope}}"
   envFrom:
     - secret: dp-mottak-unleash-api-token
   accessPolicy:
@@ -71,14 +77,15 @@ spec:
        - application: dp-saksbehandling
        - application: skjermede-personer-pip
          namespace: nom
-       - application: {{ oppgave.app }}
+       - application: "{{ oppgave.app }}"
          namespace: oppgavehandtering
-       - application: {{ saf.app }}
+       - application: "{{ saf.app }}"
          namespace: teamdokumenthandtering
+       - application: dp-saksbehandling
       external:
-        - host: {{dp_proxy.ingress}}
-        - host: {{pdl.ingress}}
-        - host: {{dokarkiv.ingress}}
+        - host: "{{dp_proxy.ingress}}"
+        - host: "{{pdl.ingress}}"
+        - host: "{{dokarkiv.ingress}}"
         - host: teamdagpenger-unleash-api.nav.cloud.nais.io
   {{#if ingresses}}
   ingresses:
@@ -90,7 +97,7 @@ spec:
     sqlInstances:
       - name: dp-mottak
         type: POSTGRES_16
-        tier:  {{db_tier}}
+        tier:  "{{db_tier}}"
         diskType: SSD
         highAvailability: true
         diskSize: {{db_size}}

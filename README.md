@@ -23,7 +23,7 @@ Skjemakoder og hvilke behandlende enhet (benk) en blir sendt til, se [tilstander
 
 ## Databasediagram
 
-![databasediagram](docs/db/DB-layout-2025-02-13.png)
+![databasediagram](docs/db/DB-layout-2025-09-24.png)
 
 
 ## HOWTOS
@@ -77,5 +77,4 @@ Spørsmål knyttet til koden eller prosjektet kan rettes mot:
 * Eller en annen måte for omverden å kontakte teamet på
 
 ## For NAV-ansatte
-
 Interne henvendelser kan sendes via Slack i kanalen #team-dagpenger-dev.

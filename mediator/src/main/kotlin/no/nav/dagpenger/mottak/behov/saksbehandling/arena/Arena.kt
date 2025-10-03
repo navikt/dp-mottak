@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling.arena
 
 import com.natpryce.konfig.Configuration
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -15,7 +16,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.jackson.JacksonConverter
-import mu.KotlinLogging
 import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
 import no.nav.dagpenger.mottak.behov.JsonMapper
@@ -34,13 +34,6 @@ internal interface ArenaOppslag {
         journalpostId: String,
         parametere: OpprettArenaOppgaveParametere,
     ): OpprettVedtakOppgaveResponse?
-}
-
-internal interface ArenaKlient {
-    suspend fun slettOppgaver(
-        fagsakId: String,
-        oppgaveIder: List<String>,
-    )
 }
 
 internal class ArenaApiClient(config: Configuration) : ArenaOppslag {

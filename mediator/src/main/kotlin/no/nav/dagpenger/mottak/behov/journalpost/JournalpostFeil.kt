@@ -1,6 +1,6 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.mottak.behov.JsonMapper
 
 internal interface JournalpostFeil {
@@ -35,6 +35,9 @@ internal interface JournalpostFeil {
                         throw journalpostException
                     }
                 }
+            }
+            else -> {
+                throw journalpostException
             }
         }
     }

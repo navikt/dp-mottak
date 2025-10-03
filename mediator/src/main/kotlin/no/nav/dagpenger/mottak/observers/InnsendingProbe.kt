@@ -1,6 +1,6 @@
 package no.nav.dagpenger.mottak.observers
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.mottak.InnsendingObserver
 
 internal object InnsendingProbe : InnsendingObserver {

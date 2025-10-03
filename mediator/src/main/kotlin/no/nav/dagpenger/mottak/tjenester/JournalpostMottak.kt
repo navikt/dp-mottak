@@ -7,9 +7,9 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.github.oshai.kotlinlogging.KotlinLogging
+import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
-import mu.KotlinLogging
-import mu.withLoggingContext
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.JsonMessageExtensions.getOrNull
@@ -75,11 +75,12 @@ internal class JournalpostMottak(
                                 },
                             registrertDato =
                                 it["relevanteDatoer"]
-                                    .firstOrNull {
-                                        it["datotype"].asText() == "DATO_REGISTRERT"
+                                    .firstOrNull { relevantDato ->
+                                        relevantDato["datotype"].asText() == "DATO_REGISTRERT"
                                     }?.get("dato")
                                     ?.asText()
-                                    .let { LocalDateTime.parse(it) } ?: LocalDateTime.now(),
+                                    ?.let { relevantDato -> LocalDateTime.parse(relevantDato) }
+                                    ?: LocalDateTime.now(),
                             behandlingstema = it["behandlingstema"].textValue(),
                             journalførendeEnhet = it["journalfoerendeEnhet"]?.asText(),
                         ).also {

@@ -1,8 +1,11 @@
 package no.nav.dagpenger.mottak.e2e
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.InnsendingTilstandType
+import no.nav.dagpenger.mottak.InnsendingVisitor
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
@@ -12,6 +15,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import java.time.LocalDateTime.now
 import java.util.UUID
 import kotlin.random.Random
@@ -22,6 +27,11 @@ internal class MediatorE2ETest {
     private val testRapid = TestRapid()
 
     private val testObservatør = TestObservatør()
+
+    private object DagpengerOppgave {
+        val oppgaveId = UUID.randomUUID()
+        val fagsakId = UUID.randomUUID()
+    }
 
     @BeforeEach
     fun setup() {
@@ -156,6 +166,46 @@ internal class MediatorE2ETest {
                 "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
             )
             assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["NAV 90-00.08", "NAV 90-00.08 K", "NAVe 90-00.08 K", "NAV 90-00.08 A", "NAVe 90-00.08 A"])
+    fun `Skal motta klage og anke i DAGPENGER`(brevkode: String) {
+        withMigratedDb {
+            settOppInfrastruktur()
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = brevkode))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("OpprettOppgave", 2)
+            håndterHendelse(opprettDagpengerOppgaveHendelse())
+            assertInnsending(journalpostId.toString()) { testInnsendingVisitor ->
+                testInnsendingVisitor.fagsakId shouldBe DagpengerOppgave.fagsakId
+                testInnsendingVisitor.oppgaveId shouldBe DagpengerOppgave.oppgaveId
+            }
+            assertBehov("OppdaterJournalpost", 3)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertBehov("FerdigstillJournalpost", 4)
+            håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+            assertTrue(
+                testRapid.inspektør.size == 5,
+                "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
+            )
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        }
+    }
+
+    private fun assertInnsending(
+        journalpostId: String,
+        assertBlock: (innsending: TestInnsendingVisitor) -> Unit,
+    ) {
+        InnsendingPostgresRepository(
+            PostgresDataSourceBuilder.dataSource,
+        ).let {
+            val innsending = requireNotNull(it.hent(journalpostId))
+            assertBlock(TestInnsendingVisitor(innsending))
         }
     }
 
@@ -315,7 +365,7 @@ internal class MediatorE2ETest {
                   "journalpostId": "$journalpostId",
                   "@løsning": {
                     "OpprettStartVedtakOppgave": {
-                      "@feil" : "Kunne ikke opprettet arenaoppgave"
+                      "@feil" : "Kunne ikke opprette Arena oppgave"
                     }
                   }
         }
@@ -423,4 +473,43 @@ internal class MediatorE2ETest {
           }
         }
         """.trimIndent()
+
+    //language=JSON
+    private fun opprettDagpengerOppgaveHendelse(): String =
+        """
+        {
+          "@event_name": "behov",
+          "@final": true,
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "OpprettOppgave"
+          ],
+          "@opprettet" : "${now()}",
+          "journalpostId": "$journalpostId",
+          "@løsning": {
+            "OpprettOppgave": {
+                "fagsakId": "${DagpengerOppgave.fagsakId}",
+                "oppgaveId": "${DagpengerOppgave.oppgaveId}",
+                "fagsystem": "DAGPENGER"
+            }
+          }
+        }
+        """.trimIndent()
+
+    private class TestInnsendingVisitor(innsending: Innsending) : InnsendingVisitor {
+        var oppgaveId: UUID? = null
+        var fagsakId: UUID? = null
+
+        init {
+            innsending.accept(this)
+        }
+
+        override fun visitOppgaveSak(
+            oppgaveId: UUID,
+            fagsakId: UUID,
+        ) {
+            this.oppgaveId = oppgaveId
+            this.fagsakId = fagsakId
+        }
+    }
 }

@@ -6,16 +6,15 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.withMDC
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
-import mu.KotlinLogging
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApi.OppdaterJournalpostRequest
 
 internal class OppdaterJournalpostBehovLøser(
     private val journalpostDokarkiv: JournalpostDokarkiv,
     rapidsConnection: RapidsConnection,
-) : River.PacketListener,
-    JournalpostFeil {
+) : River.PacketListener, JournalpostFeil {
     private companion object {
         val logger = KotlinLogging.logger { }
     }
@@ -41,6 +40,10 @@ internal class OppdaterJournalpostBehovLøser(
     ) {
         val journalpostId = packet["journalpostId"].asText()
         val behovId = packet["@behovId"].asText()
+        if (emptyList<String>().contains(journalpostId)) {
+            logger.warn { "Skipper journalpost $journalpostId fra OppdaterJournalpostBehovLøser" }
+            return
+        }
         withMDC(
             mapOf(
                 "behovId" to behovId,

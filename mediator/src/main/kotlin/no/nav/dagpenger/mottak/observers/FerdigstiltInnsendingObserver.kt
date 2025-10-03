@@ -1,7 +1,7 @@
 package no.nav.dagpenger.mottak.observers
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.mottak.InnsendingObserver
 import org.apache.kafka.clients.producer.KafkaProducer
 import org.apache.kafka.clients.producer.Producer

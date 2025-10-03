@@ -1,7 +1,7 @@
 package no.nav.dagpenger.mottak.meldinger.søknadsdata
 
 import com.fasterxml.jackson.databind.JsonNode
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.mottak.AvsluttedeArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak
@@ -42,8 +42,7 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag
                     land = it.faktaSvar("faktum.arbeidsforhold.land").asText(),
                 )
             }.onFailure { exception ->
-                logger.error { "Klarte ikke å finne AvsluttetArbeidsforhold (se sikkerlogg)" }
-                sikkerlogg.error(exception) { "Klarte ikke å finne AvsluttetArbeidsforhold" }
+                logger.info(exception) { "Klarte ikke å finne AvsluttetArbeidsforhold" }
             }.getOrNull()
         }
     }
