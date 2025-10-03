@@ -8,7 +8,6 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.prometheus.metrics.model.registry.PrometheusRegistry
 import no.nav.dagpenger.mottak.Config.dokarkivTokenProvider
-import no.nav.dagpenger.mottak.Config.dpSaksbehandlingTokenProvider
 import no.nav.dagpenger.mottak.Config.objectMapper
 import no.nav.dagpenger.mottak.api.innsendingApi
 import no.nav.dagpenger.mottak.api.installPlugins
@@ -97,7 +96,7 @@ internal class ApplicationBuilder(
                                 FerdigstiltEttersendingObserver(
                                     saksbehandlingKlient =
                                         SaksbehandlingHttpKlient(
-                                            dpSaksbehandlingUrl = Config.dpSaksbehandlingUrl,
+                                            dpSaksbehandlingBaseUrl = Config.dpSaksbehandlingBaseUrl,
                                             tokenProvider = Config.dpSaksbehandlingTokenProvider,
                                         ),
                                     gosysClient = gosysOppslag,
@@ -130,7 +129,7 @@ internal class ApplicationBuilder(
                     oppgaveKlient =
                         OppgaveHttpKlient(
                             dpSaksbehandlingBaseUrl = Config.dpSaksbehandlingBaseUrl,
-                            tokenProvider = Config.properties.dpSaksbehandlingTokenProvider,
+                            tokenProvider = Config.dpSaksbehandlingTokenProvider,
                         ),
                     oppgaveRuting = MiljøBasertRuting(),
                     rapidsConnection = this,

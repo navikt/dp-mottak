@@ -42,8 +42,6 @@ internal object Config {
                 "AZURE_OPENID_CONFIG_JWKS_URI" to "http://localhost:4443",
                 "DOKARKIV_SCOPE" to "api://dev-fss.teamdokumenthandtering.dokarkiv-q1/.default",
                 "DOKARKIV_INGRESS" to "dokarkiv.dev-fss-pub.nais.io",
-                "DP_SAKSBEHANDLING_URL" to "http://dp-saksbehandling/person/skal-varsle-om-ettersending",
-                "DP_SAKSBEHANDLING_SCOPE" to "api://dev-gcp.teamdagpenger.dp-saksbehandling/.default",
             ),
         )
     private val prodProperties =
@@ -64,9 +62,6 @@ internal object Config {
             "prod-gcp" -> systemAndEnvProperties overriding prodProperties overriding defaultProperties
             else -> systemAndEnvProperties overriding defaultProperties
         }
-    }
-    val dpSaksbehandlingUrl: String by lazy {
-        properties[Key("DP_SAKSBEHANDLING_URL", stringType)]
     }
 
     val env by lazy {

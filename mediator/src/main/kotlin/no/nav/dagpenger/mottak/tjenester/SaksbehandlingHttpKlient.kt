@@ -26,7 +26,7 @@ interface SaksbehandlingKlient {
 }
 
 class SaksbehandlingHttpKlient(
-    private val dpSaksbehandlingUrl: String = Config.dpSaksbehandlingUrl,
+    private val dpSaksbehandlingBaseUrl: String = Config.dpSaksbehandlingBaseUrl,
     private val tokenProvider: () -> String = Config.dpSaksbehandlingTokenProvider,
     private val httpClient: HttpClient = httpClient(),
 ) : SaksbehandlingKlient {
@@ -54,7 +54,7 @@ class SaksbehandlingHttpKlient(
         søknadId: String,
         ident: String,
     ): Boolean {
-        return httpClient.post(dpSaksbehandlingUrl) {
+        return httpClient.post(urlString = "$dpSaksbehandlingBaseUrl/person/skal-varsle-om-ettersending") {
             header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
             setBody(
                 SoknadDTO(
