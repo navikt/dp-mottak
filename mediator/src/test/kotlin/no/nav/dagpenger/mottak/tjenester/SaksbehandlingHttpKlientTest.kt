@@ -13,7 +13,7 @@ import io.ktor.http.headersOf
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingHttpKlient
-import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingKlient
+import no.nav.dagpenger.mottak.behov.saksbehandling.SisteSakIdResult
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.UUID
@@ -47,14 +47,14 @@ class SaksbehandlingHttpKlientTest {
             )
 
         runBlocking {
-            saksbehandlingHttpKlient.hentSisteSakId(personMedSak) shouldBe SaksbehandlingKlient.SisteSakIdResult.Success(sisteSakId)
-            saksbehandlingHttpKlient.hentSisteSakId(personUtenSak) shouldBe SaksbehandlingKlient.SisteSakIdResult.NotFound
+            saksbehandlingHttpKlient.hentSisteSakId(personMedSak) shouldBe SisteSakIdResult.Success(sisteSakId)
+            saksbehandlingHttpKlient.hentSisteSakId(personUtenSak) shouldBe SisteSakIdResult.NotFound
         }
 
         requireNotNull(requestData).let { request ->
             request.method.value shouldBe "POST"
             request.headers[HttpHeaders.Authorization] shouldBe "Bearer token"
-            request.url.toString() shouldBe "http://dp-saksbehandling/person/siste-sak"
+            request.url.toString() shouldBe "http://dp-saksbehandling/sak/siste-sak-id/for-ident"
         }
     }
 

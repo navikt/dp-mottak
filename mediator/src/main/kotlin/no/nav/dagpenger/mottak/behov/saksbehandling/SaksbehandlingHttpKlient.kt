@@ -36,12 +36,6 @@ interface SaksbehandlingKlient {
     ): UUID
 
     suspend fun hentSisteSakId(ident: String): SisteSakIdResult
-
-    sealed class SisteSakIdResult {
-        data class Success(val id: UUID) : SisteSakIdResult()
-
-        object NotFound : SisteSakIdResult()
-    }
 }
 
 class SaksbehandlingHttpKlient(
@@ -84,8 +78,8 @@ class SaksbehandlingHttpKlient(
         }.body<OpprettOppgaveResponse>().oppgaveId
     }
 
-    override suspend fun hentSisteSakId(ident: String): SaksbehandlingKlient.SisteSakIdResult {
-        return httpClient.post(urlString = "$dpSaksbehandlingBaseUrl/person/siste-sak") {
+    override suspend fun hentSisteSakId(ident: String): SisteSakIdResult {
+        return httpClient.post(urlString = "$dpSaksbehandlingBaseUrl/sak/siste-sak-id/for-ident") {
             header(HttpHeaders.Accept, ContentType.Application.Json)
             header(HttpHeaders.ContentType, ContentType.Application.Json)
             setBody(
@@ -94,11 +88,11 @@ class SaksbehandlingHttpKlient(
         }.let { httpResponse ->
             when (httpResponse.status) {
                 HttpStatusCode.OK -> {
-                    httpResponse.body<SaksbehandlingKlient.SisteSakIdResult.Success>()
+                    httpResponse.body<SisteSakIdResult.Success>()
                 }
 
                 HttpStatusCode.NoContent -> {
-                    SaksbehandlingKlient.SisteSakIdResult.NotFound
+                    SisteSakIdResult.NotFound
                 }
 
                 else -> throw RuntimeException("Uventet svar fra dp-saksbehandling: ${httpResponse.status}")
@@ -148,3 +142,9 @@ private data class OpprettOppgaveRequest(
 private data class OpprettOppgaveResponse(
     val oppgaveId: UUID,
 )
+
+sealed class SisteSakIdResult {
+    data class Success(val id: UUID) : SisteSakIdResult()
+
+    object NotFound : SisteSakIdResult()
+}
