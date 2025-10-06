@@ -7,9 +7,14 @@ import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
 import io.ktor.client.request.HttpRequestData
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.headersOf
+import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.runBlocking
-import no.nav.dagpenger.mottak.tjenester.SaksbehandlingHttpKlient.Companion.httpClient
+import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingHttpKlient
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 import java.util.UUID
 
 class SaksbehandlingHttpKlientTest {
@@ -25,7 +30,7 @@ class SaksbehandlingHttpKlientTest {
             }
         val saksbehandlingHttpKlient =
             SaksbehandlingHttpKlient(
-                httpClient = httpClient(mockEngine),
+                engine = mockEngine,
                 tokenProvider = { "token" },
             )
 
@@ -47,6 +52,56 @@ class SaksbehandlingHttpKlientTest {
                     }
                 """
             }
+        }
+    }
+
+    @Test
+    fun `skal kunne opprette en klage`() {
+        val fagsakId = UUID.randomUUID()
+        val journalpostId = "jp"
+        val opprettetTidspunkt = LocalDateTime.now()
+        val ident = "12345678901"
+        val oppgaveId = UUID.randomUUID()
+
+        var httpRequestData: HttpRequestData? = null
+
+        val mockHttpEngine =
+            MockEngine { request ->
+                httpRequestData = request
+                respond(
+                    content =
+                        ByteReadChannel(
+                            """
+                            {
+                                "oppgaveId": "$oppgaveId"
+                            }
+                            """.trimIndent(),
+                        ),
+                    status = HttpStatusCode.Created,
+                    headers = headersOf(HttpHeaders.ContentType, "application/json"),
+                )
+            }
+
+        val saksbehandlingHttpKlient =
+            SaksbehandlingHttpKlient(
+                engine = mockHttpEngine,
+                dpSaksbehandlingBaseUrl = "http://localhost",
+                tokenProvider = { "dummyToken" },
+            )
+        runBlocking {
+            saksbehandlingHttpKlient.opprettOppgave(
+                fagsakId = fagsakId,
+                journalpostId = journalpostId,
+                opprettetTidspunkt = opprettetTidspunkt,
+                ident = ident,
+                skjemaKategori = "hubba",
+            ) shouldBe oppgaveId
+        }
+
+        requireNotNull(httpRequestData) { "Feil ved oppretting av oppgave" }.let { request ->
+            request.method shouldBe HttpMethod.Post
+            request.url.toString() shouldBe "http://localhost/klage/opprett"
+            request.headers[HttpHeaders.Authorization] shouldBe "Bearer dummyToken"
         }
     }
 }

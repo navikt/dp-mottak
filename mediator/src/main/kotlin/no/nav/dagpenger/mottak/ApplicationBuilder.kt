@@ -24,7 +24,7 @@ import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.SkjermingOppslag
 import no.nav.dagpenger.mottak.behov.person.createPersonOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveBehovLøser
-import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveHttpKlient
+import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingHttpKlient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaApiClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
@@ -39,7 +39,6 @@ import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
 import no.nav.dagpenger.mottak.observers.InnsendingProbe
 import no.nav.dagpenger.mottak.observers.MetrikkObserver
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
-import no.nav.dagpenger.mottak.tjenester.SaksbehandlingHttpKlient
 import no.nav.dagpenger.mottak.tjenester.VedtakFattetMottak
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.slf4j.LoggerFactory
@@ -56,6 +55,11 @@ internal class ApplicationBuilder(
     private val journalpostApiClient = JournalpostApiClient(tokenProvider = Config.properties.dokarkivTokenProvider)
     private val gosysOppslag = GosysClient(Config.properties)
     private val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(Config.kafkaProducerProperties)
+    private val saksbehandlingKlient =
+        SaksbehandlingHttpKlient(
+            dpSaksbehandlingBaseUrl = Config.dpSaksbehandlingBaseUrl,
+            tokenProvider = Config.dpSaksbehandlingTokenProvider,
+        )
 
     private val rapidsConnection =
         RapidApplication
@@ -94,11 +98,7 @@ internal class ApplicationBuilder(
                             listOf(
                                 ferdigstiltInnsendingObserver,
                                 FerdigstiltEttersendingObserver(
-                                    saksbehandlingKlient =
-                                        SaksbehandlingHttpKlient(
-                                            dpSaksbehandlingBaseUrl = Config.dpSaksbehandlingBaseUrl,
-                                            tokenProvider = Config.dpSaksbehandlingTokenProvider,
-                                        ),
+                                    saksbehandlingKlient = saksbehandlingKlient,
                                     gosysClient = gosysOppslag,
                                 ),
                                 MetrikkObserver(),
@@ -126,11 +126,7 @@ internal class ApplicationBuilder(
                 )
                 OppgaveBehovLøser(
                     arenaOppslag = arenaApiClient,
-                    oppgaveKlient =
-                        OppgaveHttpKlient(
-                            dpSaksbehandlingBaseUrl = Config.dpSaksbehandlingBaseUrl,
-                            tokenProvider = Config.dpSaksbehandlingTokenProvider,
-                        ),
+                    saksbehandlingKlient = saksbehandlingKlient,
                     oppgaveRuting = MiljøBasertRuting(),
                     rapidsConnection = this,
                 )

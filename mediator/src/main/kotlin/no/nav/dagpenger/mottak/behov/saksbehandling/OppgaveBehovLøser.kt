@@ -19,7 +19,7 @@ private val logger = KotlinLogging.logger { }
 
 internal class OppgaveBehovLøser(
     private val arenaOppslag: ArenaOppslag,
-    private val oppgaveKlient: OppgaveKlient,
+    private val saksbehandlingKlient: SaksbehandlingKlient,
     private val oppgaveRuting: OppgaveRuting,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
@@ -71,7 +71,7 @@ internal class OppgaveBehovLøser(
                 OppgaveRuting.FagSystem.DAGPENGER -> {
                     runBlocking {
                         val oppgaveId =
-                            oppgaveKlient.opprettOppgave(
+                            saksbehandlingKlient.opprettOppgave(
                                 fagsakId = sakId,
                                 journalpostId = journalpostId,
                                 opprettetTidspunkt = registrertTidspunkt,

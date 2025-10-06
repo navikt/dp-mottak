@@ -25,7 +25,7 @@ internal class OppgaveBehovLøserTest {
     private val oppgaveId = UUID.randomUUID()
     private val ident = "12345678910"
     private val oppgaveKlientMock =
-        mockk<OppgaveKlient>().also {
+        mockk<SaksbehandlingKlient>().also {
             coEvery {
                 it.opprettOppgave(
                     fagsakId = any(),
@@ -56,7 +56,7 @@ internal class OppgaveBehovLøserTest {
     fun `Skal opprette oppgave i ARENA når oppgaverutingen svarer ARENA`() {
         OppgaveBehovLøser(
             arenaOppslag = arenaOppslagMock,
-            oppgaveKlient = mockk(),
+            saksbehandlingKlient = mockk(),
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
                     every { it.ruteOppgave() } returns ARENA
@@ -78,7 +78,7 @@ internal class OppgaveBehovLøserTest {
     fun `Skal opprette oppgave i DAGPENGER når oppgaverutingen svarer DAGPENGER`() {
         OppgaveBehovLøser(
             arenaOppslag = mockk(),
-            oppgaveKlient = oppgaveKlientMock,
+            saksbehandlingKlient = oppgaveKlientMock,
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
                     every { it.ruteOppgave() } returns DAGPENGER
@@ -104,7 +104,7 @@ internal class OppgaveBehovLøserTest {
                 mockk<ArenaOppslag>().also {
                     coEvery { it.opprettVurderHenvendelsOppgave(any(), any()) } returns null
                 },
-            oppgaveKlient = mockk(),
+            saksbehandlingKlient = mockk(),
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
                     every { it.ruteOppgave() } returns ARENA
@@ -124,8 +124,8 @@ internal class OppgaveBehovLøserTest {
     fun `Kaster exception når feil oppstår ved oppretting av oppgave i DAGPENGER`() {
         OppgaveBehovLøser(
             arenaOppslag = mockk(),
-            oppgaveKlient =
-                mockk<OppgaveKlient>().also {
+            saksbehandlingKlient =
+                mockk<SaksbehandlingKlient>().also {
                     coEvery {
                         it.opprettOppgave(
                             fagsakId = any(),

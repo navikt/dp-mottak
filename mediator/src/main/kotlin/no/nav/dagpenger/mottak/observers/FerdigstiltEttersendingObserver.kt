@@ -3,12 +3,12 @@ package no.nav.dagpenger.mottak.observers
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.mottak.InnsendingObserver
+import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingKlient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysOppgaveRequest
 import no.nav.dagpenger.mottak.meldinger.SkjemaType
 import no.nav.dagpenger.mottak.meldinger.SkjemaType.Companion.tilSkjemaType
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.QuizSøknadFormat
-import no.nav.dagpenger.mottak.tjenester.SaksbehandlingKlient
 import java.time.LocalDate
 
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.FerdigstiltEttersendingObserver")

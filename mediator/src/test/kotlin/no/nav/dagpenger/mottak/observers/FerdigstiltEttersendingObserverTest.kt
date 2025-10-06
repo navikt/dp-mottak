@@ -8,11 +8,11 @@ import io.mockk.coVerify
 import io.mockk.mockk
 import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingObserver.Type.Ettersending
+import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingKlient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysOppgaveRequest
 import no.nav.dagpenger.mottak.meldinger.SkjemaType
 import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_ORDINÆR_ETTERSENDING
-import no.nav.dagpenger.mottak.tjenester.SaksbehandlingKlient
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 
