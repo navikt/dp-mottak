@@ -13,7 +13,6 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettO
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.arenaOppgaveParametre
 import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
-import java.util.UUID
 
 private val logger = KotlinLogging.logger { }
 
@@ -60,19 +59,16 @@ internal class OppgaveBehovLøser(
         meterRegistry: MeterRegistry,
     ) {
         val journalpostId = packet["journalpostId"].asText()
-        val behovId = packet["@behovId"].asText()
+        val ident = packet["fødselsnummer"].asText()
         val registrertTidspunkt = packet["registrertDato"].asLocalDateTime()
-
-        // Vi får sak fra et eller annet sted
-        val sakId = UUID.randomUUID()
-        oppgaveRuting.ruteOppgave().let { system ->
-            logger.info { "Skal løse behov $behovNavn i fagsystem $system" }
-            when (system) {
-                OppgaveRuting.FagSystem.DAGPENGER -> {
-                    runBlocking {
+        runBlocking {
+            oppgaveRuting.ruteOppgave(ident).let { system ->
+                logger.info { "Skal løse behov $behovNavn i fagsystem $system" }
+                when (system) {
+                    is OppgaveRuting.System.Dagpenger -> {
                         val oppgaveId =
                             saksbehandlingKlient.opprettOppgave(
-                                fagsakId = sakId,
+                                fagsakId = system.sakId,
                                 journalpostId = journalpostId,
                                 opprettetTidspunkt = registrertTidspunkt,
                                 ident = packet["fødselsnummer"].asText(),
@@ -80,9 +76,9 @@ internal class OppgaveBehovLøser(
                             )
                         val løsning =
                             mapOf(
-                                "fagsakId" to sakId,
+                                "fagsakId" to system.sakId,
                                 "oppgaveId" to oppgaveId,
-                                "fagsystem" to system.name,
+                                "fagsystem" to system.fagSystem.name,
                             )
 
                         packet["@løsning"] =
@@ -93,10 +89,8 @@ internal class OppgaveBehovLøser(
                             }
                         context.publish(packet.toJson())
                     }
-                }
 
-                OppgaveRuting.FagSystem.ARENA -> {
-                    runBlocking {
+                    OppgaveRuting.System.Arena -> {
                         val oppgaveResponse =
                             arenaOppslag.opprettVurderHenvendelsOppgave(
                                 journalpostId,
@@ -110,7 +104,7 @@ internal class OppgaveBehovLøser(
                                             "journalpostId" to journalpostId,
                                             "fagsakId" to oppgaveResponse.fagsakId,
                                             "oppgaveId" to oppgaveResponse.oppgaveId,
-                                            "fagsystem" to system.name,
+                                            "fagsystem" to system.fagSystem.name,
                                         ),
                                 ).also {
                                     logger.info { "Løste behov $behovNavn med løsning $it" }
@@ -121,14 +115,14 @@ internal class OppgaveBehovLøser(
                                     behovNavn to
                                         mapOf(
                                             "@feil" to "Kunne ikke opprette Arena oppgave",
-                                            "fagsystem" to system.name,
+                                            "fagsystem" to system.fagSystem.name,
                                         ),
                                 ).also {
                                     logger.info { "Løste behov $behovNavn med feil $it" }
                                 }
                         }
+                        context.publish(packet.toJson())
                     }
-                    context.publish(packet.toJson())
                 }
             }
         }

@@ -5,7 +5,6 @@ import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.OpprettVedtakOppgaveResponse
@@ -59,7 +58,7 @@ internal class OppgaveBehovLøserTest {
             saksbehandlingKlient = mockk(),
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    every { it.ruteOppgave() } returns ARENA
+                    coEvery { it.ruteOppgave(any()) } returns OppgaveRuting.System.Arena
                 },
             rapidsConnection = testRapid,
         )
@@ -76,12 +75,13 @@ internal class OppgaveBehovLøserTest {
 
     @Test
     fun `Skal opprette oppgave i DAGPENGER når oppgaverutingen svarer DAGPENGER`() {
+        val sakId = UUID.randomUUID()
         OppgaveBehovLøser(
             arenaOppslag = mockk(),
             saksbehandlingKlient = oppgaveKlientMock,
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    every { it.ruteOppgave() } returns DAGPENGER
+                    coEvery { it.ruteOppgave(ident) } returns OppgaveRuting.System.Dagpenger(sakId)
                 },
             rapidsConnection = testRapid,
         )
@@ -89,9 +89,7 @@ internal class OppgaveBehovLøserTest {
         testRapid.sendTestMessage(opprettOppgaveBehov())
         with(testRapid.inspektør) {
             size shouldBe 1
-            shouldNotThrowAny {
-                field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["fagsakId"].asUUID()
-            }
+            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["fagsakId"].asUUID() shouldBe sakId
             field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["fagsystem"].asText() shouldBe DAGPENGER.name
             field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["oppgaveId"].asUUID() shouldBe oppgaveId
         }
@@ -107,7 +105,7 @@ internal class OppgaveBehovLøserTest {
             saksbehandlingKlient = mockk(),
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    every { it.ruteOppgave() } returns ARENA
+                    coEvery { it.ruteOppgave(any()) } returns OppgaveRuting.System.Arena
                 },
             rapidsConnection = testRapid,
         )
@@ -138,7 +136,7 @@ internal class OppgaveBehovLøserTest {
                 },
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    every { it.ruteOppgave() } returns DAGPENGER
+                    coEvery { it.ruteOppgave(any()) } returns OppgaveRuting.System.Dagpenger(UUID.randomUUID())
                 },
             rapidsConnection = testRapid,
         )

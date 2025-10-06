@@ -64,10 +64,6 @@ internal object Config {
         }
     }
 
-    val env by lazy {
-        properties.getOrElse(Key("NAIS_CLUSTER_NAME", stringType)) { "prod-gcp" }
-    }
-
     val dpSaksbehandlingBaseUrl by lazy {
         properties[Key("DP_SAKSBEHANDLING_URL", stringType)]
     }
