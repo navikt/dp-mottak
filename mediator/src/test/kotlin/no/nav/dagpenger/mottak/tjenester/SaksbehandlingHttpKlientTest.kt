@@ -13,11 +13,51 @@ import io.ktor.http.headersOf
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingHttpKlient
+import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingKlient
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.UUID
 
 class SaksbehandlingHttpKlientTest {
+    @Test
+    fun `henting av siste saks id`() {
+        val personMedSak = "personMedSak"
+        val personUtenSak = "personUtenSak"
+        var requestData: HttpRequestData? = null
+        val sisteSakId = UUID.randomUUID()
+
+        val mockEngine =
+            MockEngine { request ->
+                requestData = request
+                val bodyAsText = request.body.toByteArray().decodeToString()
+                when (bodyAsText.contains(personMedSak)) {
+                    true -> {
+                        respond(""" {"id": "$sisteSakId"} """, status = HttpStatusCode.OK, headers = headersOf(HttpHeaders.ContentType, "application/json"))
+                    }
+
+                    false -> {
+                        respond(content = "", status = HttpStatusCode.NoContent)
+                    }
+                }
+            }
+        val saksbehandlingHttpKlient =
+            SaksbehandlingHttpKlient(
+                engine = mockEngine,
+                tokenProvider = { "token" },
+            )
+
+        runBlocking {
+            saksbehandlingHttpKlient.hentSisteSakId(personMedSak) shouldBe SaksbehandlingKlient.SisteSakIdResult.Success(sisteSakId)
+            saksbehandlingHttpKlient.hentSisteSakId(personUtenSak) shouldBe SaksbehandlingKlient.SisteSakIdResult.NotFound
+        }
+
+        requireNotNull(requestData).let { request ->
+            request.method.value shouldBe "POST"
+            request.headers[HttpHeaders.Authorization] shouldBe "Bearer token"
+            request.url.toString() shouldBe "http://dp-saksbehandling/person/siste-sak"
+        }
+    }
+
     @Test
     fun `Skal kalle dp-saksbehandling for å finne ut om varsel skal sendes`() {
         var requestData: HttpRequestData? = null

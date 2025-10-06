@@ -13,6 +13,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.JacksonConverter
 import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.behov.JsonMapper
@@ -33,6 +34,14 @@ interface SaksbehandlingKlient {
         ident: String,
         skjemaKategori: String,
     ): UUID
+
+    suspend fun hentSisteSakId(ident: String): SisteSakIdResult
+
+    sealed class SisteSakIdResult {
+        data class Success(val id: UUID) : SisteSakIdResult()
+
+        object NotFound : SisteSakIdResult()
+    }
 }
 
 class SaksbehandlingHttpKlient(
@@ -73,6 +82,28 @@ class SaksbehandlingHttpKlient(
                 ),
             )
         }.body<OpprettOppgaveResponse>().oppgaveId
+    }
+
+    override suspend fun hentSisteSakId(ident: String): SaksbehandlingKlient.SisteSakIdResult {
+        return httpClient.post(urlString = "$dpSaksbehandlingBaseUrl/person/siste-sak") {
+            header(HttpHeaders.Accept, ContentType.Application.Json)
+            header(HttpHeaders.ContentType, ContentType.Application.Json)
+            setBody(
+                mapOf("ident" to ident),
+            )
+        }.let { httpResponse ->
+            when (httpResponse.status) {
+                HttpStatusCode.OK -> {
+                    httpResponse.body<SaksbehandlingKlient.SisteSakIdResult.Success>()
+                }
+
+                HttpStatusCode.NoContent -> {
+                    SaksbehandlingKlient.SisteSakIdResult.NotFound
+                }
+
+                else -> throw RuntimeException("Uventet svar fra dp-saksbehandling: ${httpResponse.status}")
+            }
+        }
     }
 
     override suspend fun skalVarsleOmEttersending(
