@@ -23,8 +23,8 @@ internal class SakseierBasertRuting(private val saksbehandlingKlient: Saksbehand
     override suspend fun ruteOppgave(ident: String): OppgaveRuting.System {
         return saksbehandlingKlient.hentSisteSakId(ident).let {
             when (it) {
-                SisteSakIdResult.NotFound -> OppgaveRuting.System.Arena
-                is SisteSakIdResult.Success -> OppgaveRuting.System.Dagpenger(it.id)
+                SisteSakIdResult.IkkeFunnet -> OppgaveRuting.System.Arena
+                is SisteSakIdResult.Funnet -> OppgaveRuting.System.Dagpenger(it.id)
             }
         }
     }

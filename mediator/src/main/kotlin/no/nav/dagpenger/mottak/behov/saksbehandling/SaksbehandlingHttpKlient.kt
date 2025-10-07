@@ -88,11 +88,11 @@ class SaksbehandlingHttpKlient(
         }.let { httpResponse ->
             when (httpResponse.status) {
                 HttpStatusCode.OK -> {
-                    httpResponse.body<SisteSakIdResult.Success>()
+                    httpResponse.body<SisteSakIdResult.Funnet>()
                 }
 
                 HttpStatusCode.NoContent -> {
-                    SisteSakIdResult.NotFound
+                    SisteSakIdResult.IkkeFunnet
                 }
 
                 else -> throw RuntimeException("Uventet svar fra dp-saksbehandling: ${httpResponse.status}")
@@ -144,7 +144,7 @@ private data class OpprettOppgaveResponse(
 )
 
 sealed class SisteSakIdResult {
-    data class Success(val id: UUID) : SisteSakIdResult()
+    data class Funnet(val id: UUID) : SisteSakIdResult()
 
-    object NotFound : SisteSakIdResult()
+    data object IkkeFunnet : SisteSakIdResult()
 }

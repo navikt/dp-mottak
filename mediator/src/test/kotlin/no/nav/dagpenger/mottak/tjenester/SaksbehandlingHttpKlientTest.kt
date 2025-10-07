@@ -47,8 +47,8 @@ class SaksbehandlingHttpKlientTest {
             )
 
         runBlocking {
-            saksbehandlingHttpKlient.hentSisteSakId(personMedSak) shouldBe SisteSakIdResult.Success(sisteSakId)
-            saksbehandlingHttpKlient.hentSisteSakId(personUtenSak) shouldBe SisteSakIdResult.NotFound
+            saksbehandlingHttpKlient.hentSisteSakId(personMedSak) shouldBe SisteSakIdResult.Funnet(sisteSakId)
+            saksbehandlingHttpKlient.hentSisteSakId(personUtenSak) shouldBe SisteSakIdResult.IkkeFunnet
         }
 
         requireNotNull(requestData).let { request ->
