@@ -11,6 +11,23 @@ private const val MAKS_TEGN = 1999
 sealed class KategorisertJournalpost(
     open val journalpost: Journalpost,
 ) {
+    enum class Kategori {
+        NY_SØKNAD,
+        GJENOPPTAK,
+        GENERELL,
+        UTDANNING,
+        ETABLERING,
+        KLAGE,
+        ANKE,
+        KLAGE_FORSKUDD,
+        ETTERSENDING,
+        UKJENT_SKJEMA_KODE,
+        UTEN_BRUKER,
+    }
+
+    abstract val kategori: Kategori
+
+
     protected abstract fun henvendelseNavn(): String
 
     protected open fun finnOppgaveBenk(
@@ -65,9 +82,9 @@ sealed class KategorisertJournalpost(
         @Suppress("ktlint:standard:max-line-length")
         val informasjon =
             "Hoveddokument: ${hovedDokument}\n" +
-                formatertVedlegg +
-                datoBeskrivelse +
-                "Dokumentet er skannet inn og journalført automatisk av digitale dagpenger. Gjennomfør rutinen \"Etterkontroll av automatisk journalførte dokumenter\"."
+                    formatertVedlegg +
+                    datoBeskrivelse +
+                    "Dokumentet er skannet inn og journalført automatisk av digitale dagpenger. Gjennomfør rutinen \"Etterkontroll av automatisk journalførte dokumenter\"."
 
         @Suppress("ktlint:standard:max-line-length")
         return if (informasjon.length > MAKS_TEGN) {
@@ -102,6 +119,7 @@ sealed class KategorisertJournalpost(
 data class NySøknad(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
+    override val kategori: Kategori = Kategori.NY_SØKNAD
     override fun henvendelseNavn(): String = "Start Vedtaksbehandling - automatisk journalført.\n"
 
     override fun finnOppgaveBenk(
@@ -174,6 +192,7 @@ private val logger = KotlinLogging.logger { }
 data class Gjenopptak(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
+    override val kategori: Kategori = Kategori.GJENOPPTAK
     override fun henvendelseNavn(): String = "Gjenopptak\n"
 
     override fun finnOppgaveBenk(
@@ -200,24 +219,28 @@ data class Gjenopptak(
 data class Generell(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
+    override val kategori: Kategori = Kategori.GENERELL
     override fun henvendelseNavn(): String = "Generell\n"
 }
 
 data class Utdanning(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
+    override val kategori: Kategori = Kategori.UTDANNING
     override fun henvendelseNavn(): String = "Utdanning\n"
 }
 
 data class Etablering(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
+    override val kategori: Kategori = Kategori.ETABLERING
     override fun henvendelseNavn(): String = "Etablering\n"
 }
 
 data class Klage(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
+    override val kategori: Kategori = Kategori.KLAGE
     override fun henvendelseNavn(): String =
         when (journalpost.erEttersending()) {
             true -> "Ettersending til klage\n"
@@ -228,6 +251,7 @@ data class Klage(
 data class Anke(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
+    override val kategori: Kategori = Kategori.ANKE
     override fun henvendelseNavn(): String =
         when (journalpost.erEttersending()) {
             true -> "Ettersending til anke\n"
@@ -249,6 +273,7 @@ data class Anke(
 data class KlageForskudd(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
+    override val kategori: Kategori = Kategori.KLAGE_FORSKUDD
     override fun henvendelseNavn(): String =
         when (journalpost.erEttersending()) {
             true -> "Ettersending til klage - Forskudd\n"
@@ -270,17 +295,20 @@ data class KlageForskudd(
 data class Ettersending(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
+    override val kategori: Kategori = Kategori.ETTERSENDING
     override fun henvendelseNavn(): String = "Ettersending\n"
 }
 
 data class UkjentSkjemaKode(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
+    override val kategori: Kategori = Kategori.UKJENT_SKJEMA_KODE
     override fun henvendelseNavn(): String = "${journalpost.tittel()}\n"
 }
 
 data class UtenBruker(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
+    override val kategori: Kategori = Kategori.UTEN_BRUKER
     override fun henvendelseNavn(): String = "${journalpost.tittel()}\n"
 }

@@ -6,6 +6,7 @@ enum class InnsendingTilstandType {
     AvventerPersondataType,
     KategoriseringType,
     AvventerSøknadsdataType,
+    AvventerFagsystem,
     AventerArenaStartVedtakType,
     AvventerFerdigstillJournalpostType,
     InnsendingFerdigstiltType,

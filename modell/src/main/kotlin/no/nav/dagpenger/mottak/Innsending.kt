@@ -5,6 +5,7 @@ import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
+import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
@@ -16,6 +17,7 @@ import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.RekjørHendelse
+import no.nav.dagpenger.mottak.meldinger.søknadsdata.QuizSøknadFormat
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
 import java.time.Duration
 
@@ -56,6 +58,14 @@ class Innsending private constructor(
             return
         }
         tilstand.håndter(this, joarkHendelse)
+    }
+
+    fun håndter(fagsystemBesluttet: FagsystemBesluttet) {
+        if (journalpostId != fagsystemBesluttet.journalpostId()) return
+        kontekst(fagsystemBesluttet, "Fagsystem besluttet for journalpost")
+
+        tilstand.håndter(this, fagsystemBesluttet)
+
     }
 
     fun håndter(journalpost: Journalpost) {
@@ -148,6 +158,13 @@ class Innsending private constructor(
             joarkHendelse: JoarkHendelse,
         ) {
             joarkHendelse.warn("Forventet ikke JoarkHendelse i %s", type.name)
+        }
+
+        fun håndter(
+            innsending: Innsending,
+            fagsystemBesluttet: FagsystemBesluttet,
+        ) {
+            fagsystemBesluttet.warn("Forventet ikke FagsystemBesluttet hendelse i %s", type.name)
         }
 
         fun håndter(
@@ -340,14 +357,42 @@ class Innsending private constructor(
                 is Generell -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Utdanning -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is Etablering -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
-                is Klage -> innsending.tilstand(hendelse, AvventerOppgave)
-                is Anke -> innsending.tilstand(hendelse, AvventerOppgave)
+                is Klage -> innsending.tilstand(hendelse, AvventerFagsystem)
+                is Anke -> innsending.tilstand(hendelse, AvventerFagsystem)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
                 is KlageForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
             }
         }
     }
+
+    internal object AvventerFagsystem : Tilstand {
+        override val type: InnsendingTilstandType
+            get() = InnsendingTilstandType.AvventerFagsystem
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
+
+        override fun entering(
+            innsending: Innsending,
+            hendelse: Hendelse,
+        ) {
+            innsending.bestemmeFagsystem(hendelse)
+        }
+
+        override fun håndter(innsending: Innsending, fagsystemBesluttet: FagsystemBesluttet) {
+//            // Hvis dagpenger sak sett oppgave sak
+//            innsending.oppgaveSak = null
+//            innsending.tilstand =  AventerDagpengerOppgaveType
+
+//            // Hvis arena sak
+//            innsending.tilstand = AventerVurderHenvendelseArenaOppgave
+
+
+        }
+
+
+    }
+
 
     internal object AvventerSøknadsdata : Tilstand {
         override val type: InnsendingTilstandType
@@ -623,6 +668,24 @@ class Innsending private constructor(
         )
     }
 
+    private fun bestemmeFagsystem(hendelse: Hendelse) {
+        val journalpostData = requireNotNull(journalpost) { " Journalpost må være innhentet " }
+        val person = requireNotNull(person) { " Person må være innhentet " }
+        val kategorisertJournalpost = journalpostData.kategorisertJournalpost()
+        val søknadsId = rutingOppslag?.let { QuizSøknadFormat(it.data()).søknadsId() }
+
+        hendelse.behov(
+            type = Behovtype.Fagsystem,
+            melding = "Trenger å bestemme fagsystem",
+            detaljer = buildMap {
+                "kategori" to kategorisertJournalpost.kategori.name
+                "fødselsnummer" to person.ident
+                "journalpostId" to journalpostId
+                søknadsId?.let { "søknadsId" to it }
+            }
+        )
+    }
+
     private fun trengerJournalpost(hendelse: Hendelse) {
         hendelse.behov(Behovtype.Journalpost, "Trenger journalpost")
     }
@@ -726,12 +789,12 @@ class Innsending private constructor(
                 "tittel" to journalpost.tittel(),
                 "mottakskanal" to mottakskanal,
                 "dokumenter" to
-                    journalpost.dokumenter().map {
-                        mapOf(
-                            "tittel" to it.tittel,
-                            "dokumentInfoId" to it.dokumentInfoId,
-                        )
-                    },
+                        journalpost.dokumenter().map {
+                            mapOf(
+                                "tittel" to it.tittel,
+                                "dokumentInfoId" to it.dokumentInfoId,
+                            )
+                        },
             ) + arenaSakId + sak
 
         hendelse.behov(
@@ -891,10 +954,10 @@ class Innsending private constructor(
 
     private fun erFerdigBehandlet() =
         this.tilstand.type in
-            setOf(
-                InnsendingTilstandType.InnsendingFerdigstiltType,
-                InnsendingTilstandType.AlleredeBehandletType,
-            )
+                setOf(
+                    InnsendingTilstandType.InnsendingFerdigstiltType,
+                    InnsendingTilstandType.AlleredeBehandletType,
+                )
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst =
         SpesifikkKontekst(

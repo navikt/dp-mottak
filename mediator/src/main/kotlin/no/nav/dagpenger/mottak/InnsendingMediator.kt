@@ -2,9 +2,11 @@ package no.nav.dagpenger.mottak
 
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
 import no.nav.dagpenger.mottak.db.InnsendingRepository
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
@@ -34,6 +36,12 @@ internal class InnsendingMediator(
     fun håndter(joarkHendelse: JoarkHendelse) {
         håndter(joarkHendelse) { innsending ->
             innsending.håndter(joarkHendelse)
+        }
+    }
+
+    fun håndter(fagSystem: FagsystemBesluttet ) {
+        håndter(fagSystem) { innsending ->
+            innsending.håndter(fagSystem)
         }
     }
 

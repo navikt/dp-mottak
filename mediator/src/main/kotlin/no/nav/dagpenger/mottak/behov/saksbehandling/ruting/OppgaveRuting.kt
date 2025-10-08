@@ -6,6 +6,7 @@ import java.util.UUID
 
 internal interface OppgaveRuting {
     suspend fun ruteOppgave(ident: String): System
+    suspend fun ruteOppgave(ident: String, søknadsId: UUID): System
 
     enum class FagSystem {
         DAGPENGER,
@@ -28,4 +29,9 @@ internal class SakseierBasertRuting(private val saksbehandlingKlient: Saksbehand
             }
         }
     }
+
+    override suspend fun ruteOppgave(ident: String, søknadsId: UUID): OppgaveRuting.System {
+        TODO("Not yet implemented")
+    }
 }
+
