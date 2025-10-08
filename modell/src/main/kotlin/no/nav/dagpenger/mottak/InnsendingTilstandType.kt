@@ -9,6 +9,7 @@ enum class InnsendingTilstandType {
     AvventerFagsystem,
     AventerArenaStartVedtakType,
     AvventerFerdigstillJournalpostType,
+    AvventerDagpengerOppgaveType,
     InnsendingFerdigstiltType,
     AventerArenaOppgaveType,
     AvventerOppgaveType,

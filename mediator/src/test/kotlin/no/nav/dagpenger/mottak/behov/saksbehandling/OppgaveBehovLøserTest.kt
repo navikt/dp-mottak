@@ -6,11 +6,12 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.mockk
+import no.nav.dagpenger.mottak.System
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.OpprettVedtakOppgaveResponse
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.Fagsystem.ARENA
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.Fagsystem.DAGPENGER
 import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
-import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting.Fagsystem.ARENA
-import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting.Fagsystem.DAGPENGER
 import no.nav.dagpenger.mottak.tjenester.asUUID
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.BeforeEach
@@ -53,12 +54,12 @@ internal class OppgaveBehovLøserTest {
 
     @Test
     fun `Skal opprette oppgave i ARENA når oppgaverutingen svarer ARENA`() {
-        OppgaveBehovLøser(
+        DagpengerOppgaveBehovLøser(
             arenaOppslag = arenaOppslagMock,
             saksbehandlingKlient = mockk(),
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    coEvery { it.ruteOppgave(any()) } returns OppgaveRuting.System.Arena
+                    coEvery { it.ruteOppgave(any()) } returns System.Arena
                 },
             rapidsConnection = testRapid,
         )
@@ -66,22 +67,22 @@ internal class OppgaveBehovLøserTest {
         testRapid.sendTestMessage(opprettOppgaveBehov())
         with(testRapid.inspektør) {
             size shouldBe 1
-            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["fagsakId"].isNull shouldBe true
-            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["fagsystem"].asText() shouldBe ARENA.name
-            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["oppgaveId"].asText() shouldBe "123"
-            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["journalpostId"].asText() shouldBe journalpostId
+            field(0, "@løsning")[DagpengerOppgaveBehovLøser.behovNavn]["fagsakId"].isNull shouldBe true
+            field(0, "@løsning")[DagpengerOppgaveBehovLøser.behovNavn]["fagsystem"].asText() shouldBe ARENA.name
+            field(0, "@løsning")[DagpengerOppgaveBehovLøser.behovNavn]["oppgaveId"].asText() shouldBe "123"
+            field(0, "@løsning")[DagpengerOppgaveBehovLøser.behovNavn]["journalpostId"].asText() shouldBe journalpostId
         }
     }
 
     @Test
     fun `Skal opprette oppgave i DAGPENGER når oppgaverutingen svarer DAGPENGER`() {
         val sakId = UUID.randomUUID()
-        OppgaveBehovLøser(
+        DagpengerOppgaveBehovLøser(
             arenaOppslag = mockk(),
             saksbehandlingKlient = oppgaveKlientMock,
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    coEvery { it.ruteOppgave(ident) } returns OppgaveRuting.System.Dagpenger(sakId)
+                    coEvery { it.ruteOppgave(ident) } returns System.Dagpenger(sakId)
                 },
             rapidsConnection = testRapid,
         )
@@ -89,15 +90,15 @@ internal class OppgaveBehovLøserTest {
         testRapid.sendTestMessage(opprettOppgaveBehov())
         with(testRapid.inspektør) {
             size shouldBe 1
-            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["fagsakId"].asUUID() shouldBe sakId
-            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["fagsystem"].asText() shouldBe DAGPENGER.name
-            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["oppgaveId"].asUUID() shouldBe oppgaveId
+            field(0, "@løsning")[DagpengerOppgaveBehovLøser.behovNavn]["fagsakId"].asUUID() shouldBe sakId
+            field(0, "@løsning")[DagpengerOppgaveBehovLøser.behovNavn]["fagsystem"].asText() shouldBe DAGPENGER.name
+            field(0, "@løsning")[DagpengerOppgaveBehovLøser.behovNavn]["oppgaveId"].asUUID() shouldBe oppgaveId
         }
     }
 
     @Test
     fun `Skal håndtere feil ved oppretting av oppgave i ARENA`() {
-        OppgaveBehovLøser(
+        DagpengerOppgaveBehovLøser(
             arenaOppslag =
                 mockk<ArenaOppslag>().also {
                     coEvery { it.opprettVurderHenvendelsOppgave(any(), any()) } returns null
@@ -105,7 +106,7 @@ internal class OppgaveBehovLøserTest {
             saksbehandlingKlient = mockk(),
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    coEvery { it.ruteOppgave(any()) } returns OppgaveRuting.System.Arena
+                    coEvery { it.ruteOppgave(any()) } returns System.Arena
                 },
             rapidsConnection = testRapid,
         )
@@ -114,13 +115,13 @@ internal class OppgaveBehovLøserTest {
         with(testRapid.inspektør) {
             size shouldBe 1
             shouldNotThrowAny { field(0, "@løsning") }
-            field(0, "@løsning")[OppgaveBehovLøser.behovNavn]["@feil"].asText() shouldBe "Kunne ikke opprette Arena oppgave"
+            field(0, "@løsning")[DagpengerOppgaveBehovLøser.behovNavn]["@feil"].asText() shouldBe "Kunne ikke opprette Arena oppgave"
         }
     }
 
     @Test
     fun `Kaster exception når feil oppstår ved oppretting av oppgave i DAGPENGER`() {
-        OppgaveBehovLøser(
+        DagpengerOppgaveBehovLøser(
             arenaOppslag = mockk(),
             saksbehandlingKlient =
                 mockk<SaksbehandlingKlient>().also {
@@ -136,7 +137,7 @@ internal class OppgaveBehovLøserTest {
                 },
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    coEvery { it.ruteOppgave(any()) } returns OppgaveRuting.System.Dagpenger(UUID.randomUUID())
+                    coEvery { it.ruteOppgave(any()) } returns System.Dagpenger(UUID.randomUUID())
                 },
             rapidsConnection = testRapid,
         )

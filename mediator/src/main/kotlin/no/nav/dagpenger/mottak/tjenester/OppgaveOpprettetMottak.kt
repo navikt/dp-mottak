@@ -14,7 +14,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.JsonMessageExtensions.getOrNull
-import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting.Fagsystem
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.Fagsystem
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet

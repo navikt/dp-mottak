@@ -13,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Fagsystem
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettOppgave
 import no.nav.dagpenger.mottak.KategorisertJournalpost
+import no.nav.dagpenger.mottak.System
 import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
 import java.util.UUID
 
@@ -88,16 +89,16 @@ internal class FagystemBehovLøser(
         }
     }
 
-    private fun lagLøsning(fagsystem: OppgaveRuting.System): Map<String, Any> {
+    private fun lagLøsning(fagsystem: System): Map<String, Any> {
         return when (fagsystem) {
-            is OppgaveRuting.System.Dagpenger -> {
+            is System.Dagpenger -> {
                 mapOf(
                     "fagsakId" to fagsystem.sakId,
                     "fagsystem" to fagsystem.fagsystem.name,
                 )
             }
 
-            OppgaveRuting.System.Arena -> {
+            System.Arena -> {
                 mapOf(
                     "fagsystem" to fagsystem.fagsystem.name,
                 )

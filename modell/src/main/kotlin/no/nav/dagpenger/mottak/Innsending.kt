@@ -379,8 +379,48 @@ class Innsending private constructor(
 
         override fun håndter(
             innsending: Innsending,
+            oppdatertJournalpost: JournalpostOppdatert,
+        ) {
+            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
+        }
+
+        override fun håndter(
+            innsending: Innsending,
             fagsystemBesluttet: FagsystemBesluttet,
         ) {
+            when (fagsystemBesluttet.system) {
+                is System.Dagpenger -> {
+                    innsending.oppgaveSak =
+                        OppgaveSak(
+                            fagsakId = fagsystemBesluttet.system.sakId,
+                            oppgaveId = null,
+                        )
+                    innsending.oppdatereJournalpost(hendelse = fagsystemBesluttet)
+                    when (innsending.journalpost.kategorisertJournalpost().kategori) {
+                        KategorisertJournalpost.Kategori.KLAGE -> {
+                            innsending.tilstand(fagsystemBesluttet, AvventerDagpengerOppgave)
+                        }
+
+                        KategorisertJournalpost.Kategori.ANKE -> {
+                            innsending.tilstand(fagsystemBesluttet, AvventerDagpengerOppgave)
+                        }
+
+                        KategorisertJournalpost.Kategori.ETTERSENDING -> {
+                            innsending.oppdatereJournalpost(hendelse = fagsystemBesluttet)
+                        }
+
+                        else -> {
+                            // todo
+                        }
+                    }
+                    innsending.tilstand(fagsystemBesluttet, AvventerOppgave)
+                }
+
+                is System.Arena -> {
+                    innsending.tilstand(fagsystemBesluttet, AventerVurderHenvendelseArenaOppgave)
+                }
+            }
+
 //            // Hvis dagpenger sak sett oppgave sak
 //            innsending.oppgaveSak = null
 //            innsending.tilstand =  AventerDagpengerOppgaveType
@@ -493,6 +533,35 @@ class Innsending private constructor(
         ) {
             innsending.arenaSak = arenaOppgave.arenaSak()
             innsending.oppdatereJournalpost(arenaOppgave)
+        }
+
+        override fun håndter(
+            innsending: Innsending,
+            oppdatertJournalpost: JournalpostOppdatert,
+        ) {
+            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
+        }
+    }
+
+    internal object AvventerDagpengerOppgave : Tilstand {
+        override val type: InnsendingTilstandType
+            get() = InnsendingTilstandType.AvventerDagpengerOppgaveType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
+
+        override fun entering(
+            innsending: Innsending,
+            hendelse: Hendelse,
+        ) {
+            innsending.oppretteDagpengerOppgave(hendelse)
+        }
+
+        override fun håndter(
+            innsending: Innsending,
+            oppgaveOpprettet: OppgaveOpprettet,
+        ) {
+            innsending.oppgaveSak = oppgaveOpprettet.oppgaveSak()
+            innsending.oppdatereJournalpost(oppgaveOpprettet)
         }
 
         override fun håndter(
@@ -742,20 +811,35 @@ class Innsending private constructor(
         )
     }
 
+    private fun oppretteDagpengerOppgave(hendelse: Hendelse) {
+        val journalpost = requireNotNull(journalpost).kategorisertJournalpost()
+        val person =
+            requireNotNull(person) { "Krever at person er satt her. Mangler for journalpostId ${journalpostId()}" }
+        val oppgavebenk = journalpost.oppgaveBenk(person)
+        val sak = requireNotNull(oppgaveSak) { "Krever at oppgave sak er satt her. Mangler for journalpostId ${journalpostId()}" }
+        val parametre =
+            mapOf(
+                "fødselsnummer" to person.ident,
+                "registrertDato" to oppgavebenk.datoRegistrert,
+                "skjemaKategori" to journalpost.javaClass.simpleName,
+                "fagsakId" to sak.fagsakId,
+            )
+
+        hendelse.behov(
+            Behovtype.OpprettDagpengerOppgave,
+            "Oppretter dagpenger oppgave og sak for journalpost $journalpostId",
+            parametre,
+        )
+    }
+
     private fun oppretteOppgaveBehov(hendelse: Hendelse) {
         val kategorisertJournalpost = requireNotNull(journalpost).kategorisertJournalpost()
         val person =
             requireNotNull(person) { "Krever at person er satt her. Mangler for journalpostId ${journalpostId()}" }
-        val oppgavebenk = kategorisertJournalpost.oppgaveBenk(person)
         val parametre =
             mapOf(
                 "fødselsnummer" to person.ident,
-                "aktørId" to person.aktørId,
-                "behandlendeEnhetId" to oppgavebenk.id,
-                "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
-                "registrertDato" to oppgavebenk.datoRegistrert,
-                "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon,
-                "skjemaKategori" to kategorisertJournalpost.javaClass.simpleName,
+                "skjemaKategori" to kategorisertJournalpost.kategori.name,
             )
 
         hendelse.behov(
@@ -818,6 +902,9 @@ class Innsending private constructor(
                     "aktørId" to it.aktørId,
                 )
             } ?: emptyMap()
+
+        val oppgaveBeskrivelse = this.oppgaveSak?.let { "Ettersendelse til dagpengesøknad i ny løsning" }
+
         val parametre =
             mapOf(
                 "behandlendeEnhetId" to oppgavebenk.id,

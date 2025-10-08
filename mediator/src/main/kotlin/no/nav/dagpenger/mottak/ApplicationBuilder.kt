@@ -23,7 +23,7 @@ import no.nav.dagpenger.mottak.behov.person.PdlPersondataOppslag
 import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.SkjermingOppslag
 import no.nav.dagpenger.mottak.behov.person.createPersonOppslag
-import no.nav.dagpenger.mottak.behov.saksbehandling.OppgaveBehovLøser
+import no.nav.dagpenger.mottak.behov.saksbehandling.DagpengerOppgaveBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingHttpKlient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaApiClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
@@ -124,7 +124,7 @@ internal class ApplicationBuilder(
                     innsendingMetadataRepository = innsendingMetadataRepository,
                     journalpostDokarkiv = journalpostApiClient,
                 )
-                OppgaveBehovLøser(
+                DagpengerOppgaveBehovLøser(
                     arenaOppslag = arenaApiClient,
                     saksbehandlingKlient = saksbehandlingKlient,
                     oppgaveRuting = SakseierBasertRuting(saksbehandlingKlient),
