@@ -63,9 +63,7 @@ class Innsending private constructor(
     fun håndter(fagsystemBesluttet: FagsystemBesluttet) {
         if (journalpostId != fagsystemBesluttet.journalpostId()) return
         kontekst(fagsystemBesluttet, "Fagsystem besluttet for journalpost")
-
         tilstand.håndter(this, fagsystemBesluttet)
-
     }
 
     fun håndter(journalpost: Journalpost) {
@@ -157,91 +155,91 @@ class Innsending private constructor(
             innsending: Innsending,
             joarkHendelse: JoarkHendelse,
         ) {
-            joarkHendelse.warn("Forventet ikke JoarkHendelse i %s", type.name)
+            joarkHendelse.warn("Forventet ikke JoarkHendelse i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             fagsystemBesluttet: FagsystemBesluttet,
         ) {
-            fagsystemBesluttet.warn("Forventet ikke FagsystemBesluttet hendelse i %s", type.name)
+            fagsystemBesluttet.warn("Forventet ikke FagsystemBesluttet i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             journalpost: Journalpost,
         ) {
-            journalpost.warn("Forventet ikke JournalpostData i %s", type.name)
+            journalpost.warn("Forventet ikke JournalpostData i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             personInformasjon: PersonInformasjon,
         ) {
-            personInformasjon.warn("Forventet ikke PersonInformasjon i %s", type.name)
+            personInformasjon.warn("Forventet ikke PersonInformasjon i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             personInformasjonIkkeFunnet: PersonInformasjonIkkeFunnet,
         ) {
-            personInformasjonIkkeFunnet.warn("Forventet ikke PersonInformasjonIkkeFunnet i %s", type.name)
+            personInformasjonIkkeFunnet.warn("Forventet ikke PersonInformasjonIkkeFunnet i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             søknadsdata: Søknadsdata,
         ) {
-            søknadsdata.warn("Forventet ikke Søknadsdata i %s", type.name)
+            søknadsdata.warn("Forventet ikke Søknadsdata i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             arenaOppgave: ArenaOppgaveOpprettet,
         ) {
-            arenaOppgave.warn("Forventet ikke ArenaOppgaveOpprettet i %s", type.name)
+            arenaOppgave.warn("Forventet ikke ArenaOppgaveOpprettet i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             oppgaveOpprettet: OppgaveOpprettet,
         ) {
-            oppgaveOpprettet.warn("Forventet ikke oppgaveOpprettet i %s", type.name)
+            oppgaveOpprettet.warn("Forventet ikke OppgaveOpprettet i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             arenaOppgaveFeilet: ArenaOppgaveFeilet,
         ) {
-            arenaOppgaveFeilet.warn("Forventet ikke ArenaOppgaveFeilet i %s", type.name)
+            arenaOppgaveFeilet.warn("Forventet ikke ArenaOppgaveFeilet i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             gosysOppgave: GosysOppgaveOpprettet,
         ) {
-            gosysOppgave.warn("Forventet ikke GosysOppgaveOpprettet i %s", type.name)
+            gosysOppgave.warn("Forventet ikke GosysOppgaveOpprettet i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             oppdatertJournalpost: JournalpostOppdatert,
         ) {
-            oppdatertJournalpost.warn("Forventet ikke ArenaOppgaveOpprettet i %s", type.name)
+            oppdatertJournalpost.warn("Forventet ikke JournalpostOppdatert i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             journalpostferdigstilt: JournalpostFerdigstilt,
         ) {
-            journalpostferdigstilt.warn("Forventet ikke FerdigStilt i %s", type.name)
+            journalpostferdigstilt.warn("Forventet ikke JournalpostFerdigstilt i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             rekjørHendelse: RekjørHendelse,
         ) {
-            rekjørHendelse.warn("${rekjørHendelse.javaClass.simpleName} er ikke støttet i %s", type.name)
+            rekjørHendelse.warn("${rekjørHendelse.javaClass.simpleName} er ikke støttet i tilstand $type.name")
         }
 
         fun leaving(
@@ -379,20 +377,18 @@ class Innsending private constructor(
             innsending.bestemmeFagsystem(hendelse)
         }
 
-        override fun håndter(innsending: Innsending, fagsystemBesluttet: FagsystemBesluttet) {
+        override fun håndter(
+            innsending: Innsending,
+            fagsystemBesluttet: FagsystemBesluttet,
+        ) {
 //            // Hvis dagpenger sak sett oppgave sak
 //            innsending.oppgaveSak = null
 //            innsending.tilstand =  AventerDagpengerOppgaveType
 
 //            // Hvis arena sak
 //            innsending.tilstand = AventerVurderHenvendelseArenaOppgave
-
-
         }
-
-
     }
-
 
     internal object AvventerSøknadsdata : Tilstand {
         override val type: InnsendingTilstandType
@@ -677,12 +673,13 @@ class Innsending private constructor(
         hendelse.behov(
             type = Behovtype.Fagsystem,
             melding = "Trenger å bestemme fagsystem",
-            detaljer = buildMap {
-                "kategori" to kategorisertJournalpost.kategori.name
-                "fødselsnummer" to person.ident
-                "journalpostId" to journalpostId
-                søknadsId?.let { "søknadsId" to it }
-            }
+            detaljer =
+                buildMap {
+                    "kategori" to kategorisertJournalpost.kategori.name
+                    "fødselsnummer" to person.ident
+                    "journalpostId" to journalpostId
+                    søknadsId?.let { "søknadsId" to it }
+                },
         )
     }
 
@@ -789,12 +786,12 @@ class Innsending private constructor(
                 "tittel" to journalpost.tittel(),
                 "mottakskanal" to mottakskanal,
                 "dokumenter" to
-                        journalpost.dokumenter().map {
-                            mapOf(
-                                "tittel" to it.tittel,
-                                "dokumentInfoId" to it.dokumentInfoId,
-                            )
-                        },
+                    journalpost.dokumenter().map {
+                        mapOf(
+                            "tittel" to it.tittel,
+                            "dokumentInfoId" to it.dokumentInfoId,
+                        )
+                    },
             ) + arenaSakId + sak
 
         hendelse.behov(
@@ -954,10 +951,10 @@ class Innsending private constructor(
 
     private fun erFerdigBehandlet() =
         this.tilstand.type in
-                setOf(
-                    InnsendingTilstandType.InnsendingFerdigstiltType,
-                    InnsendingTilstandType.AlleredeBehandletType,
-                )
+            setOf(
+                InnsendingTilstandType.InnsendingFerdigstiltType,
+                InnsendingTilstandType.AlleredeBehandletType,
+            )
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst =
         SpesifikkKontekst(

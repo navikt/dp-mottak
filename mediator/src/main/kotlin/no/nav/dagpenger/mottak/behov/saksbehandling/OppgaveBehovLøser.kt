@@ -78,7 +78,7 @@ internal class OppgaveBehovLøser(
                             mapOf(
                                 "fagsakId" to system.sakId,
                                 "oppgaveId" to oppgaveId,
-                                "fagsystem" to system.fagSystem.name,
+                                "fagsystem" to system.fagsystem.name,
                             )
 
                         packet["@løsning"] =
@@ -104,7 +104,7 @@ internal class OppgaveBehovLøser(
                                             "journalpostId" to journalpostId,
                                             "fagsakId" to oppgaveResponse.fagsakId,
                                             "oppgaveId" to oppgaveResponse.oppgaveId,
-                                            "fagsystem" to system.fagSystem.name,
+                                            "fagsystem" to system.fagsystem.name,
                                         ),
                                 ).also {
                                     logger.info { "Løste behov $behovNavn med løsning $it" }
@@ -115,7 +115,7 @@ internal class OppgaveBehovLøser(
                                     behovNavn to
                                         mapOf(
                                             "@feil" to "Kunne ikke opprette Arena oppgave",
-                                            "fagsystem" to system.fagSystem.name,
+                                            "fagsystem" to system.fagsystem.name,
                                         ),
                                 ).also {
                                     logger.info { "Løste behov $behovNavn med feil $it" }

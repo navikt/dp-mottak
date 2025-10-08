@@ -6,19 +6,13 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageProblems
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.InnsendingMediator
-import no.nav.dagpenger.mottak.JsonMessageExtensions.getOrNull
-import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting.FagSystem
-import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
-import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
 
 private val logg = KotlinLogging.logger {}
 
@@ -37,6 +31,9 @@ internal class FagystemMottak(
                 validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
                 validate { it.requireKey("@løsning") }
                 validate { it.requireKey("journalpostId") }
+                // TODO: Skal denne være required? Eller må vi håndtere at behovet er løst med @feil?
+                validate { it.requireKey("fagsystem") }
+                validate { it.interestedIn("fagsakId") }
             }.register(this)
     }
 
@@ -48,12 +45,16 @@ internal class FagystemMottak(
     ) {
         val løsning = packet["@løsning"].first()
         val journalpostId = packet["journalpostId"].asText()
+        val fagsystem = packet["fagsystem"].asText()
+        logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId. Fagsystem er $fagsystem" }
 
-        val fagsystemBesluttet = FagsystemBesluttet(
-            aktivitetslogg = Aktivitetslogg(),
-            journalpostId = journalpostId,
-        )
-
+        val fagsystemBesluttet =
+            FagsystemBesluttet(
+                aktivitetslogg = Aktivitetslogg(),
+                journalpostId = journalpostId,
+                fagsystem = fagsystem,
+                fagsakId = packet["fagsystem"].asUUID(),
+            )
 
         innsendingMediator.håndter(fagsystemBesluttet)
 

@@ -40,13 +40,15 @@ internal class FagystemBehovLøser(
                 }
                 validate {
                     it.requireKey(
-                        "@behovId", "journalpostId", "fødselsnummer", "kategori",
+                        "@behovId",
+                        "journalpostId",
+                        "fødselsnummer",
+                        "kategori",
                     )
                     it.interestedIn("søknadsId")
                 }
             }.register(this)
     }
-
 
     override fun onPacket(
         packet: JsonMessage,
@@ -59,26 +61,28 @@ internal class FagystemBehovLøser(
         withLoggingContext("journalpostId" to journalpostId) {
             runBlocking {
                 val kategori = KategorisertJournalpost.Kategori.valueOf(packet["kategori"].asText())
-                val løsning: Map<String, Any> = when (kategori) {
-                    KategorisertJournalpost.Kategori.KLAGE -> {
-                        lagLøsning(oppgaveRuting.ruteOppgave(ident))
-                    }
+                val løsning: Map<String, Any> =
+                    when (kategori) {
+                        KategorisertJournalpost.Kategori.KLAGE -> {
+                            lagLøsning(oppgaveRuting.ruteOppgave(ident))
+                        }
 
-                    KategorisertJournalpost.Kategori.ETTERSENDING -> {
-                        lagLøsning(oppgaveRuting.ruteOppgave(ident, packet["soknadsId"].asUUID()))
-                    }
+                        KategorisertJournalpost.Kategori.ETTERSENDING -> {
+                            lagLøsning(oppgaveRuting.ruteOppgave(ident, packet["soknadsId"].asUUID()))
+                        }
 
-                    else -> {
-                        logger.error { "Behov for bestemmelse av fagsystem for kategori $kategori er ikke støttet" }
-                        mapOf(
-                            "@feil" to "Kunne ikke bestemme fagsystem for journalpostId: ${journalpostId} med kategori $kategori",
-                        )
+                        else -> {
+                            logger.error { "Behov for bestemmelse av fagsystem for kategori $kategori er ikke støttet" }
+                            mapOf(
+                                "@feil" to "Kunne ikke bestemme fagsystem for journalpostId: $journalpostId med kategori $kategori",
+                            )
+                        }
                     }
-                }
-                packet["@løsning"] = mapOf(
-                    behovNavn to løsning,
-                    "@final" to true
-                )
+                packet["@løsning"] =
+                    mapOf(
+                        behovNavn to løsning,
+                        "@final" to true,
+                    )
             }
             context.publish(packet.toJson())
         }
@@ -89,13 +93,13 @@ internal class FagystemBehovLøser(
             is OppgaveRuting.System.Dagpenger -> {
                 mapOf(
                     "fagsakId" to fagsystem.sakId,
-                    "fagsystem" to fagsystem.fagSystem.name,
+                    "fagsystem" to fagsystem.fagsystem.name,
                 )
             }
 
             OppgaveRuting.System.Arena -> {
                 mapOf(
-                    "fagsystem" to fagsystem.fagSystem.name,
+                    "fagsystem" to fagsystem.fagsystem.name,
                 )
             }
         }.also {
@@ -104,5 +108,4 @@ internal class FagystemBehovLøser(
     }
 
     private fun JsonNode.asUUID(): UUID = this.asText().let { UUID.fromString(it) }
-
 }

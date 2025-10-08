@@ -6,17 +6,21 @@ import java.util.UUID
 
 internal interface OppgaveRuting {
     suspend fun ruteOppgave(ident: String): System
-    suspend fun ruteOppgave(ident: String, søknadsId: UUID): System
 
-    enum class FagSystem {
+    suspend fun ruteOppgave(
+        ident: String,
+        søknadsId: UUID,
+    ): System
+
+    enum class Fagsystem {
         DAGPENGER,
         ARENA,
     }
 
-    sealed class System(val fagSystem: FagSystem) {
-        data class Dagpenger(val sakId: UUID) : System(FagSystem.DAGPENGER)
+    sealed class System(val fagsystem: Fagsystem) {
+        data class Dagpenger(val sakId: UUID) : System(Fagsystem.DAGPENGER)
 
-        object Arena : System(FagSystem.ARENA)
+        object Arena : System(Fagsystem.ARENA)
     }
 }
 
@@ -30,8 +34,10 @@ internal class SakseierBasertRuting(private val saksbehandlingKlient: Saksbehand
         }
     }
 
-    override suspend fun ruteOppgave(ident: String, søknadsId: UUID): OppgaveRuting.System {
+    override suspend fun ruteOppgave(
+        ident: String,
+        søknadsId: UUID,
+    ): OppgaveRuting.System {
         TODO("Not yet implemented")
     }
 }
-

@@ -9,8 +9,8 @@ import io.mockk.mockk
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.OpprettVedtakOppgaveResponse
 import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
-import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting.FagSystem.ARENA
-import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting.FagSystem.DAGPENGER
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting.Fagsystem.ARENA
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting.Fagsystem.DAGPENGER
 import no.nav.dagpenger.mottak.tjenester.asUUID
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.BeforeEach

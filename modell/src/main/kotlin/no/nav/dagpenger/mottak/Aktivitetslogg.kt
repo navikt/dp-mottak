@@ -207,6 +207,7 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
                 Persondata,
                 Søknadsdata,
                 Fagsystem,
+
                 @Deprecated("MinsteinntektVurdering er deprekert men trengs for å rehyrdrere gammel aktivitetslogg")
                 MinsteinntektVurdering,
 

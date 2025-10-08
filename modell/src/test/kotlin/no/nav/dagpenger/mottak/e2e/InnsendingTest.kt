@@ -355,6 +355,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerPersondataType,
             KategoriseringType,
             AvventerSøknadsdataType,
+//            AvventerFagsystem,
             AventerArenaOppgaveType,
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType,
