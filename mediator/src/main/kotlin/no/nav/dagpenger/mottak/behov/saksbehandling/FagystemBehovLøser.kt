@@ -11,7 +11,6 @@ import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettOppgave
 import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.KategorisertJournalpost
 import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
@@ -24,7 +23,7 @@ internal class FagystemBehovLøser(
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
     companion object {
-        val behovNavn: String = OpprettOppgave.name
+        val behovNavn: String = Behovtype.Fagsystem.name
     }
 
     init {
@@ -34,7 +33,7 @@ internal class FagystemBehovLøser(
                 precondition {
                     it.requireAllOrAny(
                         "@behov",
-                        listOf(Behovtype.Fagsystem.name),
+                        listOf(behovNavn),
                     )
                     it.forbid("@løsning")
                     it.forbid("@feil")

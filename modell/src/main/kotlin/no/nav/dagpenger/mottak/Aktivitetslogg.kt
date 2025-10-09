@@ -218,7 +218,6 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
                 OppdaterJournalpost,
                 FerdigstillJournalpost,
                 OpprettGosysoppgave,
-                OpprettOppgave,
                 OpprettDagpengerOppgave,
             }
         }

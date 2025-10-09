@@ -83,7 +83,6 @@ data class InnsendingData(
                 InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType -> Innsending.AventerFerdigstill
                 InnsendingTilstandTypeData.InnsendingFerdigstiltType -> Innsending.InnsendingFerdigStilt
                 InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerVurderHenvendelseArenaOppgave
-                InnsendingTilstandTypeData.AvventerOppgaveType -> Innsending.AvventerOppgave
                 InnsendingTilstandTypeData.AvventerGosysType -> Innsending.AvventerGosysOppgave
                 InnsendingTilstandTypeData.UkjentBrukerType -> Innsending.UkjentBruker
                 InnsendingTilstandTypeData.AlleredeBehandletType -> Innsending.AlleredeBehandlet
@@ -101,7 +100,6 @@ data class InnsendingData(
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType,
             AventerArenaOppgaveType,
-            AvventerOppgaveType,
             AvventerGosysType,
             UkjentBrukerType,
             AlleredeBehandletType,

@@ -27,7 +27,7 @@ internal class FagystemMottak(
                 precondition { it.requireValue("@event_name", "behov") }
                 precondition { it.requireValue("@final", true) }
                 precondition {
-                    it.requireAll("@behov", listOf(Behovtype.OpprettOppgave.name))
+                    it.requireAll("@behov", listOf(Behovtype.Fagsystem.name))
                 }
                 validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
                 validate { it.requireKey("@løsning") }

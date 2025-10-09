@@ -408,10 +408,8 @@ class Innsending private constructor(
                         }
 
                         KategorisertJournalpost.Kategori.ETTERSENDING -> {
-                            innsending.oppdatereJournalpost(hendelse = fagsystemBesluttet)
                             innsending.tilstand(fagsystemBesluttet, AventerFerdigstill)
                         }
-
                         else -> {
                             // todo
                         }
@@ -556,50 +554,6 @@ class Innsending private constructor(
             hendelse: Hendelse,
         ) {
             innsending.oppretteDagpengerOppgave(hendelse)
-        }
-
-        override fun håndter(
-            innsending: Innsending,
-            oppgaveOpprettet: OppgaveOpprettet,
-        ) {
-            innsending.oppgaveSak = oppgaveOpprettet.oppgaveSak()
-            innsending.oppdatereJournalpost(oppgaveOpprettet)
-        }
-
-        override fun håndter(
-            innsending: Innsending,
-            oppdatertJournalpost: JournalpostOppdatert,
-        ) {
-            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
-        }
-    }
-
-    internal object AvventerOppgave : Tilstand {
-        override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.AvventerOppgaveType
-        override val timeout: Duration
-            get() = Duration.ofDays(1)
-
-        override fun entering(
-            innsending: Innsending,
-            hendelse: Hendelse,
-        ) {
-            innsending.oppretteOppgaveBehov(hendelse)
-        }
-
-        override fun håndter(
-            innsending: Innsending,
-            arenaOppgaveFeilet: ArenaOppgaveFeilet,
-        ) {
-            innsending.tilstand(arenaOppgaveFeilet, AvventerGosysOppgave)
-        }
-
-        override fun håndter(
-            innsending: Innsending,
-            arenaOppgave: ArenaOppgaveOpprettet,
-        ) {
-            innsending.arenaSak = arenaOppgave.arenaSak()
-            innsending.oppdatereJournalpost(arenaOppgave)
         }
 
         override fun håndter(
@@ -836,23 +790,6 @@ class Innsending private constructor(
         )
     }
 
-    private fun oppretteOppgaveBehov(hendelse: Hendelse) {
-        val kategorisertJournalpost = requireNotNull(journalpost).kategorisertJournalpost()
-        val person =
-            requireNotNull(person) { "Krever at person er satt her. Mangler for journalpostId ${journalpostId()}" }
-        val parametre =
-            mapOf(
-                "fødselsnummer" to person.ident,
-                "skjemaKategori" to kategorisertJournalpost.kategori.name,
-            )
-
-        hendelse.behov(
-            Behovtype.OpprettOppgave,
-            "Oppretter oppgave og sak for journalpost $journalpostId",
-            parametre,
-        )
-    }
-
     private fun oppdatereJournalpost(hendelse: Hendelse) {
         val person = requireNotNull(person) { "Krever at person er satt her, $journalpostId" }
         val journalpost = requireNotNull(journalpost) { "Krever at journalpost her" }
@@ -905,8 +842,6 @@ class Innsending private constructor(
                     "aktørId" to it.aktørId,
                 )
             } ?: emptyMap()
-
-        val oppgaveBeskrivelse = this.oppgaveSak?.let { "Ettersendelse til dagpengesøknad i ny løsning" }
 
         val parametre =
             mapOf(

@@ -135,7 +135,7 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(søknadsdata())
     }
 
-    protected fun håndterFagsystemLøst(fagsystem: Fagsystem.FagsystemType) {
+    protected fun håndterFagystemBesluttet(fagsystem: Fagsystem.FagsystemType) {
         innsending.håndter(fagsystem(fagsystem))
     }
 

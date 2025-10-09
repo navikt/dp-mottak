@@ -440,7 +440,7 @@ internal class MediatorE2ETest {
           "@event_name": "behov",
           "@final": true,
           "@id": "${UUID.randomUUID()}",
-          "@behov": [
+          "@behov": [' ',
             "FerdigstillJournalpost"
           ],
           "@opprettet" : "${now()}",
@@ -505,7 +505,7 @@ internal class MediatorE2ETest {
         }
 
         override fun visitOppgaveSak(
-            oppgaveId: UUID,
+            oppgaveId: UUID?,
             fagsakId: UUID,
         ) {
             this.oppgaveId = oppgaveId

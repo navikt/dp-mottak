@@ -6,7 +6,6 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Ferdigst
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OppdaterJournalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettGosysoppgave
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettOppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettStartVedtakOppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettVurderhenvendelseOppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata
@@ -20,7 +19,6 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerFagsystem
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerFerdigstillJournalpostType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerGosysType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerJournalpostType
-import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerOppgaveType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerPersondataType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerSøknadsdataType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.InnsendingFerdigstiltType
@@ -256,50 +254,98 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["NAV 90-00.08", "NAV 90-00.08 K", "NAVe 90-00.08 K"])
-    fun `skal håndtere joark hendelsene for klage og anke, klage og ettersending`(brevkode: String) {
+    @CsvSource(
+        "NAV 90-00.08,DAGPENGER ",
+        "NAV 90-00.08 K, DAGPENGER ",
+        "NAVe 90-00.08 K, DAGPENGER ",
+        "NAV 90-00.08,ARENA ",
+        "NAV 90-00.08 K, ARENA ",
+        "NAVe 90-00.08 K, ARENA ",
+    )
+    fun `skal håndtere joark hendelsene for klage og anke, klage og ettersending`(
+        brevkode: String,
+        fagsystemType: Fagsystem.FagsystemType,
+    ) {
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
-        håndterOppgaveOpprettet()
         assertBehovDetaljer(
-            OpprettOppgave,
-            setOf(
-                "aktørId",
-                "fødselsnummer",
-                "behandlendeEnhetId",
-                "oppgavebeskrivelse",
-                "registrertDato",
-                "tilleggsinformasjon",
-                "skjemaKategori",
-            ),
+            type = Behovtype.Fagsystem,
+            detaljer =
+                setOf(
+                    "kategori",
+                    "fødselsnummer",
+                    "journalpostId",
+                ),
         )
-        håndterJournalpostOppdatert()
+        håndterFagystemBesluttet(fagsystemType)
+        when (fagsystemType) {
+            Fagsystem.FagsystemType.ARENA -> {
+                assertBehovDetaljer(
+                    OpprettVurderhenvendelseOppgave,
+                    setOf(
+                        "aktørId",
+                        "fødselsnummer",
+                        "behandlendeEnhetId",
+                        "oppgavebeskrivelse",
+                        "registrertDato",
+                        "tilleggsinformasjon",
+                    ),
+                )
+                håndterArenaOppgaveOpprettet()
+            }
+
+            Fagsystem.FagsystemType.DAGPENGER -> {
+                assertBehovDetaljer(
+                    Behovtype.OpprettDagpengerOppgave,
+                    setOf(
+                        "fødselsnummer",
+                        "registrertDato",
+                        "skjemaKategori",
+                        "fagsakId",
+                    ),
+                )
+            }
+        }
+
         assertBehovDetaljer(
             OppdaterJournalpost,
             setOf(
                 "aktørId",
                 "fødselsnummer",
                 "fagsakId",
-                "oppgaveId",
                 "navn",
-                "tittel",
                 "mottakskanal",
+                "tittel",
                 "dokumenter",
             ),
         )
+        håndterJournalpostOppdatert()
         håndterJournalpostFerdigstilt()
 
-        assertTilstander(
-            MottattType,
-            AvventerJournalpostType,
-            AvventerPersondataType,
-            KategoriseringType,
-            AvventerOppgaveType,
-            AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType,
-        )
+        val forventedeTilstander: List<InnsendingTilstandType> =
+            buildList {
+                add(MottattType)
+                add(AvventerJournalpostType)
+                add(AvventerPersondataType)
+                add(KategoriseringType)
+                add(AvventerFagsystem)
+                when (fagsystemType) {
+                    Fagsystem.FagsystemType.ARENA -> {
+                        add(AventerArenaOppgaveType)
+                    }
 
+                    Fagsystem.FagsystemType.DAGPENGER -> {
+                        add(InnsendingTilstandType.AvventerDagpengerOppgaveType)
+                    }
+                }
+                add(AvventerFerdigstillJournalpostType)
+                add(InnsendingFerdigstiltType)
+            }
+
+        assertTilstander(
+            *forventedeTilstander.toTypedArray(),
+        )
         inspektør.also {
             assertNoErrors(it)
             assertMessages(it)
@@ -310,13 +356,13 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             val expected = setOf("Klage")
             assertTrue(it.type.name in expected, "Forventet at ${it.type.name} var en av $expected")
             assertNotNull(it.fagsakId)
+            when (fagsystemType) {
+                Fagsystem.FagsystemType.ARENA -> assertEquals(ARENA_FAGSAK_ID, it.fagsakId)
+                Fagsystem.FagsystemType.DAGPENGER -> assertEquals(DAGPENGER_FAGSAK_ID, it.fagsakId)
+            }
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
-        }
-
-        if (brevkode == "NAV 90-00.08") {
-            assertPuml(brevkode)
         }
     }
 
@@ -350,7 +396,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "søknadsId",
                 ),
         )
-        håndterFagsystemLøst(fagsystemType)
+        håndterFagystemBesluttet(fagsystemType)
         if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
             assertBehovDetaljer(
                 OpprettVurderhenvendelseOppgave,

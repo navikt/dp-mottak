@@ -7,10 +7,10 @@ import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.mockk
 import no.nav.dagpenger.mottak.Fagsystem
+import no.nav.dagpenger.mottak.Fagsystem.FagsystemType.ARENA
+import no.nav.dagpenger.mottak.Fagsystem.FagsystemType.DAGPENGER
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.OpprettVedtakOppgaveResponse
-import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.Fagsystem.ARENA
-import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.Fagsystem.DAGPENGER
 import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
 import no.nav.dagpenger.mottak.tjenester.asUUID
 import org.intellij.lang.annotations.Language
