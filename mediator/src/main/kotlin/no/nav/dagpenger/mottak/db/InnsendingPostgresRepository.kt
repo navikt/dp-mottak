@@ -405,7 +405,7 @@ internal class InnsendingPostgresRepository(
         }
 
         override fun visitOppgaveSak(
-            oppgaveId: UUID,
+            oppgaveId: UUID?,
             fagsakId: UUID,
         ) {
             lagreQueries.add(

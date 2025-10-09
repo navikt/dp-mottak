@@ -10,10 +10,10 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Fagsystem
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettOppgave
+import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.KategorisertJournalpost
-import no.nav.dagpenger.mottak.System
 import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
 import java.util.UUID
 
@@ -34,7 +34,7 @@ internal class FagystemBehovLøser(
                 precondition {
                     it.requireAllOrAny(
                         "@behov",
-                        listOf(Fagsystem.name),
+                        listOf(Behovtype.Fagsystem.name),
                     )
                     it.forbid("@løsning")
                     it.forbid("@feil")
@@ -89,18 +89,18 @@ internal class FagystemBehovLøser(
         }
     }
 
-    private fun lagLøsning(fagsystem: System): Map<String, Any> {
+    private fun lagLøsning(fagsystem: Fagsystem): Map<String, Any> {
         return when (fagsystem) {
-            is System.Dagpenger -> {
+            is Fagsystem.Dagpenger -> {
                 mapOf(
                     "fagsakId" to fagsystem.sakId,
-                    "fagsystem" to fagsystem.fagsystem.name,
+                    "fagsystem" to fagsystem.fagsystemType.name,
                 )
             }
 
-            System.Arena -> {
+            Fagsystem.Arena -> {
                 mapOf(
-                    "fagsystem" to fagsystem.fagsystem.name,
+                    "fagsystem" to fagsystem.fagsystemType.name,
                 )
             }
         }.also {

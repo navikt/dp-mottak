@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.e2e
 
 import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.FerdigstillJournalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Journalpost
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OppdaterJournalpost
@@ -10,9 +11,11 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettS
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettVurderhenvendelseOppgave
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Søknadsdata
+import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AlleredeBehandletType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaOppgaveType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerFagsystem
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerFerdigstillJournalpostType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerGosysType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerJournalpostType
@@ -322,6 +325,17 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
         håndterSøknadsdata()
+        assertBehovDetaljer(
+            type = Behovtype.Fagsystem,
+            detaljer =
+                setOf(
+                    "kategori",
+                    "fødselsnummer",
+                    "journalpostId",
+                    "søknadsId",
+                ),
+        )
+        håndterFagsystemLøst(Fagsystem.Arena)
         håndterArenaOppgaveOpprettet()
         assertBehovDetaljer(
             OpprettVurderhenvendelseOppgave,
@@ -355,7 +369,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerPersondataType,
             KategoriseringType,
             AvventerSøknadsdataType,
-//            AvventerFagsystem,
+            AvventerFagsystem,
             AventerArenaOppgaveType,
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType,

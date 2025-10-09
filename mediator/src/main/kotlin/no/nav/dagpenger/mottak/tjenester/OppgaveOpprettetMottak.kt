@@ -12,9 +12,9 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
+import no.nav.dagpenger.mottak.Fagsystem.FagsystemType
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.JsonMessageExtensions.getOrNull
-import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.Fagsystem
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
@@ -48,11 +48,11 @@ internal class OppgaveOpprettetMottak(
         val løsning = packet["@løsning"].first()
         val journalpostId = packet["journalpostId"].asText()
 
-        val fagsystem = løsning["fagsystem"].asText().let { Fagsystem.valueOf(it) }
+        val fagsystem = løsning["fagsystem"].asText().let { FagsystemType.valueOf(it) }
         logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId. Løst av $fagsystem" }
 
         when (fagsystem) {
-            Fagsystem.DAGPENGER -> {
+            FagsystemType.DAGPENGER -> {
                 val oppgaveId = løsning["oppgaveId"].asUUID()
                 val fagsakId = løsning["fagsakId"].asUUID()
                 innsendingMediator.håndter(
@@ -64,7 +64,7 @@ internal class OppgaveOpprettetMottak(
                     ),
                 )
             }
-            Fagsystem.ARENA -> {
+            FagsystemType.ARENA -> {
                 if (løsning.has("@feil")) {
                     innsendingMediator.håndter(
                         ArenaOppgaveFeilet(
@@ -92,20 +92,5 @@ internal class OppgaveOpprettetMottak(
         metadata: MessageMetadata,
     ) {
         super.onError(problems, context, metadata)
-    }
-
-    override fun onSevere(
-        error: MessageProblems.MessageException,
-        context: MessageContext,
-    ) {
-        super.onSevere(error, context)
-    }
-
-    override fun onPreconditionError(
-        error: MessageProblems,
-        context: MessageContext,
-        metadata: MessageMetadata,
-    ) {
-        super.onPreconditionError(error, context, metadata)
     }
 }

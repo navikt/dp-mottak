@@ -388,15 +388,17 @@ class Innsending private constructor(
             innsending: Innsending,
             fagsystemBesluttet: FagsystemBesluttet,
         ) {
-            when (fagsystemBesluttet.system) {
-                is System.Dagpenger -> {
+            val journalpostData = requireNotNull(innsending.journalpost) { " Journalpost må være innhentet " }
+            val hendelseType = journalpostData.kategorisertJournalpost()
+            when (fagsystemBesluttet.fagsystem) {
+                is Fagsystem.Dagpenger -> {
                     innsending.oppgaveSak =
                         OppgaveSak(
-                            fagsakId = fagsystemBesluttet.system.sakId,
+                            fagsakId = fagsystemBesluttet.fagsystem.sakId,
                             oppgaveId = null,
                         )
                     innsending.oppdatereJournalpost(hendelse = fagsystemBesluttet)
-                    when (innsending.journalpost.kategorisertJournalpost().kategori) {
+                    when (hendelseType.kategori) {
                         KategorisertJournalpost.Kategori.KLAGE -> {
                             innsending.tilstand(fagsystemBesluttet, AvventerDagpengerOppgave)
                         }
@@ -416,7 +418,7 @@ class Innsending private constructor(
                     innsending.tilstand(fagsystemBesluttet, AvventerOppgave)
                 }
 
-                is System.Arena -> {
+                is Fagsystem.Arena -> {
                     innsending.tilstand(fagsystemBesluttet, AventerVurderHenvendelseArenaOppgave)
                 }
             }
@@ -464,7 +466,7 @@ class Innsending private constructor(
             when (kategorisertJournalpost) {
                 is NySøknad -> innsending.tilstand(søknadsdata, AventerArenaStartVedtak)
                 is Gjenopptak -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
-                is Ettersending -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
+                is Ettersending -> innsending.tilstand(søknadsdata, AvventerFagsystem)
                 is Generell -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
                 else -> søknadsdata.severe("Forventet kun søknadsdata for NySøknad og Gjenopptak")
             }
@@ -739,16 +741,18 @@ class Innsending private constructor(
         val kategorisertJournalpost = journalpostData.kategorisertJournalpost()
         val søknadsId = rutingOppslag?.let { QuizSøknadFormat(it.data()).søknadsId() }
 
+        val detaljer =
+            buildMap<String, Any> {
+                this["kategori"] = kategorisertJournalpost.kategori.name
+                this["fødselsnummer"] = person.ident
+                this["journalpostId"] = journalpostId
+                søknadsId?.let { this["søknadsId"] = it }
+            }.toMap()
         hendelse.behov(
             type = Behovtype.Fagsystem,
             melding = "Trenger å bestemme fagsystem",
             detaljer =
-                buildMap {
-                    "kategori" to kategorisertJournalpost.kategori.name
-                    "fødselsnummer" to person.ident
-                    "journalpostId" to journalpostId
-                    søknadsId?.let { "søknadsId" to it }
-                },
+            detaljer,
         )
     }
 
@@ -854,13 +858,12 @@ class Innsending private constructor(
         val journalpost = requireNotNull(journalpost) { "Krever at journalpost her" }
         val arenaSakId = arenaSak?.fagsakId?.let { mapOf("fagsakId" to it) } ?: emptyMap()
         val sak =
-            oppgaveSak?.let {
-                mapOf(
-                    "fagsakId" to it.fagsakId,
-                    "oppgaveId" to it.oppgaveId,
-                )
-            } ?: emptyMap()
-
+            buildMap {
+                oppgaveSak?.let {
+                    put("fagsakId", it.fagsakId)
+                    it.oppgaveId?.let { oppgaveId -> put("oppgaveId", oppgaveId) }
+                }
+            }
         val mottakskanal = mottakskanal() ?: "ukjent"
         val parametre =
             mapOf(

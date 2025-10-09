@@ -1,25 +1,25 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling.ruting
 
-import no.nav.dagpenger.mottak.System
+import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingKlient
 import no.nav.dagpenger.mottak.behov.saksbehandling.SisteSakIdResult
 import java.util.UUID
 
 internal interface OppgaveRuting {
-    suspend fun ruteOppgave(ident: String): System
+    suspend fun ruteOppgave(ident: String): Fagsystem
 
     suspend fun ruteOppgave(
         ident: String,
         søknadsId: UUID,
-    ): System
+    ): Fagsystem
 }
 
 internal class SakseierBasertRuting(private val saksbehandlingKlient: SaksbehandlingKlient) : OppgaveRuting {
-    override suspend fun ruteOppgave(ident: String): System {
+    override suspend fun ruteOppgave(ident: String): Fagsystem {
         return saksbehandlingKlient.hentSisteSakId(ident).let {
             when (it) {
-                SisteSakIdResult.IkkeFunnet -> System.Arena
-                is SisteSakIdResult.Funnet -> System.Dagpenger(it.id)
+                SisteSakIdResult.IkkeFunnet -> Fagsystem.Arena
+                is SisteSakIdResult.Funnet -> Fagsystem.Dagpenger(it.id)
             }
         }
     }
@@ -27,7 +27,7 @@ internal class SakseierBasertRuting(private val saksbehandlingKlient: Saksbehand
     override suspend fun ruteOppgave(
         ident: String,
         søknadsId: UUID,
-    ): System {
+    ): Fagsystem {
         // returner kun dagpenger hvis  søknad har vedtak i dagpenger system.
 
         TODO("Not yet implemented")

@@ -6,7 +6,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.mockk
-import no.nav.dagpenger.mottak.System
+import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.OpprettVedtakOppgaveResponse
 import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.Fagsystem.ARENA
@@ -59,7 +59,7 @@ internal class OppgaveBehovLøserTest {
             saksbehandlingKlient = mockk(),
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    coEvery { it.ruteOppgave(any()) } returns System.Arena
+                    coEvery { it.ruteOppgave(any()) } returns Fagsystem.Arena
                 },
             rapidsConnection = testRapid,
         )
@@ -82,7 +82,7 @@ internal class OppgaveBehovLøserTest {
             saksbehandlingKlient = oppgaveKlientMock,
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    coEvery { it.ruteOppgave(ident) } returns System.Dagpenger(sakId)
+                    coEvery { it.ruteOppgave(ident) } returns Fagsystem.Dagpenger(sakId)
                 },
             rapidsConnection = testRapid,
         )
@@ -106,7 +106,7 @@ internal class OppgaveBehovLøserTest {
             saksbehandlingKlient = mockk(),
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    coEvery { it.ruteOppgave(any()) } returns System.Arena
+                    coEvery { it.ruteOppgave(any()) } returns Fagsystem.Arena
                 },
             rapidsConnection = testRapid,
         )
@@ -137,7 +137,7 @@ internal class OppgaveBehovLøserTest {
                 },
             oppgaveRuting =
                 mockk<OppgaveRuting>().also {
-                    coEvery { it.ruteOppgave(any()) } returns System.Dagpenger(UUID.randomUUID())
+                    coEvery { it.ruteOppgave(any()) } returns Fagsystem.Dagpenger(UUID.randomUUID())
                 },
             rapidsConnection = testRapid,
         )

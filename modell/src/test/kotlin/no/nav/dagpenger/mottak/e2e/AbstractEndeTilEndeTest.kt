@@ -5,12 +5,14 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
+import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.ReplayFerdigstillEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
@@ -79,7 +81,7 @@ abstract class AbstractEndeTilEndeTest {
 
         val forventet = detaljer + setOf("tilstand", "journalpostId")
         val faktisk = behov.detaljer().keys + behov.kontekster.flatMap { it.kontekstMap.keys }
-        forventet.shouldContainExactlyInAnyOrder(faktisk)
+        faktisk.shouldContainExactlyInAnyOrder(forventet)
     }
 
     protected fun assertFerdigstilt(test: (InnsendingObserver.InnsendingEvent) -> Unit) {
@@ -134,6 +136,10 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(søknadsdata())
     }
 
+    protected fun håndterFagsystemLøst(fagsystem: Fagsystem) {
+        innsending.håndter(fagsystem(fagsystem))
+    }
+
     protected fun håndterArenaOppgaveOpprettet() {
         innsending.håndter(arenaOppgaveOpprettet())
     }
@@ -172,6 +178,13 @@ abstract class AbstractEndeTilEndeTest {
             journalpostId = JOURNALPOST_ID,
             oppgaveId = "1234",
             fagsakId = "9867541",
+        )
+
+    private fun fagsystem(fagsystem: Fagsystem): FagsystemBesluttet =
+        FagsystemBesluttet(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+            fagsystem = fagsystem,
         )
 
     private fun oppgaveOpprettet(): OppgaveOpprettet =

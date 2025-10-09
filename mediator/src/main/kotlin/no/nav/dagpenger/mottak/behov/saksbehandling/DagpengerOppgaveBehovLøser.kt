@@ -10,7 +10,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
-import no.nav.dagpenger.mottak.System
+import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.arenaOppgaveParametre
 import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
@@ -56,7 +56,7 @@ internal class DagpengerOppgaveBehovLøser(
             oppgaveRuting.ruteOppgave(ident).let { system ->
                 logger.info { "Skal løse behov $behovNavn i fagsystem $system" }
                 when (system) {
-                    is System.Dagpenger -> {
+                    is Fagsystem.Dagpenger -> {
                         val oppgaveId =
                             saksbehandlingKlient.opprettOppgave(
                                 fagsakId = system.sakId,
@@ -69,7 +69,7 @@ internal class DagpengerOppgaveBehovLøser(
                             mapOf(
                                 "fagsakId" to system.sakId,
                                 "oppgaveId" to oppgaveId,
-                                "fagsystem" to system.fagsystem.name,
+                                "fagsystem" to system.fagsystemType.name,
                             )
 
                         packet["@løsning"] =
@@ -81,7 +81,7 @@ internal class DagpengerOppgaveBehovLøser(
                         context.publish(packet.toJson())
                     }
 
-                    System.Arena -> {
+                    Fagsystem.Arena -> {
                         val oppgaveResponse =
                             arenaOppslag.opprettVurderHenvendelsOppgave(
                                 journalpostId,
@@ -95,7 +95,7 @@ internal class DagpengerOppgaveBehovLøser(
                                             "journalpostId" to journalpostId,
                                             "fagsakId" to oppgaveResponse.fagsakId,
                                             "oppgaveId" to oppgaveResponse.oppgaveId,
-                                            "fagsystem" to system.fagsystem.name,
+                                            "fagsystem" to system.fagsystemType.name,
                                         ),
                                 ).also {
                                     logger.info { "Løste behov $behovNavn med løsning $it" }
@@ -106,7 +106,7 @@ internal class DagpengerOppgaveBehovLøser(
                                     behovNavn to
                                         mapOf(
                                             "@feil" to "Kunne ikke opprette Arena oppgave",
-                                            "fagsystem" to system.fagsystem.name,
+                                            "fagsystem" to system.fagsystemType.name,
                                         ),
                                 ).also {
                                     logger.info { "Løste behov $behovNavn med feil $it" }

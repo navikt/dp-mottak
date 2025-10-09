@@ -11,8 +11,8 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
+import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.InnsendingMediator
-import no.nav.dagpenger.mottak.System
 import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
 
 private val logg = KotlinLogging.logger {}
@@ -38,16 +38,16 @@ internal class FagystemMottak(
             }.register(this)
     }
 
-    private fun JsonMessage.fagsystem(): System {
-        val fagsystem =
+    private fun JsonMessage.fagsystem(): Fagsystem {
+        val fagsystemType =
             try {
-                System.Fagsystem.valueOf(this["fagsystem"].asText())
+                Fagsystem.FagsystemType.valueOf(this["fagsystem"].asText())
             } catch (e: IllegalArgumentException) {
                 throw IllegalArgumentException("Ukjent fagsystem: ${this["fagsystem"].asText()}")
             }
-        return when (fagsystem) {
-            System.Fagsystem.DAGPENGER -> System.Dagpenger(this["fagsakId"].asUUID())
-            System.Fagsystem.ARENA -> System.Arena
+        return when (fagsystemType) {
+            Fagsystem.FagsystemType.DAGPENGER -> Fagsystem.Dagpenger(this["fagsakId"].asUUID())
+            Fagsystem.FagsystemType.ARENA -> Fagsystem.Arena
         }
     }
 
@@ -66,7 +66,7 @@ internal class FagystemMottak(
             FagsystemBesluttet(
                 aktivitetslogg = Aktivitetslogg(),
                 journalpostId = journalpostId,
-                system = packet.fagsystem(),
+                fagsystem = packet.fagsystem(),
             )
 
         innsendingMediator.håndter(fagsystemBesluttet)
