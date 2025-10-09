@@ -352,7 +352,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         )
         håndterFagsystemLøst(fagsystemType)
         if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
-            håndterArenaOppgaveOpprettet()
             assertBehovDetaljer(
                 OpprettVurderhenvendelseOppgave,
                 setOf(
@@ -364,8 +363,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "tilleggsinformasjon",
                 ),
             )
+            håndterArenaOppgaveOpprettet()
         }
-        håndterJournalpostOppdatert()
         assertBehovDetaljer(
             OppdaterJournalpost,
             setOf(
@@ -378,6 +377,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "dokumenter",
             ),
         )
+        håndterJournalpostOppdatert()
         håndterJournalpostFerdigstilt()
 
         val forventedeTilstander: List<InnsendingTilstandType> =
@@ -408,6 +408,10 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         assertFerdigstilt {
             assertEquals("Ettersending", it.type.name)
             assertNotNull(it.fagsakId)
+            when (fagsystemType) {
+                Fagsystem.FagsystemType.ARENA -> assertEquals(ARENA_FAGSAK_ID, it.fagsakId)
+                Fagsystem.FagsystemType.DAGPENGER -> assertEquals(DAGPENGER_FAGSAK_ID, it.fagsakId)
+            }
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)

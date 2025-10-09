@@ -1,7 +1,5 @@
 package no.nav.dagpenger.mottak.e2e
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
@@ -37,7 +35,8 @@ abstract class AbstractEndeTilEndeTest {
         private const val NAVN = "TEST TESTEN"
         private const val AKTØRID = "42"
         private const val JOURNALPOST_ID = "12345"
-        private val mapper: ObjectMapper = jacksonObjectMapper()
+        const val ARENA_FAGSAK_ID = "9867541"
+        const val DAGPENGER_FAGSAK_ID = "a707fc07-4691-46ea-82f7-52a53b4a4786"
     }
 
     protected lateinit var innsending: Innsending
@@ -177,13 +176,13 @@ abstract class AbstractEndeTilEndeTest {
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = JOURNALPOST_ID,
             oppgaveId = "1234",
-            fagsakId = "9867541",
+            fagsakId = ARENA_FAGSAK_ID,
         )
 
     private fun fagsystem(fagsystemType: Fagsystem.FagsystemType): FagsystemBesluttet {
         val fagsystem =
             when (fagsystemType) {
-                Fagsystem.FagsystemType.DAGPENGER -> Fagsystem.Dagpenger(sakId = UUID.randomUUID())
+                Fagsystem.FagsystemType.DAGPENGER -> Fagsystem.Dagpenger(sakId = UUID.fromString(DAGPENGER_FAGSAK_ID))
                 Fagsystem.FagsystemType.ARENA -> Fagsystem.Arena
             }
         return FagsystemBesluttet(

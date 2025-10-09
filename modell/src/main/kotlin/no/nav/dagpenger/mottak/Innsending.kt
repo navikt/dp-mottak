@@ -417,6 +417,7 @@ class Innsending private constructor(
                         }
                     }
                 }
+
                 is Fagsystem.Arena -> {
                     innsending.tilstand(fagsystemBesluttet, AventerVurderHenvendelseArenaOppgave)
                 }
