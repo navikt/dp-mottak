@@ -32,7 +32,6 @@ interface SaksbehandlingKlient {
         journalpostId: String,
         opprettetTidspunkt: LocalDateTime,
         ident: String,
-        skjemaKategori: String,
     ): UUID
 
     suspend fun hentSisteSakId(ident: String): SisteSakIdResult
@@ -62,7 +61,6 @@ class SaksbehandlingHttpKlient(
         journalpostId: String,
         opprettetTidspunkt: LocalDateTime,
         ident: String,
-        skjemaKategori: String,
     ): UUID {
         return httpClient.post(urlString = "$dpSaksbehandlingBaseUrl/klage/opprett") {
             header(HttpHeaders.ContentType, "application/json")

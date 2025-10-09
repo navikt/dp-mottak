@@ -134,7 +134,6 @@ class SaksbehandlingHttpKlientTest {
                 journalpostId = journalpostId,
                 opprettetTidspunkt = opprettetTidspunkt,
                 ident = ident,
-                skjemaKategori = "hubba",
             ) shouldBe oppgaveId
         }
 

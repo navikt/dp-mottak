@@ -5,7 +5,7 @@ import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.OppgaveSakVisitor
 import java.util.UUID
 
-class OppgaveOpprettet(
+class DagpengerOppgaveOpprettet(
     aktivitetslogg: Aktivitetslogg,
     private val journalpostId: String,
     private val oppgaveId: UUID?,

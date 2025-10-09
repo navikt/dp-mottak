@@ -3,8 +3,8 @@ package no.nav.dagpenger.mottak.serder
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Journalpost
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.rutingOppslag
 import java.time.LocalDateTime
@@ -63,7 +63,7 @@ data class InnsendingData(
                 },
                 arenaSakData?.let { ArenaOppgaveOpprettet.ArenaSak(oppgaveId = it.oppgaveId, fagsakId = it.fagsakId) },
                 mottakskanal,
-                oppgaveSakData?.let { OppgaveOpprettet.OppgaveSak(oppgaveId = it.oppgaveId, fagsakId = it.fagsakId) },
+                oppgaveSakData?.let { DagpengerOppgaveOpprettet.OppgaveSak(oppgaveId = it.oppgaveId, fagsakId = it.fagsakId) },
                 aktivitetslogg.let(::konverterTilAktivitetslogg),
             )
 

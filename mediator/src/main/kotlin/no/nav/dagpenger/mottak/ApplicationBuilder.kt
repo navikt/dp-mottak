@@ -61,6 +61,7 @@ internal class ApplicationBuilder(
             tokenProvider = Config.dpSaksbehandlingTokenProvider,
         )
 
+    val sakseierBasertRuting = SakseierBasertRuting(saksbehandlingKlient)
     private val rapidsConnection =
         RapidApplication
             .create(env = env, builder = {
@@ -125,9 +126,7 @@ internal class ApplicationBuilder(
                     journalpostDokarkiv = journalpostApiClient,
                 )
                 DagpengerOppgaveBehovLøser(
-                    arenaOppslag = arenaApiClient,
                     saksbehandlingKlient = saksbehandlingKlient,
-                    oppgaveRuting = SakseierBasertRuting(saksbehandlingKlient),
                     rapidsConnection = this,
                 )
             }

@@ -5,13 +5,13 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.mottak.db.InnsendingRepository
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.RekjørHendelse
@@ -74,9 +74,9 @@ internal class InnsendingMediator(
         }
     }
 
-    fun håndter(oppgaveOpprettet: OppgaveOpprettet) {
-        håndter(oppgaveOpprettet) { innsending ->
-            innsending.håndter(oppgaveOpprettet)
+    fun håndter(dagpengerOppgaveOpprettet: DagpengerOppgaveOpprettet) {
+        håndter(dagpengerOppgaveOpprettet) { innsending ->
+            innsending.håndter(dagpengerOppgaveOpprettet)
         }
     }
 

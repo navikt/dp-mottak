@@ -10,6 +10,7 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.ReplayFerdigstillEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
@@ -17,7 +18,6 @@ import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.Journalpost.Bruker
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
@@ -36,7 +36,9 @@ abstract class AbstractEndeTilEndeTest {
         private const val AKTØRID = "42"
         private const val JOURNALPOST_ID = "12345"
         const val ARENA_FAGSAK_ID = "9867541"
+        const val ARENA_OPPGAVE_ID = "1234"
         const val DAGPENGER_FAGSAK_ID = "a707fc07-4691-46ea-82f7-52a53b4a4786"
+        const val DAGPENGER_OPPGAVE_ID = "a707fc07-4691-46ea-82f7-52a53b4a4786"
     }
 
     protected lateinit var innsending: Innsending
@@ -143,6 +145,10 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(arenaOppgaveOpprettet())
     }
 
+    protected fun håndterDagpengerOppgaveOpprettet() {
+        innsending.håndter(dagpengerOppgaveOpprettet())
+    }
+
     protected fun håndterGosysOppgaveOpprettet() {
         innsending.håndter(gosysOppgaveOpprettet())
     }
@@ -175,8 +181,16 @@ abstract class AbstractEndeTilEndeTest {
         ArenaOppgaveOpprettet(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = JOURNALPOST_ID,
-            oppgaveId = "1234",
+            oppgaveId = ARENA_OPPGAVE_ID,
             fagsakId = ARENA_FAGSAK_ID,
+        )
+
+    private fun dagpengerOppgaveOpprettet(): DagpengerOppgaveOpprettet =
+        DagpengerOppgaveOpprettet(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+            oppgaveId = UUID.fromString(DAGPENGER_OPPGAVE_ID),
+            fagsakId = UUID.fromString(DAGPENGER_FAGSAK_ID),
         )
 
     private fun fagsystem(fagsystemType: Fagsystem.FagsystemType): FagsystemBesluttet {
@@ -192,8 +206,8 @@ abstract class AbstractEndeTilEndeTest {
         )
     }
 
-    private fun oppgaveOpprettet(): OppgaveOpprettet =
-        OppgaveOpprettet(
+    private fun oppgaveOpprettet(): DagpengerOppgaveOpprettet =
+        DagpengerOppgaveOpprettet(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = JOURNALPOST_ID,
             oppgaveId = UUID.randomUUID(),

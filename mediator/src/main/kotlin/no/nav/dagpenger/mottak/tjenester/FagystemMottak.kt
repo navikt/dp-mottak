@@ -14,6 +14,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
+import no.nav.dagpenger.mottak.serder.asUUID
 
 private val logg = KotlinLogging.logger {}
 
@@ -27,7 +28,7 @@ internal class FagystemMottak(
                 precondition { it.requireValue("@event_name", "behov") }
                 precondition { it.requireValue("@final", true) }
                 precondition {
-                    it.requireAll("@behov", listOf(Behovtype.Fagsystem.name))
+                    it.requireAll("@behov", listOf(Behovtype.BestemFagsystem.name))
                 }
                 validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
                 validate { it.requireKey("@løsning") }
@@ -70,42 +71,5 @@ internal class FagystemMottak(
             )
 
         innsendingMediator.håndter(fagsystemBesluttet)
-
-//        val fagsystem = løsning["fagsystem"].asText().let { FagSystem.valueOf(it) }
-//        logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId. Løst av $fagsystem" }
-//
-//        when (fagsystem) {
-//            FagSystem.DAGPENGER -> {
-//                val oppgaveId = løsning["oppgaveId"].asUUID()
-//                val fagsakId = løsning["fagsakId"].asUUID()
-//                innsendingMediator.håndter(
-//                    OppgaveOpprettet(
-//                        aktivitetslogg = Aktivitetslogg(),
-//                        journalpostId = journalpostId,
-//                        oppgaveId = oppgaveId,
-//                        fagsakId = fagsakId,
-//                    ),
-//                )
-//            }
-//            FagSystem.ARENA -> {
-//                if (løsning.has("@feil")) {
-//                    innsendingMediator.håndter(
-//                        ArenaOppgaveFeilet(
-//                            aktivitetslogg = Aktivitetslogg(),
-//                            journalpostId = packet["journalpostId"].asText(),
-//                        ),
-//                    )
-//                } else {
-//                    innsendingMediator.håndter(
-//                        ArenaOppgaveOpprettet(
-//                            aktivitetslogg = Aktivitetslogg(),
-//                            journalpostId = journalpostId,
-//                            oppgaveId = løsning["oppgaveId"].asText(),
-//                            fagsakId = løsning.getOrNull("fagsakId")?.asText(),
-//                        ),
-//                    )
-//                }
-//            }
-//        }
     }
 }

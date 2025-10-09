@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -14,7 +13,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.KategorisertJournalpost
 import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
-import java.util.UUID
+import no.nav.dagpenger.mottak.serder.asUUID
 
 private val logger = KotlinLogging.logger { }
 
@@ -23,7 +22,7 @@ internal class FagystemBehovLøser(
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
     companion object {
-        val behovNavn: String = Behovtype.Fagsystem.name
+        val behovNavn: String = Behovtype.BestemFagsystem.name
     }
 
     init {
@@ -106,6 +105,4 @@ internal class FagystemBehovLøser(
             logger.info { "Løste behov $behovNavn med løsning $it" }
         }
     }
-
-    private fun JsonNode.asUUID(): UUID = this.asText().let { UUID.fromString(it) }
 }

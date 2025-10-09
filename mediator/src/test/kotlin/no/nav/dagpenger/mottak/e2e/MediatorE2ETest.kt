@@ -2,6 +2,8 @@ package no.nav.dagpenger.mottak.e2e
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettDagpengerOppgave
+import no.nav.dagpenger.mottak.Fagsystem.FagsystemType.DAGPENGER
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.InnsendingTilstandType
@@ -179,7 +181,10 @@ internal class MediatorE2ETest {
             håndterHendelse(journalpostMottattHendelse(brevkode = brevkode))
             assertBehov("Persondata", 1)
             håndterHendelse(persondataMottattHendelse())
-            assertBehov("OpprettOppgave", 2)
+            assertBehov("BestemFagsystem", 2)
+            val melding = fagsystemBesluttet(fagsakId = DagpengerOppgave.fagsakId.toString(), fagsystem = DAGPENGER.name)
+            håndterHendelse(melding)
+            assertBehov("OpprettDagpengerOppgave", 3)
             håndterHendelse(opprettDagpengerOppgaveHendelse())
             assertInnsending(journalpostId.toString()) { testInnsendingVisitor ->
                 testInnsendingVisitor.fagsakId shouldBe DagpengerOppgave.fagsakId
@@ -287,6 +292,31 @@ internal class MediatorE2ETest {
           }
         }
         """.trimIndent()
+
+    private fun fagsystemBesluttet(
+        fagsakId: String?,
+        fagsystem: String,
+    ): String {
+        val fagsakIdJson = fagsakId?.let { """ "fagsakId": "$fagsakId",""" } ?: ""
+        //language=JSON
+        return """
+        {
+          "@event_name": "behov",
+          "@final": true,
+          "@id": "${UUID.randomUUID()}",
+          "@behov": [
+            "BestemFagsystem"
+          ],
+          "@opprettet" : "${now()}",
+          "journalpostId": "$journalpostId",
+          "@løsning": {
+            "BestemFagsystem": {
+              $fagsakIdJson 
+              "fagsystem": "$fagsystem"
+            }
+          }
+        }"""
+    }
 
     //language=JSON
     private fun persondataMottattHendelse(): String =
@@ -440,7 +470,7 @@ internal class MediatorE2ETest {
           "@event_name": "behov",
           "@final": true,
           "@id": "${UUID.randomUUID()}",
-          "@behov": [' ',
+          "@behov": [
             "FerdigstillJournalpost"
           ],
           "@opprettet" : "${now()}",
@@ -482,15 +512,14 @@ internal class MediatorE2ETest {
           "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
-            "OpprettOppgave"
+            "${OpprettDagpengerOppgave.name}"
           ],
           "@opprettet" : "${now()}",
           "journalpostId": "$journalpostId",
           "@løsning": {
             "OpprettOppgave": {
                 "fagsakId": "${DagpengerOppgave.fagsakId}",
-                "oppgaveId": "${DagpengerOppgave.oppgaveId}",
-                "fagsystem": "DAGPENGER"
+                "oppgaveId": "${DagpengerOppgave.oppgaveId}"
             }
           }
         }

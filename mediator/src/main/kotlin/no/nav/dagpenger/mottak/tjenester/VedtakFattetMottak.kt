@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.tjenester
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
@@ -12,7 +11,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostDokarkiv
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
-import java.util.UUID
+import no.nav.dagpenger.mottak.serder.asUUID
 
 private val logger = KotlinLogging.logger {}
 
@@ -92,5 +91,3 @@ internal class VedtakFattetMottak(
         }
     }
 }
-
-fun JsonNode.asUUID(): UUID = this.asText().let { UUID.fromString(it) }

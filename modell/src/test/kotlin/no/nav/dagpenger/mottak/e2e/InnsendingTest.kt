@@ -270,7 +270,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
         assertBehovDetaljer(
-            type = Behovtype.Fagsystem,
+            type = Behovtype.BestemFagsystem,
             detaljer =
                 setOf(
                     "kategori",
@@ -305,6 +305,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                         "fagsakId",
                     ),
                 )
+                håndterDagpengerOppgaveOpprettet()
             }
         }
 
@@ -357,8 +358,15 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertTrue(it.type.name in expected, "Forventet at ${it.type.name} var en av $expected")
             assertNotNull(it.fagsakId)
             when (fagsystemType) {
-                Fagsystem.FagsystemType.ARENA -> assertEquals(ARENA_FAGSAK_ID, it.fagsakId)
-                Fagsystem.FagsystemType.DAGPENGER -> assertEquals(DAGPENGER_FAGSAK_ID, it.fagsakId)
+                Fagsystem.FagsystemType.ARENA -> {
+                    assertEquals(ARENA_FAGSAK_ID, it.fagsakId)
+                    assertEquals(ARENA_OPPGAVE_ID, it.oppgaveId)
+                }
+
+                Fagsystem.FagsystemType.DAGPENGER -> {
+                    assertEquals(DAGPENGER_FAGSAK_ID, it.fagsakId)
+                    assertEquals(DAGPENGER_OPPGAVE_ID, it.oppgaveId)
+                }
             }
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
@@ -387,7 +395,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterPersonInformasjon()
         håndterSøknadsdata()
         assertBehovDetaljer(
-            type = Behovtype.Fagsystem,
+            type = Behovtype.BestemFagsystem,
             detaljer =
                 setOf(
                     "kategori",
@@ -411,6 +419,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             )
             håndterArenaOppgaveOpprettet()
         }
+
         assertBehovDetaljer(
             OppdaterJournalpost,
             setOf(
@@ -455,8 +464,15 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertEquals("Ettersending", it.type.name)
             assertNotNull(it.fagsakId)
             when (fagsystemType) {
-                Fagsystem.FagsystemType.ARENA -> assertEquals(ARENA_FAGSAK_ID, it.fagsakId)
-                Fagsystem.FagsystemType.DAGPENGER -> assertEquals(DAGPENGER_FAGSAK_ID, it.fagsakId)
+                Fagsystem.FagsystemType.ARENA -> {
+                    assertEquals(ARENA_FAGSAK_ID, it.fagsakId)
+                    assertEquals(ARENA_OPPGAVE_ID, it.oppgaveId)
+                }
+
+                Fagsystem.FagsystemType.DAGPENGER -> {
+                    assertEquals(DAGPENGER_FAGSAK_ID, it.fagsakId)
+                    assertEquals(null, it.oppgaveId)
+                }
             }
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)

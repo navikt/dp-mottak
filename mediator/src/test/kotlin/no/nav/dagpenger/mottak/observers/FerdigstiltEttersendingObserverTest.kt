@@ -96,6 +96,7 @@ class FerdigstiltEttersendingObserverTest {
             aktørId = "aktørId",
             fødselsnummer = ident,
             fagsakId = "fagsakId",
+            oppgaveId = "oppgaveId",
             datoRegistrert = LocalDateTime.now(),
             søknadsData = jacksonObjectMapper().readTree("""{"søknad_uuid": "søknad_uuid"}"""),
             behandlendeEnhet = "tildeleEnhetsnr",

@@ -5,14 +5,14 @@ import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
+import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet.OppgaveSak
 import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet.OppgaveSak
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
@@ -101,10 +101,10 @@ class Innsending private constructor(
         tilstand.håndter(this, arenaOppgave)
     }
 
-    fun håndter(oppgaveOpprettet: OppgaveOpprettet) {
-        if (journalpostId != oppgaveOpprettet.journalpostId()) return
-        kontekst(oppgaveOpprettet, "Mottatt informasjon om opprettet oppgave")
-        tilstand.håndter(this, oppgaveOpprettet)
+    fun håndter(dagpengerOppgaveOpprettet: DagpengerOppgaveOpprettet) {
+        if (journalpostId != dagpengerOppgaveOpprettet.journalpostId()) return
+        kontekst(dagpengerOppgaveOpprettet, "Mottatt informasjon om opprettet oppgave")
+        tilstand.håndter(this, dagpengerOppgaveOpprettet)
     }
 
     fun håndter(arenaOppgaveFeilet: ArenaOppgaveFeilet) {
@@ -202,9 +202,9 @@ class Innsending private constructor(
 
         fun håndter(
             innsending: Innsending,
-            oppgaveOpprettet: OppgaveOpprettet,
+            dagpengerOppgaveOpprettet: DagpengerOppgaveOpprettet,
         ) {
-            oppgaveOpprettet.warn("Forventet ikke OppgaveOpprettet i tilstand $type.name")
+            dagpengerOppgaveOpprettet.warn("Forventet ikke OppgaveOpprettet i tilstand $type.name")
         }
 
         fun håndter(
@@ -397,7 +397,6 @@ class Innsending private constructor(
                             fagsakId = fagsystemBesluttet.fagsystem.sakId,
                             oppgaveId = null,
                         )
-                    innsending.oppdatereJournalpost(hendelse = fagsystemBesluttet)
                     when (hendelseType.kategori) {
                         KategorisertJournalpost.Kategori.KLAGE -> {
                             innsending.tilstand(fagsystemBesluttet, AvventerDagpengerOppgave)
@@ -408,8 +407,10 @@ class Innsending private constructor(
                         }
 
                         KategorisertJournalpost.Kategori.ETTERSENDING -> {
+                            innsending.oppdatereJournalpost(fagsystemBesluttet)
                             innsending.tilstand(fagsystemBesluttet, AventerFerdigstill)
                         }
+
                         else -> {
                             // todo
                         }
@@ -420,13 +421,6 @@ class Innsending private constructor(
                     innsending.tilstand(fagsystemBesluttet, AventerVurderHenvendelseArenaOppgave)
                 }
             }
-
-//            // Hvis dagpenger sak sett oppgave sak
-//            innsending.oppgaveSak = null
-//            innsending.tilstand =  AventerDagpengerOppgaveType
-
-//            // Hvis arena sak
-//            innsending.tilstand = AventerVurderHenvendelseArenaOppgave
         }
     }
 
@@ -558,10 +552,10 @@ class Innsending private constructor(
 
         override fun håndter(
             innsending: Innsending,
-            oppgaveOpprettet: OppgaveOpprettet,
+            dagpengerOppgaveOpprettet: DagpengerOppgaveOpprettet,
         ) {
-            innsending.oppgaveSak = oppgaveOpprettet.oppgaveSak()
-            innsending.oppdatereJournalpost(oppgaveOpprettet)
+            innsending.oppgaveSak = dagpengerOppgaveOpprettet.oppgaveSak()
+            innsending.oppdatereJournalpost(dagpengerOppgaveOpprettet)
         }
 
         override fun håndter(
@@ -703,7 +697,7 @@ class Innsending private constructor(
                 søknadsId?.let { this["søknadsId"] = it }
             }.toMap()
         hendelse.behov(
-            type = Behovtype.Fagsystem,
+            type = Behovtype.BestemFagsystem,
             melding = "Trenger å bestemme fagsystem",
             detaljer =
             detaljer,
@@ -798,7 +792,6 @@ class Innsending private constructor(
             buildMap {
                 oppgaveSak?.let {
                     put("fagsakId", it.fagsakId)
-                    it.oppgaveId?.let { oppgaveId -> put("oppgaveId", oppgaveId) }
                 }
             }
         val mottakskanal = mottakskanal() ?: "ukjent"
@@ -896,9 +889,13 @@ class Innsending private constructor(
 
     private fun emitFerdigstilt() {
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
+
         val fagsakId: String? =
             arenaSak?.fagsakId
-                ?: oppgaveSak?.fagsakId.toString()
+                ?: oppgaveSak?.fagsakId?.toString()
+        val oppgaveId: String? =
+            arenaSak?.oppgaveId
+                ?: oppgaveSak?.oppgaveId?.toString()
 
         InnsendingEvent(
             type = mapToHendelseType(jp),
@@ -907,6 +904,7 @@ class Innsending private constructor(
             aktørId = person?.aktørId,
             fødselsnummer = person?.ident,
             fagsakId = fagsakId,
+            oppgaveId = oppgaveId,
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = rutingOppslag?.data(),
             behandlendeEnhet =
@@ -929,6 +927,7 @@ class Innsending private constructor(
             aktørId = person?.aktørId,
             fødselsnummer = person?.ident,
             fagsakId = null,
+            oppgaveId = null,
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = rutingOppslag?.data(),
             behandlendeEnhet =
