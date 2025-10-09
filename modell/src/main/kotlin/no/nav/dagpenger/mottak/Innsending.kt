@@ -409,15 +409,14 @@ class Innsending private constructor(
 
                         KategorisertJournalpost.Kategori.ETTERSENDING -> {
                             innsending.oppdatereJournalpost(hendelse = fagsystemBesluttet)
+                            innsending.tilstand(fagsystemBesluttet, AventerFerdigstill)
                         }
 
                         else -> {
                             // todo
                         }
                     }
-                    innsending.tilstand(fagsystemBesluttet, AvventerOppgave)
                 }
-
                 is Fagsystem.Arena -> {
                     innsending.tilstand(fagsystemBesluttet, AventerVurderHenvendelseArenaOppgave)
                 }

@@ -136,7 +136,7 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(søknadsdata())
     }
 
-    protected fun håndterFagsystemLøst(fagsystem: Fagsystem) {
+    protected fun håndterFagsystemLøst(fagsystem: Fagsystem.FagsystemType) {
         innsending.håndter(fagsystem(fagsystem))
     }
 
@@ -180,12 +180,18 @@ abstract class AbstractEndeTilEndeTest {
             fagsakId = "9867541",
         )
 
-    private fun fagsystem(fagsystem: Fagsystem): FagsystemBesluttet =
-        FagsystemBesluttet(
+    private fun fagsystem(fagsystemType: Fagsystem.FagsystemType): FagsystemBesluttet {
+        val fagsystem =
+            when (fagsystemType) {
+                Fagsystem.FagsystemType.DAGPENGER -> Fagsystem.Dagpenger(sakId = UUID.randomUUID())
+                Fagsystem.FagsystemType.ARENA -> Fagsystem.Arena
+            }
+        return FagsystemBesluttet(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = JOURNALPOST_ID,
             fagsystem = fagsystem,
         )
+    }
 
     private fun oppgaveOpprettet(): OppgaveOpprettet =
         OppgaveOpprettet(

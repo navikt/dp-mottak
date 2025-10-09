@@ -12,6 +12,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettV
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Persondata
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Søknadsdata
 import no.nav.dagpenger.mottak.Fagsystem
+import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AlleredeBehandletType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaOppgaveType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakType
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
 import java.lang.IllegalArgumentException
 
@@ -319,8 +321,21 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["NAVe 04-16.04", "NAVe 04-16.03", "NAVe 04-01.03", "NAVe 04-01.04"])
-    fun `skal håndtere joark hendelsene ettersending`(brevkode: String) {
+    @CsvSource(
+        "NAVe 04-16.04, ARENA",
+        "NAVe 04-16.03, ARENA",
+        "NAVe 04-01.03, ARENA",
+        "NAVe 04-01.04, ARENA",
+        "NAVe 04-16.04, DAGPENGER",
+        "NAVe 04-16.03, DAGPENGER",
+        "NAVe 04-01.03, DAGPENGER",
+        "NAVe 04-01.04, DAGPENGER",
+    )
+    fun `skal håndtere joark hendelsene ettersending`(
+        brevkode: String,
+        fagsystemType: String,
+    ) {
+        val fagsystemType = Fagsystem.FagsystemType.valueOf(fagsystemType)
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
@@ -335,19 +350,21 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "søknadsId",
                 ),
         )
-        håndterFagsystemLøst(Fagsystem.Arena)
-        håndterArenaOppgaveOpprettet()
-        assertBehovDetaljer(
-            OpprettVurderhenvendelseOppgave,
-            setOf(
-                "aktørId",
-                "fødselsnummer",
-                "behandlendeEnhetId",
-                "oppgavebeskrivelse",
-                "registrertDato",
-                "tilleggsinformasjon",
-            ),
-        )
+        håndterFagsystemLøst(fagsystemType)
+        if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+            håndterArenaOppgaveOpprettet()
+            assertBehovDetaljer(
+                OpprettVurderhenvendelseOppgave,
+                setOf(
+                    "aktørId",
+                    "fødselsnummer",
+                    "behandlendeEnhetId",
+                    "oppgavebeskrivelse",
+                    "registrertDato",
+                    "tilleggsinformasjon",
+                ),
+            )
+        }
         håndterJournalpostOppdatert()
         assertBehovDetaljer(
             OppdaterJournalpost,
@@ -363,16 +380,23 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         )
         håndterJournalpostFerdigstilt()
 
+        val forventedeTilstander: List<InnsendingTilstandType> =
+            buildList {
+                add(MottattType)
+                add(AvventerJournalpostType)
+                add(AvventerPersondataType)
+                add(KategoriseringType)
+                add(AvventerSøknadsdataType)
+                add(AvventerFagsystem)
+                if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+                    add(AventerArenaOppgaveType)
+                }
+                add(AvventerFerdigstillJournalpostType)
+                add(InnsendingFerdigstiltType)
+            }
+
         assertTilstander(
-            MottattType,
-            AvventerJournalpostType,
-            AvventerPersondataType,
-            KategoriseringType,
-            AvventerSøknadsdataType,
-            AvventerFagsystem,
-            AventerArenaOppgaveType,
-            AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType,
+            *forventedeTilstander.toTypedArray(),
         )
 
         inspektør.also {
@@ -389,8 +413,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.datoRegistrert)
             assertNotNull(it.søknadsData)
         }
-
-        assertPuml(brevkode)
     }
 
     @ParameterizedTest
