@@ -31,6 +31,7 @@ internal class FagsystemMottak(
             .apply {
                 precondition { it.requireValue("@event_name", "behov") }
                 precondition { it.requireValue("@final", true) }
+                precondition { it.requireAll("@behov", listOf<String>(behovNavn)) }
                 validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
                 validate { it.requireKey(løsning) }
                 validate { it.requireKey("journalpostId") }

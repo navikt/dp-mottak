@@ -30,6 +30,7 @@ class DagpengerOppgaveOpprettetMottak internal constructor(
             .apply {
                 precondition { it.requireValue("@event_name", "behov") }
                 precondition { it.requireValue("@final", true) }
+                precondition { it.requireAll("@behov", listOf<String>(behovNavn)) }
                 validate {
                     it.require("@opprettet", JsonNode::asLocalDateTime)
                     it.requireKey(løsning)

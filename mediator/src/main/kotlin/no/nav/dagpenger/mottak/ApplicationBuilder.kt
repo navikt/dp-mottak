@@ -30,7 +30,6 @@ import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaApiClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.OpprettGosysOppgaveLøser
-import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
 import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.SakseierBasertRuting
 import no.nav.dagpenger.mottak.db.InnsendingMetadataPostgresRepository
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
@@ -129,8 +128,9 @@ internal class ApplicationBuilder(
                 )
                 FagystemBehovLøser(
                     rapidsConnection = this,
-                    oppgaveRuting = SakseierBasertRuting(
-                        saksbehandlingKlient = saksbehandlingKlient,
+                    oppgaveRuting =
+                        SakseierBasertRuting(
+                            saksbehandlingKlient = saksbehandlingKlient,
                         ),
                 )
                 DagpengerOppgaveBehovLøser(
