@@ -38,9 +38,9 @@ internal class InnsendingMediator(
         }
     }
 
-    fun håndter(fagsystemBesluttet: FagsystemBesluttet) {
-        håndter(fagsystemBesluttet) { innsending ->
-            innsending.håndter(fagsystemBesluttet)
+    fun håndter(fagsystem: FagsystemBesluttet) {
+        håndter(fagsystem) { innsending ->
+            innsending.håndter(fagsystem)
         }
     }
 
@@ -62,9 +62,9 @@ internal class InnsendingMediator(
         }
     }
 
-    fun håndter(gosysOppgaveOpprettet: GosysOppgaveOpprettet) {
-        håndter(gosysOppgaveOpprettet) { innsending ->
-            innsending.håndter(gosysOppgaveOpprettet)
+    fun håndter(oppgaveOpprettet: GosysOppgaveOpprettet) {
+        håndter(oppgaveOpprettet) { innsending ->
+            innsending.håndter(oppgaveOpprettet)
         }
     }
 

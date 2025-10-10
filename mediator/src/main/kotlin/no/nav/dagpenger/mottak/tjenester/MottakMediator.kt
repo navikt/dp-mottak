@@ -11,7 +11,7 @@ internal class MottakMediator(
         JoarkMottak(mediator, rapidsConnection)
         JournalpostMottak(mediator, rapidsConnection)
         PersondataMottak(mediator, rapidsConnection)
-        FagsystemMottak(mediator, rapidsConnection)
+        FagystemMottak(mediator, rapidsConnection)
         JournalpostOppdatertMottak(mediator, rapidsConnection)
         JournalpostFerdigstiltMottak(mediator, rapidsConnection)
         OpprettArenaOppgaveMottak(mediator, rapidsConnection)

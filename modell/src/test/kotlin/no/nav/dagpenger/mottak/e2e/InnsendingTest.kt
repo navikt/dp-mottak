@@ -13,8 +13,8 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Søknads
 import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AlleredeBehandletType
-import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerArenaStartVedtakType
-import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerArenaVurderHenvendelseOppgaveType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaOppgaveType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerFagsystem
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerFerdigstillJournalpostType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerGosysType
@@ -90,7 +90,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerPersondataType,
             KategoriseringType,
             AvventerSøknadsdataType,
-            AvventerArenaStartVedtakType,
+            AventerArenaStartVedtakType,
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType,
         )
@@ -169,7 +169,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerPersondataType,
             KategoriseringType,
             AvventerSøknadsdataType,
-            AvventerArenaVurderHenvendelseOppgaveType,
+            AventerArenaOppgaveType,
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType,
         )
@@ -230,7 +230,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerJournalpostType,
             AvventerPersondataType,
             KategoriseringType,
-            AvventerArenaVurderHenvendelseOppgaveType,
+            AventerArenaOppgaveType,
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType,
         )
@@ -333,7 +333,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 add(AvventerFagsystem)
                 when (fagsystemType) {
                     Fagsystem.FagsystemType.ARENA -> {
-                        add(AvventerArenaVurderHenvendelseOppgaveType)
+                        add(AventerArenaOppgaveType)
                     }
 
                     Fagsystem.FagsystemType.DAGPENGER -> {
@@ -444,7 +444,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 add(AvventerSøknadsdataType)
                 add(AvventerFagsystem)
                 if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
-                    add(AvventerArenaVurderHenvendelseOppgaveType)
+                    add(AventerArenaOppgaveType)
                 }
                 add(AvventerFerdigstillJournalpostType)
                 add(InnsendingFerdigstiltType)
@@ -521,7 +521,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerPersondataType,
             KategoriseringType,
             AvventerSøknadsdataType,
-            AvventerArenaVurderHenvendelseOppgaveType,
+            AventerArenaOppgaveType,
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType,
         )

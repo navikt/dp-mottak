@@ -77,17 +77,15 @@ data class InnsendingData(
                 InnsendingTilstandTypeData.AvventerPersondataType -> Innsending.AvventerPersondata
                 InnsendingTilstandTypeData.KategoriseringType -> Innsending.Kategorisering
                 InnsendingTilstandTypeData.AvventerSøknadsdataType -> Innsending.AvventerSøknadsdata
-                InnsendingTilstandTypeData.AvventerMinsteinntektVurderingType -> Innsending.AvventerArenaStartVedtak
-                InnsendingTilstandTypeData.AvventerSvarOmEksisterendeSakerType -> Innsending.AvventerArenaStartVedtak
-                InnsendingTilstandTypeData.AvventerArenaStartVedtakType -> Innsending.AvventerArenaStartVedtak
-                InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType -> Innsending.AvventerFerdigstill
+                InnsendingTilstandTypeData.AvventerMinsteinntektVurderingType -> Innsending.AventerArenaStartVedtak
+                InnsendingTilstandTypeData.AvventerSvarOmEksisterendeSakerType -> Innsending.AventerArenaStartVedtak
+                InnsendingTilstandTypeData.AventerArenaStartVedtakType -> Innsending.AventerArenaStartVedtak
+                InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType -> Innsending.AventerFerdigstill
                 InnsendingTilstandTypeData.InnsendingFerdigstiltType -> Innsending.InnsendingFerdigStilt
-                InnsendingTilstandTypeData.AvventerArenaVurderHenvendelseOppgaveType -> Innsending.AvventerVurderHenvendelseArenaOppgave
+                InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerVurderHenvendelseArenaOppgave
                 InnsendingTilstandTypeData.AvventerGosysType -> Innsending.AvventerGosysOppgave
                 InnsendingTilstandTypeData.UkjentBrukerType -> Innsending.UkjentBruker
                 InnsendingTilstandTypeData.AlleredeBehandletType -> Innsending.AlleredeBehandlet
-                InnsendingTilstandTypeData.AvventerFagsystemType -> Innsending.AvventerFagsystem
-                InnsendingTilstandTypeData.AvventerDagpengerOppgaveType -> Innsending.AvventerDagpengerOppgave
             }
 
         enum class InnsendingTilstandTypeData {
@@ -98,15 +96,13 @@ data class InnsendingData(
             AvventerSøknadsdataType,
             AvventerMinsteinntektVurderingType,
             AvventerSvarOmEksisterendeSakerType,
-            AvventerArenaStartVedtakType,
+            AventerArenaStartVedtakType,
             AvventerFerdigstillJournalpostType,
             InnsendingFerdigstiltType,
-            AvventerArenaVurderHenvendelseOppgaveType,
+            AventerArenaOppgaveType,
             AvventerGosysType,
             UkjentBrukerType,
             AlleredeBehandletType,
-            AvventerFagsystemType,
-            AvventerDagpengerOppgaveType,
         }
     }
 

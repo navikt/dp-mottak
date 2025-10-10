@@ -80,7 +80,7 @@ val innsendingData =
         journalpostId = journalpostId,
         tilstand =
             InnsendingData.TilstandData(
-                InnsendingData.TilstandData.InnsendingTilstandTypeData.AvventerArenaVurderHenvendelseOppgaveType,
+                InnsendingData.TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType,
             ),
         journalpostData =
             InnsendingData.JournalpostData(
