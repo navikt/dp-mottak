@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.UUID
 
-internal class DagpengerOppgaveBehovTest {
+internal class DagpengerOppgaveBehovLøserTest {
     private val testRapid = TestRapid()
     private val journalpostId = "2345678"
     private val oppgaveId = UUID.randomUUID()

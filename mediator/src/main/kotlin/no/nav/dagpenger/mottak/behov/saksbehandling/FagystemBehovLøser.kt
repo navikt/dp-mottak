@@ -67,7 +67,7 @@ internal class FagystemBehovLøser(
                         }
 
                         KategorisertJournalpost.Kategori.ETTERSENDING -> {
-                            lagLøsning(oppgaveRuting.ruteOppgave(ident, packet["soknadsId"].asUUID()))
+                            lagLøsning(oppgaveRuting.ruteOppgave(ident, packet["søknadsId"].asUUID()))
                         }
 
                         else -> {
