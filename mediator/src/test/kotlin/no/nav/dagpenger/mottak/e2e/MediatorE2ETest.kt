@@ -2,7 +2,6 @@ package no.nav.dagpenger.mottak.e2e
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
-import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OpprettDagpengerOppgave
 import no.nav.dagpenger.mottak.Fagsystem.FagsystemType.DAGPENGER
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingMediator
@@ -512,12 +511,12 @@ internal class MediatorE2ETest {
           "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
-            "${OpprettDagpengerOppgave.name}"
+            "OpprettDagpengerOppgave"
           ],
           "@opprettet" : "${now()}",
           "journalpostId": "$journalpostId",
           "@løsning": {
-            "OpprettOppgave": {
+            "OpprettDagpengerOppgave": {
                 "fagsakId": "${DagpengerOppgave.fagsakId}",
                 "oppgaveId": "${DagpengerOppgave.oppgaveId}"
             }
