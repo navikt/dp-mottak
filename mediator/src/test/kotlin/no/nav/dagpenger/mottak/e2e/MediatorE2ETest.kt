@@ -190,12 +190,12 @@ internal class MediatorE2ETest {
                 testInnsendingVisitor.fagsakId shouldBe DagpengerOppgave.fagsakId
                 testInnsendingVisitor.oppgaveId shouldBe DagpengerOppgave.oppgaveId
             }
-            assertBehov("OppdaterJournalpost", 3)
+            assertBehov("OppdaterJournalpost", 4)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
-            assertBehov("FerdigstillJournalpost", 4)
+            assertBehov("FerdigstillJournalpost", 5)
             håndterHendelse(ferdigstiltJournalpostMotattHendelse())
             assertTrue(
-                testRapid.inspektør.size == 5,
+                testRapid.inspektør.size == 6,
                 "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
             )
             assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())

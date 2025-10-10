@@ -37,7 +37,7 @@ internal class InnsendingDataTest {
                 journalpostId = journalpostId,
                 tilstand =
                     TilstandData(
-                        TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType,
+                        TilstandData.InnsendingTilstandTypeData.AvventerArenaVurderHenvendelseOppgaveType,
                     ),
                 journalpostData =
                     JournalpostData(

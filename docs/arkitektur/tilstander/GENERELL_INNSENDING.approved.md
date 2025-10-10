@@ -7,8 +7,8 @@ Kategorisert som: `Generell`, Behandlende enhet: `4450`
 	AvventerJournalpostType --> AvventerPersondataType
 	AvventerPersondataType --> KategoriseringType
 	KategoriseringType --> AvventerSøknadsdataType
-	AvventerSøknadsdataType --> AventerArenaOppgaveType
-	AventerArenaOppgaveType --> AvventerFerdigstillJournalpostType
+	AvventerSøknadsdataType --> AvventerArenaVurderHenvendelseOppgaveType
+	AvventerArenaVurderHenvendelseOppgaveType --> AvventerFerdigstillJournalpostType
 	AvventerFerdigstillJournalpostType --> InnsendingFerdigstiltType
    InnsendingFerdigstiltType--> [*]    
 ```

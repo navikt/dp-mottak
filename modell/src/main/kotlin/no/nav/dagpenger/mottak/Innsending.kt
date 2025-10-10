@@ -97,19 +97,19 @@ class Innsending private constructor(
 
     fun håndter(arenaOppgave: ArenaOppgaveOpprettet) {
         if (journalpostId != arenaOppgave.journalpostId()) return
-        kontekst(arenaOppgave, "Mottatt informasjon om opprettet Arena oppgave")
+        kontekst(arenaOppgave, "Mottatt informasjon om opprettet Arena-oppgave")
         tilstand.håndter(this, arenaOppgave)
     }
 
     fun håndter(dagpengerOppgaveOpprettet: DagpengerOppgaveOpprettet) {
         if (journalpostId != dagpengerOppgaveOpprettet.journalpostId()) return
-        kontekst(dagpengerOppgaveOpprettet, "Mottatt informasjon om opprettet oppgave")
+        kontekst(dagpengerOppgaveOpprettet, "Mottatt informasjon om opprettet dagpengeoppgave")
         tilstand.håndter(this, dagpengerOppgaveOpprettet)
     }
 
     fun håndter(arenaOppgaveFeilet: ArenaOppgaveFeilet) {
         if (journalpostId != arenaOppgaveFeilet.journalpostId()) return
-        kontekst(arenaOppgaveFeilet, "Mottatt informasjon om oppgaveopprettelse mot Arena feilet")
+        kontekst(arenaOppgaveFeilet, "Mottatt informasjon om feil ved oppretting av Arena-oppgave")
         tilstand.håndter(this, arenaOppgaveFeilet)
     }
 
@@ -125,10 +125,10 @@ class Innsending private constructor(
         tilstand.håndter(this, journalpostferdigstilt)
     }
 
-    fun håndter(gosysoppgaveopprettet: GosysOppgaveOpprettet) {
-        if (journalpostId != gosysoppgaveopprettet.journalpostId()) return
-        kontekst(gosysoppgaveopprettet, "Mottatt informasjon om opprettet Gosys oppgave")
-        tilstand.håndter(this, gosysoppgaveopprettet)
+    fun håndter(gosysOppgaveOpprettet: GosysOppgaveOpprettet) {
+        if (journalpostId != gosysOppgaveOpprettet.journalpostId()) return
+        kontekst(gosysOppgaveOpprettet, "Mottatt informasjon om opprettet Gosys-oppgave")
+        tilstand.håndter(this, gosysOppgaveOpprettet)
     }
 
     fun håndter(rekjørHendelse: RekjørHendelse) {
@@ -353,8 +353,8 @@ class Innsending private constructor(
                 is Gjenopptak -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Ettersending -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Generell -> innsending.tilstand(hendelse, AvventerSøknadsdata)
-                is Utdanning -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
-                is Etablering -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
+                is Utdanning -> innsending.tilstand(hendelse, AvventerVurderHenvendelseArenaOppgave)
+                is Etablering -> innsending.tilstand(hendelse, AvventerVurderHenvendelseArenaOppgave)
                 is Klage -> innsending.tilstand(hendelse, AvventerFagsystem)
                 is Anke -> innsending.tilstand(hendelse, AvventerFagsystem)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
@@ -381,14 +381,14 @@ class Innsending private constructor(
             innsending: Innsending,
             oppdatertJournalpost: JournalpostOppdatert,
         ) {
-            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
+            innsending.tilstand(oppdatertJournalpost, AvventerFerdigstill)
         }
 
         override fun håndter(
             innsending: Innsending,
             fagsystemBesluttet: FagsystemBesluttet,
         ) {
-            val journalpostData = requireNotNull(innsending.journalpost) { " Journalpost må være innhentet " }
+            val journalpostData = requireNotNull(innsending.journalpost) { "Journalpost må være innhentet" }
             val hendelseType = journalpostData.kategorisertJournalpost()
             when (fagsystemBesluttet.fagsystem) {
                 is Fagsystem.Dagpenger -> {
@@ -408,7 +408,7 @@ class Innsending private constructor(
 
                         KategorisertJournalpost.Kategori.ETTERSENDING -> {
                             innsending.oppdatereJournalpost(fagsystemBesluttet)
-                            innsending.tilstand(fagsystemBesluttet, AventerFerdigstill)
+                            innsending.tilstand(fagsystemBesluttet, AvventerFerdigstill)
                         }
 
                         else -> {
@@ -418,7 +418,7 @@ class Innsending private constructor(
                 }
 
                 is Fagsystem.Arena -> {
-                    innsending.tilstand(fagsystemBesluttet, AventerVurderHenvendelseArenaOppgave)
+                    innsending.tilstand(fagsystemBesluttet, AvventerVurderHenvendelseArenaOppgave)
                 }
             }
         }
@@ -456,18 +456,18 @@ class Innsending private constructor(
             innsending.rutingOppslag = søknadsdata.søknad()
 
             when (kategorisertJournalpost) {
-                is NySøknad -> innsending.tilstand(søknadsdata, AventerArenaStartVedtak)
-                is Gjenopptak -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
+                is NySøknad -> innsending.tilstand(søknadsdata, AvventerArenaStartVedtak)
+                is Gjenopptak -> innsending.tilstand(søknadsdata, AvventerVurderHenvendelseArenaOppgave)
                 is Ettersending -> innsending.tilstand(søknadsdata, AvventerFagsystem)
-                is Generell -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
+                is Generell -> innsending.tilstand(søknadsdata, AvventerVurderHenvendelseArenaOppgave)
                 else -> søknadsdata.severe("Forventet kun søknadsdata for NySøknad og Gjenopptak")
             }
         }
     }
 
-    internal object AventerArenaStartVedtak : Tilstand {
+    internal object AvventerArenaStartVedtak : Tilstand {
         override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.AventerArenaStartVedtakType
+            get() = InnsendingTilstandType.AvventerArenaStartVedtakType
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
@@ -497,13 +497,13 @@ class Innsending private constructor(
             innsending: Innsending,
             oppdatertJournalpost: JournalpostOppdatert,
         ) {
-            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
+            innsending.tilstand(oppdatertJournalpost, AvventerFerdigstill)
         }
     }
 
-    internal object AventerVurderHenvendelseArenaOppgave : Tilstand {
+    internal object AvventerVurderHenvendelseArenaOppgave : Tilstand {
         override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.AventerArenaOppgaveType
+            get() = InnsendingTilstandType.AvventerArenaVurderHenvendelseOppgaveType
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
@@ -533,7 +533,7 @@ class Innsending private constructor(
             innsending: Innsending,
             oppdatertJournalpost: JournalpostOppdatert,
         ) {
-            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
+            innsending.tilstand(oppdatertJournalpost, AvventerFerdigstill)
         }
     }
 
@@ -562,7 +562,7 @@ class Innsending private constructor(
             innsending: Innsending,
             oppdatertJournalpost: JournalpostOppdatert,
         ) {
-            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
+            innsending.tilstand(oppdatertJournalpost, AvventerFerdigstill)
         }
     }
 
@@ -615,7 +615,7 @@ class Innsending private constructor(
         }
     }
 
-    internal object AventerFerdigstill : Tilstand {
+    internal object AvventerFerdigstill : Tilstand {
         override val type: InnsendingTilstandType
             get() = InnsendingTilstandType.AvventerFerdigstillJournalpostType
         override val timeout: Duration

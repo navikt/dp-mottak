@@ -22,7 +22,8 @@ class DagpengerOppgaveOpprettetMottak internal constructor(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
-    private val løsning = "@løsning.${Behovtype.OpprettDagpengerOppgave.name}"
+    private val behovNavn = Behovtype.OpprettDagpengerOppgave.name
+    private val løsning = "@løsning.$behovNavn"
 
     init {
         River(rapidsConnection)
@@ -45,8 +46,9 @@ class DagpengerOppgaveOpprettetMottak internal constructor(
     ) {
         val journalpostId = packet["journalpostId"].asText()
         val løsningNode = packet[løsning]
+
         withLoggingContext("journalpostId" to "$journalpostId") {
-            logg.info { "Motatt løsning for behov ${Behovtype.OpprettDagpengerOppgave.name} med løsning: $løsningNode " }
+            logg.info { "Mottatt løsning for behov $behovNavn med løsning: $løsningNode" }
             val dagpengerOppgaveOpprettet =
                 DagpengerOppgaveOpprettet(
                     aktivitetslogg = Aktivitetslogg(),

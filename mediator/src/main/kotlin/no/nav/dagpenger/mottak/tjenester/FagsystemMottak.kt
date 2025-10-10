@@ -8,6 +8,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
@@ -18,28 +19,49 @@ import no.nav.dagpenger.mottak.serder.asUUID
 
 private val logg = KotlinLogging.logger {}
 
-internal class FagystemMottak(
+internal class FagsystemMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
+    private val behovNavn = Behovtype.BestemFagsystem.name
+    private val løsning = "@løsning.$behovNavn"
+
     init {
         River(rapidsConnection)
             .apply {
                 precondition { it.requireValue("@event_name", "behov") }
                 precondition { it.requireValue("@final", true) }
-                precondition {
-                    it.requireAll("@behov", listOf(Behovtype.BestemFagsystem.name))
-                }
                 validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
-                validate { it.requireKey("@løsning") }
+                validate { it.requireKey(løsning) }
                 validate { it.requireKey("journalpostId") }
-                // TODO: Skal denne være required? Eller må vi håndtere at behovet er løst med @feil?
-                validate { it.requireKey("fagsystem") }
-                validate { it.interestedIn("fagsakId") }
             }.register(this)
     }
 
-    private fun JsonMessage.fagsystem(): Fagsystem {
+    override fun onPacket(
+        packet: JsonMessage,
+        context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
+    ) {
+        val journalpostId = packet["journalpostId"].asText()
+        val løsningNode: JsonNode = packet[løsning]
+
+        withLoggingContext("journalpostId" to "$journalpostId") {
+            logg.info { "Mottatt løsning for behov $behovNavn med løsning: $løsningNode" }
+
+            val fagsystemBesluttet =
+                FagsystemBesluttet(
+                    aktivitetslogg = Aktivitetslogg(),
+                    journalpostId = journalpostId,
+                    fagsystem = løsningNode.fagsystem(),
+                )
+            innsendingMediator.håndter(
+                fagsystemBesluttet,
+            )
+        }
+    }
+
+    private fun JsonNode.fagsystem(): Fagsystem {
         val fagsystemType =
             try {
                 Fagsystem.FagsystemType.valueOf(this["fagsystem"].asText())
@@ -50,26 +72,5 @@ internal class FagystemMottak(
             Fagsystem.FagsystemType.DAGPENGER -> Fagsystem.Dagpenger(this["fagsakId"].asUUID())
             Fagsystem.FagsystemType.ARENA -> Fagsystem.Arena
         }
-    }
-
-    override fun onPacket(
-        packet: JsonMessage,
-        context: MessageContext,
-        metadata: MessageMetadata,
-        meterRegistry: MeterRegistry,
-    ) {
-        val løsning = packet["@løsning"].first()
-        val journalpostId = packet["journalpostId"].asText()
-        val fagsystem = packet["fagsystem"].asText()
-        logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId. Fagsystem er $fagsystem" }
-
-        val fagsystemBesluttet =
-            FagsystemBesluttet(
-                aktivitetslogg = Aktivitetslogg(),
-                journalpostId = journalpostId,
-                fagsystem = packet.fagsystem(),
-            )
-
-        innsendingMediator.håndter(fagsystemBesluttet)
     }
 }

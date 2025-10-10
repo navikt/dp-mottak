@@ -4,27 +4,27 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.dagpenger.mottak.Fagsystem.FagsystemType
 import no.nav.dagpenger.mottak.InnsendingMediator
-import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.UUID
 
-class DagpengerOppgaveOpprettetMottakTest {
+class FagsystemMottakTest {
     private val testRapid = TestRapid()
     private val journalpostId = "12345"
     private val sakId = UUID.randomUUID()
-    private val oppgaveId = UUID.randomUUID()
     private val opprettetTidspunkt = LocalDateTime.now()
 
     @Test
-    fun `Skal ta i mot dagpenger oppgave opprettet løsning`() {
-        val slot = mutableListOf<DagpengerOppgaveOpprettet>()
+    fun `Skal ta imot løsning på fagsystem`() {
+        val slot = mutableListOf<FagsystemBesluttet>()
         val innsendingMediator =
             mockk<InnsendingMediator>().also {
                 every { it.håndter(capture(slot)) } returns Unit
             }
-        DagpengerOppgaveOpprettetMottak(
+        FagsystemMottak(
             rapidsConnection = testRapid,
             innsendingMediator = innsendingMediator,
         )
@@ -38,14 +38,14 @@ class DagpengerOppgaveOpprettetMottakTest {
                   "@final": true,
                   "@id": "${UUID.randomUUID()}",
                   "@behov": [
-                    "OpprettDagpengerOppgave"
+                    "BestemFagsystem"
                   ],
                   "journalpostId": "$journalpostId",
                   "@opprettet": "$opprettetTidspunkt",
                   "@løsning": {
-                    "OpprettDagpengerOppgave": {
+                    "BestemFagsystem": {
                       "fagsakId": "$sakId",
-                      "oppgaveId": "$oppgaveId"
+                      "fagsystem": "DAGPENGER"
                     }
                   }
                 }
@@ -53,9 +53,6 @@ class DagpengerOppgaveOpprettetMottakTest {
                 """.trimIndent(),
         )
 
-        slot.single().oppgaveSak().let {
-            it.oppgaveId shouldBe oppgaveId
-            it.fagsakId shouldBe sakId
-        }
+        slot.single().fagsystem.fagsystemType shouldBe FagsystemType.DAGPENGER
     }
 }
