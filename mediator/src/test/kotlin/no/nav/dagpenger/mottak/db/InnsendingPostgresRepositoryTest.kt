@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.db
 
+import io.kotest.matchers.shouldBe
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
@@ -65,6 +66,47 @@ internal class InnsendingPostgresRepositoryTest {
                 hent(journalpostId).also {
                     assertDeepEquals(innsending, it)
                 }
+            }
+        }
+    }
+
+    @Test
+    fun `skal kunne oppdatere en  innsending med oppgaveId for oppgaveSak `() {
+        class OppgaveSakTestVisitor(innsending: Innsending?) : InnsendingVisitor {
+            init {
+                require(innsending != null)
+                innsending.accept(this)
+            }
+
+            override fun visitOppgaveSak(
+                oppgaveId: UUID?,
+                fagsakId: UUID,
+            ) {
+                this.oppgaveId = oppgaveId
+            }
+
+            var oppgaveId: UUID? = null
+        }
+
+        val oppgaveSakData =
+            InnsendingData.OppgaveSakData(
+                oppgaveId = null,
+                fagsakId = UUID.randomUUID(),
+            )
+        val innsending =
+            innsendingData.copy(
+                oppgaveSakData =
+                oppgaveSakData,
+            ).createInnsending()
+
+        withMigratedDb {
+            with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
+                lagre(innsending).also {
+                    assertTrue(it > 0, "lagring av innsending feilet")
+                }
+                val oppgaveId = UUID.randomUUID()
+                lagre(innsendingData.copy(oppgaveSakData = oppgaveSakData.copy(oppgaveId = oppgaveId)).createInnsending())
+                OppgaveSakTestVisitor(hent(journalpostId)).oppgaveId shouldBe oppgaveId
             }
         }
     }

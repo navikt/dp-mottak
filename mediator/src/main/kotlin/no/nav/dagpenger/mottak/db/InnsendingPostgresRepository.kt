@@ -413,7 +413,7 @@ internal class InnsendingPostgresRepository(
                     //language=PostgreSQL
                     """
                         INSERT INTO oppgave_sak_v1(fagsak_id, oppgave_id, id) VALUES (:fagsak_id, :oppgave_id, :id) 
-                        ON CONFLICT(id) DO NOTHING 
+                        ON CONFLICT(id) DO UPDATE SET fagsak_id = :fagsak_id, oppgave_id = :oppgave_id
                         """,
                     mapOf(
                         "id" to internId,
