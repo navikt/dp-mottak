@@ -1,18 +1,18 @@
 package no.nav.dagpenger.mottak
 
 enum class InnsendingTilstandType {
-    MottattType,
+    AlleredeBehandletType,
+    AventerArenaOppgaveType,
+    AventerArenaStartVedtakType,
+    AvventerDagpengerOppgaveType,
+    AvventerFagsystem,
+    AvventerFerdigstillJournalpostType,
+    AvventerGosysType,
     AvventerJournalpostType,
     AvventerPersondataType,
-    KategoriseringType,
     AvventerSøknadsdataType,
-    AvventerFagsystem,
-    AventerArenaStartVedtakType,
-    AvventerFerdigstillJournalpostType,
-    AvventerDagpengerOppgaveType,
     InnsendingFerdigstiltType,
-    AventerArenaOppgaveType,
-    AvventerGosysType,
+    KategoriseringType,
+    MottattType,
     UkjentBrukerType,
-    AlleredeBehandletType,
 }

@@ -72,37 +72,41 @@ data class InnsendingData(
     ) {
         fun createTilstand(): Innsending.Tilstand =
             when (type) {
-                InnsendingTilstandTypeData.MottattType -> Innsending.Mottatt
-                InnsendingTilstandTypeData.AvventerJournalpostType -> Innsending.AvventerJournalpost
-                InnsendingTilstandTypeData.AvventerPersondataType -> Innsending.AvventerPersondata
-                InnsendingTilstandTypeData.KategoriseringType -> Innsending.Kategorisering
-                InnsendingTilstandTypeData.AvventerSøknadsdataType -> Innsending.AvventerSøknadsdata
-                InnsendingTilstandTypeData.AvventerMinsteinntektVurderingType -> Innsending.AventerArenaStartVedtak
-                InnsendingTilstandTypeData.AvventerSvarOmEksisterendeSakerType -> Innsending.AventerArenaStartVedtak
-                InnsendingTilstandTypeData.AventerArenaStartVedtakType -> Innsending.AventerArenaStartVedtak
-                InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType -> Innsending.AventerFerdigstill
-                InnsendingTilstandTypeData.InnsendingFerdigstiltType -> Innsending.InnsendingFerdigStilt
-                InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerVurderHenvendelseArenaOppgave
-                InnsendingTilstandTypeData.AvventerGosysType -> Innsending.AvventerGosysOppgave
-                InnsendingTilstandTypeData.UkjentBrukerType -> Innsending.UkjentBruker
                 InnsendingTilstandTypeData.AlleredeBehandletType -> Innsending.AlleredeBehandlet
+                InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerVurderHenvendelseArenaOppgave
+                InnsendingTilstandTypeData.AventerArenaStartVedtakType -> Innsending.AventerArenaStartVedtak
+                InnsendingTilstandTypeData.AvventerDagpengerOppgaveType -> Innsending.AvventerDagpengerOppgave
+                InnsendingTilstandTypeData.AvventerFagsystem -> Innsending.AvventerFagsystem
+                InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType -> Innsending.AventerFerdigstill
+                InnsendingTilstandTypeData.AvventerGosysType -> Innsending.AvventerGosysOppgave
+                InnsendingTilstandTypeData.AvventerJournalpostType -> Innsending.AvventerJournalpost
+                InnsendingTilstandTypeData.AvventerMinsteinntektVurderingType -> Innsending.AventerArenaStartVedtak
+                InnsendingTilstandTypeData.AvventerPersondataType -> Innsending.AvventerPersondata
+                InnsendingTilstandTypeData.AvventerSvarOmEksisterendeSakerType -> Innsending.AventerArenaStartVedtak
+                InnsendingTilstandTypeData.AvventerSøknadsdataType -> Innsending.AvventerSøknadsdata
+                InnsendingTilstandTypeData.InnsendingFerdigstiltType -> Innsending.InnsendingFerdigStilt
+                InnsendingTilstandTypeData.KategoriseringType -> Innsending.Kategorisering
+                InnsendingTilstandTypeData.MottattType -> Innsending.Mottatt
+                InnsendingTilstandTypeData.UkjentBrukerType -> Innsending.UkjentBruker
             }
 
         enum class InnsendingTilstandTypeData {
-            MottattType,
-            AvventerJournalpostType,
-            AvventerPersondataType,
-            KategoriseringType,
-            AvventerSøknadsdataType,
-            AvventerMinsteinntektVurderingType,
-            AvventerSvarOmEksisterendeSakerType,
-            AventerArenaStartVedtakType,
-            AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType,
-            AventerArenaOppgaveType,
-            AvventerGosysType,
-            UkjentBrukerType,
             AlleredeBehandletType,
+            AventerArenaOppgaveType,
+            AventerArenaStartVedtakType,
+            AvventerDagpengerOppgaveType,
+            AvventerFagsystem,
+            AvventerFerdigstillJournalpostType,
+            AvventerGosysType,
+            AvventerJournalpostType,
+            AvventerMinsteinntektVurderingType,
+            AvventerPersondataType,
+            AvventerSvarOmEksisterendeSakerType,
+            AvventerSøknadsdataType,
+            InnsendingFerdigstiltType,
+            KategoriseringType,
+            MottattType,
+            UkjentBrukerType,
         }
     }
 
