@@ -24,11 +24,13 @@ import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.SkjermingOppslag
 import no.nav.dagpenger.mottak.behov.person.createPersonOppslag
 import no.nav.dagpenger.mottak.behov.saksbehandling.DagpengerOppgaveBehovLøser
+import no.nav.dagpenger.mottak.behov.saksbehandling.FagystemBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingHttpKlient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaApiClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.OpprettGosysOppgaveLøser
+import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.OppgaveRuting
 import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.SakseierBasertRuting
 import no.nav.dagpenger.mottak.db.InnsendingMetadataPostgresRepository
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
@@ -124,6 +126,12 @@ internal class ApplicationBuilder(
                     rapidsConnection = this,
                     innsendingMetadataRepository = innsendingMetadataRepository,
                     journalpostDokarkiv = journalpostApiClient,
+                )
+                FagystemBehovLøser(
+                    rapidsConnection = this,
+                    oppgaveRuting = SakseierBasertRuting(
+                        saksbehandlingKlient = saksbehandlingKlient,
+                        ),
                 )
                 DagpengerOppgaveBehovLøser(
                     saksbehandlingKlient = saksbehandlingKlient,
