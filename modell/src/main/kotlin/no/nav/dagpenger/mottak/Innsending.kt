@@ -408,7 +408,6 @@ class Innsending private constructor(
 
                         KategorisertJournalpost.Kategori.ETTERSENDING -> {
                             innsending.oppdatereJournalpost(fagsystemBesluttet)
-                            innsending.tilstand(fagsystemBesluttet, AventerFerdigstill)
                         }
 
                         else -> {

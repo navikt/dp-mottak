@@ -2,20 +2,33 @@ package no.nav.dagpenger.mottak.e2e
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import no.nav.dagpenger.mottak.Fagsystem.FagsystemType
 import no.nav.dagpenger.mottak.Fagsystem.FagsystemType.DAGPENGER
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingMediator
+import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.InnsendingVisitor
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
+import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingKlient
+import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
+import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysOppgaveRequest
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
 import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
+import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
+import no.nav.dagpenger.mottak.observers.FerdigstiltEttersendingObserver
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNotNull
+import org.junit.jupiter.api.assertNull
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import java.time.LocalDateTime.now
@@ -29,9 +42,14 @@ internal class MediatorE2ETest {
 
     private val testObservatør = TestObservatør()
 
-    private object DagpengerOppgave {
+    private object TestDagpengerOppgave {
         val oppgaveId = UUID.randomUUID()
         val fagsakId = UUID.randomUUID()
+    }
+
+    private object TestArenaOppgave {
+        val oppgaveId = "1231"
+        val fagsakId = null
     }
 
     @BeforeEach
@@ -171,6 +189,175 @@ internal class MediatorE2ETest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = ["NAVe 04-01.03", "NAVe 04-01.04"])
+    fun `Skal motta ettersending som skal til Dagpenger`(brevkode: String) {
+        val fagsakId = UUID.randomUUID()
+        val saksbehandlingKlient =
+            mockk<SaksbehandlingKlient>().also {
+                coEvery { it.skalVarsleOmEttersending(any(), any()) } returns true
+            }
+
+        val slot = mutableListOf<GosysOppgaveRequest>()
+        val gosysClient =
+            mockk<GosysClient>().also {
+                coEvery { it.opprettOppgave(capture(slot)) } returns "gosysid"
+            }
+
+        val ferdigstiltEttersendingObserver =
+            FerdigstiltEttersendingObserver(
+                saksbehandlingKlient = saksbehandlingKlient,
+                gosysClient = gosysClient,
+            )
+        withMigratedDb {
+            settOppInfrastruktur(additionalObservers = listOf(ferdigstiltEttersendingObserver))
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = brevkode))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("Søknadsdata", 2)
+            håndterHendelse(søknadsdataMottakHendelse())
+            assertBehov("BestemFagsystem", 3)
+            val melding = fagsystemBesluttet(fagsakId = fagsakId.toString(), fagsystem = DAGPENGER.name)
+            håndterHendelse(melding)
+            assertBehov("OppdaterJournalpost", 4)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertBehov("FerdigstillJournalpost", 5)
+            håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+
+            assertInnsending(journalpostId.toString()) { testInnsendingVisitor ->
+                assertNotNull(testInnsendingVisitor.oppgaveSak)
+                testInnsendingVisitor.oppgaveSak!!.fagsakId shouldBe fagsakId
+            }
+            assertTrue(
+                testRapid.inspektør.size == 6,
+                "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
+            )
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+
+            assertEquals(1, slot.size)
+            slot.single().let {
+                it.journalpostId shouldBe journalpostId.toString()
+                it.beskrivelse shouldBe "Ettersendelse til dagpengesøknad i ny løsning"
+                it.oppgavetype shouldBe "ETTERSEND_MOTT"
+                it.aktoerId shouldBe "tadda"
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["NAVe 04-01.03", "NAVe 04-01.04"])
+    fun `Skal motta ettersending som skal til Arena men som skal varsles i Dagpenger`(brevkode: String) {
+        val oppgaveId = "12324"
+        val saksbehandlingKlient =
+            mockk<SaksbehandlingKlient>().also {
+                coEvery { it.skalVarsleOmEttersending(any(), any()) } returns true
+            }
+
+        val slot = mutableListOf<GosysOppgaveRequest>()
+        val gosysClient =
+            mockk<GosysClient>().also {
+                coEvery { it.opprettOppgave(capture(slot)) } returns "gosysid"
+            }
+
+        val ferdigstiltEttersendingObserver =
+            FerdigstiltEttersendingObserver(
+                saksbehandlingKlient = saksbehandlingKlient,
+                gosysClient = gosysClient,
+            )
+        withMigratedDb {
+            settOppInfrastruktur(additionalObservers = listOf(ferdigstiltEttersendingObserver))
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = brevkode))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("Søknadsdata", 2)
+            håndterHendelse(søknadsdataMottakHendelse())
+            assertBehov("BestemFagsystem", 3)
+            val melding = fagsystemBesluttet(fagsakId = null, fagsystem = FagsystemType.ARENA.name)
+            håndterHendelse(melding)
+            assertBehov("OpprettVurderhenvendelseOppgave", 4)
+            håndterHendelse(opprettOpprettVurderhenvendelseHendelse(oppgaveId))
+            assertBehov("OppdaterJournalpost", 5)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertBehov("FerdigstillJournalpost", 6)
+            håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+
+            assertInnsending(journalpostId.toString()) { testInnsendingVisitor ->
+                assertNotNull(testInnsendingVisitor.arenaSak)
+                assertNull(testInnsendingVisitor.oppgaveSak)
+                testInnsendingVisitor.arenaSak!!.oppgaveId shouldBe oppgaveId
+            }
+            assertTrue(
+                testRapid.inspektør.size == 7,
+                "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
+            )
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+
+            assertEquals(1, slot.size)
+            slot.single().let {
+                it.journalpostId shouldBe journalpostId.toString()
+                it.beskrivelse shouldBe "Ettersendelse til dagpengesøknad i ny løsning"
+                it.oppgavetype shouldBe "ETTERSEND_MOTT"
+                it.aktoerId shouldBe "tadda"
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["NAVe 04-01.03", "NAVe 04-01.04"])
+    fun `Skal motta ettersending som skal til Arena men som ikke skal varsles i Dagpenger`(brevkode: String) {
+        val oppgaveId = "12324"
+        val saksbehandlingKlient =
+            mockk<SaksbehandlingKlient>().also {
+                coEvery { it.skalVarsleOmEttersending(any(), any()) } returns false
+            }
+
+        val gosysClient =
+            mockk<GosysClient>().also {
+                coEvery { it.opprettOppgave(any()) } returns "gosysid"
+            }
+
+        val ferdigstiltEttersendingObserver =
+            FerdigstiltEttersendingObserver(
+                saksbehandlingKlient = saksbehandlingKlient,
+                gosysClient = gosysClient,
+            )
+        withMigratedDb {
+            settOppInfrastruktur(additionalObservers = listOf(ferdigstiltEttersendingObserver))
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = brevkode))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("Søknadsdata", 2)
+            håndterHendelse(søknadsdataMottakHendelse())
+            assertBehov("BestemFagsystem", 3)
+            val melding = fagsystemBesluttet(fagsakId = null, fagsystem = FagsystemType.ARENA.name)
+            håndterHendelse(melding)
+            assertBehov("OpprettVurderhenvendelseOppgave", 4)
+            håndterHendelse(opprettOpprettVurderhenvendelseHendelse(oppgaveId))
+            assertBehov("OppdaterJournalpost", 5)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertBehov("FerdigstillJournalpost", 6)
+            håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+
+            assertInnsending(journalpostId.toString()) { testInnsendingVisitor ->
+                assertNotNull(testInnsendingVisitor.arenaSak)
+                assertNull(testInnsendingVisitor.oppgaveSak)
+                testInnsendingVisitor.arenaSak!!.oppgaveId shouldBe oppgaveId
+            }
+            assertTrue(
+                testRapid.inspektør.size == 7,
+                "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
+            )
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+            coVerify(exactly = 0) { gosysClient.opprettOppgave(any()) }
+        }
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = ["NAV 90-00.08", "NAV 90-00.08 K", "NAVe 90-00.08 K", "NAV 90-00.08 A", "NAVe 90-00.08 A"])
     fun `Skal motta klage og anke i DAGPENGER`(brevkode: String) {
         withMigratedDb {
@@ -181,20 +368,57 @@ internal class MediatorE2ETest {
             assertBehov("Persondata", 1)
             håndterHendelse(persondataMottattHendelse())
             assertBehov("BestemFagsystem", 2)
-            val melding = fagsystemBesluttet(fagsakId = DagpengerOppgave.fagsakId.toString(), fagsystem = DAGPENGER.name)
+            val melding = fagsystemBesluttet(fagsakId = TestDagpengerOppgave.fagsakId.toString(), fagsystem = DAGPENGER.name)
             håndterHendelse(melding)
             assertBehov("OpprettDagpengerOppgave", 3)
             håndterHendelse(opprettDagpengerOppgaveHendelse())
             assertInnsending(journalpostId.toString()) { testInnsendingVisitor ->
-                testInnsendingVisitor.fagsakId shouldBe DagpengerOppgave.fagsakId
-                testInnsendingVisitor.oppgaveId shouldBe DagpengerOppgave.oppgaveId
+                assertNotNull(testInnsendingVisitor.oppgaveSak)
+                testInnsendingVisitor.oppgaveSak!!.fagsakId shouldBe TestDagpengerOppgave.fagsakId
+                testInnsendingVisitor.oppgaveSak!!.oppgaveId shouldBe TestDagpengerOppgave.oppgaveId
             }
-            assertBehov("OppdaterJournalpost", 3)
+            assertBehov("OppdaterJournalpost", 4)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
-            assertBehov("FerdigstillJournalpost", 4)
+            assertBehov("FerdigstillJournalpost", 5)
             håndterHendelse(ferdigstiltJournalpostMotattHendelse())
             assertTrue(
-                testRapid.inspektør.size == 5,
+                testRapid.inspektør.size == 6,
+                "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
+            )
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["NAV 90-00.08", "NAV 90-00.08 K", "NAVe 90-00.08 K", "NAV 90-00.08 A", "NAVe 90-00.08 A"])
+    fun `Skal motta klage og anke i Arena`(brevkode: String) {
+        withMigratedDb {
+            settOppInfrastruktur()
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = brevkode))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("BestemFagsystem", 2)
+            val melding = fagsystemBesluttet(fagsakId = TestArenaOppgave.fagsakId, fagsystem = FagsystemType.ARENA.name)
+            håndterHendelse(melding)
+            assertBehov("OpprettVurderhenvendelseOppgave", 3)
+            håndterHendelse(
+                opprettOpprettVurderhenvendelseHendelse(
+                    oppgaveId = TestArenaOppgave.oppgaveId,
+                ),
+            )
+            assertInnsending(journalpostId.toString()) { testInnsendingVisitor ->
+                assertNotNull(testInnsendingVisitor.arenaSak)
+                testInnsendingVisitor.arenaSak!!.oppgaveId shouldBe TestArenaOppgave.oppgaveId
+            }
+
+            assertBehov("OppdaterJournalpost", 4)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertBehov("FerdigstillJournalpost", 5)
+            håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+            assertTrue(
+                testRapid.inspektør.size == 6,
                 "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
             )
             assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
@@ -203,17 +427,17 @@ internal class MediatorE2ETest {
 
     private fun assertInnsending(
         journalpostId: String,
-        assertBlock: (innsending: TestInnsendingVisitor) -> Unit,
+        assertBlock: (innsending: TestInnsendingSakVisitor) -> Unit,
     ) {
         InnsendingPostgresRepository(
             PostgresDataSourceBuilder.dataSource,
         ).let {
             val innsending = requireNotNull(it.hent(journalpostId))
-            assertBlock(TestInnsendingVisitor(innsending))
+            assertBlock(TestInnsendingSakVisitor(innsending))
         }
     }
 
-    private fun settOppInfrastruktur() {
+    private fun settOppInfrastruktur(additionalObservers: List<InnsendingObserver> = emptyList()) {
         val innsendingRepository =
             InnsendingPostgresRepository(datasource = PostgresDataSourceBuilder.dataSource).also {
                 PostgresDataSourceBuilder.runMigration()
@@ -222,7 +446,7 @@ internal class MediatorE2ETest {
             InnsendingMediator(
                 innsendingRepository = innsendingRepository,
                 rapidsConnection = testRapid,
-                observatører = listOf(testObservatør),
+                observatører = listOf(testObservatør) + additionalObservers,
             )
 
         MottakMediator(innsendingMediator, testRapid)
@@ -422,7 +646,9 @@ internal class MediatorE2ETest {
         """.trimIndent()
 
     //language=JSON
-    private fun opprettOpprettVurderhenvendelseHendelse(): String =
+    private fun opprettOpprettVurderhenvendelseHendelse(
+        oppgaveId: String = "12345678",
+    ): String =
         """
         {
           "@event_name": "behov",
@@ -436,7 +662,7 @@ internal class MediatorE2ETest {
           "@løsning": {
             "OpprettVurderhenvendelseOppgave": {
               "fagsakId": "12345",
-              "oppgaveId": "12345678"
+              "oppgaveId": "$oppgaveId"
             }
           }
         }
@@ -517,27 +743,41 @@ internal class MediatorE2ETest {
           "journalpostId": "$journalpostId",
           "@løsning": {
             "OpprettDagpengerOppgave": {
-                "fagsakId": "${DagpengerOppgave.fagsakId}",
-                "oppgaveId": "${DagpengerOppgave.oppgaveId}"
+                "fagsakId": "${TestDagpengerOppgave.fagsakId}",
+                "oppgaveId": "${TestDagpengerOppgave.oppgaveId}"
             }
           }
         }
         """.trimIndent()
 
-    private class TestInnsendingVisitor(innsending: Innsending) : InnsendingVisitor {
-        var oppgaveId: UUID? = null
-        var fagsakId: UUID? = null
+    private class TestInnsendingSakVisitor(innsending: Innsending) : InnsendingVisitor {
+        var arenaSak: ArenaOppgaveOpprettet.ArenaSak? = null
+        var oppgaveSak: DagpengerOppgaveOpprettet.OppgaveSak? = null
 
         init {
             innsending.accept(this)
+        }
+
+        override fun visitArenaSak(
+            oppgaveId: String,
+            fagsakId: String?,
+        ) {
+            this.arenaSak =
+                ArenaOppgaveOpprettet.ArenaSak(
+                    oppgaveId = oppgaveId,
+                    fagsakId = fagsakId,
+                )
         }
 
         override fun visitOppgaveSak(
             oppgaveId: UUID?,
             fagsakId: UUID,
         ) {
-            this.oppgaveId = oppgaveId
-            this.fagsakId = fagsakId
+            this.oppgaveSak =
+                DagpengerOppgaveOpprettet.OppgaveSak(
+                    oppgaveId = oppgaveId,
+                    fagsakId = fagsakId,
+                )
         }
     }
 }
