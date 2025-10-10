@@ -143,7 +143,7 @@ data class InnsendingData(
     )
 
     data class OppgaveSakData(
-        val oppgaveId: UUID,
+        val oppgaveId: UUID?,
         val fagsakId: UUID,
     )
 

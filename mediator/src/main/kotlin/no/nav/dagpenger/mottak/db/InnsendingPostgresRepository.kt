@@ -113,10 +113,10 @@ internal class InnsendingPostgresRepository(
                                     )
                                 },
                             oppgaveSakData =
-                                row.uuidOrNull("oppgave_id_dagpenger")?.let {
+                                row.uuidOrNull("fagsak_id_dagpenger")?.let { fagsakId ->
                                     InnsendingData.OppgaveSakData(
-                                        oppgaveId = it,
-                                        fagsakId = row.uuid("fagsak_id_dagpenger"),
+                                        oppgaveId = row.uuidOrNull("oppgave_id_dagpenger"),
+                                        fagsakId = fagsakId,
                                     )
                                 },
                             søknadsData =
