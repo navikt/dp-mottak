@@ -33,6 +33,7 @@ tasks.test {
         exceptionFormat = TestExceptionFormat.FULL
         events = setOf(TestLogEvent.PASSED, TestLogEvent.SKIPPED, TestLogEvent.FAILED)
     }
+    maxParallelForks = Runtime.getRuntime().availableProcessors()
 }
 
 tasks.withType<KotlinCompile>().configureEach {
