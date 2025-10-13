@@ -20,15 +20,13 @@ class FagsystemBehovLøserTest {
     private val testIdentUtenDagpengerSak = "12121244444"
     private val sakId = UUID.randomUUID()
     private val søknadIdFerdigbehandlet = UUID.randomUUID()
-    private val søknadIdUnderBehandling = UUID.randomUUID()
-    private val søknadIdIkkePåstartet = UUID.randomUUID()
+    private val søknadIdIkkeFerdigbehandlet = UUID.randomUUID()
     private val oppgaveRutingMock =
         mockk<OppgaveRuting>().also {
-            coEvery { it.ruteOppgave(testIdent, søknadIdUnderBehandling) } returns Fagsystem.Arena
-            coEvery { it.ruteOppgave(testIdent, søknadIdIkkePåstartet) } returns Fagsystem.Arena
-            coEvery { it.ruteOppgave(testIdent, søknadIdFerdigbehandlet) } returns Fagsystem.Dagpenger(sakId)
-            coEvery { it.ruteOppgave(testIdent) } returns Fagsystem.Dagpenger(sakId)
-            coEvery { it.ruteOppgave(testIdentUtenDagpengerSak) } returns Fagsystem.Arena
+            coEvery { it.ruteOppgave(ident = testIdent, søknadsId = søknadIdIkkeFerdigbehandlet) } returns Fagsystem.Arena
+            coEvery { it.ruteOppgave(ident = testIdent, søknadsId = søknadIdFerdigbehandlet) } returns Fagsystem.Dagpenger(sakId)
+            coEvery { it.ruteOppgave(ident = testIdent) } returns Fagsystem.Dagpenger(sakId)
+            coEvery { it.ruteOppgave(ident = testIdentUtenDagpengerSak) } returns Fagsystem.Arena
         }
 
     @BeforeEach
@@ -37,7 +35,7 @@ class FagsystemBehovLøserTest {
     }
 
     @Test
-    fun `Bestem fagsystem for ettersending til søknad som er ferdigbehandlet i dp-sak`() {
+    fun `Bestem fagsystem for ettersending til søknad som er ferdigbehandlet med vedtak i dp-sak`() {
         FagystemBehovLøser(
             oppgaveRuting = oppgaveRutingMock,
             rapidsConnection = testRapid,
@@ -52,13 +50,13 @@ class FagsystemBehovLøserTest {
     }
 
     @Test
-    fun `Bestem fagsystem for ettersending til søknad som er under behandling i dp-sak`() {
+    fun `Bestem fagsystem for ettersending til søknad som ikke er ferdigbehandlet med vedtak i dp-sak`() {
         FagystemBehovLøser(
             oppgaveRuting = oppgaveRutingMock,
             rapidsConnection = testRapid,
         )
 
-        testRapid.sendTestMessage(bestemFagsystemBehovForEttersending(søknadIdUnderBehandling))
+        testRapid.sendTestMessage(bestemFagsystemBehovForEttersending(søknadIdIkkeFerdigbehandlet))
         with(testRapid.inspektør) {
             size shouldBe 1
             field(0, "@løsning")[FagystemBehovLøser.behovNavn]["fagsystem"].asText() shouldBe "ARENA"
