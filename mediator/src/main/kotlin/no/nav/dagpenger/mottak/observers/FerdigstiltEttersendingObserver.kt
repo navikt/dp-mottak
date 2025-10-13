@@ -6,8 +6,11 @@ import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingKlient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysOppgaveRequest
-import no.nav.dagpenger.mottak.meldinger.SkjemaType
 import no.nav.dagpenger.mottak.meldinger.SkjemaType.Companion.tilSkjemaType
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_GJENOPPTAK_ORDINÆR_ETTERSENDING
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_GJENOPPTAK_PERMITTERT_ETTERSENDING
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_ORDINÆR_ETTERSENDING
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_PERMITTERT_ETTERSENDING
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.QuizSøknadFormat
 import java.time.LocalDate
 
@@ -20,7 +23,13 @@ class FerdigstiltEttersendingObserver internal constructor(
     override fun innsendingFerdigstilt(event: InnsendingObserver.InnsendingEvent) {
         sikkerlogg.info { "FerdigstiltEttersendingObserver innsending $event" }
         val skjemaType = event.skjemaKode.tilSkjemaType()
-        if (skjemaType != SkjemaType.DAGPENGESØKNAD_ORDINÆR_ETTERSENDING && skjemaType != SkjemaType.DAGPENGESØKNAD_PERMITTERT_ETTERSENDING) {
+        if (!setOf(
+                DAGPENGESØKNAD_GJENOPPTAK_ORDINÆR_ETTERSENDING,
+                DAGPENGESØKNAD_GJENOPPTAK_PERMITTERT_ETTERSENDING,
+                DAGPENGESØKNAD_ORDINÆR_ETTERSENDING,
+                DAGPENGESØKNAD_PERMITTERT_ETTERSENDING,
+            ).contains(skjemaType)
+        ) {
             return
         }
 

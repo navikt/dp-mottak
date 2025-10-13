@@ -11,9 +11,10 @@ import no.nav.dagpenger.mottak.InnsendingObserver.Type.Ettersending
 import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingKlient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysOppgaveRequest
-import no.nav.dagpenger.mottak.meldinger.SkjemaType
 import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_ORDINÆR_ETTERSENDING
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import java.time.LocalDateTime
 
 class FerdigstiltEttersendingObserverTest {
@@ -26,7 +27,7 @@ class FerdigstiltEttersendingObserverTest {
         }
 
     @Test
-    fun `Hvis varsle om ettersending kall gosys`() {
+    fun `Hvis varsle om ettersending med oppgave i gosys`() {
         val slot = CapturingSlot<GosysOppgaveRequest>()
         val gosysClient =
             mockk<GosysClient>().also {
@@ -58,7 +59,7 @@ class FerdigstiltEttersendingObserverTest {
     }
 
     @Test
-    fun `Hvis ikke varsle om ettersending ikke kall gosys`() {
+    fun `Hvis ikke varsle om ettersending med oppgave i gosys`() {
         val gosysClient = mockk<GosysClient>()
 
         val observer = FerdigstiltEttersendingObserver(saksbehandlingKlient, gosysClient)
@@ -71,18 +72,40 @@ class FerdigstiltEttersendingObserverTest {
         coVerify(exactly = 0) { gosysClient.opprettOppgave(any()) }
     }
 
-    @Test
-    fun `Hvis ikke varsle om ettersending hvis skjemakode ikke er ettersending til søknad`() {
-        val mockSaksbehandlingKlient = mockk<SaksbehandlingKlient>()
+    @ParameterizedTest
+    @CsvSource(
+        "NAVe 04-01.03, 1",
+        "NAVe 04-01.04, 1",
+        "NAVe 04-16.03, 1",
+        "NAVe 04-16.04, 1",
+        "NAVe 90-00.08 K, 0",
+        "NAVe 90-00.08 A, 0",
+        "NAVe 04-02.01, 0",
+        "NAVe 04-02.05, 0",
+        "NAVe 04-03.07, 0",
+        "NAVe 04-03.08, 0",
+        "NAVe 04-08.03, 0",
+        "NAVe 04-08.04, 0",
+    )
+    fun `Skal bare sjekke behov for varsling for ettersendinger hvis skjemakode er ettersending til dagpengesøknad`(
+        skjemaKode: String,
+        antallSjekkOmVarsling: Int,
+    ) {
+        val mockGosysClient =
+            mockk<GosysClient>().also {
+                coEvery {
+                    it.opprettOppgave(any())
+                } returns "oppgaveId"
+            }
 
-        val observer = FerdigstiltEttersendingObserver(mockSaksbehandlingKlient, mockk<GosysClient>())
+        val observer = FerdigstiltEttersendingObserver(saksbehandlingKlient, mockGosysClient)
         observer.innsendingFerdigstilt(
             innsendingFerdigstiltEvent(
                 ident = identVarsle,
-                skjemaKode = SkjemaType.DAGPENGESØKNAD_ETABLERING.skjemakode,
+                skjemaKode = skjemaKode,
             ),
         )
-        coVerify(exactly = 0) { mockSaksbehandlingKlient.skalVarsleOmEttersending(any(), any()) }
+        coVerify(exactly = antallSjekkOmVarsling) { saksbehandlingKlient.skalVarsleOmEttersending(any(), any()) }
     }
 
     private fun innsendingFerdigstiltEvent(
