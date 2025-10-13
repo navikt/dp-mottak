@@ -9,18 +9,19 @@ import io.ktor.client.request.HttpRequestData
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.fullPath
 import io.ktor.http.headersOf
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.runBlocking
+import no.nav.dagpenger.mottak.behov.saksbehandling.SakIdResponse
 import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingHttpKlient
-import no.nav.dagpenger.mottak.behov.saksbehandling.SisteSakIdResult
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.UUID
 
 class SaksbehandlingHttpKlientTest {
     @Test
-    fun `henting av siste saks id`() {
+    fun `henting av siste sakId`() {
         val personMedSak = "personMedSak"
         val personUtenSak = "personUtenSak"
         var requestData: HttpRequestData? = null
@@ -47,14 +48,50 @@ class SaksbehandlingHttpKlientTest {
             )
 
         runBlocking {
-            saksbehandlingHttpKlient.hentSisteSakId(personMedSak) shouldBe SisteSakIdResult.Funnet(sisteSakId)
-            saksbehandlingHttpKlient.hentSisteSakId(personUtenSak) shouldBe SisteSakIdResult.IkkeFunnet
+            saksbehandlingHttpKlient.hentSisteSakId(personMedSak) shouldBe SakIdResponse.Funnet(sisteSakId)
+            saksbehandlingHttpKlient.hentSisteSakId(personUtenSak) shouldBe SakIdResponse.IkkeFunnet
         }
 
         requireNotNull(requestData).let { request ->
             request.method.value shouldBe "POST"
             request.headers[HttpHeaders.Authorization] shouldBe "Bearer token"
             request.url.toString() shouldBe "http://dp-saksbehandling/sak/siste-sak-id/for-ident"
+        }
+    }
+
+    @Test
+    fun `henting av sakId for søknad`() {
+        val søknadMedSak = UUID.randomUUID()
+        val søknadUtenSak = UUID.randomUUID()
+        var requestData: HttpRequestData? = null
+        val sakId = UUID.randomUUID()
+
+        val mockEngine =
+            MockEngine { request ->
+                requestData = request
+                val harSak = request.url.fullPath.contains(søknadMedSak.toString())
+                when (harSak) {
+                    true -> {
+                        respond(""" {"id": "$sakId"} """, status = HttpStatusCode.OK, headers = headersOf(HttpHeaders.ContentType, "application/json"))
+                    }
+
+                    false -> {
+                        respond(content = "", status = HttpStatusCode.NoContent)
+                    }
+                }
+            }
+        val saksbehandlingHttpKlient =
+            SaksbehandlingHttpKlient(
+                engine = mockEngine,
+                tokenProvider = { "token" },
+            )
+
+        runBlocking {
+            saksbehandlingHttpKlient.hentSakIdForSøknad(søknadMedSak) shouldBe SakIdResponse.Funnet(sakId)
+            assertRequest(requestData = requestData, expectedUrl = "http://dp-saksbehandling/sak/sak-id-for-soknad/$søknadMedSak", expectedMethod = HttpMethod.Get)
+
+            saksbehandlingHttpKlient.hentSakIdForSøknad(søknadUtenSak) shouldBe SakIdResponse.IkkeFunnet
+            assertRequest(requestData = requestData, expectedUrl = "http://dp-saksbehandling/sak/sak-id-for-soknad/$søknadUtenSak", expectedMethod = HttpMethod.Get)
         }
     }
 
@@ -141,6 +178,18 @@ class SaksbehandlingHttpKlientTest {
             request.method shouldBe HttpMethod.Post
             request.url.toString() shouldBe "http://localhost/klage/opprett"
             request.headers[HttpHeaders.Authorization] shouldBe "Bearer dummyToken"
+        }
+    }
+
+    private fun assertRequest(
+        requestData: HttpRequestData?,
+        expectedUrl: String,
+        expectedMethod: HttpMethod,
+    ) {
+        requireNotNull(requestData).let { request ->
+            request.method shouldBe expectedMethod
+            request.url.toString() shouldBe expectedUrl
+            request.headers[HttpHeaders.Authorization] shouldBe "Bearer token"
         }
     }
 }

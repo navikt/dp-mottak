@@ -7,6 +7,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -34,7 +35,9 @@ interface SaksbehandlingKlient {
         ident: String,
     ): UUID
 
-    suspend fun hentSisteSakId(ident: String): SisteSakIdResult
+    suspend fun hentSisteSakId(ident: String): SakIdResponse
+
+    suspend fun hentSakIdForSøknad(søknadId: UUID): SakIdResponse
 }
 
 class SaksbehandlingHttpKlient(
@@ -76,7 +79,7 @@ class SaksbehandlingHttpKlient(
         }.body<OpprettOppgaveResponse>().oppgaveId
     }
 
-    override suspend fun hentSisteSakId(ident: String): SisteSakIdResult {
+    override suspend fun hentSisteSakId(ident: String): SakIdResponse {
         return httpClient.post(urlString = "$dpSaksbehandlingBaseUrl/sak/siste-sak-id/for-ident") {
             header(HttpHeaders.Accept, ContentType.Application.Json)
             header(HttpHeaders.ContentType, ContentType.Application.Json)
@@ -86,13 +89,33 @@ class SaksbehandlingHttpKlient(
         }.let { httpResponse ->
             when (httpResponse.status) {
                 HttpStatusCode.OK -> {
-                    httpResponse.body<SisteSakIdResult.Funnet>()
+                    httpResponse.body<SakIdResponse.Funnet>()
                 }
 
                 HttpStatusCode.NoContent -> {
-                    SisteSakIdResult.IkkeFunnet
+                    SakIdResponse.IkkeFunnet
                 }
 
+                // TODO: Annen exception?
+                else -> throw RuntimeException("Uventet svar fra dp-saksbehandling: ${httpResponse.status}")
+            }
+        }
+    }
+
+    override suspend fun hentSakIdForSøknad(søknadId: UUID): SakIdResponse {
+        return httpClient.get(urlString = "$dpSaksbehandlingBaseUrl/sak/sak-id-for-soknad/$søknadId") {
+            header(HttpHeaders.Accept, ContentType.Application.Json)
+        }.let { httpResponse ->
+            when (httpResponse.status) {
+                HttpStatusCode.OK -> {
+                    httpResponse.body<SakIdResponse.Funnet>()
+                }
+
+                HttpStatusCode.NoContent -> {
+                    SakIdResponse.IkkeFunnet
+                }
+
+                // TODO: Annen exception?
                 else -> throw RuntimeException("Uventet svar fra dp-saksbehandling: ${httpResponse.status}")
             }
         }
@@ -141,8 +164,8 @@ private data class OpprettOppgaveResponse(
     val oppgaveId: UUID,
 )
 
-sealed class SisteSakIdResult {
-    data class Funnet(val id: UUID) : SisteSakIdResult()
+sealed class SakIdResponse {
+    data class Funnet(val id: UUID) : SakIdResponse()
 
-    data object IkkeFunnet : SisteSakIdResult()
+    data object IkkeFunnet : SakIdResponse()
 }

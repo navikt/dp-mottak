@@ -63,11 +63,11 @@ internal class FagystemBehovLøser(
                 val løsning: Map<String, Any> =
                     when (kategori) {
                         KategorisertJournalpost.Kategori.KLAGE -> {
-                            lagLøsning(oppgaveRuting.ruteOppgave(ident))
+                            lagLøsning(oppgaveRuting.ruteOppgave(ident = ident))
                         }
 
                         KategorisertJournalpost.Kategori.ETTERSENDING -> {
-                            lagLøsning(oppgaveRuting.ruteOppgave(ident, packet["søknadsId"].asUUID()))
+                            lagLøsning(oppgaveRuting.ruteOppgave(søknadsId = packet["søknadsId"].asUUID()))
                         }
 
                         else -> {

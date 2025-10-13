@@ -23,8 +23,8 @@ class FagsystemBehovLøserTest {
     private val søknadIdIkkeFerdigbehandlet = UUID.randomUUID()
     private val oppgaveRutingMock =
         mockk<OppgaveRuting>().also {
-            coEvery { it.ruteOppgave(ident = testIdent, søknadsId = søknadIdIkkeFerdigbehandlet) } returns Fagsystem.Arena
-            coEvery { it.ruteOppgave(ident = testIdent, søknadsId = søknadIdFerdigbehandlet) } returns Fagsystem.Dagpenger(sakId)
+            coEvery { it.ruteOppgave(søknadsId = søknadIdIkkeFerdigbehandlet) } returns Fagsystem.Arena
+            coEvery { it.ruteOppgave(søknadsId = søknadIdFerdigbehandlet) } returns Fagsystem.Dagpenger(sakId)
             coEvery { it.ruteOppgave(ident = testIdent) } returns Fagsystem.Dagpenger(sakId)
             coEvery { it.ruteOppgave(ident = testIdentUtenDagpengerSak) } returns Fagsystem.Arena
         }
