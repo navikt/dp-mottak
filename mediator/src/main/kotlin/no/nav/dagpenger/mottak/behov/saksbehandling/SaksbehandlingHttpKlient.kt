@@ -8,6 +8,8 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -23,7 +25,6 @@ import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.time.Duration.Companion.minutes
 
-private val logger = KotlinLogging.logger { }
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.SaksbehandlingHttpKlient")
 
 interface SaksbehandlingKlient {
@@ -60,6 +61,9 @@ class SaksbehandlingHttpKlient(
             }
             install(ContentNegotiation) {
                 register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
+            }
+            install(Logging) {
+                level = LogLevel.INFO
             }
         }
 
