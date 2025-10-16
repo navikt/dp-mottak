@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
@@ -20,6 +21,8 @@ import no.nav.dagpenger.mottak.meldinger.RekjørHendelse
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.QuizSøknadFormat
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
 import java.time.Duration
+
+private val logger = KotlinLogging.logger { }
 
 class Innsending private constructor(
     private val journalpostId: String,
@@ -411,7 +414,9 @@ class Innsending private constructor(
                         }
 
                         else -> {
-                            // todo
+                            val feilmelding = "Kan ikke håndtere hendelse ${fagsystemBesluttet.javaClass.simpleName} for hendelsestype ${hendelseType.kategori} "
+                            logger.error { feilmelding }
+                            throw IllegalArgumentException(feilmelding)
                         }
                     }
                 }
@@ -699,7 +704,7 @@ class Innsending private constructor(
             type = Behovtype.BestemFagsystem,
             melding = "Trenger å bestemme fagsystem",
             detaljer =
-            detaljer,
+                detaljer,
         )
     }
 
@@ -802,12 +807,12 @@ class Innsending private constructor(
                 "tittel" to journalpost.tittel(),
                 "mottakskanal" to mottakskanal,
                 "dokumenter" to
-                    journalpost.dokumenter().map {
-                        mapOf(
-                            "tittel" to it.tittel,
-                            "dokumentInfoId" to it.dokumentInfoId,
-                        )
-                    },
+                        journalpost.dokumenter().map {
+                            mapOf(
+                                "tittel" to it.tittel,
+                                "dokumentInfoId" to it.dokumentInfoId,
+                            )
+                        },
             ) + arenaSakId + sak
 
         hendelse.behov(
@@ -974,10 +979,10 @@ class Innsending private constructor(
 
     private fun erFerdigBehandlet() =
         this.tilstand.type in
-            setOf(
-                InnsendingTilstandType.InnsendingFerdigstiltType,
-                InnsendingTilstandType.AlleredeBehandletType,
-            )
+                setOf(
+                    InnsendingTilstandType.InnsendingFerdigstiltType,
+                    InnsendingTilstandType.AlleredeBehandletType,
+                )
 
     override fun toSpesifikkKontekst(): SpesifikkKontekst =
         SpesifikkKontekst(
