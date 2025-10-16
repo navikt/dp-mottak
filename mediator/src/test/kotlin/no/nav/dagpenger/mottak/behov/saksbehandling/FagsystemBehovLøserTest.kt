@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -70,10 +71,22 @@ class FagsystemBehovLøserTest {
             rapidsConnection = testRapid,
         )
 
-        testRapid.sendTestMessage(bestemFagsystemBehovForKlage(testIdent))
+        testRapid.sendTestMessage(fagsystemBehovUtenSøknadId(testIdent, "KLAGE"))
         with(testRapid.inspektør) {
             size shouldBe 1
             field(0, "@løsning")[FagystemBehovLøser.behovNavn]["fagsystem"].asText() shouldBe "DAGPENGER"
+        }
+    }
+
+    @Test
+    fun `Skal kaste exception for ikke støttet kategori `() {
+        FagystemBehovLøser(
+            oppgaveRuting = oppgaveRutingMock,
+            rapidsConnection = testRapid,
+        )
+
+        shouldThrow<RuntimeException> {
+            testRapid.sendTestMessage(fagsystemBehovUtenSøknadId(testIdent, "GENERELL"))
         }
     }
 
@@ -84,7 +97,35 @@ class FagsystemBehovLøserTest {
             rapidsConnection = testRapid,
         )
 
-        testRapid.sendTestMessage(bestemFagsystemBehovForKlage(testIdentUtenDagpengerSak))
+        testRapid.sendTestMessage(fagsystemBehovUtenSøknadId(testIdentUtenDagpengerSak, "KLAGE"))
+        with(testRapid.inspektør) {
+            size shouldBe 1
+            field(0, "@løsning")[FagystemBehovLøser.behovNavn]["fagsystem"].asText() shouldBe "ARENA"
+        }
+    }
+
+    @Test
+    fun `Bestem fagsystem for anke der person har sak i dp-sak`() {
+        FagystemBehovLøser(
+            oppgaveRuting = oppgaveRutingMock,
+            rapidsConnection = testRapid,
+        )
+
+        testRapid.sendTestMessage(fagsystemBehovUtenSøknadId(testIdent, "ANKE"))
+        with(testRapid.inspektør) {
+            size shouldBe 1
+            field(0, "@løsning")[FagystemBehovLøser.behovNavn]["fagsystem"].asText() shouldBe "DAGPENGER"
+        }
+    }
+
+    @Test
+    fun `Bestem fagsystem for anke der person ikke har sak i dp-sak`() {
+        FagystemBehovLøser(
+            oppgaveRuting = oppgaveRutingMock,
+            rapidsConnection = testRapid,
+        )
+
+        testRapid.sendTestMessage(fagsystemBehovUtenSøknadId(testIdentUtenDagpengerSak, "ANKE"))
         with(testRapid.inspektør) {
             size shouldBe 1
             field(0, "@løsning")[FagystemBehovLøser.behovNavn]["fagsystem"].asText() shouldBe "ARENA"
@@ -92,7 +133,10 @@ class FagsystemBehovLøserTest {
     }
 
     @Language("JSON")
-    private fun bestemFagsystemBehovForKlage(ident: String): String =
+    private fun fagsystemBehovUtenSøknadId(
+        ident: String,
+        kategori: String,
+    ): String =
         """
         {
           "@event_name": "behov",
@@ -104,7 +148,7 @@ class FagsystemBehovLøserTest {
           "@opprettet" : "${LocalDateTime.now()}",
           "journalpostId": "$journalpostId",
           "fødselsnummer": "$ident",
-          "kategori": "KLAGE"
+          "kategori": "$kategori"
         }
         """.trimIndent()
 

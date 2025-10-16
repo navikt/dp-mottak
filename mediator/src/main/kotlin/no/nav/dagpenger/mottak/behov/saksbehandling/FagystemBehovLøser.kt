@@ -66,15 +66,18 @@ internal class FagystemBehovLøser(
                             lagLøsning(oppgaveRuting.ruteOppgave(ident = ident))
                         }
 
+                        KategorisertJournalpost.Kategori.ANKE -> {
+                            lagLøsning(oppgaveRuting.ruteOppgave(ident = ident))
+                        }
+
                         KategorisertJournalpost.Kategori.ETTERSENDING -> {
                             lagLøsning(oppgaveRuting.ruteOppgave(søknadsId = packet["søknadsId"].asUUID()))
                         }
 
                         else -> {
-                            logger.error { "Behov for bestemmelse av fagsystem for kategori $kategori er ikke støttet" }
-                            mapOf(
-                                "@feil" to "Kunne ikke bestemme fagsystem for journalpostId: $journalpostId med kategori $kategori",
-                            )
+                            val feilmelding = "Behov for bestemmelse av fagsystem for kategori $kategori er ikke støttet"
+                            logger.error { feilmelding }
+                            throw RuntimeException(feilmelding)
                         }
                     }
                 packet["@løsning"] =
