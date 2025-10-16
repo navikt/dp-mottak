@@ -61,7 +61,7 @@ class FerdigstiltEttersendingObserver internal constructor(
                             sikkerlogg.info { "Oppretter gosys oppgave: $oppgave for søknaId: $søknadId og ident: $ident" }
                             gosysClient.opprettOppgave(
                                 oppgave =
-                                    oppgave,
+                                oppgave,
                             ).also {
                                 sikkerlogg.info { "Opprettet gosys oppgave for søknaId: $søknadId og ident: $ident og gosys id: $it " }
                             }
@@ -71,7 +71,6 @@ class FerdigstiltEttersendingObserver internal constructor(
                         logger.info { "Lager IKKE gosys varsel oppgave ettersending" }
                     }
                 }
-
             }
         }
     }
