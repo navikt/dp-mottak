@@ -5,10 +5,10 @@ import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.OppgaveSakVisitor
 import java.util.UUID
 
-class OppgaveOpprettet(
+class DagpengerOppgaveOpprettet(
     aktivitetslogg: Aktivitetslogg,
     private val journalpostId: String,
-    private val oppgaveId: UUID,
+    private val oppgaveId: UUID?,
     private val fagsakId: UUID,
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
@@ -16,7 +16,7 @@ class OppgaveOpprettet(
     fun oppgaveSak(): OppgaveSak = OppgaveSak(oppgaveId, fagsakId)
 
     data class OppgaveSak(
-        val oppgaveId: UUID,
+        val oppgaveId: UUID?,
         val fagsakId: UUID,
     ) {
         fun accept(visitor: OppgaveSakVisitor) {

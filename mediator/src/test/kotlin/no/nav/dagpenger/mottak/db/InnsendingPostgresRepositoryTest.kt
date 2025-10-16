@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.db
 
+import io.kotest.matchers.shouldBe
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import kotliquery.using
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
+import java.util.UUID
 
 internal class InnsendingPostgresRepositoryTest {
     class TestVisitor(
@@ -41,6 +43,71 @@ internal class InnsendingPostgresRepositoryTest {
             dokumenter: List<Journalpost.DokumentInfo>,
         ) {
             forventetDokumenter.addAll(dokumenter)
+        }
+    }
+
+    @Test
+    fun `skal kunne lagre innsending med oppgaveSak som har null oppgaveId`() {
+        val innsending =
+            innsendingData.copy(
+                oppgaveSakData =
+                    InnsendingData.OppgaveSakData(
+                        oppgaveId = null,
+                        fagsakId = UUID.randomUUID(),
+                    ),
+            ).createInnsending()
+
+        withMigratedDb {
+            with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
+                lagre(innsending).also {
+                    assertTrue(it > 0, "lagring av innsending feilet")
+                }
+
+                hent(journalpostId).also {
+                    assertDeepEquals(innsending, it)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `skal kunne oppdatere en  innsending med oppgaveId for oppgaveSak `() {
+        class OppgaveSakTestVisitor(innsending: Innsending?) : InnsendingVisitor {
+            init {
+                require(innsending != null)
+                innsending.accept(this)
+            }
+
+            override fun visitOppgaveSak(
+                oppgaveId: UUID?,
+                fagsakId: UUID,
+            ) {
+                this.oppgaveId = oppgaveId
+            }
+
+            var oppgaveId: UUID? = null
+        }
+
+        val oppgaveSakData =
+            InnsendingData.OppgaveSakData(
+                oppgaveId = null,
+                fagsakId = UUID.randomUUID(),
+            )
+        val innsending =
+            innsendingData.copy(
+                oppgaveSakData =
+                oppgaveSakData,
+            ).createInnsending()
+
+        withMigratedDb {
+            with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
+                lagre(innsending).also {
+                    assertTrue(it > 0, "lagring av innsending feilet")
+                }
+                val oppgaveId = UUID.randomUUID()
+                lagre(innsendingData.copy(oppgaveSakData = oppgaveSakData.copy(oppgaveId = oppgaveId)).createInnsending())
+                OppgaveSakTestVisitor(hent(journalpostId)).oppgaveId shouldBe oppgaveId
+            }
         }
     }
 
@@ -152,7 +219,8 @@ internal class InnsendingPostgresRepositoryTest {
         }
     }
 
-    @Test @Ignore
+    @Test
+    @Ignore
     fun `håndterer flere innsendinger for samme person men med dnr og fnr skille`() {
         val innsending = innsendingData.createInnsending()
 

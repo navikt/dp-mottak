@@ -42,7 +42,7 @@ interface ArenaSakVisitor {
 
 interface OppgaveSakVisitor {
     fun visitOppgaveSak(
-        oppgaveId: UUID,
+        oppgaveId: UUID?,
         fagsakId: UUID,
     ) {}
 }

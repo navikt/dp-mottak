@@ -113,10 +113,10 @@ internal class InnsendingPostgresRepository(
                                     )
                                 },
                             oppgaveSakData =
-                                row.uuidOrNull("oppgave_id_dagpenger")?.let {
+                                row.uuidOrNull("fagsak_id_dagpenger")?.let { fagsakId ->
                                     InnsendingData.OppgaveSakData(
-                                        oppgaveId = it,
-                                        fagsakId = row.uuid("fagsak_id_dagpenger"),
+                                        oppgaveId = row.uuidOrNull("oppgave_id_dagpenger"),
+                                        fagsakId = fagsakId,
                                     )
                                 },
                             søknadsData =
@@ -405,7 +405,7 @@ internal class InnsendingPostgresRepository(
         }
 
         override fun visitOppgaveSak(
-            oppgaveId: UUID,
+            oppgaveId: UUID?,
             fagsakId: UUID,
         ) {
             lagreQueries.add(
@@ -413,7 +413,7 @@ internal class InnsendingPostgresRepository(
                     //language=PostgreSQL
                     """
                         INSERT INTO oppgave_sak_v1(fagsak_id, oppgave_id, id) VALUES (:fagsak_id, :oppgave_id, :id) 
-                        ON CONFLICT(id) DO NOTHING 
+                        ON CONFLICT(id) DO UPDATE SET fagsak_id = :fagsak_id, oppgave_id = :oppgave_id
                         """,
                     mapOf(
                         "id" to internId,

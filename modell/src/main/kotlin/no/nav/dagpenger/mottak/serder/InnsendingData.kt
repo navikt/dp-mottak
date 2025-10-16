@@ -3,8 +3,8 @@ package no.nav.dagpenger.mottak.serder
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Journalpost
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.rutingOppslag
 import java.time.LocalDateTime
@@ -63,7 +63,7 @@ data class InnsendingData(
                 },
                 arenaSakData?.let { ArenaOppgaveOpprettet.ArenaSak(oppgaveId = it.oppgaveId, fagsakId = it.fagsakId) },
                 mottakskanal,
-                oppgaveSakData?.let { OppgaveOpprettet.OppgaveSak(oppgaveId = it.oppgaveId, fagsakId = it.fagsakId) },
+                oppgaveSakData?.let { DagpengerOppgaveOpprettet.OppgaveSak(oppgaveId = it.oppgaveId, fagsakId = it.fagsakId) },
                 aktivitetslogg.let(::konverterTilAktivitetslogg),
             )
 
@@ -72,39 +72,41 @@ data class InnsendingData(
     ) {
         fun createTilstand(): Innsending.Tilstand =
             when (type) {
-                InnsendingTilstandTypeData.MottattType -> Innsending.Mottatt
-                InnsendingTilstandTypeData.AvventerJournalpostType -> Innsending.AvventerJournalpost
-                InnsendingTilstandTypeData.AvventerPersondataType -> Innsending.AvventerPersondata
-                InnsendingTilstandTypeData.KategoriseringType -> Innsending.Kategorisering
-                InnsendingTilstandTypeData.AvventerSøknadsdataType -> Innsending.AvventerSøknadsdata
-                InnsendingTilstandTypeData.AvventerMinsteinntektVurderingType -> Innsending.AventerArenaStartVedtak
-                InnsendingTilstandTypeData.AvventerSvarOmEksisterendeSakerType -> Innsending.AventerArenaStartVedtak
-                InnsendingTilstandTypeData.AventerArenaStartVedtakType -> Innsending.AventerArenaStartVedtak
-                InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType -> Innsending.AventerFerdigstill
-                InnsendingTilstandTypeData.InnsendingFerdigstiltType -> Innsending.InnsendingFerdigStilt
-                InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerVurderHenvendelseArenaOppgave
-                InnsendingTilstandTypeData.AvventerOppgaveType -> Innsending.AvventerOppgave
-                InnsendingTilstandTypeData.AvventerGosysType -> Innsending.AvventerGosysOppgave
-                InnsendingTilstandTypeData.UkjentBrukerType -> Innsending.UkjentBruker
                 InnsendingTilstandTypeData.AlleredeBehandletType -> Innsending.AlleredeBehandlet
+                InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerVurderHenvendelseArenaOppgave
+                InnsendingTilstandTypeData.AventerArenaStartVedtakType -> Innsending.AventerArenaStartVedtak
+                InnsendingTilstandTypeData.AvventerDagpengerOppgaveType -> Innsending.AvventerDagpengerOppgave
+                InnsendingTilstandTypeData.AvventerFagsystem -> Innsending.AvventerFagsystem
+                InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType -> Innsending.AventerFerdigstill
+                InnsendingTilstandTypeData.AvventerGosysType -> Innsending.AvventerGosysOppgave
+                InnsendingTilstandTypeData.AvventerJournalpostType -> Innsending.AvventerJournalpost
+                InnsendingTilstandTypeData.AvventerMinsteinntektVurderingType -> Innsending.AventerArenaStartVedtak
+                InnsendingTilstandTypeData.AvventerPersondataType -> Innsending.AvventerPersondata
+                InnsendingTilstandTypeData.AvventerSvarOmEksisterendeSakerType -> Innsending.AventerArenaStartVedtak
+                InnsendingTilstandTypeData.AvventerSøknadsdataType -> Innsending.AvventerSøknadsdata
+                InnsendingTilstandTypeData.InnsendingFerdigstiltType -> Innsending.InnsendingFerdigStilt
+                InnsendingTilstandTypeData.KategoriseringType -> Innsending.Kategorisering
+                InnsendingTilstandTypeData.MottattType -> Innsending.Mottatt
+                InnsendingTilstandTypeData.UkjentBrukerType -> Innsending.UkjentBruker
             }
 
         enum class InnsendingTilstandTypeData {
-            MottattType,
-            AvventerJournalpostType,
-            AvventerPersondataType,
-            KategoriseringType,
-            AvventerSøknadsdataType,
-            AvventerMinsteinntektVurderingType,
-            AvventerSvarOmEksisterendeSakerType,
-            AventerArenaStartVedtakType,
-            AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType,
-            AventerArenaOppgaveType,
-            AvventerOppgaveType,
-            AvventerGosysType,
-            UkjentBrukerType,
             AlleredeBehandletType,
+            AventerArenaOppgaveType,
+            AventerArenaStartVedtakType,
+            AvventerDagpengerOppgaveType,
+            AvventerFagsystem,
+            AvventerFerdigstillJournalpostType,
+            AvventerGosysType,
+            AvventerJournalpostType,
+            AvventerMinsteinntektVurderingType,
+            AvventerPersondataType,
+            AvventerSvarOmEksisterendeSakerType,
+            AvventerSøknadsdataType,
+            InnsendingFerdigstiltType,
+            KategoriseringType,
+            MottattType,
+            UkjentBrukerType,
         }
     }
 
@@ -141,7 +143,7 @@ data class InnsendingData(
     )
 
     data class OppgaveSakData(
-        val oppgaveId: UUID,
+        val oppgaveId: UUID?,
         val fagsakId: UUID,
     )
 

@@ -1,25 +1,33 @@
 package no.nav.dagpenger.mottak.behov.saksbehandling.ruting
 
-import no.nav.dagpenger.mottak.Config
+import no.nav.dagpenger.mottak.Fagsystem
+import no.nav.dagpenger.mottak.behov.saksbehandling.SakIdResponse
+import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingKlient
+import java.util.UUID
 
 internal interface OppgaveRuting {
-    fun ruteOppgave(): FagSystem
+    suspend fun ruteOppgave(ident: String): Fagsystem
 
-    enum class FagSystem {
-        DAGPENGER,
-        ARENA,
-    }
+    suspend fun ruteOppgave(søknadsId: UUID): Fagsystem
 }
 
-internal class MiljøBasertRuting() : OppgaveRuting {
-    override fun ruteOppgave(): OppgaveRuting.FagSystem {
-        return when (Config.env) {
-            "dev-gcp" -> {
-                OppgaveRuting.FagSystem.DAGPENGER
+internal class SakseierBasertRuting(private val saksbehandlingKlient: SaksbehandlingKlient) : OppgaveRuting {
+    override suspend fun ruteOppgave(ident: String): Fagsystem {
+        return saksbehandlingKlient.hentSisteSakId(ident).let { sakIdResponse ->
+            when (sakIdResponse) {
+                SakIdResponse.IkkeFunnet -> Fagsystem.Arena
+                is SakIdResponse.Funnet -> Fagsystem.Dagpenger(sakId = sakIdResponse.id)
             }
+        }
+    }
 
-            else -> {
-                OppgaveRuting.FagSystem.ARENA
+    override suspend fun ruteOppgave(
+        søknadsId: UUID,
+    ): Fagsystem {
+        return saksbehandlingKlient.hentSakIdForSøknad(søknadsId).let { sakIdResponse ->
+            when (sakIdResponse) {
+                SakIdResponse.IkkeFunnet -> Fagsystem.Arena
+                is SakIdResponse.Funnet -> Fagsystem.Dagpenger(sakId = sakIdResponse.id)
             }
         }
     }

@@ -1,0 +1,129 @@
+package no.nav.dagpenger.mottak.observers
+
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.kotest.matchers.shouldBe
+import io.mockk.CapturingSlot
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import no.nav.dagpenger.mottak.InnsendingObserver
+import no.nav.dagpenger.mottak.InnsendingObserver.Type.Ettersending
+import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingKlient
+import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
+import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysOppgaveRequest
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_ORDINÆR_ETTERSENDING
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
+import java.time.LocalDateTime
+
+class FerdigstiltEttersendingObserverTest {
+    private val identVarsle = "skalVarsle"
+    private val identIkkeVarsle = "skalIkkeVarsle"
+    private val saksbehandlingKlient =
+        mockk<SaksbehandlingKlient>().also {
+            coEvery { it.skalVarsleOmEttersending(søknadId = any(), ident = identVarsle) } returns true
+            coEvery { it.skalVarsleOmEttersending(søknadId = any(), ident = identIkkeVarsle) } returns false
+        }
+
+    @Test
+    fun `Hvis varsle om ettersending med oppgave i gosys`() {
+        val slot = CapturingSlot<GosysOppgaveRequest>()
+        val gosysClient =
+            mockk<GosysClient>().also {
+                coEvery {
+                    it.opprettOppgave(capture(slot))
+                } returns "oppgaveId"
+            }
+
+        val observer = FerdigstiltEttersendingObserver(saksbehandlingKlient, gosysClient)
+
+        observer.innsendingFerdigstilt(
+            event =
+                innsendingFerdigstiltEvent(
+                    identVarsle,
+                    DAGPENGESØKNAD_ORDINÆR_ETTERSENDING.skjemakode,
+                ),
+        )
+
+        coVerify(exactly = 1) {
+            gosysClient.opprettOppgave(any())
+        }
+        slot.captured.let {
+            it.journalpostId shouldBe "journalpostId"
+            it.aktoerId shouldBe "aktørId"
+            it.tildeltEnhetsnr shouldBe "tildeleEnhetsnr"
+            it.beskrivelse shouldBe "Ettersendelse til dagpengesøknad i ny løsning"
+            it.oppgavetype shouldBe "ETTERSEND_MOTT"
+        }
+    }
+
+    @Test
+    fun `Hvis ikke varsle om ettersending med oppgave i gosys`() {
+        val gosysClient = mockk<GosysClient>()
+
+        val observer = FerdigstiltEttersendingObserver(saksbehandlingKlient, gosysClient)
+        observer.innsendingFerdigstilt(
+            innsendingFerdigstiltEvent(
+                ident = identIkkeVarsle,
+                skjemaKode = DAGPENGESØKNAD_ORDINÆR_ETTERSENDING.skjemakode,
+            ),
+        )
+        coVerify(exactly = 0) { gosysClient.opprettOppgave(any()) }
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "NAVe 04-01.03, 1",
+        "NAVe 04-01.04, 1",
+        "NAVe 04-16.03, 1",
+        "NAVe 04-16.04, 1",
+        "NAVe 90-00.08 K, 0",
+        "NAVe 90-00.08 A, 0",
+        "NAVe 04-02.01, 0",
+        "NAVe 04-02.05, 0",
+        "NAVe 04-03.07, 0",
+        "NAVe 04-03.08, 0",
+        "NAVe 04-08.03, 0",
+        "NAVe 04-08.04, 0",
+    )
+    fun `Skal bare sjekke behov for varsling for ettersendinger hvis skjemakode er ettersending til dagpengesøknad`(
+        skjemaKode: String,
+        antallSjekkOmVarsling: Int,
+    ) {
+        val mockGosysClient =
+            mockk<GosysClient>().also {
+                coEvery {
+                    it.opprettOppgave(any())
+                } returns "oppgaveId"
+            }
+
+        val observer = FerdigstiltEttersendingObserver(saksbehandlingKlient, mockGosysClient)
+        observer.innsendingFerdigstilt(
+            innsendingFerdigstiltEvent(
+                ident = identVarsle,
+                skjemaKode = skjemaKode,
+            ),
+        )
+        coVerify(exactly = antallSjekkOmVarsling) { saksbehandlingKlient.skalVarsleOmEttersending(any(), any()) }
+    }
+
+    private fun innsendingFerdigstiltEvent(
+        ident: String,
+        skjemaKode: String,
+    ): InnsendingObserver.InnsendingEvent {
+        return InnsendingObserver.InnsendingEvent(
+            type = Ettersending,
+            skjemaKode = skjemaKode,
+            journalpostId = "journalpostId",
+            aktørId = "aktørId",
+            fødselsnummer = ident,
+            fagsakId = "fagsakId",
+            oppgaveId = "oppgaveId",
+            datoRegistrert = LocalDateTime.now(),
+            søknadsData = jacksonObjectMapper().readTree("""{"søknad_uuid": "søknad_uuid"}"""),
+            behandlendeEnhet = "tildeleEnhetsnr",
+            tittel = "tittel",
+        )
+    }
+}

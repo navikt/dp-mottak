@@ -13,6 +13,7 @@ import no.nav.dagpenger.mottak.behov.journalpost.JournalpostDokarkiv
 import no.nav.dagpenger.mottak.behov.journalpost.KnyttJounalPostTilNySakResponse
 import no.nav.dagpenger.mottak.db.ArenaOppgave
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
+import no.nav.dagpenger.mottak.serder.asUUID
 import org.junit.jupiter.api.Test
 import java.util.UUID
 

@@ -1,23 +1,28 @@
 package no.nav.dagpenger.mottak
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
+import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet.OppgaveSak
+import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.OppgaveOpprettet.OppgaveSak
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.RekjørHendelse
+import no.nav.dagpenger.mottak.meldinger.søknadsdata.QuizSøknadFormat
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
 import java.time.Duration
+
+private val logger = KotlinLogging.logger { }
 
 class Innsending private constructor(
     private val journalpostId: String,
@@ -58,6 +63,12 @@ class Innsending private constructor(
         tilstand.håndter(this, joarkHendelse)
     }
 
+    fun håndter(fagsystemBesluttet: FagsystemBesluttet) {
+        if (journalpostId != fagsystemBesluttet.journalpostId()) return
+        kontekst(fagsystemBesluttet, "Fagsystem besluttet for journalpost")
+        tilstand.håndter(this, fagsystemBesluttet)
+    }
+
     fun håndter(journalpost: Journalpost) {
         if (journalpostId != journalpost.journalpostId()) return
         kontekst(journalpost, "Mottatt informasjon om journalpost")
@@ -93,10 +104,10 @@ class Innsending private constructor(
         tilstand.håndter(this, arenaOppgave)
     }
 
-    fun håndter(oppgaveOpprettet: OppgaveOpprettet) {
-        if (journalpostId != oppgaveOpprettet.journalpostId()) return
-        kontekst(oppgaveOpprettet, "Mottatt informasjon om opprettet oppgave")
-        tilstand.håndter(this, oppgaveOpprettet)
+    fun håndter(dagpengerOppgaveOpprettet: DagpengerOppgaveOpprettet) {
+        if (journalpostId != dagpengerOppgaveOpprettet.journalpostId()) return
+        kontekst(dagpengerOppgaveOpprettet, "Mottatt informasjon om opprettet oppgave")
+        tilstand.håndter(this, dagpengerOppgaveOpprettet)
     }
 
     fun håndter(arenaOppgaveFeilet: ArenaOppgaveFeilet) {
@@ -147,84 +158,91 @@ class Innsending private constructor(
             innsending: Innsending,
             joarkHendelse: JoarkHendelse,
         ) {
-            joarkHendelse.warn("Forventet ikke JoarkHendelse i %s", type.name)
+            joarkHendelse.warn("Forventet ikke JoarkHendelse i tilstand $type.name")
+        }
+
+        fun håndter(
+            innsending: Innsending,
+            fagsystemBesluttet: FagsystemBesluttet,
+        ) {
+            fagsystemBesluttet.warn("Forventet ikke FagsystemBesluttet i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             journalpost: Journalpost,
         ) {
-            journalpost.warn("Forventet ikke JournalpostData i %s", type.name)
+            journalpost.warn("Forventet ikke JournalpostData i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             personInformasjon: PersonInformasjon,
         ) {
-            personInformasjon.warn("Forventet ikke PersonInformasjon i %s", type.name)
+            personInformasjon.warn("Forventet ikke PersonInformasjon i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             personInformasjonIkkeFunnet: PersonInformasjonIkkeFunnet,
         ) {
-            personInformasjonIkkeFunnet.warn("Forventet ikke PersonInformasjonIkkeFunnet i %s", type.name)
+            personInformasjonIkkeFunnet.warn("Forventet ikke PersonInformasjonIkkeFunnet i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             søknadsdata: Søknadsdata,
         ) {
-            søknadsdata.warn("Forventet ikke Søknadsdata i %s", type.name)
+            søknadsdata.warn("Forventet ikke Søknadsdata i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             arenaOppgave: ArenaOppgaveOpprettet,
         ) {
-            arenaOppgave.warn("Forventet ikke ArenaOppgaveOpprettet i %s", type.name)
+            arenaOppgave.warn("Forventet ikke ArenaOppgaveOpprettet i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
-            oppgaveOpprettet: OppgaveOpprettet,
+            dagpengerOppgaveOpprettet: DagpengerOppgaveOpprettet,
         ) {
-            oppgaveOpprettet.warn("Forventet ikke oppgaveOpprettet i %s", type.name)
+            dagpengerOppgaveOpprettet.warn("Forventet ikke OppgaveOpprettet i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             arenaOppgaveFeilet: ArenaOppgaveFeilet,
         ) {
-            arenaOppgaveFeilet.warn("Forventet ikke ArenaOppgaveFeilet i %s", type.name)
+            arenaOppgaveFeilet.warn("Forventet ikke ArenaOppgaveFeilet i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             gosysOppgave: GosysOppgaveOpprettet,
         ) {
-            gosysOppgave.warn("Forventet ikke GosysOppgaveOpprettet i %s", type.name)
+            gosysOppgave.warn("Forventet ikke GosysOppgaveOpprettet i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             oppdatertJournalpost: JournalpostOppdatert,
         ) {
-            oppdatertJournalpost.warn("Forventet ikke ArenaOppgaveOpprettet i %s", type.name)
+            oppdatertJournalpost.warn("Forventet ikke JournalpostOppdatert i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             journalpostferdigstilt: JournalpostFerdigstilt,
         ) {
-            journalpostferdigstilt.warn("Forventet ikke FerdigStilt i %s", type.name)
+            journalpostferdigstilt.warn("Forventet ikke JournalpostFerdigstilt i tilstand $type.name")
         }
 
         fun håndter(
             innsending: Innsending,
             rekjørHendelse: RekjørHendelse,
         ) {
-            rekjørHendelse.warn("${rekjørHendelse.javaClass.simpleName} er ikke støttet i %s", type.name)
+            rekjørHendelse.warn("${rekjørHendelse.javaClass.simpleName} er ikke støttet i tilstand $type.name")
         }
 
         fun leaving(
@@ -340,11 +358,72 @@ class Innsending private constructor(
                 is Generell -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Utdanning -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is Etablering -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
-                is Klage -> innsending.tilstand(hendelse, AvventerOppgave)
-                is Anke -> innsending.tilstand(hendelse, AvventerOppgave)
+                is Klage -> innsending.tilstand(hendelse, AvventerFagsystem)
+                is Anke -> innsending.tilstand(hendelse, AvventerFagsystem)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
                 is KlageForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
+            }
+        }
+    }
+
+    internal object AvventerFagsystem : Tilstand {
+        override val type: InnsendingTilstandType
+            get() = InnsendingTilstandType.AvventerFagsystem
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
+
+        override fun entering(
+            innsending: Innsending,
+            hendelse: Hendelse,
+        ) {
+            innsending.bestemmeFagsystem(hendelse)
+        }
+
+        override fun håndter(
+            innsending: Innsending,
+            oppdatertJournalpost: JournalpostOppdatert,
+        ) {
+            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
+        }
+
+        override fun håndter(
+            innsending: Innsending,
+            fagsystemBesluttet: FagsystemBesluttet,
+        ) {
+            val journalpostData = requireNotNull(innsending.journalpost) { " Journalpost må være innhentet " }
+            val hendelseType = journalpostData.kategorisertJournalpost()
+            when (fagsystemBesluttet.fagsystem) {
+                is Fagsystem.Dagpenger -> {
+                    innsending.oppgaveSak =
+                        OppgaveSak(
+                            fagsakId = fagsystemBesluttet.fagsystem.sakId,
+                            oppgaveId = null,
+                        )
+                    when (hendelseType.kategori) {
+                        KategorisertJournalpost.Kategori.KLAGE -> {
+                            innsending.tilstand(fagsystemBesluttet, AvventerDagpengerOppgave)
+                        }
+
+                        KategorisertJournalpost.Kategori.ANKE -> {
+                            innsending.tilstand(fagsystemBesluttet, AvventerDagpengerOppgave)
+                        }
+
+                        KategorisertJournalpost.Kategori.ETTERSENDING -> {
+                            innsending.oppdatereJournalpost(fagsystemBesluttet)
+                        }
+
+                        else -> {
+                            val feilmelding = "Kan ikke håndtere hendelse ${fagsystemBesluttet.javaClass.simpleName} for hendelsestype ${hendelseType.kategori} "
+                            logger.error { feilmelding }
+                            throw IllegalArgumentException(feilmelding)
+                        }
+                    }
+                }
+
+                is Fagsystem.Arena -> {
+                    innsending.tilstand(fagsystemBesluttet, AventerVurderHenvendelseArenaOppgave)
+                }
             }
         }
     }
@@ -383,7 +462,7 @@ class Innsending private constructor(
             when (kategorisertJournalpost) {
                 is NySøknad -> innsending.tilstand(søknadsdata, AventerArenaStartVedtak)
                 is Gjenopptak -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
-                is Ettersending -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
+                is Ettersending -> innsending.tilstand(søknadsdata, AvventerFagsystem)
                 is Generell -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
                 else -> søknadsdata.severe("Forventet kun søknadsdata for NySøknad og Gjenopptak")
             }
@@ -462,9 +541,9 @@ class Innsending private constructor(
         }
     }
 
-    internal object AvventerOppgave : Tilstand {
+    internal object AvventerDagpengerOppgave : Tilstand {
         override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.AvventerOppgaveType
+            get() = InnsendingTilstandType.AvventerDagpengerOppgaveType
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
@@ -472,30 +551,15 @@ class Innsending private constructor(
             innsending: Innsending,
             hendelse: Hendelse,
         ) {
-            innsending.oppretteOppgaveBehov(hendelse)
+            innsending.oppretteDagpengerOppgave(hendelse)
         }
 
         override fun håndter(
             innsending: Innsending,
-            arenaOppgaveFeilet: ArenaOppgaveFeilet,
+            dagpengerOppgaveOpprettet: DagpengerOppgaveOpprettet,
         ) {
-            innsending.tilstand(arenaOppgaveFeilet, AvventerGosysOppgave)
-        }
-
-        override fun håndter(
-            innsending: Innsending,
-            arenaOppgave: ArenaOppgaveOpprettet,
-        ) {
-            innsending.arenaSak = arenaOppgave.arenaSak()
-            innsending.oppdatereJournalpost(arenaOppgave)
-        }
-
-        override fun håndter(
-            innsending: Innsending,
-            oppgaveOpprettet: OppgaveOpprettet,
-        ) {
-            innsending.oppgaveSak = oppgaveOpprettet.oppgaveSak()
-            innsending.oppdatereJournalpost(oppgaveOpprettet)
+            innsending.oppgaveSak = dagpengerOppgaveOpprettet.oppgaveSak()
+            innsending.oppdatereJournalpost(dagpengerOppgaveOpprettet)
         }
 
         override fun håndter(
@@ -623,6 +687,27 @@ class Innsending private constructor(
         )
     }
 
+    private fun bestemmeFagsystem(hendelse: Hendelse) {
+        val journalpostData = requireNotNull(journalpost) { " Journalpost må være innhentet " }
+        val person = requireNotNull(person) { " Person må være innhentet " }
+        val kategorisertJournalpost = journalpostData.kategorisertJournalpost()
+        val søknadsId = rutingOppslag?.let { QuizSøknadFormat(it.data()).søknadsId() }
+
+        val detaljer =
+            buildMap<String, Any> {
+                this["kategori"] = kategorisertJournalpost.kategori.name
+                this["fødselsnummer"] = person.ident
+                this["journalpostId"] = journalpostId
+                søknadsId?.let { this["søknadsId"] = it }
+            }.toMap()
+        hendelse.behov(
+            type = Behovtype.BestemFagsystem,
+            melding = "Trenger å bestemme fagsystem",
+            detaljer =
+            detaljer,
+        )
+    }
+
     private fun trengerJournalpost(hendelse: Hendelse) {
         hendelse.behov(Behovtype.Journalpost, "Trenger journalpost")
     }
@@ -682,25 +767,23 @@ class Innsending private constructor(
         )
     }
 
-    private fun oppretteOppgaveBehov(hendelse: Hendelse) {
-        val kategorisertJournalpost = requireNotNull(journalpost).kategorisertJournalpost()
+    private fun oppretteDagpengerOppgave(hendelse: Hendelse) {
+        val journalpost = requireNotNull(journalpost).kategorisertJournalpost()
         val person =
             requireNotNull(person) { "Krever at person er satt her. Mangler for journalpostId ${journalpostId()}" }
-        val oppgavebenk = kategorisertJournalpost.oppgaveBenk(person)
+        val oppgavebenk = journalpost.oppgaveBenk(person)
+        val sak = requireNotNull(oppgaveSak) { "Krever at oppgave sak er satt her. Mangler for journalpostId ${journalpostId()}" }
         val parametre =
             mapOf(
                 "fødselsnummer" to person.ident,
-                "aktørId" to person.aktørId,
-                "behandlendeEnhetId" to oppgavebenk.id,
-                "oppgavebeskrivelse" to oppgavebenk.beskrivelse,
                 "registrertDato" to oppgavebenk.datoRegistrert,
-                "tilleggsinformasjon" to oppgavebenk.tilleggsinformasjon,
-                "skjemaKategori" to kategorisertJournalpost.javaClass.simpleName,
+                "skjemaKategori" to journalpost.javaClass.simpleName,
+                "fagsakId" to sak.fagsakId,
             )
 
         hendelse.behov(
-            Behovtype.OpprettOppgave,
-            "Oppretter oppgave og sak for journalpost $journalpostId",
+            Behovtype.OpprettDagpengerOppgave,
+            "Oppretter dagpenger oppgave og sak for journalpost $journalpostId",
             parametre,
         )
     }
@@ -710,13 +793,11 @@ class Innsending private constructor(
         val journalpost = requireNotNull(journalpost) { "Krever at journalpost her" }
         val arenaSakId = arenaSak?.fagsakId?.let { mapOf("fagsakId" to it) } ?: emptyMap()
         val sak =
-            oppgaveSak?.let {
-                mapOf(
-                    "fagsakId" to it.fagsakId,
-                    "oppgaveId" to it.oppgaveId,
-                )
-            } ?: emptyMap()
-
+            buildMap {
+                oppgaveSak?.let {
+                    put("fagsakId", it.fagsakId)
+                }
+            }
         val mottakskanal = mottakskanal() ?: "ukjent"
         val parametre =
             mapOf(
@@ -758,6 +839,7 @@ class Innsending private constructor(
                     "aktørId" to it.aktørId,
                 )
             } ?: emptyMap()
+
         val parametre =
             mapOf(
                 "behandlendeEnhetId" to oppgavebenk.id,
@@ -811,9 +893,13 @@ class Innsending private constructor(
 
     private fun emitFerdigstilt() {
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
+
         val fagsakId: String? =
             arenaSak?.fagsakId
-                ?: oppgaveSak?.fagsakId.toString()
+                ?: oppgaveSak?.fagsakId?.toString()
+        val oppgaveId: String? =
+            arenaSak?.oppgaveId
+                ?: oppgaveSak?.oppgaveId?.toString()
 
         InnsendingEvent(
             type = mapToHendelseType(jp),
@@ -822,6 +908,7 @@ class Innsending private constructor(
             aktørId = person?.aktørId,
             fødselsnummer = person?.ident,
             fagsakId = fagsakId,
+            oppgaveId = oppgaveId,
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = rutingOppslag?.data(),
             behandlendeEnhet =
@@ -844,6 +931,7 @@ class Innsending private constructor(
             aktørId = person?.aktørId,
             fødselsnummer = person?.ident,
             fagsakId = null,
+            oppgaveId = null,
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = rutingOppslag?.data(),
             behandlendeEnhet =
