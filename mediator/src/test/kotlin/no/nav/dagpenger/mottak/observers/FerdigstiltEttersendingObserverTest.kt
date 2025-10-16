@@ -11,10 +11,9 @@ import no.nav.dagpenger.mottak.InnsendingObserver.Type.Ettersending
 import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingKlient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysOppgaveRequest
-import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_ORDINÆR_ETTERSENDING
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.CsvSource
+import org.junit.jupiter.params.provider.EnumSource
 import java.time.LocalDateTime
 
 class FerdigstiltEttersendingObserverTest {
@@ -41,8 +40,8 @@ class FerdigstiltEttersendingObserverTest {
         observer.innsendingFerdigstilt(
             event =
                 innsendingFerdigstiltEvent(
-                    identVarsle,
-                    DAGPENGESØKNAD_ORDINÆR_ETTERSENDING.skjemakode,
+                    ident = identVarsle,
+                    innsendingType = Ettersending,
                 ),
         )
 
@@ -66,30 +65,16 @@ class FerdigstiltEttersendingObserverTest {
         observer.innsendingFerdigstilt(
             innsendingFerdigstiltEvent(
                 ident = identIkkeVarsle,
-                skjemaKode = DAGPENGESØKNAD_ORDINÆR_ETTERSENDING.skjemakode,
+                innsendingType = Ettersending,
             ),
         )
         coVerify(exactly = 0) { gosysClient.opprettOppgave(any()) }
     }
 
     @ParameterizedTest
-    @CsvSource(
-        "NAVe 04-01.03, 1",
-        "NAVe 04-01.04, 1",
-        "NAVe 04-16.03, 1",
-        "NAVe 04-16.04, 1",
-        "NAVe 90-00.08 K, 0",
-        "NAVe 90-00.08 A, 0",
-        "NAVe 04-02.01, 0",
-        "NAVe 04-02.05, 0",
-        "NAVe 04-03.07, 0",
-        "NAVe 04-03.08, 0",
-        "NAVe 04-08.03, 0",
-        "NAVe 04-08.04, 0",
-    )
+    @EnumSource(InnsendingObserver.Type::class)
     fun `Skal bare sjekke behov for varsling for ettersendinger hvis skjemakode er ettersending til dagpengesøknad`(
-        skjemaKode: String,
-        antallSjekkOmVarsling: Int,
+        innsendingType: InnsendingObserver.Type,
     ) {
         val mockGosysClient =
             mockk<GosysClient>().also {
@@ -102,19 +87,23 @@ class FerdigstiltEttersendingObserverTest {
         observer.innsendingFerdigstilt(
             innsendingFerdigstiltEvent(
                 ident = identVarsle,
-                skjemaKode = skjemaKode,
+                innsendingType = innsendingType,
             ),
         )
-        coVerify(exactly = antallSjekkOmVarsling) { saksbehandlingKlient.skalVarsleOmEttersending(any(), any()) }
+        if (innsendingType == Ettersending) {
+            coVerify(exactly = 1) { saksbehandlingKlient.skalVarsleOmEttersending(any(), any()) }
+        } else {
+            coVerify(exactly = 0) { saksbehandlingKlient.skalVarsleOmEttersending(any(), any()) }
+        }
     }
 
     private fun innsendingFerdigstiltEvent(
         ident: String,
-        skjemaKode: String,
+        innsendingType: InnsendingObserver.Type,
     ): InnsendingObserver.InnsendingEvent {
         return InnsendingObserver.InnsendingEvent(
-            type = Ettersending,
-            skjemaKode = skjemaKode,
+            type = innsendingType,
+            skjemaKode = "kod",
             journalpostId = "journalpostId",
             aktørId = "aktørId",
             fødselsnummer = ident,
