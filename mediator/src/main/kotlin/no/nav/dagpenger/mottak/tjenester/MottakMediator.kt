@@ -11,12 +11,13 @@ internal class MottakMediator(
         JoarkMottak(mediator, rapidsConnection)
         JournalpostMottak(mediator, rapidsConnection)
         PersondataMottak(mediator, rapidsConnection)
+        FagsystemMottak(mediator, rapidsConnection)
         JournalpostOppdatertMottak(mediator, rapidsConnection)
         JournalpostFerdigstiltMottak(mediator, rapidsConnection)
         OpprettArenaOppgaveMottak(mediator, rapidsConnection)
-        OppgaveOpprettetMottak(mediator, rapidsConnection)
         SøknadsdataMottak(mediator, rapidsConnection)
         GosysOppgaveOpprettetMottak(mediator, rapidsConnection)
+        DagpengerOppgaveOpprettetMottak(mediator, rapidsConnection)
         RekjørMottak(mediator, rapidsConnection)
     }
 }

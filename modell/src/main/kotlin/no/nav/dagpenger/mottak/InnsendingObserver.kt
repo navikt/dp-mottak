@@ -35,6 +35,7 @@ interface InnsendingObserver {
         val aktørId: String?,
         val fødselsnummer: String?,
         val fagsakId: String?,
+        val oppgaveId: String?,
         val datoRegistrert: LocalDateTime,
         val søknadsData: JsonNode?,
         val behandlendeEnhet: String,

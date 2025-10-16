@@ -52,6 +52,7 @@ internal object Config {
                 "DP_PROXY_SCOPE" to "api://prod-fss.teamdagpenger.dp-proxy/.default",
                 "PDL_API_SCOPE" to "api://prod-fss.pdl.pdl-api/.default",
                 "SKJERMING_API_SCOPE" to "api://prod-gcp.nom.skjermede-personer-pip/.default",
+                "DP_SAKSBEHANDLING_SCOPE" to "api://prod-gcp.teamdagpenger.dp-saksbehandling/.default",
             ),
         )
 
@@ -61,10 +62,6 @@ internal object Config {
             "prod-gcp" -> systemAndEnvProperties overriding prodProperties overriding defaultProperties
             else -> systemAndEnvProperties overriding defaultProperties
         }
-    }
-
-    val env by lazy {
-        properties.getOrElse(Key("NAIS_CLUSTER_NAME", stringType)) { "prod-gcp" }
     }
 
     val dpSaksbehandlingBaseUrl by lazy {
@@ -81,6 +78,11 @@ internal object Config {
 
     private fun String.addHttpsrotocoll(): String = "https://$this"
 
+    val dpSaksbehandlingTokenProvider: () -> String by lazy {
+        {
+            cachedTokenProvider.clientCredentials(properties[Key("DP_SAKSBEHANDLING_SCOPE", stringType)]).access_token ?: tokenfeil()
+        }
+    }
     val Configuration.dpProxyTokenProvider: () -> String by lazy {
         {
             cachedTokenProvider.clientCredentials(properties[Key("DP_PROXY_SCOPE", stringType)]).access_token ?: tokenfeil()

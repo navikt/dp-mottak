@@ -101,6 +101,7 @@ internal class FerdigstiltInnsendingObserverTest {
             aktørId = "1234455",
             fødselsnummer = "12345678901",
             fagsakId = "1234",
+            oppgaveId = "oppgaveId",
             datoRegistrert = LocalDateTime.now(),
             søknadsData =
                 JsonMapper.jacksonJsonAdapter.createObjectNode().also {
