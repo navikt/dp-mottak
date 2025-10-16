@@ -50,11 +50,19 @@ internal class FagsystemMottak(
         withLoggingContext("journalpostId" to "$journalpostId") {
             logg.info { "Mottatt løsning for behov $behovNavn med løsning: $løsningNode" }
 
+
+            val fagsystem = if (journalpostId == "723859871")  {
+                Fagsystem.Arena
+            } else {
+                løsningNode.fagsystem()
+            }
+
+
             val fagsystemBesluttet =
                 FagsystemBesluttet(
                     aktivitetslogg = Aktivitetslogg(),
                     journalpostId = journalpostId,
-                    fagsystem = løsningNode.fagsystem(),
+                    fagsystem = fagsystem,
                 )
             innsendingMediator.håndter(
                 fagsystemBesluttet,
