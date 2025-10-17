@@ -35,7 +35,6 @@ import no.nav.dagpenger.mottak.db.InnsendingMetadataPostgresRepository
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
-import no.nav.dagpenger.mottak.observers.FerdigstiltEttersendingObserver
 import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
 import no.nav.dagpenger.mottak.observers.InnsendingProbe
 import no.nav.dagpenger.mottak.observers.MetrikkObserver
@@ -99,10 +98,10 @@ internal class ApplicationBuilder(
                         observatører =
                             listOf(
                                 ferdigstiltInnsendingObserver,
-                                FerdigstiltEttersendingObserver(
-                                    saksbehandlingKlient = saksbehandlingKlient,
-                                    gosysClient = gosysOppslag,
-                                ),
+//                                FerdigstiltEttersendingObserver(
+//                                    saksbehandlingKlient = saksbehandlingKlient,
+//                                    gosysClient = gosysOppslag,
+//                                ),
                                 MetrikkObserver(),
                                 InnsendingProbe,
                             ),
