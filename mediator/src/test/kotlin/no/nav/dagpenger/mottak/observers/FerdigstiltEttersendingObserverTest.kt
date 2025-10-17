@@ -71,6 +71,22 @@ class FerdigstiltEttersendingObserverTest {
         coVerify(exactly = 0) { gosysClient.opprettOppgave(any()) }
     }
 
+    @Test
+    fun `Hvis ikke varsle om ettersending med oppgave i gosys pga manglende søknadId`() {
+        val gosysClient = mockk<GosysClient>()
+
+        val observer = FerdigstiltEttersendingObserver(saksbehandlingKlient, gosysClient)
+        observer.innsendingFerdigstilt(
+            innsendingFerdigstiltEvent(
+                ident = "enAnnenIdent",
+                innsendingType = Ettersending,
+                søknadsData = """{}""",
+            ),
+        )
+        coVerify(exactly = 0) { gosysClient.opprettOppgave(any()) }
+        coVerify(exactly = 0) { saksbehandlingKlient.skalVarsleOmEttersending(any(), any()) }
+    }
+
     @ParameterizedTest
     @EnumSource(InnsendingObserver.Type::class)
     fun `Skal bare sjekke behov for varsling for ettersendinger hvis skjemakode er ettersending til dagpengesøknad`(
@@ -100,6 +116,7 @@ class FerdigstiltEttersendingObserverTest {
     private fun innsendingFerdigstiltEvent(
         ident: String,
         innsendingType: InnsendingObserver.Type,
+        søknadsData: String = """{"søknad_uuid": "søknad_uuid"}""",
     ): InnsendingObserver.InnsendingEvent {
         return InnsendingObserver.InnsendingEvent(
             type = innsendingType,
@@ -110,7 +127,7 @@ class FerdigstiltEttersendingObserverTest {
             fagsakId = "fagsakId",
             oppgaveId = "oppgaveId",
             datoRegistrert = LocalDateTime.now(),
-            søknadsData = jacksonObjectMapper().readTree("""{"søknad_uuid": "søknad_uuid"}"""),
+            søknadsData = jacksonObjectMapper().readTree(søknadsData),
             behandlendeEnhet = "tildeleEnhetsnr",
             tittel = "tittel",
         )

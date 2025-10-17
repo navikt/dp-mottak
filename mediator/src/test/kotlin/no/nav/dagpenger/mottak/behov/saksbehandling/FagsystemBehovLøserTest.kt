@@ -65,6 +65,20 @@ class FagsystemBehovLøserTest {
     }
 
     @Test
+    fun `Bestem fagsystem for ettersending som mangler søknad-id`() {
+        FagystemBehovLøser(
+            oppgaveRuting = oppgaveRutingMock,
+            rapidsConnection = testRapid,
+        )
+
+        testRapid.sendTestMessage(fagsystemBehovUtenSøknadId(testIdent, "ETTERSENDING"))
+        with(testRapid.inspektør) {
+            size shouldBe 1
+            field(0, "@løsning")[FagystemBehovLøser.behovNavn]["fagsystem"].asText() shouldBe "ARENA"
+        }
+    }
+
+    @Test
     fun `Bestem fagsystem for klage der person har sak i dp-sak`() {
         FagystemBehovLøser(
             oppgaveRuting = oppgaveRutingMock,

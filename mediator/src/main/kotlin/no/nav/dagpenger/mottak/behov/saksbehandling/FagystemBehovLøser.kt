@@ -71,7 +71,11 @@ internal class FagystemBehovLøser(
                         }
 
                         KategorisertJournalpost.Kategori.ETTERSENDING -> {
-                            lagLøsning(oppgaveRuting.ruteOppgave(søknadsId = packet["søknadsId"].asUUID()))
+                            if (packet["søknadsId"].isMissingNode || packet["søknadsId"].isNull()) {
+                                lagLøsning(fagsystem = Fagsystem.Arena)
+                            } else {
+                                lagLøsning(oppgaveRuting.ruteOppgave(søknadsId = packet["søknadsId"].asUUID()))
+                            }
                         }
 
                         else -> {
