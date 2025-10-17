@@ -15,7 +15,6 @@ internal interface JournalpostFeil {
         private val nyWhitelistFeilmeldinger =
             setOf(
                 "bruker kan ikke oppdateres for journalpost med journalpoststatus=J og journalposttype=I",
-                "bruker kan ikke oppdateres for journalpost med journalpostStatus=J og journalpostType=I",
             )
     }
 

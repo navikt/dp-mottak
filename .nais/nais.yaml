@@ -28,7 +28,7 @@ spec:
         - id: loki
         - id: elastic
     autoInstrumentation:
-      enabled: false
+      enabled: true
       runtime: "java"
   replicas:
     min: {{replicas_min}}
