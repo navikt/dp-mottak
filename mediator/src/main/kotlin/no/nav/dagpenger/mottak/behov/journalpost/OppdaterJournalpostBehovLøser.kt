@@ -14,7 +14,8 @@ import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApi.OppdaterJournalp
 internal class OppdaterJournalpostBehovLøser(
     private val journalpostDokarkiv: JournalpostDokarkiv,
     rapidsConnection: RapidsConnection,
-) : River.PacketListener, JournalpostFeil {
+) : River.PacketListener,
+    JournalpostFeil {
     private companion object {
         val logger = KotlinLogging.logger { }
     }
@@ -40,7 +41,7 @@ internal class OppdaterJournalpostBehovLøser(
     ) {
         val journalpostId = packet["journalpostId"].asText()
         val behovId = packet["@behovId"].asText()
-        if (emptyList<String>().contains(journalpostId)) {
+        if (listOf("723891751").contains(journalpostId)) {
             logger.warn { "Skipper journalpost $journalpostId fra OppdaterJournalpostBehovLøser" }
             return
         }
