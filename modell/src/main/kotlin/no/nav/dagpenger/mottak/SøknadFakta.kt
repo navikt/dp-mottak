@@ -26,7 +26,7 @@ interface QuizOppslag : SøknadOppslag {
 
     fun ønskerDagpengerFraDato(): LocalDate
 
-    fun søknadsId(): String?
+    fun søknadId(): String?
 
     fun reellArbeidsSøker(): ReellArbeidsSøker
 }

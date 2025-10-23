@@ -380,7 +380,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "kategori",
                     "fødselsnummer",
                     "journalpostId",
-                    "søknadsId",
+                    "søknadId",
                     "registrertDato",
                 ),
         )

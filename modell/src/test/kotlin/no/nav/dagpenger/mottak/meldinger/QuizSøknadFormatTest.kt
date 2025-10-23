@@ -113,11 +113,11 @@ internal class QuizSøknadFormatTest {
     }
 
     @Test
-    fun søknadsId() {
+    fun søknadId() {
         val uuid = UUID.randomUUID()
         assertEquals(
             uuid.toString(),
-            QuizSøknadFormat(utenSeksjoner(uuid)).søknadsId(),
+            QuizSøknadFormat(utenSeksjoner(uuid)).søknadId(),
         )
     }
 }

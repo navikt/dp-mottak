@@ -88,7 +88,7 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag
             .faktaSvar("faktum.dagpenger-soknadsdato")
             .asLocalDate()
 
-    override fun søknadsId(): String? = data["søknad_uuid"]?.textValue()
+    override fun søknadId(): String? = data["søknad_uuid"]?.textValue()
 
     override fun reellArbeidsSøker(): ReellArbeidsSøker =
         data.hentFaktaFraSeksjon("reell-arbeidssoker").let { node ->

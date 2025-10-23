@@ -639,7 +639,7 @@ class Innsending private constructor(
         val journalpostData = requireNotNull(journalpost) { " Journalpost må være innhentet " }
         val person = requireNotNull(person) { " Person må være innhentet " }
         val kategorisertJournalpost = journalpostData.kategorisertJournalpost()
-        val søknadsId = rutingOppslag?.let { QuizSøknadFormat(it.data()).søknadsId() }
+        val søknadId = rutingOppslag?.let { QuizSøknadFormat(it.data()).søknadId() }
 
         val detaljer =
             buildMap<String, Any> {
@@ -647,11 +647,11 @@ class Innsending private constructor(
                 this["fødselsnummer"] = person.ident
                 this["journalpostId"] = journalpostId
                 this["registrertDato"] = journalpostData.datoRegistrert()
-                søknadsId?.let { this["søknadsId"] = it }
+                søknadId?.let { this["søknadId"] = it }
             }.toMap()
         hendelse.behov(
             type = Behovtype.HåndterHenvendelse,
-            melding = "Trenger å bestemme fagsystem",
+            melding = "Sjekker om dp-saksbehandling kan håndtere henvendelsen",
             detaljer =
             detaljer,
         )
