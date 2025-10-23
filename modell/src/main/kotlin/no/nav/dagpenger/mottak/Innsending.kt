@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
@@ -8,8 +7,8 @@ import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
 import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet.OppgaveSak
-import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.HåndtertHenvendelse
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
@@ -21,8 +20,6 @@ import no.nav.dagpenger.mottak.meldinger.RekjørHendelse
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.QuizSøknadFormat
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
 import java.time.Duration
-
-private val logger = KotlinLogging.logger { }
 
 class Innsending private constructor(
     private val journalpostId: String,
@@ -63,10 +60,10 @@ class Innsending private constructor(
         tilstand.håndter(this, joarkHendelse)
     }
 
-    fun håndter(fagsystemBesluttet: FagsystemBesluttet) {
-        if (journalpostId != fagsystemBesluttet.journalpostId()) return
-        kontekst(fagsystemBesluttet, "Fagsystem besluttet for journalpost")
-        tilstand.håndter(this, fagsystemBesluttet)
+    fun håndter(håndtertHenvendelse: HåndtertHenvendelse) {
+        if (journalpostId != håndtertHenvendelse.journalpostId()) return
+        kontekst(håndtertHenvendelse, "HenvendelseHåndtert for journalpost")
+        tilstand.håndter(this, håndtertHenvendelse)
     }
 
     fun håndter(journalpost: Journalpost) {
@@ -163,9 +160,9 @@ class Innsending private constructor(
 
         fun håndter(
             innsending: Innsending,
-            fagsystemBesluttet: FagsystemBesluttet,
+            håndtertHenvendelse: HåndtertHenvendelse,
         ) {
-            fagsystemBesluttet.warn("Forventet ikke FagsystemBesluttet i tilstand $type.name")
+            håndtertHenvendelse.warn("Forventet ikke HåndtertHenvendelse i tilstand $type.name")
         }
 
         fun håndter(
@@ -358,8 +355,8 @@ class Innsending private constructor(
                 is Generell -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Utdanning -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
                 is Etablering -> innsending.tilstand(hendelse, AventerVurderHenvendelseArenaOppgave)
-                is Klage -> innsending.tilstand(hendelse, AvventerFagsystem)
-                is Anke -> innsending.tilstand(hendelse, AvventerFagsystem)
+                is Klage -> innsending.tilstand(hendelse, HåndterHenvendelse)
+                is Anke -> innsending.tilstand(hendelse, HåndterHenvendelse)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
                 is KlageForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
@@ -367,9 +364,9 @@ class Innsending private constructor(
         }
     }
 
-    internal object AvventerFagsystem : Tilstand {
+    internal object HåndterHenvendelse : Tilstand {
         override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.AvventerFagsystem
+            get() = InnsendingTilstandType.HåndterHenvendelseType
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
@@ -377,7 +374,7 @@ class Innsending private constructor(
             innsending: Innsending,
             hendelse: Hendelse,
         ) {
-            innsending.bestemmeFagsystem(hendelse)
+            innsending.håndtereHenvendelse(hendelse)
         }
 
         override fun håndter(
@@ -389,40 +386,20 @@ class Innsending private constructor(
 
         override fun håndter(
             innsending: Innsending,
-            fagsystemBesluttet: FagsystemBesluttet,
+            håndtertHenvendelse: HåndtertHenvendelse,
         ) {
-            val journalpostData = requireNotNull(innsending.journalpost) { " Journalpost må være innhentet " }
-            val hendelseType = journalpostData.kategorisertJournalpost()
-            when (fagsystemBesluttet.fagsystem) {
+            when (håndtertHenvendelse.fagsystem) {
                 is Fagsystem.Dagpenger -> {
                     innsending.oppgaveSak =
                         OppgaveSak(
-                            fagsakId = fagsystemBesluttet.fagsystem.sakId,
+                            fagsakId = håndtertHenvendelse.fagsystem.sakId,
                             oppgaveId = null,
                         )
-                    when (hendelseType.kategori) {
-                        KategorisertJournalpost.Kategori.KLAGE -> {
-                            innsending.tilstand(fagsystemBesluttet, AvventerDagpengerOppgave)
-                        }
-
-                        KategorisertJournalpost.Kategori.ANKE -> {
-                            innsending.tilstand(fagsystemBesluttet, AvventerDagpengerOppgave)
-                        }
-
-                        KategorisertJournalpost.Kategori.ETTERSENDING -> {
-                            innsending.oppdatereJournalpost(fagsystemBesluttet)
-                        }
-
-                        else -> {
-                            val feilmelding = "Kan ikke håndtere hendelse ${fagsystemBesluttet.javaClass.simpleName} for hendelsestype ${hendelseType.kategori} "
-                            logger.error { feilmelding }
-                            throw IllegalArgumentException(feilmelding)
-                        }
-                    }
+                    innsending.oppdatereJournalpost(håndtertHenvendelse)
                 }
 
                 is Fagsystem.Arena -> {
-                    innsending.tilstand(fagsystemBesluttet, AventerVurderHenvendelseArenaOppgave)
+                    innsending.tilstand(håndtertHenvendelse, AventerVurderHenvendelseArenaOppgave)
                 }
             }
         }
@@ -462,7 +439,7 @@ class Innsending private constructor(
             when (kategorisertJournalpost) {
                 is NySøknad -> innsending.tilstand(søknadsdata, AventerArenaStartVedtak)
                 is Gjenopptak -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
-                is Ettersending -> innsending.tilstand(søknadsdata, AvventerFagsystem)
+                is Ettersending -> innsending.tilstand(søknadsdata, HåndterHenvendelse)
                 is Generell -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
                 else -> søknadsdata.severe("Forventet kun søknadsdata for NySøknad og Gjenopptak")
             }
@@ -531,35 +508,6 @@ class Innsending private constructor(
         ) {
             innsending.arenaSak = arenaOppgave.arenaSak()
             innsending.oppdatereJournalpost(arenaOppgave)
-        }
-
-        override fun håndter(
-            innsending: Innsending,
-            oppdatertJournalpost: JournalpostOppdatert,
-        ) {
-            innsending.tilstand(oppdatertJournalpost, AventerFerdigstill)
-        }
-    }
-
-    internal object AvventerDagpengerOppgave : Tilstand {
-        override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.AvventerDagpengerOppgaveType
-        override val timeout: Duration
-            get() = Duration.ofDays(1)
-
-        override fun entering(
-            innsending: Innsending,
-            hendelse: Hendelse,
-        ) {
-            innsending.oppretteDagpengerOppgave(hendelse)
-        }
-
-        override fun håndter(
-            innsending: Innsending,
-            dagpengerOppgaveOpprettet: DagpengerOppgaveOpprettet,
-        ) {
-            innsending.oppgaveSak = dagpengerOppgaveOpprettet.oppgaveSak()
-            innsending.oppdatereJournalpost(dagpengerOppgaveOpprettet)
         }
 
         override fun håndter(
@@ -687,7 +635,7 @@ class Innsending private constructor(
         )
     }
 
-    private fun bestemmeFagsystem(hendelse: Hendelse) {
+    private fun håndtereHenvendelse(hendelse: Hendelse) {
         val journalpostData = requireNotNull(journalpost) { " Journalpost må være innhentet " }
         val person = requireNotNull(person) { " Person må være innhentet " }
         val kategorisertJournalpost = journalpostData.kategorisertJournalpost()
@@ -702,7 +650,7 @@ class Innsending private constructor(
                 søknadsId?.let { this["søknadsId"] = it }
             }.toMap()
         hendelse.behov(
-            type = Behovtype.BestemFagsystem,
+            type = Behovtype.HåndterHenvendelse,
             melding = "Trenger å bestemme fagsystem",
             detaljer =
             detaljer,
@@ -764,27 +712,6 @@ class Innsending private constructor(
         hendelse.behov(
             Behovtype.OpprettVurderhenvendelseOppgave,
             "Oppretter oppgave og sak for journalpost $journalpostId",
-            parametre,
-        )
-    }
-
-    private fun oppretteDagpengerOppgave(hendelse: Hendelse) {
-        val journalpost = requireNotNull(journalpost).kategorisertJournalpost()
-        val person =
-            requireNotNull(person) { "Krever at person er satt her. Mangler for journalpostId ${journalpostId()}" }
-        val oppgavebenk = journalpost.oppgaveBenk(person)
-        val sak = requireNotNull(oppgaveSak) { "Krever at oppgave sak er satt her. Mangler for journalpostId ${journalpostId()}" }
-        val parametre =
-            mapOf(
-                "fødselsnummer" to person.ident,
-                "registrertDato" to oppgavebenk.datoRegistrert,
-                "skjemaKategori" to journalpost.javaClass.simpleName,
-                "fagsakId" to sak.fagsakId,
-            )
-
-        hendelse.behov(
-            Behovtype.OpprettDagpengerOppgave,
-            "Oppretter dagpenger oppgave og sak for journalpost $journalpostId",
             parametre,
         )
     }

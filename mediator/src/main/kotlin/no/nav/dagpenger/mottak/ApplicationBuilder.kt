@@ -23,14 +23,10 @@ import no.nav.dagpenger.mottak.behov.person.PdlPersondataOppslag
 import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.SkjermingOppslag
 import no.nav.dagpenger.mottak.behov.person.createPersonOppslag
-import no.nav.dagpenger.mottak.behov.saksbehandling.DagpengerOppgaveBehovLøser
-import no.nav.dagpenger.mottak.behov.saksbehandling.FagystemBehovLøser
-import no.nav.dagpenger.mottak.behov.saksbehandling.SaksbehandlingHttpKlient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaApiClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.arena.ArenaBehovLøser
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.GosysClient
 import no.nav.dagpenger.mottak.behov.saksbehandling.gosys.OpprettGosysOppgaveLøser
-import no.nav.dagpenger.mottak.behov.saksbehandling.ruting.SakseierBasertRuting
 import no.nav.dagpenger.mottak.db.InnsendingMetadataPostgresRepository
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
@@ -55,13 +51,6 @@ internal class ApplicationBuilder(
     private val journalpostApiClient = JournalpostApiClient(tokenProvider = Config.properties.dokarkivTokenProvider)
     private val gosysOppslag = GosysClient(Config.properties)
     private val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(Config.kafkaProducerProperties)
-    private val saksbehandlingKlient =
-        SaksbehandlingHttpKlient(
-            dpSaksbehandlingBaseUrl = Config.dpSaksbehandlingBaseUrl,
-            tokenProvider = Config.dpSaksbehandlingTokenProvider,
-        )
-
-    val sakseierBasertRuting = SakseierBasertRuting(saksbehandlingKlient)
     private val rapidsConnection =
         RapidApplication
             .create(env = env, builder = {
@@ -98,10 +87,6 @@ internal class ApplicationBuilder(
                         observatører =
                             listOf(
                                 ferdigstiltInnsendingObserver,
-//                                FerdigstiltEttersendingObserver(
-//                                    saksbehandlingKlient = saksbehandlingKlient,
-//                                    gosysClient = gosysOppslag,
-//                                ),
                                 MetrikkObserver(),
                                 InnsendingProbe,
                             ),
@@ -124,17 +109,6 @@ internal class ApplicationBuilder(
                     rapidsConnection = this,
                     innsendingMetadataRepository = innsendingMetadataRepository,
                     journalpostDokarkiv = journalpostApiClient,
-                )
-                FagystemBehovLøser(
-                    rapidsConnection = this,
-                    oppgaveRuting =
-                        SakseierBasertRuting(
-                            saksbehandlingKlient = saksbehandlingKlient,
-                        ),
-                )
-                DagpengerOppgaveBehovLøser(
-                    saksbehandlingKlient = saksbehandlingKlient,
-                    rapidsConnection = this,
                 )
             }
 

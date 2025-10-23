@@ -12,17 +12,18 @@ import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
+import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.InnsendingMediator
-import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.HåndtertHenvendelse
 import no.nav.dagpenger.mottak.serder.asUUID
 
 private val logg = KotlinLogging.logger {}
 
-class DagpengerOppgaveOpprettetMottak internal constructor(
+internal class HåndtertHenvendelseMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
-    private val behovNavn = Behovtype.OpprettDagpengerOppgave.name
+    private val behovNavn = Behovtype.HåndterHenvendelse.name
     private val løsning = "@løsning.$behovNavn"
 
     init {
@@ -31,11 +32,9 @@ class DagpengerOppgaveOpprettetMottak internal constructor(
                 precondition { it.requireValue("@event_name", "behov") }
                 precondition { it.requireValue("@final", true) }
                 precondition { it.requireAll("@behov", listOf<String>(behovNavn)) }
-                validate {
-                    it.require("@opprettet", JsonNode::asLocalDateTime)
-                    it.requireKey(løsning)
-                    it.requireKey("journalpostId")
-                }
+                validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
+                validate { it.requireKey(løsning) }
+                validate { it.requireKey("journalpostId") }
             }.register(this)
     }
 
@@ -46,20 +45,38 @@ class DagpengerOppgaveOpprettetMottak internal constructor(
         meterRegistry: MeterRegistry,
     ) {
         val journalpostId = packet["journalpostId"].asText()
-        val løsningNode = packet[løsning]
+        val løsningNode: JsonNode = packet[løsning]
 
         withLoggingContext("journalpostId" to "$journalpostId") {
             logg.info { "Mottatt løsning for behov $behovNavn med løsning: $løsningNode" }
-            val dagpengerOppgaveOpprettet =
-                DagpengerOppgaveOpprettet(
+
+            val henvendelseHåndtert =
+                HåndtertHenvendelse(
                     aktivitetslogg = Aktivitetslogg(),
                     journalpostId = journalpostId,
-                    oppgaveId = løsningNode["oppgaveId"].asUUID(),
-                    fagsakId = løsningNode["fagsakId"].asUUID(),
+                    fagsystem = løsningNode.fagsystem(),
                 )
             innsendingMediator.håndter(
-                dagpengerOppgaveOpprettet,
+                henvendelseHåndtert,
             )
+        }
+    }
+
+    private fun JsonNode.fagsystem(): Fagsystem {
+        val håndterNode = this["håndtert"]
+        require(!håndterNode.isMissingNode && håndterNode.isBoolean) {
+            "Feltet håndtert må være satt og av typen boolean men var: $this"
+        }
+
+        val fagsystemType =
+            when (this["håndtert"].asBoolean()) {
+                true -> Fagsystem.FagsystemType.DAGPENGER
+                false -> Fagsystem.FagsystemType.ARENA
+            }
+
+        return when (fagsystemType) {
+            Fagsystem.FagsystemType.DAGPENGER -> Fagsystem.Dagpenger(this["sakId"].asUUID())
+            Fagsystem.FagsystemType.ARENA -> Fagsystem.Arena
         }
     }
 }

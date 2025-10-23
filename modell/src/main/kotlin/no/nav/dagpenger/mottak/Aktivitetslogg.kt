@@ -206,6 +206,8 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
                 Journalpost,
                 Persondata,
                 Søknadsdata,
+
+                @Deprecated("BestemFagsystem er deprekert men trengs for å rehyrdrere gammel aktivitetslogg")
                 BestemFagsystem,
 
                 @Deprecated("MinsteinntektVurdering er deprekert men trengs for å rehyrdrere gammel aktivitetslogg")
@@ -218,7 +220,7 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
                 OppdaterJournalpost,
                 FerdigstillJournalpost,
                 OpprettGosysoppgave,
-                OpprettDagpengerOppgave,
+                HåndterHenvendelse,
             }
         }
 

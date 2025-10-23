@@ -15,12 +15,12 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AlleredeBehandletType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaOppgaveType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AventerArenaStartVedtakType
-import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerFagsystem
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerFerdigstillJournalpostType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerGosysType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerJournalpostType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerPersondataType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerSøknadsdataType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.HåndterHenvendelseType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.InnsendingFerdigstiltType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.MottattType
@@ -270,7 +270,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
         assertBehovDetaljer(
-            type = Behovtype.BestemFagsystem,
+            type = Behovtype.HåndterHenvendelse,
             detaljer =
                 setOf(
                     "kategori",
@@ -279,35 +279,20 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "registrertDato",
                 ),
         )
-        håndterFagystemBesluttet(fagsystemType)
-        when (fagsystemType) {
-            Fagsystem.FagsystemType.ARENA -> {
-                assertBehovDetaljer(
-                    OpprettVurderhenvendelseOppgave,
-                    setOf(
-                        "aktørId",
-                        "fødselsnummer",
-                        "behandlendeEnhetId",
-                        "oppgavebeskrivelse",
-                        "registrertDato",
-                        "tilleggsinformasjon",
-                    ),
-                )
-                håndterArenaOppgaveOpprettet()
-            }
-
-            Fagsystem.FagsystemType.DAGPENGER -> {
-                assertBehovDetaljer(
-                    Behovtype.OpprettDagpengerOppgave,
-                    setOf(
-                        "fødselsnummer",
-                        "registrertDato",
-                        "skjemaKategori",
-                        "fagsakId",
-                    ),
-                )
-                håndterDagpengerOppgaveOpprettet()
-            }
+        håndterHenvendelse(fagsystemType)
+        if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+            assertBehovDetaljer(
+                OpprettVurderhenvendelseOppgave,
+                setOf(
+                    "aktørId",
+                    "fødselsnummer",
+                    "behandlendeEnhetId",
+                    "oppgavebeskrivelse",
+                    "registrertDato",
+                    "tilleggsinformasjon",
+                ),
+            )
+            håndterArenaOppgaveOpprettet()
         }
 
         assertBehovDetaljer(
@@ -331,15 +316,9 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 add(AvventerJournalpostType)
                 add(AvventerPersondataType)
                 add(KategoriseringType)
-                add(AvventerFagsystem)
-                when (fagsystemType) {
-                    Fagsystem.FagsystemType.ARENA -> {
-                        add(AventerArenaOppgaveType)
-                    }
-
-                    Fagsystem.FagsystemType.DAGPENGER -> {
-                        add(InnsendingTilstandType.AvventerDagpengerOppgaveType)
-                    }
+                add(HåndterHenvendelseType)
+                if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+                    add(AventerArenaOppgaveType)
                 }
                 add(AvventerFerdigstillJournalpostType)
                 add(InnsendingFerdigstiltType)
@@ -366,7 +345,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
                 Fagsystem.FagsystemType.DAGPENGER -> {
                     assertEquals(DAGPENGER_FAGSAK_ID, it.fagsakId)
-                    assertEquals(DAGPENGER_OPPGAVE_ID, it.oppgaveId)
                 }
             }
             assertNotNull(it.aktørId)
@@ -396,7 +374,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterPersonInformasjon()
         håndterSøknadsdata()
         assertBehovDetaljer(
-            type = Behovtype.BestemFagsystem,
+            type = Behovtype.HåndterHenvendelse,
             detaljer =
                 setOf(
                     "kategori",
@@ -406,7 +384,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "registrertDato",
                 ),
         )
-        håndterFagystemBesluttet(fagsystemType)
+        håndterHenvendelse(fagsystemType)
         if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
             assertBehovDetaljer(
                 OpprettVurderhenvendelseOppgave,
@@ -444,7 +422,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 add(AvventerPersondataType)
                 add(KategoriseringType)
                 add(AvventerSøknadsdataType)
-                add(AvventerFagsystem)
+                add(HåndterHenvendelseType)
                 if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
                     add(AventerArenaOppgaveType)
                 }

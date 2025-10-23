@@ -75,8 +75,6 @@ data class InnsendingData(
                 InnsendingTilstandTypeData.AlleredeBehandletType -> Innsending.AlleredeBehandlet
                 InnsendingTilstandTypeData.AventerArenaOppgaveType -> Innsending.AventerVurderHenvendelseArenaOppgave
                 InnsendingTilstandTypeData.AventerArenaStartVedtakType -> Innsending.AventerArenaStartVedtak
-                InnsendingTilstandTypeData.AvventerDagpengerOppgaveType -> Innsending.AvventerDagpengerOppgave
-                InnsendingTilstandTypeData.AvventerFagsystem -> Innsending.AvventerFagsystem
                 InnsendingTilstandTypeData.AvventerFerdigstillJournalpostType -> Innsending.AventerFerdigstill
                 InnsendingTilstandTypeData.AvventerGosysType -> Innsending.AvventerGosysOppgave
                 InnsendingTilstandTypeData.AvventerJournalpostType -> Innsending.AvventerJournalpost
@@ -88,14 +86,13 @@ data class InnsendingData(
                 InnsendingTilstandTypeData.KategoriseringType -> Innsending.Kategorisering
                 InnsendingTilstandTypeData.MottattType -> Innsending.Mottatt
                 InnsendingTilstandTypeData.UkjentBrukerType -> Innsending.UkjentBruker
+                InnsendingTilstandTypeData.HåndterHenvendelseType -> Innsending.HåndterHenvendelse
             }
 
         enum class InnsendingTilstandTypeData {
             AlleredeBehandletType,
             AventerArenaOppgaveType,
             AventerArenaStartVedtakType,
-            AvventerDagpengerOppgaveType,
-            AvventerFagsystem,
             AvventerFerdigstillJournalpostType,
             AvventerGosysType,
             AvventerJournalpostType,
@@ -107,6 +104,7 @@ data class InnsendingData(
             KategoriseringType,
             MottattType,
             UkjentBrukerType,
+            HåndterHenvendelseType,
         }
     }
 

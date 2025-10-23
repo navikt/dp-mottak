@@ -6,8 +6,8 @@ import no.nav.dagpenger.mottak.db.InnsendingRepository
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.HåndtertHenvendelse
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
@@ -38,9 +38,9 @@ internal class InnsendingMediator(
         }
     }
 
-    fun håndter(fagsystem: FagsystemBesluttet) {
-        håndter(fagsystem) { innsending ->
-            innsending.håndter(fagsystem)
+    fun håndter(håndtertHenvendelse: HåndtertHenvendelse) {
+        håndter(håndtertHenvendelse) { innsending ->
+            innsending.håndter(håndtertHenvendelse)
         }
     }
 
@@ -133,6 +133,7 @@ internal class InnsendingMediator(
                 log.debug { "Fant Innsending for ${hendelse.journalpostId()}" }
                 innsending
             }
+
             else -> {
                 val nyInnsending = Innsending(hendelse.journalpostId())
                 innsendingRepository.lagre(nyInnsending)

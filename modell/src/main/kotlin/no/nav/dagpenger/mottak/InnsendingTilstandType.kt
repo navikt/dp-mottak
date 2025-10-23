@@ -4,8 +4,6 @@ enum class InnsendingTilstandType {
     AlleredeBehandletType,
     AventerArenaOppgaveType,
     AventerArenaStartVedtakType,
-    AvventerDagpengerOppgaveType,
-    AvventerFagsystem,
     AvventerFerdigstillJournalpostType,
     AvventerGosysType,
     AvventerJournalpostType,
@@ -15,4 +13,5 @@ enum class InnsendingTilstandType {
     KategoriseringType,
     MottattType,
     UkjentBrukerType,
+    HåndterHenvendelseType,
 }

@@ -13,6 +13,7 @@ import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.HåndtertHenvendelse
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.Journalpost.Bruker
@@ -137,8 +138,8 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(søknadsdata())
     }
 
-    protected fun håndterFagystemBesluttet(fagsystem: Fagsystem.FagsystemType) {
-        innsending.håndter(fagsystem(fagsystem))
+    protected fun håndterHenvendelse(fagsystem: Fagsystem.FagsystemType) {
+        innsending.håndter(henvendelseHåndtert(fagsystem))
     }
 
     protected fun håndterArenaOppgaveOpprettet() {
@@ -200,6 +201,20 @@ abstract class AbstractEndeTilEndeTest {
                 Fagsystem.FagsystemType.ARENA -> Fagsystem.Arena
             }
         return FagsystemBesluttet(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+            fagsystem = fagsystem,
+        )
+    }
+
+    private fun henvendelseHåndtert(fagsystemType: Fagsystem.FagsystemType): HåndtertHenvendelse {
+        val fagsystem =
+            when (fagsystemType) {
+                Fagsystem.FagsystemType.DAGPENGER -> Fagsystem.Dagpenger(sakId = UUID.fromString(DAGPENGER_FAGSAK_ID))
+                Fagsystem.FagsystemType.ARENA -> Fagsystem.Arena
+            }
+
+        return HåndtertHenvendelse(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = JOURNALPOST_ID,
             fagsystem = fagsystem,
