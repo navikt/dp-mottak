@@ -276,6 +276,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "kategori",
                     "fødselsnummer",
                     "journalpostId",
+                    "registrertDato",
                 ),
         )
         håndterFagystemBesluttet(fagsystemType)
@@ -402,6 +403,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "fødselsnummer",
                     "journalpostId",
                     "søknadsId",
+                    "registrertDato",
                 ),
         )
         håndterFagystemBesluttet(fagsystemType)

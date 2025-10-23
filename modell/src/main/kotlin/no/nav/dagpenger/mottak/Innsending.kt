@@ -698,6 +698,7 @@ class Innsending private constructor(
                 this["kategori"] = kategorisertJournalpost.kategori.name
                 this["fødselsnummer"] = person.ident
                 this["journalpostId"] = journalpostId
+                this["registrertDato"] = journalpostData.datoRegistrert()
                 søknadsId?.let { this["søknadsId"] = it }
             }.toMap()
         hendelse.behov(
