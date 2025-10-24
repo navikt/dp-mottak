@@ -54,20 +54,21 @@ internal class JournalpostBehovLøser(
             runBlocking(MDCContext()) { journalpostArkiv.hentJournalpost(journalpostId) }.also {
                 packet["@løsning"] = mapOf("Journalpost" to it)
                 context.publish(packet.toJson())
-                if (it.harDokumentitlerLengreEnn(255)) {
+                if (it.harDokumentTitlerLengreEnn(255)) {
                     val dokumentTitler = it.dokumenter.joinToString { dokument -> "${dokument.tittel}\n" }
-                    sikkerlogg.info { "Mottok journalpost fra Joark. Dokumentene har tittlene:\n$dokumentTitler" }
+                    sikkerlogg.info { "Mottok journalpost fra Joark. Dokumentene har titlene:\n$dokumentTitler" }
                 }
                 logger.info {
                     val tidSidenOpprettet =
                         it.datoOpprettet?.let { datoOpprettet ->
                             Duration.between(LocalDateTime.parse(datoOpprettet), LocalDateTime.now())
                         }
-                    "Løst behov Journalpost for journalpost med id ${it.journalpostId}. Opprettet Joark for $tidSidenOpprettet siden."
+                    "Løst behov Journalpost for journalpost med id ${it.journalpostId}. Opprettet i Joark for $tidSidenOpprettet siden."
                 }
             }
         }
     }
 
-    private fun SafGraphQL.Journalpost.harDokumentitlerLengreEnn(lengde: Int) = dokumenter.mapNotNull { dokument -> dokument.tittel }.any { tittel -> tittel.length > lengde }
+    private fun SafGraphQL.Journalpost.harDokumentTitlerLengreEnn(lengde: Int) =
+        dokumenter.mapNotNull { dokument -> dokument.tittel }.any { tittel -> tittel.length > lengde }
 }

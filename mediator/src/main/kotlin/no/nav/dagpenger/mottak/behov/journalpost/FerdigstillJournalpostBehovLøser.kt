@@ -62,7 +62,7 @@ internal class FerdigstillJournalpostBehovLøser(
                         ),
                 )
             context.publish(packet.toJson())
-            logger.info("løste behov FerdigstillJournalpost for journalpost med id $journalpostId")
+            logger.info { "Løste behov FerdigstillJournalpost for journalpost med id $journalpostId" }
         }
     }
 }
