@@ -154,7 +154,8 @@ internal class MediatorE2ETest {
     }
 
     @Test
-    fun `Skal motta generell henvendelse`() {
+    fun `Skal motta generell henvendelse som skal til Dagpenger`() {
+        val fagsakId = UUID.randomUUID()
         withMigratedDb {
             settOppInfrastruktur()
             håndterHendelse(joarkMelding())
@@ -164,14 +165,41 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("OpprettVurderhenvendelseOppgave", 3)
-            håndterHendelse(opprettOpprettVurderhenvendelseHendelse())
+            assertBehov("HåndterHenvendelse", 3)
+            håndterHendelse(håndtertHenvendelse(sakId = fagsakId.toString(), håndtert = true))
             assertBehov("OppdaterJournalpost", 4)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
             assertBehov("FerdigstillJournalpost", 5)
             håndterHendelse(ferdigstiltJournalpostMotattHendelse())
             assertTrue(
                 testRapid.inspektør.size == 6,
+                "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
+            )
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        }
+    }
+
+    @Test
+    fun `Skal motta generell henvendelse som skal til Arena`() {
+        withMigratedDb {
+            settOppInfrastruktur()
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = "GENERELL_INNSENDING"))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("Søknadsdata", 2)
+            håndterHendelse(søknadsdataMottakHendelse())
+            assertBehov("HåndterHenvendelse", 3)
+            håndterHendelse(håndtertHenvendelse(sakId = null, håndtert = false))
+            assertBehov("OpprettVurderhenvendelseOppgave", 4)
+            håndterHendelse(opprettOpprettVurderhenvendelseHendelse())
+            assertBehov("OppdaterJournalpost", 5)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertBehov("FerdigstillJournalpost", 6)
+            håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+            assertTrue(
+                testRapid.inspektør.size == 7,
                 "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
             )
             assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())

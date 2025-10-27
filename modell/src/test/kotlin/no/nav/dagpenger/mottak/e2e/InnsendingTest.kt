@@ -495,24 +495,45 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["GENERELL_INNSENDING"])
-    fun `skal håndtere joark hendelsene generell innsending`(brevkode: String) {
+    @CsvSource(
+        "GENERELL_INNSENDING, ARENA",
+        "GENERELL_INNSENDING, DAGPENGER",
+    )
+    fun `skal håndtere joark hendelsene generell innsending`(
+        brevkode: String,
+        fagsystemType: Fagsystem.FagsystemType,
+    ) {
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
         håndterSøknadsdata()
-        håndterArenaOppgaveOpprettet()
         assertBehovDetaljer(
-            OpprettVurderhenvendelseOppgave,
-            setOf(
-                "aktørId",
-                "fødselsnummer",
-                "behandlendeEnhetId",
-                "oppgavebeskrivelse",
-                "registrertDato",
-                "tilleggsinformasjon",
-            ),
+            type = Behovtype.HåndterHenvendelse,
+            detaljer =
+                setOf(
+                    "kategori",
+                    "fødselsnummer",
+                    "journalpostId",
+                    "registrertDato",
+                    "søknadId",
+                ),
         )
+        håndterHenvendelse(fagsystemType)
+        if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+            assertBehovDetaljer(
+                OpprettVurderhenvendelseOppgave,
+                setOf(
+                    "aktørId",
+                    "fødselsnummer",
+                    "behandlendeEnhetId",
+                    "oppgavebeskrivelse",
+                    "registrertDato",
+                    "tilleggsinformasjon",
+                ),
+            )
+            håndterArenaOppgaveOpprettet()
+        }
+
         håndterJournalpostOppdatert()
         assertBehovDetaljer(
             OppdaterJournalpost,
@@ -528,16 +549,30 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         )
         håndterJournalpostFerdigstilt()
 
-        assertTilstander(
-            MottattType,
-            AvventerJournalpostType,
-            AvventerPersondataType,
-            KategoriseringType,
-            AvventerSøknadsdataType,
-            AventerArenaOppgaveType,
-            AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType,
-        )
+        if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+            assertTilstander(
+                MottattType,
+                AvventerJournalpostType,
+                AvventerPersondataType,
+                KategoriseringType,
+                AvventerSøknadsdataType,
+                HåndterHenvendelseType,
+                AventerArenaOppgaveType,
+                AvventerFerdigstillJournalpostType,
+                InnsendingFerdigstiltType,
+            )
+        } else {
+            assertTilstander(
+                MottattType,
+                AvventerJournalpostType,
+                AvventerPersondataType,
+                KategoriseringType,
+                AvventerSøknadsdataType,
+                HåndterHenvendelseType,
+                AvventerFerdigstillJournalpostType,
+                InnsendingFerdigstiltType,
+            )
+        }
 
         inspektør.also {
             assertNoErrors(it)
@@ -552,8 +587,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
         }
-
-        assertPuml(brevkode)
     }
 
     @Test

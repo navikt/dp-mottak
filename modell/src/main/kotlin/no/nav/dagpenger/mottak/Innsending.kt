@@ -440,8 +440,8 @@ class Innsending private constructor(
                 is NySøknad -> innsending.tilstand(søknadsdata, AventerArenaStartVedtak)
                 is Gjenopptak -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
                 is Ettersending -> innsending.tilstand(søknadsdata, HåndterHenvendelse)
-                is Generell -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
-                else -> søknadsdata.severe("Forventet kun søknadsdata for NySøknad og Gjenopptak")
+                is Generell -> innsending.tilstand(søknadsdata, HåndterHenvendelse)
+                else -> søknadsdata.severe("Forventet kun søknadsdata for NySøknad, Gjenopptak, Ettersending og Generell")
             }
         }
     }
