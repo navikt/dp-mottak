@@ -6,7 +6,10 @@ Kategorisert som: `UkjentSkjemaKode`, Behandlende enhet: `4450`
    	MottattType --> AvventerJournalpostType
 	AvventerJournalpostType --> AvventerPersondataType
 	AvventerPersondataType --> KategoriseringType
-	KategoriseringType --> AvventerGosysType
+	KategoriseringType --> HåndterHenvendelseType
+    HåndterHenvendelseType --> AvventerGosysType
+    HåndterHenvendelseType --> AvventerFerdigstillJournalpostType
+    AvventerFerdigstillJournalpostType --> InnsendingFerdigstiltType
 	AvventerGosysType --> InnsendingFerdigstiltType
    InnsendingFerdigstiltType--> [*]    
 ```

@@ -125,7 +125,7 @@ internal class MediatorE2ETest {
     }
 
     @Test
-    fun `Skal motta hendelser som fører til manuell behandling og sende ut behov`() {
+    fun `Skal motta ukjent skjemakode som fører til manuell behandling i Gosys`() {
         withMigratedDb {
             settOppInfrastruktur()
             håndterHendelse(joarkMelding())
@@ -133,10 +133,33 @@ internal class MediatorE2ETest {
             håndterHendelse(journalpostMottattHendelse(brevkode = "ukjent"))
             assertBehov("Persondata", 1)
             håndterHendelse(persondataMottattHendelse())
-            assertBehov("OpprettGosysoppgave", 2)
+            assertBehov("HåndterHenvendelse", 2)
+            håndterHendelse(håndtertHenvendelse(sakId = null, håndtert = false))
+            assertBehov("OpprettGosysoppgave", 3)
             håndterHendelse(gosysOppgaveOpprettetHendelse())
+            assertBehov("OppdaterJournalpost", 4)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        }
+    }
+
+    @Test
+    fun `Skal motta ukjent skjemakode som fører til henvendelse i Dagpenger`() {
+        val sakId = UUID.randomUUID()
+        withMigratedDb {
+            settOppInfrastruktur()
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = "ukjent"))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("HåndterHenvendelse", 2)
+            håndterHendelse(håndtertHenvendelse(sakId = sakId.toString(), håndtert = true))
             assertBehov("OppdaterJournalpost", 3)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertBehov("FerdigstillJournalpost", 4)
+            håndterHendelse(ferdigstiltJournalpostMotattHendelse())
 
             assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
         }

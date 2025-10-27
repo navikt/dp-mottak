@@ -357,7 +357,7 @@ class Innsending private constructor(
                 is Etablering -> innsending.tilstand(hendelse, HåndterHenvendelse)
                 is Klage -> innsending.tilstand(hendelse, HåndterHenvendelse)
                 is Anke -> innsending.tilstand(hendelse, HåndterHenvendelse)
-                is UkjentSkjemaKode -> innsending.tilstand(hendelse, AvventerGosysOppgave)
+                is UkjentSkjemaKode -> innsending.tilstand(hendelse, HåndterHenvendelse)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
                 is KlageForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
             }
@@ -399,7 +399,14 @@ class Innsending private constructor(
                 }
 
                 is Fagsystem.Arena -> {
-                    innsending.tilstand(håndtertHenvendelse, AventerVurderHenvendelseArenaOppgave)
+                    val kategorisertJournalpost =
+                        requireNotNull(
+                            innsending.journalpost,
+                        ) { " Journalpost må være kategorisert på dette tidspunktet " }.kategorisertJournalpost()
+                    when (kategorisertJournalpost) {
+                        is UkjentSkjemaKode -> innsending.tilstand(håndtertHenvendelse, AvventerGosysOppgave)
+                        else -> innsending.tilstand(håndtertHenvendelse, AventerVurderHenvendelseArenaOppgave)
+                    }
                 }
             }
         }

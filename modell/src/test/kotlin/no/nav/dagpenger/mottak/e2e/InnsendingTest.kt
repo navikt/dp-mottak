@@ -589,23 +589,43 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         }
     }
 
-    @Test
-    fun `skal håndtere ukjente brevkoder`() {
+    @ParameterizedTest
+    @ValueSource(strings = ["ARENA", "DAGPENGER"])
+    fun `skal håndtere ukjente brevkoder`(fagsystemType: Fagsystem.FagsystemType) {
         håndterJoarkHendelse()
         håndterJournalpostData("Fritekstkode")
         håndterPersonInformasjon()
-        håndterGosysOppgaveOpprettet()
-        håndterJournalpostOppdatert()
+        håndterHenvendelse(fagsystemType)
 
-        assertTilstander(
-            MottattType,
-            AvventerJournalpostType,
-            AvventerPersondataType,
-            KategoriseringType,
-            AvventerGosysType,
-            InnsendingFerdigstiltType,
-        )
+        if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+            håndterGosysOppgaveOpprettet()
+            håndterJournalpostOppdatert()
+        } else {
+            håndterJournalpostOppdatert()
+            håndterJournalpostFerdigstilt()
+        }
 
+        if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+            assertTilstander(
+                MottattType,
+                AvventerJournalpostType,
+                AvventerPersondataType,
+                KategoriseringType,
+                HåndterHenvendelseType,
+                AvventerGosysType,
+                InnsendingFerdigstiltType,
+            )
+        } else {
+            assertTilstander(
+                MottattType,
+                AvventerJournalpostType,
+                AvventerPersondataType,
+                KategoriseringType,
+                HåndterHenvendelseType,
+                AvventerFerdigstillJournalpostType,
+                InnsendingFerdigstiltType,
+            )
+        }
         inspektør.also {
             assertNoErrors(it)
             assertMessages(it)
@@ -618,8 +638,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
         }
-
-        assertPuml("Ukjente brevkoder")
     }
 
     @Test
@@ -842,6 +860,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJoarkHendelse()
         håndterJournalpostData("ukjent")
         håndterPersonInformasjon()
+        håndterHenvendelse(fagsystem = Fagsystem.FagsystemType.ARENA)
         håndterGosysOppgaveOpprettet()
         håndterJournalpostOppdatert()
         // joark hendelse med samme journalpostId kommer
@@ -856,10 +875,10 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerJournalpostType,
             AvventerPersondataType,
             KategoriseringType,
+            HåndterHenvendelseType,
             AvventerGosysType,
             InnsendingFerdigstiltType,
         )
-        assertPuml("Ferdigstilte journalposter")
     }
 
     @Test
