@@ -12,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
 import java.time.Duration
 import java.time.LocalDateTime
+import kotlin.compareTo
 
 internal class JournalpostBehovLøser(
     private val journalpostArkiv: JournalpostArkiv,
@@ -63,10 +64,24 @@ internal class JournalpostBehovLøser(
                         it.datoOpprettet?.let { datoOpprettet ->
                             Duration.between(LocalDateTime.parse(datoOpprettet), LocalDateTime.now())
                         }
-                    "Løst behov Journalpost for journalpost med id ${it.journalpostId}. Opprettet i Joark for $tidSidenOpprettet siden."
+                    "Løst behov Journalpost for journalpost med id ${it.journalpostId}. Opprettet i Joark for ${tidSidenOpprettet.toHumanReadable()} siden."
                 }
             }
         }
+    }
+
+    fun Duration?.toHumanReadable(): String {
+        if (this == null) return "N/A"
+        val days = toDaysPart()
+        val hours = toHoursPart()
+        val minutes = toMinutesPart()
+        val seconds = toSecondsPart()
+        return buildString {
+            if (days > 0) append("${days}d ")
+            if (hours > 0) append("${hours}h ")
+            if (minutes > 0) append("${minutes}m ")
+            if (seconds > 0 || length == 0) append("${seconds}s")
+        }.trim()
     }
 
     private fun SafGraphQL.Journalpost.harDokumentTitlerLengreEnn(lengde: Int) =
