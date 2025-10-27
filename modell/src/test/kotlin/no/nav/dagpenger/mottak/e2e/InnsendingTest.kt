@@ -33,7 +33,6 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
-import java.lang.IllegalArgumentException
 
 internal class InnsendingTest : AbstractEndeTilEndeTest() {
     @ParameterizedTest
@@ -193,23 +192,46 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["NAV 04-06.08", "NAV 04-06.05"])
-    fun `skal håndtere joark hendelsene etablering og utdanning`(brevkode: String) {
+    @CsvSource(
+        "NAV 04-06.08, ARENA",
+        "NAV 04-06.08, DAGPENGER",
+        "NAV 04-06.05, ARENA",
+        "NAV 04-06.05, DAGPENGER",
+    )
+    fun `skal håndtere joark hendelsene etablering og utdanning`(
+        brevkode: String,
+        fagsystemType: Fagsystem.FagsystemType,
+    ) {
         håndterJoarkHendelse()
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
-        håndterArenaOppgaveOpprettet()
+
         assertBehovDetaljer(
-            OpprettVurderhenvendelseOppgave,
-            setOf(
-                "aktørId",
-                "fødselsnummer",
-                "behandlendeEnhetId",
-                "oppgavebeskrivelse",
-                "registrertDato",
-                "tilleggsinformasjon",
-            ),
+            type = Behovtype.HåndterHenvendelse,
+            detaljer =
+                setOf(
+                    "kategori",
+                    "fødselsnummer",
+                    "journalpostId",
+                    "registrertDato",
+                ),
         )
+        håndterHenvendelse(fagsystemType)
+        if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+            assertBehovDetaljer(
+                OpprettVurderhenvendelseOppgave,
+                setOf(
+                    "aktørId",
+                    "fødselsnummer",
+                    "behandlendeEnhetId",
+                    "oppgavebeskrivelse",
+                    "registrertDato",
+                    "tilleggsinformasjon",
+                ),
+            )
+            håndterArenaOppgaveOpprettet()
+        }
+
         håndterJournalpostOppdatert()
         assertBehovDetaljer(
             OppdaterJournalpost,
@@ -225,15 +247,28 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         )
         håndterJournalpostFerdigstilt()
 
-        assertTilstander(
-            MottattType,
-            AvventerJournalpostType,
-            AvventerPersondataType,
-            KategoriseringType,
-            AventerArenaOppgaveType,
-            AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType,
-        )
+        if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+            assertTilstander(
+                MottattType,
+                AvventerJournalpostType,
+                AvventerPersondataType,
+                KategoriseringType,
+                HåndterHenvendelseType,
+                AventerArenaOppgaveType,
+                AvventerFerdigstillJournalpostType,
+                InnsendingFerdigstiltType,
+            )
+        } else {
+            assertTilstander(
+                MottattType,
+                AvventerJournalpostType,
+                AvventerPersondataType,
+                KategoriseringType,
+                HåndterHenvendelseType,
+                AvventerFerdigstillJournalpostType,
+                InnsendingFerdigstiltType,
+            )
+        }
 
         inspektør.also {
             assertNoErrors(it)
@@ -249,8 +284,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
         }
-
-        assertPuml(brevkode)
     }
 
     @ParameterizedTest
