@@ -4,6 +4,7 @@ import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingObserver.Type.NySøknad
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import org.apache.kafka.clients.producer.MockProducer
+import org.apache.kafka.clients.producer.RoundRobinPartitioner
 import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -16,7 +17,7 @@ internal class FerdigstiltInnsendingObserverTest {
 
     @Test
     fun `skal sende til melding til journalforing v1 topic på ferdigstilte innsendinger `() {
-        val mockProducer = MockProducer(true, StringSerializer(), StringSerializer())
+        val mockProducer = MockProducer(true, RoundRobinPartitioner(), StringSerializer(), StringSerializer())
         val observer = FerdigstiltInnsendingObserver(mockProducer)
 
         observer.innsendingFerdigstilt(ferdigstiltEvent())
@@ -40,7 +41,7 @@ internal class FerdigstiltInnsendingObserverTest {
 
     @Test
     fun `skal sende til melding til journalforing v1 topic på mottatte innsendinger `() {
-        val mockProducer = MockProducer(true, StringSerializer(), StringSerializer())
+        val mockProducer = MockProducer(true, RoundRobinPartitioner(), StringSerializer(), StringSerializer())
         val observer = FerdigstiltInnsendingObserver(mockProducer)
 
         observer.innsendingMottatt(ferdigstiltEvent())
@@ -64,7 +65,7 @@ internal class FerdigstiltInnsendingObserverTest {
 
     @Test
     fun `melding til journalforing v1 topic på ferdigstilte innsendinger der person er ukjent`() {
-        val mockProducer = MockProducer(true, StringSerializer(), StringSerializer())
+        val mockProducer = MockProducer(true, RoundRobinPartitioner(), StringSerializer(), StringSerializer())
         val observer = FerdigstiltInnsendingObserver(mockProducer)
 
         observer.innsendingFerdigstilt(ukjentPersonEvent())
