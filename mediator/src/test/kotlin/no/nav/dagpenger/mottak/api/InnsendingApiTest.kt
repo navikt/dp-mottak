@@ -19,6 +19,7 @@ import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
 import no.nav.dagpenger.mottak.serder.InnsendingData
 import no.nav.dagpenger.mottak.serder.InnsendingData.TilstandData.InnsendingTilstandTypeData.InnsendingFerdigstiltType
 import org.apache.kafka.clients.producer.MockProducer
+import org.apache.kafka.clients.producer.RoundRobinPartitioner
 import org.apache.kafka.common.serialization.StringSerializer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -33,7 +34,7 @@ internal class InnsendingApiTest {
     fun `skal kunne sende ferdigstilt_event`() {
         val journalpostId = "187689"
 
-        val mockProducer = MockProducer(true, StringSerializer(), StringSerializer())
+        val mockProducer = MockProducer(true, RoundRobinPartitioner(), StringSerializer(), StringSerializer())
         val innsending =
             innsendingData
                 .copy(
@@ -65,7 +66,7 @@ internal class InnsendingApiTest {
     fun `skal ikke kunne sende ferdigstilt_event hvis status annen enn ferdigstill`() {
         val journalpostId = "187689"
 
-        val mockProducer = MockProducer(true, StringSerializer(), StringSerializer())
+        val mockProducer = MockProducer(true, RoundRobinPartitioner(), StringSerializer(), StringSerializer())
         val innsending = innsendingData.createInnsending()
 
         val innsendingRepository =
