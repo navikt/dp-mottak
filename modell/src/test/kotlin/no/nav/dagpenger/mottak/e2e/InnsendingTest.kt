@@ -214,6 +214,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "fødselsnummer",
                     "journalpostId",
                     "registrertDato",
+                    "skjemaKode",
                 ),
         )
         håndterHenvendelse(fagsystemType)
@@ -310,6 +311,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "fødselsnummer",
                     "journalpostId",
                     "registrertDato",
+                    "skjemaKode",
                 ),
         )
         håndterHenvendelse(fagsystemType)
@@ -415,6 +417,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "journalpostId",
                     "søknadId",
                     "registrertDato",
+                    "skjemaKode",
                 ),
         )
         håndterHenvendelse(fagsystemType)
@@ -515,6 +518,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "fødselsnummer",
                     "journalpostId",
                     "registrertDato",
+                    "skjemaKode",
                     "søknadId",
                 ),
         )
