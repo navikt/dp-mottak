@@ -404,6 +404,7 @@ class Innsending private constructor(
                             innsending.journalpost,
                         ) { " Journalpost må være kategorisert på dette tidspunktet " }.kategorisertJournalpost()
                     when (kategorisertJournalpost) {
+                        is NySøknad -> innsending.tilstand(håndtertHenvendelse, AventerArenaStartVedtak)
                         is UkjentSkjemaKode -> innsending.tilstand(håndtertHenvendelse, AvventerGosysOppgave)
                         else -> innsending.tilstand(håndtertHenvendelse, AventerVurderHenvendelseArenaOppgave)
                     }
@@ -444,8 +445,8 @@ class Innsending private constructor(
             innsending.rutingOppslag = søknadsdata.søknad()
 
             when (kategorisertJournalpost) {
-                is NySøknad -> innsending.tilstand(søknadsdata, AventerArenaStartVedtak)
-                is Gjenopptak -> innsending.tilstand(søknadsdata, AventerVurderHenvendelseArenaOppgave)
+                is NySøknad -> innsending.tilstand(søknadsdata, HåndterHenvendelse)
+                is Gjenopptak -> innsending.tilstand(søknadsdata, HåndterHenvendelse)
                 is Ettersending -> innsending.tilstand(søknadsdata, HåndterHenvendelse)
                 is Generell -> innsending.tilstand(søknadsdata, HåndterHenvendelse)
                 else -> søknadsdata.severe("Forventet kun søknadsdata for NySøknad, Gjenopptak, Ettersending og Generell")

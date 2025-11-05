@@ -36,33 +36,55 @@ import org.junit.jupiter.params.provider.ValueSource
 
 internal class InnsendingTest : AbstractEndeTilEndeTest() {
     @ParameterizedTest
-    @ValueSource(strings = ["NAV 04-01.03", "NAV 04-01.04"])
-    fun `skal håndtere joark hendelse der journalpost er ny søknad`(brevkode: String) {
+    @CsvSource(
+        "NAV 04-16.04, ARENA",
+        "NAV 04-16.04, DAGPENGER",
+        "NAV 04-16.03, ARENA",
+        "NAV 04-16.03, DAGPENGER",
+    )
+    fun `skal håndtere joark hendelse der journalpost er gjennopptak søknad`(
+        brevkode: String,
+        fagsystemType: Fagsystem.FagsystemType,
+    ) {
         håndterJoarkHendelse()
 
-        håndterJournalpostData(brevkode)
         assertBehovDetaljer(Journalpost)
+        håndterJournalpostData(brevkode)
 
-        håndterPersonInformasjon()
         assertBehovDetaljer(Persondata, setOf("brukerId"))
+        håndterPersonInformasjon()
 
-        håndterSøknadsdata()
         assertBehovDetaljer(Søknadsdata, setOf("dokumentInfoId"))
+        håndterSøknadsdata()
 
-        håndterArenaOppgaveOpprettet()
         assertBehovDetaljer(
-            OpprettStartVedtakOppgave,
-            setOf(
-                "aktørId",
-                "fødselsnummer",
-                "behandlendeEnhetId",
-                "oppgavebeskrivelse",
-                "registrertDato",
-                "tilleggsinformasjon",
-            ),
+            type = Behovtype.HåndterHenvendelse,
+            detaljer =
+                setOf(
+                    "kategori",
+                    "fødselsnummer",
+                    "journalpostId",
+                    "registrertDato",
+                    "søknadId",
+                    "skjemaKode",
+                ),
         )
+        håndterHenvendelse(fagsystemType)
+        if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+            assertBehovDetaljer(
+                OpprettVurderhenvendelseOppgave,
+                setOf(
+                    "aktørId",
+                    "fødselsnummer",
+                    "behandlendeEnhetId",
+                    "oppgavebeskrivelse",
+                    "registrertDato",
+                    "tilleggsinformasjon",
+                ),
+            )
+            håndterArenaOppgaveOpprettet()
+        }
 
-        håndterJournalpostOppdatert()
         assertBehovDetaljer(
             OppdaterJournalpost,
             setOf(
@@ -75,6 +97,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "dokumenter",
             ),
         )
+        håndterJournalpostOppdatert()
 
         val behov =
             inspektør.innsendingLogg.behov().find { it.type == OppdaterJournalpost }
@@ -83,16 +106,148 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJournalpostFerdigstilt()
         assertBehovDetaljer(FerdigstillJournalpost)
 
-        assertTilstander(
-            MottattType,
-            AvventerJournalpostType,
-            AvventerPersondataType,
-            KategoriseringType,
-            AvventerSøknadsdataType,
-            AventerArenaStartVedtakType,
-            AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType,
+        if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+            assertTilstander(
+                MottattType,
+                AvventerJournalpostType,
+                AvventerPersondataType,
+                KategoriseringType,
+                AvventerSøknadsdataType,
+                HåndterHenvendelseType,
+                AventerArenaOppgaveType,
+                AvventerFerdigstillJournalpostType,
+                InnsendingFerdigstiltType,
+            )
+        } else {
+            assertTilstander(
+                MottattType,
+                AvventerJournalpostType,
+                AvventerPersondataType,
+                KategoriseringType,
+                AvventerSøknadsdataType,
+                HåndterHenvendelseType,
+                AvventerFerdigstillJournalpostType,
+                InnsendingFerdigstiltType,
+            )
+        }
+
+        inspektør.also {
+            assertNoErrors(it)
+            assertMessages(it)
+            println(it.innsendingLogg.toString())
+        }
+        assertMottatt {
+            assertEquals("Gjenopptak", it.type.name)
+            assertNotNull(it.søknadsData)
+            assertNotNull(it.aktørId)
+            assertNotNull(it.fødselsnummer)
+            assertNotNull(it.datoRegistrert)
+        }
+        assertFerdigstilt {
+            assertEquals("Gjenopptak", it.type.name)
+            assertNotNull(it.søknadsData)
+            assertNotNull(it.fagsakId)
+            assertNotNull(it.aktørId)
+            assertNotNull(it.fødselsnummer)
+            assertNotNull(it.datoRegistrert)
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+        "NAV 04-01.03, ARENA",
+        "NAV 04-01.03, DAGPENGER",
+        "NAV 04-01.04, ARENA",
+        "NAV 04-01.04, DAGPENGER",
+    )
+    fun `skal håndtere joark hendelse der journalpost er ny søknad`(
+        brevkode: String,
+        fagsystemType: Fagsystem.FagsystemType,
+    ) {
+        håndterJoarkHendelse()
+
+        assertBehovDetaljer(Journalpost)
+        håndterJournalpostData(brevkode)
+
+        assertBehovDetaljer(Persondata, setOf("brukerId"))
+        håndterPersonInformasjon()
+
+        assertBehovDetaljer(Søknadsdata, setOf("dokumentInfoId"))
+        håndterSøknadsdata()
+
+        assertBehovDetaljer(
+            type = Behovtype.HåndterHenvendelse,
+            detaljer =
+                setOf(
+                    "kategori",
+                    "fødselsnummer",
+                    "journalpostId",
+                    "registrertDato",
+                    "søknadId",
+                    "skjemaKode",
+                ),
         )
+        håndterHenvendelse(fagsystemType)
+        if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+            assertBehovDetaljer(
+                OpprettStartVedtakOppgave,
+                setOf(
+                    "aktørId",
+                    "fødselsnummer",
+                    "behandlendeEnhetId",
+                    "oppgavebeskrivelse",
+                    "registrertDato",
+                    "tilleggsinformasjon",
+                ),
+            )
+            håndterArenaOppgaveOpprettet()
+        }
+
+        assertBehovDetaljer(
+            OppdaterJournalpost,
+            setOf(
+                "aktørId",
+                "fødselsnummer",
+                "navn",
+                "fagsakId",
+                "tittel",
+                "mottakskanal",
+                "dokumenter",
+            ),
+        )
+        håndterJournalpostOppdatert()
+
+        val behov =
+            inspektør.innsendingLogg.behov().find { it.type == OppdaterJournalpost }
+        behov!!.detaljer()["mottakskanal"] shouldBe "NAV_NO"
+
+        håndterJournalpostFerdigstilt()
+        assertBehovDetaljer(FerdigstillJournalpost)
+
+        if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+            assertTilstander(
+                MottattType,
+                AvventerJournalpostType,
+                AvventerPersondataType,
+                KategoriseringType,
+                AvventerSøknadsdataType,
+                HåndterHenvendelseType,
+                AventerArenaStartVedtakType,
+                AvventerFerdigstillJournalpostType,
+                InnsendingFerdigstiltType,
+            )
+        } else {
+            assertTilstander(
+                MottattType,
+                AvventerJournalpostType,
+                AvventerPersondataType,
+                KategoriseringType,
+                AvventerSøknadsdataType,
+                HåndterHenvendelseType,
+                AvventerFerdigstillJournalpostType,
+                InnsendingFerdigstiltType,
+            )
+        }
 
         inspektør.also {
             assertNoErrors(it)
@@ -114,81 +269,6 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
         }
-
-        assertPuml(brevkode)
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = ["NAV 04-16.03", "NAV 04-16.04"])
-    fun `skal håndtere joark hendelse der journalpost er gjenopptak`(brevkode: String) {
-        håndterJoarkHendelse()
-
-        håndterJournalpostData(brevkode)
-        assertBehovDetaljer(Journalpost)
-
-        håndterPersonInformasjon()
-        assertBehovDetaljer(Persondata, setOf("brukerId"))
-
-        håndterSøknadsdata()
-        assertBehovDetaljer(Søknadsdata, setOf("dokumentInfoId"))
-
-        håndterArenaOppgaveOpprettet()
-        assertBehovDetaljer(
-            OpprettVurderhenvendelseOppgave,
-            setOf(
-                "aktørId",
-                "fødselsnummer",
-                "behandlendeEnhetId",
-                "oppgavebeskrivelse",
-                "registrertDato",
-                "tilleggsinformasjon",
-            ),
-        )
-
-        håndterJournalpostOppdatert()
-        assertBehovDetaljer(
-            OppdaterJournalpost,
-            setOf(
-                "aktørId",
-                "fødselsnummer",
-                "navn",
-                "fagsakId",
-                "tittel",
-                "mottakskanal",
-                "dokumenter",
-            ),
-        )
-
-        håndterJournalpostFerdigstilt()
-        assertBehovDetaljer(FerdigstillJournalpost)
-
-        assertTilstander(
-            MottattType,
-            AvventerJournalpostType,
-            AvventerPersondataType,
-            KategoriseringType,
-            AvventerSøknadsdataType,
-            AventerArenaOppgaveType,
-            AvventerFerdigstillJournalpostType,
-            InnsendingFerdigstiltType,
-        )
-
-        inspektør.also {
-            assertNoErrors(it)
-            assertMessages(it)
-            println(it.innsendingLogg.toString())
-        }
-
-        assertFerdigstilt {
-            assertEquals("Gjenopptak", it.type.name)
-            assertNotNull(it.søknadsData)
-            assertNotNull(it.fagsakId)
-            assertNotNull(it.aktørId)
-            assertNotNull(it.fødselsnummer)
-            assertNotNull(it.datoRegistrert)
-        }
-
-        assertPuml(brevkode)
     }
 
     @ParameterizedTest
