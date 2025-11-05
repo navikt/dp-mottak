@@ -49,7 +49,7 @@ internal class MediatorE2ETest {
     }
 
     @Test
-    fun `Skal motta hendelser om ny søknad og sende ut behov`() {
+    fun `Skal motta hendelse om ny søknad og sende ut behov der oppgave skal opprettes i Arena`() {
         withMigratedDb {
             settOppInfrastruktur()
 
@@ -60,8 +60,36 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("OpprettStartVedtakOppgave", 3)
+            assertBehov("HåndterHenvendelse", 3)
+            håndterHendelse(håndtertHenvendelse(sakId = null, håndtert = false))
+            assertBehov("OpprettStartVedtakOppgave", 4)
             håndterHendelse(opprettStartVedtakMotattHendelse())
+            assertBehov("OppdaterJournalpost", 5)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertBehov("FerdigstillJournalpost", 6)
+            håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+            assertTrue(
+                testRapid.inspektør.size == 7,
+                "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
+            )
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        }
+    }
+
+    @Test
+    fun `Skal motta hendelse om ny søknad og sende ut behov der henvendelse skal opprettes i Dagpenger`() {
+        withMigratedDb {
+            val fagsakId = UUID.randomUUID()
+            settOppInfrastruktur()
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = "NAV 04-01.03"))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("Søknadsdata", 2)
+            håndterHendelse(søknadsdataMottakHendelse())
+            assertBehov("HåndterHenvendelse", 3)
+            håndterHendelse(håndtertHenvendelse(sakId = fagsakId.toString(), håndtert = true))
             assertBehov("OppdaterJournalpost", 4)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
             assertBehov("FerdigstillJournalpost", 5)
@@ -75,7 +103,7 @@ internal class MediatorE2ETest {
     }
 
     @Test
-    fun `Skal motta hendelser om gjennopptak og sende ut behov`() {
+    fun `Skal motta hendelse om gjenopptak og sende ut behov der oppgave skal til Arena`() {
         withMigratedDb {
             settOppInfrastruktur()
             håndterHendelse(joarkMelding())
@@ -85,8 +113,36 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("OpprettVurderhenvendelseOppgave", 3)
+            assertBehov("HåndterHenvendelse", 3)
+            håndterHendelse(håndtertHenvendelse(sakId = null, håndtert = false))
+            assertBehov("OpprettVurderhenvendelseOppgave", 4)
             håndterHendelse(opprettOpprettVurderhenvendelseHendelse())
+            assertBehov("OppdaterJournalpost", 5)
+            håndterHendelse(oppdatertJournalpostMotattHendelse())
+            assertBehov("FerdigstillJournalpost", 6)
+            håndterHendelse(ferdigstiltJournalpostMotattHendelse())
+            assertTrue(
+                testRapid.inspektør.size == 7,
+                "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
+            )
+            assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
+        }
+    }
+
+    @Test
+    fun `Skal motta hendelse om gjenopptak og sende ut behov der henvendelse skal opprettes i Dagpenger`() {
+        withMigratedDb {
+            val fagsakId = UUID.randomUUID()
+            settOppInfrastruktur()
+            håndterHendelse(joarkMelding())
+            assertBehov("Journalpost", 0)
+            håndterHendelse(journalpostMottattHendelse(brevkode = "NAV 04-16.03"))
+            assertBehov("Persondata", 1)
+            håndterHendelse(persondataMottattHendelse())
+            assertBehov("Søknadsdata", 2)
+            håndterHendelse(søknadsdataMottakHendelse())
+            assertBehov("HåndterHenvendelse", 3)
+            håndterHendelse(håndtertHenvendelse(sakId = fagsakId.toString(), håndtert = true))
             assertBehov("OppdaterJournalpost", 4)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
             assertBehov("FerdigstillJournalpost", 5)
@@ -110,14 +166,16 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("OpprettStartVedtakOppgave", 3)
+            assertBehov("HåndterHenvendelse", 3)
+            håndterHendelse(håndtertHenvendelse(sakId = null, håndtert = false))
+            assertBehov("OpprettStartVedtakOppgave", 4)
             håndterHendelse(opprettArenaOppgaveFeilet())
-            assertBehov("OpprettGosysoppgave", 4)
+            assertBehov("OpprettGosysoppgave", 5)
             håndterHendelse(gosysOppgaveOpprettetHendelse())
-            assertBehov("OppdaterJournalpost", 5)
+            assertBehov("OppdaterJournalpost", 6)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
             assertTrue(
-                testRapid.inspektør.size == 6,
+                testRapid.inspektør.size == 7,
                 "For mange behov på kafka rapid, antall er : ${testRapid.inspektør.size}",
             )
             assertEquals(InnsendingTilstandType.InnsendingFerdigstiltType, testObservatør.tilstander.last())
