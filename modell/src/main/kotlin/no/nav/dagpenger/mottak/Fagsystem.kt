@@ -8,7 +8,15 @@ sealed class Fagsystem(val fagsystemType: FagsystemType) {
         ARENA,
     }
 
-    data class Dagpenger(val sakId: UUID) : Fagsystem(FagsystemType.DAGPENGER)
+    data class Dagpenger(val sakId: UUID) : Fagsystem(FagsystemType.DAGPENGER) {
+        override fun toString(): String {
+            return "Dagpenger(sakId=$sakId)"
+        }
+    }
 
-    object Arena : Fagsystem(FagsystemType.ARENA)
+    object Arena : Fagsystem(FagsystemType.ARENA) {
+        override fun toString(): String {
+            return "Arena"
+        }
+    }
 }

@@ -62,7 +62,11 @@ class Innsending private constructor(
 
     fun håndter(håndtertInnsending: HåndtertInnsending) {
         if (journalpostId != håndtertInnsending.journalpostId()) return
-        kontekst(håndtertInnsending, "InnsendingHåndtert for journalpost")
+        kontekst(
+            håndtertInnsending,
+            "Journalpost med id ${håndtertInnsending.journalpostId()} " +
+                "skal til fagsystem ${håndtertInnsending.fagsystem}",
+        )
         tilstand.håndter(this, håndtertInnsending)
     }
 
