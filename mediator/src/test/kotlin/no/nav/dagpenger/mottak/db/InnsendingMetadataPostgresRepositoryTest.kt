@@ -91,6 +91,48 @@ class InnsendingMetadataPostgresRepositoryTest {
     }
 
     @Test
+    fun `hent journalposter for en søknad som er journalført på Dagpenger sak`() {
+        val dpSakId = UUID.randomUUID()
+        val søknad =
+            innsendingData.copy(
+                id = 1,
+                søknadsData = søknadsData,
+                arenaSakData = null,
+                oppgaveSakData =
+                    InnsendingData.OppgaveSakData(
+                        oppgaveId = null,
+                        fagsakId = dpSakId,
+                    ),
+                journalpostId = "1",
+                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+            )
+        val ettersending =
+            innsendingData.copy(
+                id = 2,
+                søknadsData = søknadsData,
+                arenaSakData = null,
+                oppgaveSakData =
+                    InnsendingData.OppgaveSakData(
+                        oppgaveId = null,
+                        fagsakId = dpSakId,
+                    ),
+                journalpostId = "2",
+                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "2"),
+            )
+        withMigratedDb {
+            val innsendingPostgresRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
+            innsendingPostgresRepository.apply {
+                lagre(søknad.createInnsending())
+                lagre(ettersending.createInnsending())
+            }
+
+            InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
+                hentJournalpostIder(søknadId, fnr) shouldBe listOf("1", "2")
+            }
+        }
+    }
+
+    @Test
     fun `hent journalposter for en søknad avhengig av om journalpost er knyttet til ny sak i Dagpenger eller kun til Arena sak`() {
         val søknad =
             innsendingData.copy(
@@ -115,7 +157,7 @@ class InnsendingMetadataPostgresRepositoryTest {
                         fagsakId = null,
                     ),
                 journalpostId = "2",
-                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "2"),
             )
 
         withMigratedDb {

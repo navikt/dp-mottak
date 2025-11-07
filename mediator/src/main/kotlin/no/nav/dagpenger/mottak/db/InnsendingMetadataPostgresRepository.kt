@@ -53,12 +53,21 @@ internal class InnsendingMetadataPostgresRepository(private val ds: DataSource =
                     //language=SQL
                     statement =
                         """
-                        SELECT    jour.journalpost_id 
+                        SELECT    jour.journalpost_id as journalpost_id
                         FROM      innsending_v1 inns
                         JOIN      person_innsending_v1 peri         ON peri.id = inns.id
                         JOIN      person_v1 pers                    ON pers.id = peri.personid
                         JOIN      soknad_v1 sokn                    ON sokn.id = inns.id
                         JOIN      journalpost_dagpenger_sak_v1 jour ON jour.innsending_id = inns.id 
+                        WHERE     pers.ident =  :ident
+                        AND       sokn.data ->> 'søknad_uuid' = :soknad_id
+                        UNION ALL
+                        SELECT    inns.journalpostid as journalpost_id
+                        FROM      innsending_v1 inns
+                        JOIN      person_innsending_v1 peri         ON peri.id = inns.id
+                        JOIN      person_v1 pers                    ON pers.id = peri.personid
+                        JOIN      soknad_v1 sokn                    ON sokn.id = inns.id
+                        JOIN      oppgave_sak_v1 osak               ON osak.id = inns.id 
                         WHERE     pers.ident =  :ident
                         AND       sokn.data ->> 'søknad_uuid' = :soknad_id
                         """.trimIndent(),
