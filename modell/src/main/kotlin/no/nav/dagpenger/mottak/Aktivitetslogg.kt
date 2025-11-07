@@ -207,20 +207,23 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
                 Persondata,
                 Søknadsdata,
 
-                @Deprecated("BestemFagsystem er deprekert men trengs for å rehyrdrere gammel aktivitetslogg")
+                @Deprecated("BestemFagsystem er deprekert, men trengs for å rehyrdrere gammel aktivitetslogg")
                 BestemFagsystem,
 
-                @Deprecated("MinsteinntektVurdering er deprekert men trengs for å rehyrdrere gammel aktivitetslogg")
+                @Deprecated("MinsteinntektVurdering er deprekert, men trengs for å rehyrdrere gammel aktivitetslogg")
                 MinsteinntektVurdering,
 
-                @Deprecated("EksisterendeSaker er deprekert men trengs for å rehyrdrere gammel aktivitetslogg")
+                @Deprecated("EksisterendeSaker er deprekert, men trengs for å rehyrdrere gammel aktivitetslogg")
                 EksisterendeSaker,
                 OpprettStartVedtakOppgave,
                 OpprettVurderhenvendelseOppgave,
                 OppdaterJournalpost,
                 FerdigstillJournalpost,
                 OpprettGosysoppgave,
+
+                @Deprecated("HåndterHenvendelse er deprekert, men trengs for å rehyrdrere gammel aktivitetslogg")
                 HåndterHenvendelse,
+                HåndterInnsending,
             }
         }
 

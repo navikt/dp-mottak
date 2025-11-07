@@ -7,25 +7,25 @@ import io.mockk.mockk
 import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.Fagsystem.FagsystemType
 import no.nav.dagpenger.mottak.InnsendingMediator
-import no.nav.dagpenger.mottak.meldinger.HåndtertHenvendelse
+import no.nav.dagpenger.mottak.meldinger.HåndtertInnsending
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import java.util.UUID
 
-class HåndtertHenvendelseMottakTest {
+class HåndtertInnsendingMottakTest {
     private val testRapid = TestRapid()
     private val journalpostId = "12345"
     private val sakId = UUID.randomUUID()
     private val opprettetTidspunkt = LocalDateTime.now()
 
     @Test
-    fun `Skal ta imot løsning på håndtertHenvendelse`() {
-        val slot = mutableListOf<HåndtertHenvendelse>()
+    fun `Skal ta imot løsning på håndtertInnsending`() {
+        val slot = mutableListOf<HåndtertInnsending>()
         val innsendingMediator =
             mockk<InnsendingMediator>().also {
                 every { it.håndter(capture(slot)) } returns Unit
             }
-        HåndtertHenvendelseMottak(
+        HåndtertInnsendingMottak(
             rapidsConnection = testRapid,
             innsendingMediator = innsendingMediator,
         )
@@ -39,12 +39,12 @@ class HåndtertHenvendelseMottakTest {
                   "@final": true,
                   "@id": "${UUID.randomUUID()}",
                   "@behov": [
-                    "HåndterHenvendelse"
+                    "HåndterInnsending"
                   ],
                   "journalpostId": "$journalpostId",
                   "@opprettet": "$opprettetTidspunkt",
                   "@løsning": {
-                    "HåndterHenvendelse": {
+                    "HåndterInnsending": {
                       "sakId": "$sakId",
                       "håndtert": true
                     }
@@ -63,12 +63,12 @@ class HåndtertHenvendelseMottakTest {
                   "@final": true,
                   "@id": "${UUID.randomUUID()}",
                   "@behov": [
-                    "HåndterHenvendelse"
+                    "HåndterInnsending"
                   ],
                   "journalpostId": "$journalpostId",
                   "@opprettet": "$opprettetTidspunkt",
                   "@løsning": {
-                    "HåndterHenvendelse": {
+                    "HåndterInnsending": {
                       "håndtert": false
                     }
                   }
@@ -78,9 +78,9 @@ class HåndtertHenvendelseMottakTest {
         )
 
         slot.size shouldBe 2
-        slot.first().let { håndtertHenvendelse ->
-            håndtertHenvendelse.fagsystem.fagsystemType shouldBe FagsystemType.DAGPENGER
-            (håndtertHenvendelse.fagsystem as Fagsystem.Dagpenger).sakId shouldBe sakId
+        slot.first().let { håndtertInnsending ->
+            håndtertInnsending.fagsystem.fagsystemType shouldBe FagsystemType.DAGPENGER
+            (håndtertInnsending.fagsystem as Fagsystem.Dagpenger).sakId shouldBe sakId
         }
         slot.last().fagsystem.fagsystemType shouldBe FagsystemType.ARENA
     }

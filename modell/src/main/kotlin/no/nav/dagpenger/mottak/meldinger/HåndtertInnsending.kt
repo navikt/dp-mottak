@@ -4,7 +4,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.Hendelse
 
-class HåndtertHenvendelse(
+class HåndtertInnsending(
     aktivitetslogg: Aktivitetslogg,
     private val journalpostId: String,
     val fagsystem: Fagsystem,

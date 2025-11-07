@@ -60,8 +60,8 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("HåndterHenvendelse", 3)
-            håndterHendelse(håndtertHenvendelse(sakId = null, håndtert = false))
+            assertBehov("HåndterInnsending", 3)
+            håndterHendelse(håndtertInnsending(sakId = null, håndtert = false))
             assertBehov("OpprettStartVedtakOppgave", 4)
             håndterHendelse(opprettStartVedtakMotattHendelse())
             assertBehov("OppdaterJournalpost", 5)
@@ -77,7 +77,7 @@ internal class MediatorE2ETest {
     }
 
     @Test
-    fun `Skal motta hendelse om ny søknad og sende ut behov der henvendelse skal opprettes i Dagpenger`() {
+    fun `Skal motta hendelse om ny søknad og sende ut behov der innsending skal opprettes i Dagpenger`() {
         withMigratedDb {
             val fagsakId = UUID.randomUUID()
             settOppInfrastruktur()
@@ -88,8 +88,8 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("HåndterHenvendelse", 3)
-            håndterHendelse(håndtertHenvendelse(sakId = fagsakId.toString(), håndtert = true))
+            assertBehov("HåndterInnsending", 3)
+            håndterHendelse(håndtertInnsending(sakId = fagsakId.toString(), håndtert = true))
             assertBehov("OppdaterJournalpost", 4)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
             assertBehov("FerdigstillJournalpost", 5)
@@ -113,8 +113,8 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("HåndterHenvendelse", 3)
-            håndterHendelse(håndtertHenvendelse(sakId = null, håndtert = false))
+            assertBehov("HåndterInnsending", 3)
+            håndterHendelse(håndtertInnsending(sakId = null, håndtert = false))
             assertBehov("OpprettVurderhenvendelseOppgave", 4)
             håndterHendelse(opprettOpprettVurderhenvendelseHendelse())
             assertBehov("OppdaterJournalpost", 5)
@@ -141,8 +141,8 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("HåndterHenvendelse", 3)
-            håndterHendelse(håndtertHenvendelse(sakId = fagsakId.toString(), håndtert = true))
+            assertBehov("HåndterInnsending", 3)
+            håndterHendelse(håndtertInnsending(sakId = fagsakId.toString(), håndtert = true))
             assertBehov("OppdaterJournalpost", 4)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
             assertBehov("FerdigstillJournalpost", 5)
@@ -166,8 +166,8 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("HåndterHenvendelse", 3)
-            håndterHendelse(håndtertHenvendelse(sakId = null, håndtert = false))
+            assertBehov("HåndterInnsending", 3)
+            håndterHendelse(håndtertInnsending(sakId = null, håndtert = false))
             assertBehov("OpprettStartVedtakOppgave", 4)
             håndterHendelse(opprettArenaOppgaveFeilet())
             assertBehov("OpprettGosysoppgave", 5)
@@ -191,8 +191,8 @@ internal class MediatorE2ETest {
             håndterHendelse(journalpostMottattHendelse(brevkode = "ukjent"))
             assertBehov("Persondata", 1)
             håndterHendelse(persondataMottattHendelse())
-            assertBehov("HåndterHenvendelse", 2)
-            håndterHendelse(håndtertHenvendelse(sakId = null, håndtert = false))
+            assertBehov("HåndterInnsending", 2)
+            håndterHendelse(håndtertInnsending(sakId = null, håndtert = false))
             assertBehov("OpprettGosysoppgave", 3)
             håndterHendelse(gosysOppgaveOpprettetHendelse())
             assertBehov("OppdaterJournalpost", 4)
@@ -203,7 +203,7 @@ internal class MediatorE2ETest {
     }
 
     @Test
-    fun `Skal motta ukjent skjemakode som fører til henvendelse i Dagpenger`() {
+    fun `Skal motta ukjent skjemakode som fører til innsending i Dagpenger`() {
         val sakId = UUID.randomUUID()
         withMigratedDb {
             settOppInfrastruktur()
@@ -212,8 +212,8 @@ internal class MediatorE2ETest {
             håndterHendelse(journalpostMottattHendelse(brevkode = "ukjent"))
             assertBehov("Persondata", 1)
             håndterHendelse(persondataMottattHendelse())
-            assertBehov("HåndterHenvendelse", 2)
-            håndterHendelse(håndtertHenvendelse(sakId = sakId.toString(), håndtert = true))
+            assertBehov("HåndterInnsending", 2)
+            håndterHendelse(håndtertInnsending(sakId = sakId.toString(), håndtert = true))
             assertBehov("OppdaterJournalpost", 3)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
             assertBehov("FerdigstillJournalpost", 4)
@@ -235,7 +235,7 @@ internal class MediatorE2ETest {
     }
 
     @Test
-    fun `Skal motta generell henvendelse som skal til Dagpenger`() {
+    fun `Skal motta generell innsending som skal til Dagpenger`() {
         val fagsakId = UUID.randomUUID()
         withMigratedDb {
             settOppInfrastruktur()
@@ -246,8 +246,8 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("HåndterHenvendelse", 3)
-            håndterHendelse(håndtertHenvendelse(sakId = fagsakId.toString(), håndtert = true))
+            assertBehov("HåndterInnsending", 3)
+            håndterHendelse(håndtertInnsending(sakId = fagsakId.toString(), håndtert = true))
             assertBehov("OppdaterJournalpost", 4)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
             assertBehov("FerdigstillJournalpost", 5)
@@ -261,7 +261,7 @@ internal class MediatorE2ETest {
     }
 
     @Test
-    fun `Skal motta generell henvendelse som skal til Arena`() {
+    fun `Skal motta generell innsending som skal til Arena`() {
         withMigratedDb {
             settOppInfrastruktur()
             håndterHendelse(joarkMelding())
@@ -271,8 +271,8 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("HåndterHenvendelse", 3)
-            håndterHendelse(håndtertHenvendelse(sakId = null, håndtert = false))
+            assertBehov("HåndterInnsending", 3)
+            håndterHendelse(håndtertInnsending(sakId = null, håndtert = false))
             assertBehov("OpprettVurderhenvendelseOppgave", 4)
             håndterHendelse(opprettOpprettVurderhenvendelseHendelse())
             assertBehov("OppdaterJournalpost", 5)
@@ -300,8 +300,8 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("HåndterHenvendelse", 3)
-            håndterHendelse(håndtertHenvendelse(sakId = fagsakId.toString(), håndtert = true))
+            assertBehov("HåndterInnsending", 3)
+            håndterHendelse(håndtertInnsending(sakId = fagsakId.toString(), håndtert = true))
             assertBehov("OppdaterJournalpost", 4)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
             assertBehov("FerdigstillJournalpost", 5)
@@ -331,8 +331,8 @@ internal class MediatorE2ETest {
             håndterHendelse(persondataMottattHendelse())
             assertBehov("Søknadsdata", 2)
             håndterHendelse(søknadsdataMottakHendelse())
-            assertBehov("HåndterHenvendelse", 3)
-            håndterHendelse(håndtertHenvendelse(sakId = null, håndtert = false))
+            assertBehov("HåndterInnsending", 3)
+            håndterHendelse(håndtertInnsending(sakId = null, håndtert = false))
             assertBehov("OpprettVurderhenvendelseOppgave", 4)
             håndterHendelse(
                 opprettOpprettVurderhenvendelseHendelse(
@@ -367,8 +367,8 @@ internal class MediatorE2ETest {
             håndterHendelse(journalpostMottattHendelse(brevkode = brevkode))
             assertBehov("Persondata", 1)
             håndterHendelse(persondataMottattHendelse())
-            assertBehov("HåndterHenvendelse", 2)
-            håndterHendelse(håndtertHenvendelse(sakId = TestDagpengerOppgave.fagsakId.toString(), håndtert = true))
+            assertBehov("HåndterInnsending", 2)
+            håndterHendelse(håndtertInnsending(sakId = TestDagpengerOppgave.fagsakId.toString(), håndtert = true))
             assertInnsending(journalpostId.toString()) { testInnsendingVisitor ->
                 assertNotNull(testInnsendingVisitor.oppgaveSak)
                 testInnsendingVisitor.oppgaveSak!!.fagsakId shouldBe TestDagpengerOppgave.fagsakId
@@ -395,8 +395,8 @@ internal class MediatorE2ETest {
             håndterHendelse(journalpostMottattHendelse(brevkode = brevkode))
             assertBehov("Persondata", 1)
             håndterHendelse(persondataMottattHendelse())
-            assertBehov("HåndterHenvendelse", 2)
-            val melding = håndtertHenvendelse(sakId = TestArenaOppgave.fagsakId, håndtert = false)
+            assertBehov("HåndterInnsending", 2)
+            val melding = håndtertInnsending(sakId = TestArenaOppgave.fagsakId, håndtert = false)
             håndterHendelse(melding)
             assertBehov("OpprettVurderhenvendelseOppgave", 3)
             håndterHendelse(
@@ -512,7 +512,7 @@ internal class MediatorE2ETest {
         }
         """.trimIndent()
 
-    private fun håndtertHenvendelse(
+    private fun håndtertInnsending(
         sakId: String?,
         håndtert: Boolean,
     ): String {
@@ -524,12 +524,12 @@ internal class MediatorE2ETest {
           "@final": true,
           "@id": "${UUID.randomUUID()}",
           "@behov": [
-            "HåndterHenvendelse"
+            "HåndterInnsending"
           ],
           "@opprettet" : "${now()}",
           "journalpostId": "$journalpostId",
           "@løsning": {
-            "HåndterHenvendelse": {
+            "HåndterInnsending": {
               $fagsakIdJson 
               "håndtert": $håndtert
             }

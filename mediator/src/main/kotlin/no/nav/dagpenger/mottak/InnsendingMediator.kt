@@ -7,7 +7,7 @@ import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.HåndtertHenvendelse
+import no.nav.dagpenger.mottak.meldinger.HåndtertInnsending
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
@@ -38,9 +38,9 @@ internal class InnsendingMediator(
         }
     }
 
-    fun håndter(håndtertHenvendelse: HåndtertHenvendelse) {
-        håndter(håndtertHenvendelse) { innsending ->
-            innsending.håndter(håndtertHenvendelse)
+    fun håndter(håndtertInnsending: HåndtertInnsending) {
+        håndter(håndtertInnsending) { innsending ->
+            innsending.håndter(håndtertInnsending)
         }
     }
 

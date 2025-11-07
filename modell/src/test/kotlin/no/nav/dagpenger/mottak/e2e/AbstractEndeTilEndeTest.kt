@@ -11,9 +11,8 @@ import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.ReplayFerdigstillEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.FagsystemBesluttet
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.HåndtertHenvendelse
+import no.nav.dagpenger.mottak.meldinger.HåndtertInnsending
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.Journalpost.Bruker
@@ -138,8 +137,8 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(søknadsdata())
     }
 
-    protected fun håndterHenvendelse(fagsystem: Fagsystem.FagsystemType) {
-        innsending.håndter(henvendelseHåndtert(fagsystem))
+    protected fun håndterInnsending(fagsystem: Fagsystem.FagsystemType) {
+        innsending.håndter(innsendingHåndtert(fagsystem))
     }
 
     protected fun håndterArenaOppgaveOpprettet() {
@@ -194,27 +193,14 @@ abstract class AbstractEndeTilEndeTest {
             fagsakId = UUID.fromString(DAGPENGER_FAGSAK_ID),
         )
 
-    private fun fagsystem(fagsystemType: Fagsystem.FagsystemType): FagsystemBesluttet {
-        val fagsystem =
-            when (fagsystemType) {
-                Fagsystem.FagsystemType.DAGPENGER -> Fagsystem.Dagpenger(sakId = UUID.fromString(DAGPENGER_FAGSAK_ID))
-                Fagsystem.FagsystemType.ARENA -> Fagsystem.Arena
-            }
-        return FagsystemBesluttet(
-            aktivitetslogg = Aktivitetslogg(),
-            journalpostId = JOURNALPOST_ID,
-            fagsystem = fagsystem,
-        )
-    }
-
-    private fun henvendelseHåndtert(fagsystemType: Fagsystem.FagsystemType): HåndtertHenvendelse {
+    private fun innsendingHåndtert(fagsystemType: Fagsystem.FagsystemType): HåndtertInnsending {
         val fagsystem =
             when (fagsystemType) {
                 Fagsystem.FagsystemType.DAGPENGER -> Fagsystem.Dagpenger(sakId = UUID.fromString(DAGPENGER_FAGSAK_ID))
                 Fagsystem.FagsystemType.ARENA -> Fagsystem.Arena
             }
 
-        return HåndtertHenvendelse(
+        return HåndtertInnsending(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = JOURNALPOST_ID,
             fagsystem = fagsystem,

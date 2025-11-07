@@ -20,7 +20,7 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerGosysType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerJournalpostType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerPersondataType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.AvventerSøknadsdataType
-import no.nav.dagpenger.mottak.InnsendingTilstandType.HåndterHenvendelseType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.HåndterInnsendingType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.InnsendingFerdigstiltType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.MottattType
@@ -58,7 +58,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterSøknadsdata()
 
         assertBehovDetaljer(
-            type = Behovtype.HåndterHenvendelse,
+            type = Behovtype.HåndterInnsending,
             detaljer =
                 setOf(
                     "kategori",
@@ -69,7 +69,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "skjemaKode",
                 ),
         )
-        håndterHenvendelse(fagsystemType)
+        håndterInnsending(fagsystemType)
         if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
             assertBehovDetaljer(
                 OpprettVurderhenvendelseOppgave,
@@ -113,7 +113,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 AvventerPersondataType,
                 KategoriseringType,
                 AvventerSøknadsdataType,
-                HåndterHenvendelseType,
+                HåndterInnsendingType,
                 AventerArenaOppgaveType,
                 AvventerFerdigstillJournalpostType,
                 InnsendingFerdigstiltType,
@@ -125,7 +125,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 AvventerPersondataType,
                 KategoriseringType,
                 AvventerSøknadsdataType,
-                HåndterHenvendelseType,
+                HåndterInnsendingType,
                 AvventerFerdigstillJournalpostType,
                 InnsendingFerdigstiltType,
             )
@@ -176,7 +176,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterSøknadsdata()
 
         assertBehovDetaljer(
-            type = Behovtype.HåndterHenvendelse,
+            type = Behovtype.HåndterInnsending,
             detaljer =
                 setOf(
                     "kategori",
@@ -187,7 +187,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "skjemaKode",
                 ),
         )
-        håndterHenvendelse(fagsystemType)
+        håndterInnsending(fagsystemType)
         if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
             assertBehovDetaljer(
                 OpprettStartVedtakOppgave,
@@ -231,7 +231,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 AvventerPersondataType,
                 KategoriseringType,
                 AvventerSøknadsdataType,
-                HåndterHenvendelseType,
+                HåndterInnsendingType,
                 AventerArenaStartVedtakType,
                 AvventerFerdigstillJournalpostType,
                 InnsendingFerdigstiltType,
@@ -243,7 +243,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 AvventerPersondataType,
                 KategoriseringType,
                 AvventerSøknadsdataType,
-                HåndterHenvendelseType,
+                HåndterInnsendingType,
                 AvventerFerdigstillJournalpostType,
                 InnsendingFerdigstiltType,
             )
@@ -287,7 +287,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterPersonInformasjon()
 
         assertBehovDetaljer(
-            type = Behovtype.HåndterHenvendelse,
+            type = Behovtype.HåndterInnsending,
             detaljer =
                 setOf(
                     "kategori",
@@ -297,7 +297,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "skjemaKode",
                 ),
         )
-        håndterHenvendelse(fagsystemType)
+        håndterInnsending(fagsystemType)
         if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
             assertBehovDetaljer(
                 OpprettVurderhenvendelseOppgave,
@@ -334,7 +334,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 AvventerJournalpostType,
                 AvventerPersondataType,
                 KategoriseringType,
-                HåndterHenvendelseType,
+                HåndterInnsendingType,
                 AventerArenaOppgaveType,
                 AvventerFerdigstillJournalpostType,
                 InnsendingFerdigstiltType,
@@ -345,7 +345,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 AvventerJournalpostType,
                 AvventerPersondataType,
                 KategoriseringType,
-                HåndterHenvendelseType,
+                HåndterInnsendingType,
                 AvventerFerdigstillJournalpostType,
                 InnsendingFerdigstiltType,
             )
@@ -384,7 +384,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJournalpostData(brevkode)
         håndterPersonInformasjon()
         assertBehovDetaljer(
-            type = Behovtype.HåndterHenvendelse,
+            type = Behovtype.HåndterInnsending,
             detaljer =
                 setOf(
                     "kategori",
@@ -394,7 +394,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "skjemaKode",
                 ),
         )
-        håndterHenvendelse(fagsystemType)
+        håndterInnsending(fagsystemType)
         if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
             assertBehovDetaljer(
                 OpprettVurderhenvendelseOppgave,
@@ -431,7 +431,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 add(AvventerJournalpostType)
                 add(AvventerPersondataType)
                 add(KategoriseringType)
-                add(HåndterHenvendelseType)
+                add(HåndterInnsendingType)
                 if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
                     add(AventerArenaOppgaveType)
                 }
@@ -489,7 +489,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterPersonInformasjon()
         håndterSøknadsdata()
         assertBehovDetaljer(
-            type = Behovtype.HåndterHenvendelse,
+            type = Behovtype.HåndterInnsending,
             detaljer =
                 setOf(
                     "kategori",
@@ -500,7 +500,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "skjemaKode",
                 ),
         )
-        håndterHenvendelse(fagsystemType)
+        håndterInnsending(fagsystemType)
         if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
             assertBehovDetaljer(
                 OpprettVurderhenvendelseOppgave,
@@ -538,7 +538,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 add(AvventerPersondataType)
                 add(KategoriseringType)
                 add(AvventerSøknadsdataType)
-                add(HåndterHenvendelseType)
+                add(HåndterInnsendingType)
                 if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
                     add(AventerArenaOppgaveType)
                 }
@@ -591,7 +591,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterPersonInformasjon()
         håndterSøknadsdata()
         assertBehovDetaljer(
-            type = Behovtype.HåndterHenvendelse,
+            type = Behovtype.HåndterInnsending,
             detaljer =
                 setOf(
                     "kategori",
@@ -602,7 +602,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "søknadId",
                 ),
         )
-        håndterHenvendelse(fagsystemType)
+        håndterInnsending(fagsystemType)
         if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
             assertBehovDetaljer(
                 OpprettVurderhenvendelseOppgave,
@@ -640,7 +640,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 AvventerPersondataType,
                 KategoriseringType,
                 AvventerSøknadsdataType,
-                HåndterHenvendelseType,
+                HåndterInnsendingType,
                 AventerArenaOppgaveType,
                 AvventerFerdigstillJournalpostType,
                 InnsendingFerdigstiltType,
@@ -652,7 +652,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 AvventerPersondataType,
                 KategoriseringType,
                 AvventerSøknadsdataType,
-                HåndterHenvendelseType,
+                HåndterInnsendingType,
                 AvventerFerdigstillJournalpostType,
                 InnsendingFerdigstiltType,
             )
@@ -679,7 +679,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJoarkHendelse()
         håndterJournalpostData("Fritekstkode")
         håndterPersonInformasjon()
-        håndterHenvendelse(fagsystemType)
+        håndterInnsending(fagsystemType)
 
         if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
             håndterGosysOppgaveOpprettet()
@@ -695,7 +695,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 AvventerJournalpostType,
                 AvventerPersondataType,
                 KategoriseringType,
-                HåndterHenvendelseType,
+                HåndterInnsendingType,
                 AvventerGosysType,
                 InnsendingFerdigstiltType,
             )
@@ -705,7 +705,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 AvventerJournalpostType,
                 AvventerPersondataType,
                 KategoriseringType,
-                HåndterHenvendelseType,
+                HåndterInnsendingType,
                 AvventerFerdigstillJournalpostType,
                 InnsendingFerdigstiltType,
             )
@@ -944,7 +944,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         håndterJoarkHendelse()
         håndterJournalpostData("ukjent")
         håndterPersonInformasjon()
-        håndterHenvendelse(fagsystem = Fagsystem.FagsystemType.ARENA)
+        håndterInnsending(fagsystem = Fagsystem.FagsystemType.ARENA)
         håndterGosysOppgaveOpprettet()
         håndterJournalpostOppdatert()
         // joark hendelse med samme journalpostId kommer
@@ -959,7 +959,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             AvventerJournalpostType,
             AvventerPersondataType,
             KategoriseringType,
-            HåndterHenvendelseType,
+            HåndterInnsendingType,
             AvventerGosysType,
             InnsendingFerdigstiltType,
         )

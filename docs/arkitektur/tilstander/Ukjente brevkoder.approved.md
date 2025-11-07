@@ -6,9 +6,9 @@ Kategorisert som: `UkjentSkjemaKode`, Behandlende enhet: `4450`
    	MottattType --> AvventerJournalpostType
 	AvventerJournalpostType --> AvventerPersondataType
 	AvventerPersondataType --> KategoriseringType
-	KategoriseringType --> HåndterHenvendelseType
-    HåndterHenvendelseType --> AvventerGosysType
-    HåndterHenvendelseType --> AvventerFerdigstillJournalpostType
+	KategoriseringType --> HåndterInnsendingType
+    HåndterInnsendingType --> AvventerGosysType
+    HåndterInnsendingType --> AvventerFerdigstillJournalpostType
     AvventerFerdigstillJournalpostType --> InnsendingFerdigstiltType
 	AvventerGosysType --> InnsendingFerdigstiltType
    InnsendingFerdigstiltType--> [*]    

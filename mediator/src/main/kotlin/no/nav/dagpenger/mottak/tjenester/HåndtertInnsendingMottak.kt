@@ -14,16 +14,16 @@ import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.InnsendingMediator
-import no.nav.dagpenger.mottak.meldinger.HåndtertHenvendelse
+import no.nav.dagpenger.mottak.meldinger.HåndtertInnsending
 import no.nav.dagpenger.mottak.serder.asUUID
 
 private val logg = KotlinLogging.logger {}
 
-internal class HåndtertHenvendelseMottak(
+internal class HåndtertInnsendingMottak(
     private val innsendingMediator: InnsendingMediator,
     rapidsConnection: RapidsConnection,
 ) : River.PacketListener {
-    private val behovNavn = Behovtype.HåndterHenvendelse.name
+    private val behovNavn = Behovtype.HåndterInnsending.name
     private val løsning = "@løsning.$behovNavn"
 
     init {
@@ -50,14 +50,14 @@ internal class HåndtertHenvendelseMottak(
         withLoggingContext("journalpostId" to "$journalpostId") {
             logg.info { "Mottatt løsning for behov $behovNavn med løsning: $løsningNode" }
 
-            val henvendelseHåndtert =
-                HåndtertHenvendelse(
+            val innsendingHåndtert =
+                HåndtertInnsending(
                     aktivitetslogg = Aktivitetslogg(),
                     journalpostId = journalpostId,
                     fagsystem = løsningNode.fagsystem(),
                 )
             innsendingMediator.håndter(
-                henvendelseHåndtert,
+                innsendingHåndtert,
             )
         }
     }

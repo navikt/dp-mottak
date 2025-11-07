@@ -8,7 +8,7 @@ import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
 import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet.OppgaveSak
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.HåndtertHenvendelse
+import no.nav.dagpenger.mottak.meldinger.HåndtertInnsending
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
@@ -60,10 +60,10 @@ class Innsending private constructor(
         tilstand.håndter(this, joarkHendelse)
     }
 
-    fun håndter(håndtertHenvendelse: HåndtertHenvendelse) {
-        if (journalpostId != håndtertHenvendelse.journalpostId()) return
-        kontekst(håndtertHenvendelse, "HenvendelseHåndtert for journalpost")
-        tilstand.håndter(this, håndtertHenvendelse)
+    fun håndter(håndtertInnsending: HåndtertInnsending) {
+        if (journalpostId != håndtertInnsending.journalpostId()) return
+        kontekst(håndtertInnsending, "InnsendingHåndtert for journalpost")
+        tilstand.håndter(this, håndtertInnsending)
     }
 
     fun håndter(journalpost: Journalpost) {
@@ -160,9 +160,9 @@ class Innsending private constructor(
 
         fun håndter(
             innsending: Innsending,
-            håndtertHenvendelse: HåndtertHenvendelse,
+            håndtertInnsending: HåndtertInnsending,
         ) {
-            håndtertHenvendelse.warn("Forventet ikke HåndtertHenvendelse i tilstand $type.name")
+            håndtertInnsending.warn("Forventet ikke HåndtertInnsending i tilstand $type.name")
         }
 
         fun håndter(
@@ -353,20 +353,20 @@ class Innsending private constructor(
                 is Gjenopptak -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Ettersending -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Generell -> innsending.tilstand(hendelse, AvventerSøknadsdata)
-                is Utdanning -> innsending.tilstand(hendelse, HåndterHenvendelse)
-                is Etablering -> innsending.tilstand(hendelse, HåndterHenvendelse)
-                is Klage -> innsending.tilstand(hendelse, HåndterHenvendelse)
-                is Anke -> innsending.tilstand(hendelse, HåndterHenvendelse)
-                is UkjentSkjemaKode -> innsending.tilstand(hendelse, HåndterHenvendelse)
+                is Utdanning -> innsending.tilstand(hendelse, HåndterInnsending)
+                is Etablering -> innsending.tilstand(hendelse, HåndterInnsending)
+                is Klage -> innsending.tilstand(hendelse, HåndterInnsending)
+                is Anke -> innsending.tilstand(hendelse, HåndterInnsending)
+                is UkjentSkjemaKode -> innsending.tilstand(hendelse, HåndterInnsending)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
                 is KlageForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
             }
         }
     }
 
-    internal object HåndterHenvendelse : Tilstand {
+    internal object HåndterInnsending : Tilstand {
         override val type: InnsendingTilstandType
-            get() = InnsendingTilstandType.HåndterHenvendelseType
+            get() = InnsendingTilstandType.HåndterInnsendingType
         override val timeout: Duration
             get() = Duration.ofDays(1)
 
@@ -374,7 +374,7 @@ class Innsending private constructor(
             innsending: Innsending,
             hendelse: Hendelse,
         ) {
-            innsending.håndtereHenvendelse(hendelse)
+            innsending.håndtereInnsending(hendelse)
         }
 
         override fun håndter(
@@ -386,16 +386,16 @@ class Innsending private constructor(
 
         override fun håndter(
             innsending: Innsending,
-            håndtertHenvendelse: HåndtertHenvendelse,
+            håndtertInnsending: HåndtertInnsending,
         ) {
-            when (håndtertHenvendelse.fagsystem) {
+            when (håndtertInnsending.fagsystem) {
                 is Fagsystem.Dagpenger -> {
                     innsending.oppgaveSak =
                         OppgaveSak(
-                            fagsakId = håndtertHenvendelse.fagsystem.sakId,
+                            fagsakId = håndtertInnsending.fagsystem.sakId,
                             oppgaveId = null,
                         )
-                    innsending.oppdatereJournalpost(håndtertHenvendelse)
+                    innsending.oppdatereJournalpost(håndtertInnsending)
                 }
 
                 is Fagsystem.Arena -> {
@@ -404,9 +404,9 @@ class Innsending private constructor(
                             innsending.journalpost,
                         ) { " Journalpost må være kategorisert på dette tidspunktet " }.kategorisertJournalpost()
                     when (kategorisertJournalpost) {
-                        is NySøknad -> innsending.tilstand(håndtertHenvendelse, AventerArenaStartVedtak)
-                        is UkjentSkjemaKode -> innsending.tilstand(håndtertHenvendelse, AvventerGosysOppgave)
-                        else -> innsending.tilstand(håndtertHenvendelse, AventerVurderHenvendelseArenaOppgave)
+                        is NySøknad -> innsending.tilstand(håndtertInnsending, AventerArenaStartVedtak)
+                        is UkjentSkjemaKode -> innsending.tilstand(håndtertInnsending, AvventerGosysOppgave)
+                        else -> innsending.tilstand(håndtertInnsending, AventerVurderHenvendelseArenaOppgave)
                     }
                 }
             }
@@ -445,10 +445,10 @@ class Innsending private constructor(
             innsending.rutingOppslag = søknadsdata.søknad()
 
             when (kategorisertJournalpost) {
-                is NySøknad -> innsending.tilstand(søknadsdata, HåndterHenvendelse)
-                is Gjenopptak -> innsending.tilstand(søknadsdata, HåndterHenvendelse)
-                is Ettersending -> innsending.tilstand(søknadsdata, HåndterHenvendelse)
-                is Generell -> innsending.tilstand(søknadsdata, HåndterHenvendelse)
+                is NySøknad -> innsending.tilstand(søknadsdata, HåndterInnsending)
+                is Gjenopptak -> innsending.tilstand(søknadsdata, HåndterInnsending)
+                is Ettersending -> innsending.tilstand(søknadsdata, HåndterInnsending)
+                is Generell -> innsending.tilstand(søknadsdata, HåndterInnsending)
                 else -> søknadsdata.severe("Forventet kun søknadsdata for NySøknad, Gjenopptak, Ettersending og Generell")
             }
         }
@@ -643,7 +643,7 @@ class Innsending private constructor(
         )
     }
 
-    private fun håndtereHenvendelse(hendelse: Hendelse) {
+    private fun håndtereInnsending(hendelse: Hendelse) {
         val journalpostData = requireNotNull(journalpost) { " Journalpost må være innhentet " }
         val person = requireNotNull(person) { " Person må være innhentet " }
         val kategorisertJournalpost = journalpostData.kategorisertJournalpost()
@@ -659,8 +659,8 @@ class Innsending private constructor(
                 søknadId?.let { this["søknadId"] = it }
             }.toMap()
         hendelse.behov(
-            type = Behovtype.HåndterHenvendelse,
-            melding = "Sjekker om dp-saksbehandling kan håndtere henvendelsen",
+            type = Behovtype.HåndterInnsending,
+            melding = "Sjekker om dp-saksbehandling kan håndtere innsendingen",
             detaljer =
             detaljer,
         )
