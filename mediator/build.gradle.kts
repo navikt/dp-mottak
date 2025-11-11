@@ -18,14 +18,14 @@ dependencies {
     implementation(project(":modell"))
     implementation(project(":openapi"))
     implementation("no.nav.dagpenger:oauth2-klient:2025.08.20-08.53.9250ac7fbd99")
-    implementation("io.prometheus:prometheus-metrics-core:1.4.2")
+    implementation("io.prometheus:prometheus-metrics-core:1.4.3")
     implementation(libs.rapids.and.rivers)
     implementation("io.getunleash:unleash-client-java:11.1.1")
 
     implementation(libs.bundles.postgres)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.10.2")
 
-    implementation("com.github.navikt.tbd-libs:naisful-app:2025.09.19-13.31-61342e73")
+    implementation("com.github.navikt.tbd-libs:naisful-app:2025.11.04-10.54-c831038e")
 
     implementation(libs.bundles.jackson)
 
@@ -33,7 +33,7 @@ dependencies {
     implementation(libs.bundles.ktor.client)
     implementation("io.ktor:ktor-client-logging-jvm:${libs.versions.ktor.get()}")
     implementation("de.slub-dresden:urnlib:3.0.0")
-    implementation("io.ktor:ktor-client-logging:3.3.1")
+    implementation("io.ktor:ktor-client-logging:3.3.2")
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter-params:${libs.versions.junit.get()}")
@@ -45,7 +45,7 @@ dependencies {
     testImplementation("no.bekk.bekkopen:nocommons:0.16.0")
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation("io.ktor:ktor-client-mock-jvm:${libs.versions.ktor.get()}")
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.09.19-13.31-61342e73")
+    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.11.04-10.54-c831038e")
 }
 
 tasks.withType<ShadowJar> {
