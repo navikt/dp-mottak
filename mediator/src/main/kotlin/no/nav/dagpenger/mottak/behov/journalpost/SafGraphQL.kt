@@ -83,6 +83,7 @@ internal class SafGraphQL {
         DATO_REGISTRERT,
         DATO_AVS_RETUR,
         DATO_DOKUMENT,
+        DATO_LEST,
     }
 
     enum class Journalstatus {
