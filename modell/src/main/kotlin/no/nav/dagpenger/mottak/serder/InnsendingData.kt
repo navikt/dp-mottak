@@ -6,7 +6,7 @@ import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
-import no.nav.dagpenger.mottak.meldinger.søknadsdata.rutingOppslag
+import no.nav.dagpenger.mottak.meldinger.søknadsdata.rutingOppslagV2
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.reflect.full.primaryConstructor
@@ -50,7 +50,7 @@ data class InnsendingData(
                             },
                     )
                 },
-                søknadsData?.let { rutingOppslag(it) },
+                søknadsData?.let { rutingOppslagV2(it) },
                 personData?.let {
                     PersonInformasjon.Person(
                         it.navn,

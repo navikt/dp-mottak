@@ -15,21 +15,18 @@ class Søknadsdata(
     override fun journalpostId(): String = journalpostId
 
     fun søknad(): RutingOppslag {
-        return rutingOppslag(data)
+        return rutingOppslagV2(data)
     }
 }
 
-internal fun rutingOppslag(data: JsonNode): RutingOppslag {
-    return when (erQuizSøknad(data)) {
-        true -> QuizSøknadFormat(data)
-        else -> NullSøknadData(data)
+internal fun rutingOppslagV2(data: JsonNode): RutingOppslag {
+    val versjonNavn = data["versjon_navn"]?.asText()
+    when (versjonNavn) {
+        "Dagpenger" -> return QuizSøknadFormat(data)
+        "Dagpenger_v2" -> return OrkestratorSøknadFormat(data)
+        else -> return NullSøknadData(data)
     }
 }
-
-private fun erQuizSøknad(data: JsonNode) =
-    data["versjon_navn"]?.let {
-        !it.isNull && it.asText() == "Dagpenger"
-    }
 
 class NullSøknadData(private val data: JsonNode) : RutingOppslag {
     override fun data() = data
