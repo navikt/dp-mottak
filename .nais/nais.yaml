@@ -72,13 +72,15 @@ spec:
         - application: dp-saksbehandling
     outbound:
       rules:
-       - application: skjermede-personer-pip
-         namespace: nom
-       - application: "{{ oppgave.app }}"
-         namespace: oppgavehandtering
-       - application: "{{ saf.app }}"
-         namespace: teamdokumenthandtering
-       - application: dp-saksbehandling
+        - application: logging
+          namespace: nais-system
+        - application: skjermede-personer-pip
+          namespace: nom
+        - application: "{{ oppgave.app }}"
+          namespace: oppgavehandtering
+        - application: "{{ saf.app }}"
+          namespace: teamdokumenthandtering
+        - application: dp-saksbehandling
       external:
         - host: "{{dp_proxy.ingress}}"
         - host: "{{pdl.ingress}}"
