@@ -162,7 +162,7 @@ data class NySøknad(
 
             konkurs ->
                 OppgaveBenk(
-                    "4401",
+                    "4457",
                     "Konkurs\n",
                     datoRegistrert,
                     tilleggsinformasjon(),
