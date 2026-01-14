@@ -62,7 +62,7 @@ internal class ArenaBehovLøser(
             val journalpostId = packet["journalpostId"].asText()
             val behovId = packet["@behovId"].asText()
 
-            if (listOf("717559965", "717559978").contains(journalpostId)) {
+            if (listOf("717559990").contains(journalpostId)) {
                 logger.info { "Skipper journalpost $journalpostId fra ArenaBehovLøser" }
                 return
             }
