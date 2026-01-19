@@ -638,11 +638,12 @@ class Innsending private constructor(
 
     private fun trengerSøknadsdata(hendelse: Hendelse) {
         val jp = requireNotNull(journalpost) { " Journalpost må være satt i ${tilstand.type} " }
+        val person = requireNotNull(person) { "Person må være satt i ${tilstand.type} " }
         hendelse.behov(
             Behovtype.Søknadsdata,
             "Trenger søknadsdata",
             mapOf(
-                "dokumentInfoId" to jp.hovedDokument().dokumentInfoId,
+                "ident" to person.ident,
             ),
         )
     }
