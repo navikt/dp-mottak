@@ -644,6 +644,7 @@ class Innsending private constructor(
             "Trenger søknadsdata",
             mapOf(
                 "ident" to person.ident,
+                "dokumentInfoId" to jp.hovedDokument().dokumentInfoId,
             ),
         )
     }
