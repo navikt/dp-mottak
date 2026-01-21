@@ -67,14 +67,6 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
         return harMottatt || harTidligereArbeidsgiver
     }
 
-    override fun permittertFraFiskeForedling(): Boolean = avsluttetArbeidsforhold().any { it.fiskeforedling }
-
-    override fun avsluttetArbeidsforholdFraKonkurs(): Boolean {
-        return avsluttetArbeidsforhold().any { it.sluttårsak == Sluttårsak.ARBEIDSGIVER_KONKURS }
-    }
-
-    override fun permittert(): Boolean = avsluttetArbeidsforhold().any { it.sluttårsak == Sluttårsak.PERMITTERT }
-
     override fun søknadId(): String? = data["søknad_uuid"]?.textValue()
 
     override fun data(): JsonNode = data

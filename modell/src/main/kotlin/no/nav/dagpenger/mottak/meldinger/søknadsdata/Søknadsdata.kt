@@ -20,18 +20,15 @@ class Søknadsdata(
 }
 
 fun rutingOppslag(data: JsonNode): RutingOppslag {
-    return if (erQuizSøknad(data)) {
-        QuizSøknadFormat(data)
-    } else if (erBrukerdiaglogSøknadFormat(data)) {
+    return runCatching {
         BrukerdialogSøknadFormat(data)
-    } else {
-        NullSøknadData(data)
+    }.getOrElse {
+        if (erQuizSøknad(data)) {
+            QuizSøknadFormat(data)
+        } else {
+            NullSøknadData(data)
+        }
     }
-}
-
-private fun erBrukerdiaglogSøknadFormat(data: JsonNode): Boolean {
-    val verdi = data.path("@løsning").path("Søknadsdata").path("verdi")
-    return !verdi.isMissingNode && !verdi.isNull && verdi.isObject
 }
 
 private fun erQuizSøknad(data: JsonNode) =

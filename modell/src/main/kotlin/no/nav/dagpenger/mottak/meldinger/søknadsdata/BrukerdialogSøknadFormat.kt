@@ -2,32 +2,39 @@ package no.nav.dagpenger.mottak.meldinger.søknadsdata
 
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.mottak.AvsluttedeArbeidsforhold
+import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.RutingOppslag
 import no.nav.dagpenger.mottak.SøknadVisitor
 
 class BrukerdialogSøknadFormat(private val data: JsonNode) : RutingOppslag {
-    override fun data(): JsonNode {
-        TODO("Not yet implemented")
+    private val verdi: JsonNode = data.path("@løsning").path("Søknadsdata").path("verdi")
+
+    init {
+        require(verdi.isObject) {
+            "Data er ikke i forventet brukerdialog søknadsformat"
+        }
     }
+
+    override fun data(): JsonNode = data
 
     override fun accept(visitor: SøknadVisitor) {
-        TODO("Not yet implemented")
+        visitor.visitSøknad(this)
     }
 
-    override fun eøsBostedsland(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun eøsBostedsland(): Boolean = verdi["eøsBostedsland"]?.asBoolean() ?: false
 
-    override fun eøsArbeidsforhold(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun eøsArbeidsforhold(): Boolean = verdi["eøsArbeidsforhold"]?.asBoolean() ?: false
 
-    override fun avtjentVerneplikt(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun avtjentVerneplikt(): Boolean = verdi["avtjentVerneplikt"]?.asBoolean() ?: false
 
     override fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
-        TODO("Not yet implemented")
+        return verdi["avsluttetArbeidsforhold"]?.map {
+            AvsluttetArbeidsforhold(
+                sluttårsak = AvsluttetArbeidsforhold.Sluttårsak.valueOf(it["sluttårsak"].asText()),
+                fiskeforedling = it["fiskeforedling"]?.asBoolean() ?: false,
+                land = it["land"].asText(),
+            )
+        } ?: emptyList()
     }
 
     override fun harBarn(): Boolean {
@@ -38,19 +45,5 @@ class BrukerdialogSøknadFormat(private val data: JsonNode) : RutingOppslag {
         TODO("Not yet implemented")
     }
 
-    override fun søknadId(): String? {
-        TODO("Not yet implemented")
-    }
-
-    override fun permittertFraFiskeForedling(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun avsluttetArbeidsforholdFraKonkurs(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun permittert(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun søknadId(): String? = verdi["søknadId"]?.asText()
 }

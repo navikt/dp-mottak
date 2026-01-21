@@ -1,6 +1,7 @@
 package no.nav.dagpenger.mottak
 
 import com.fasterxml.jackson.databind.JsonNode
+import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak
 
 interface SøknadOppslag {
     fun data(): JsonNode
@@ -23,14 +24,17 @@ interface SøknadOppslag {
 }
 
 interface RutingOppslag : SøknadOppslag {
-    fun permittertFraFiskeForedling(): Boolean
+    fun permittertFraFiskeForedling(): Boolean = avsluttetArbeidsforhold().any { it.fiskeforedling }
 
-    fun avsluttetArbeidsforholdFraKonkurs(): Boolean
+    fun avsluttetArbeidsforholdFraKonkurs(): Boolean =
+        avsluttetArbeidsforhold().any {
+            it.sluttårsak == Sluttårsak.ARBEIDSGIVER_KONKURS
+        }
 
-    fun permittert(): Boolean
+    fun permittert(): Boolean = avsluttetArbeidsforhold().any { it.sluttårsak == Sluttårsak.PERMITTERT }
 }
 
-internal typealias AvsluttedeArbeidsforhold = List<AvsluttetArbeidsforhold>
+typealias AvsluttedeArbeidsforhold = List<AvsluttetArbeidsforhold>
 
 data class ReellArbeidsSøker(
     val helse: Boolean,
@@ -45,13 +49,14 @@ data class AvsluttetArbeidsforhold(
     val land: String,
 ) {
     enum class Sluttårsak {
-        AVSKJEDIGET,
         ARBEIDSGIVER_KONKURS,
+        AVSKJEDIGET,
+        IKKE_ENDRET,
         KONTRAKT_UTGAATT,
         PERMITTERT,
+        PERMITTERT_FISKEFOREDLING,
         REDUSERT_ARBEIDSTID,
         SAGT_OPP_AV_ARBEIDSGIVER,
         SAGT_OPP_SELV,
-        IKKE_ENDRET,
     }
 }
