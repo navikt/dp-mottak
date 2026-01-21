@@ -5,17 +5,14 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.mottak.AvsluttedeArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak
-import no.nav.dagpenger.mottak.QuizOppslag
-import no.nav.dagpenger.mottak.ReellArbeidsSøker
 import no.nav.dagpenger.mottak.RutingOppslag
 import no.nav.dagpenger.mottak.SøknadVisitor
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 private val logger = KotlinLogging.logger { }
-private val sikkerlogg = KotlinLogging.logger("tjenestekall.QuizSøknadFormat")
 
-class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag {
+class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
     override fun eøsBostedsland(): Boolean =
         data
             .hentNullableFaktaFraSeksjon("bostedsland")
@@ -78,27 +75,7 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag, QuizOppslag
 
     override fun permittert(): Boolean = avsluttetArbeidsforhold().any { it.sluttårsak == Sluttårsak.PERMITTERT }
 
-    override fun fangstOgFisk(): Boolean {
-        // todo remove behov from quiz
-        return false
-    }
-
-    override fun ønskerDagpengerFraDato(): LocalDate =
-        data.hentFaktaFraSeksjon("din-situasjon")
-            .faktaSvar("faktum.dagpenger-soknadsdato")
-            .asLocalDate()
-
     override fun søknadId(): String? = data["søknad_uuid"]?.textValue()
-
-    override fun reellArbeidsSøker(): ReellArbeidsSøker =
-        data.hentFaktaFraSeksjon("reell-arbeidssoker").let { node ->
-            ReellArbeidsSøker(
-                helse = node.faktaSvar("faktum.alle-typer-arbeid").asBoolean(),
-                geografi = node.faktaSvar("faktum.jobbe-hele-norge").asBoolean(),
-                deltid = node.faktaSvar("faktum.jobbe-hel-deltid").asBoolean(),
-                yrke = node.faktaSvar("faktum.bytte-yrke-ned-i-lonn").asBoolean(),
-            )
-        }
 
     override fun data(): JsonNode = data
 

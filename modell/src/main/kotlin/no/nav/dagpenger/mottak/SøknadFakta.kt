@@ -1,7 +1,6 @@
 package no.nav.dagpenger.mottak
 
 import com.fasterxml.jackson.databind.JsonNode
-import java.time.LocalDate
 
 interface SøknadOppslag {
     fun data(): JsonNode
@@ -19,16 +18,8 @@ interface SøknadOppslag {
     fun harBarn(): Boolean
 
     fun harAndreYtelser(): Boolean
-}
-
-interface QuizOppslag : SøknadOppslag {
-    fun fangstOgFisk(): Boolean
-
-    fun ønskerDagpengerFraDato(): LocalDate
 
     fun søknadId(): String?
-
-    fun reellArbeidsSøker(): ReellArbeidsSøker
 }
 
 interface RutingOppslag : SøknadOppslag {

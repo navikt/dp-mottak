@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
-import java.time.LocalDate
 import java.util.UUID
 
 internal class QuizSøknadFormatTest {
@@ -92,23 +91,6 @@ internal class QuizSøknadFormatTest {
         assertEquals(
             false,
             QuizSøknadFormat(avsluttedeArbeidsforholdQuizJson(permittert = false)).permittert(),
-        )
-    }
-
-    @Test
-    fun fangstOgFiske() {
-        assertEquals(
-            false,
-            QuizSøknadFormat(utenSeksjoner()).fangstOgFisk(),
-        )
-    }
-
-    @Test
-    fun ønskerDagpengerFraDato() {
-        val now = LocalDate.now()
-        assertEquals(
-            now,
-            QuizSøknadFormat(ønskerDagpengerFraDatoJson(now.toString())).ønskerDagpengerFraDato(),
         )
     }
 

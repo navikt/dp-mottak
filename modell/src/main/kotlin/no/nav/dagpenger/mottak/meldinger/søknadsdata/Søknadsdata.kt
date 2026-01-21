@@ -50,6 +50,8 @@ class NullSøknadData(private val data: JsonNode) : RutingOppslag {
 
     override fun harAndreYtelser() = false
 
+    override fun søknadId(): String? = null
+
     override fun permittertFraFiskeForedling() = false
 
     override fun avsluttetArbeidsforholdFraKonkurs() = false
