@@ -19,17 +19,25 @@ class Søknadsdata(
     }
 }
 
-internal fun rutingOppslag(data: JsonNode): RutingOppslag {
-    return when (erQuizSøknad(data)) {
-        true -> QuizSøknadFormat(data)
-        else -> NullSøknadData(data)
+fun rutingOppslag(data: JsonNode): RutingOppslag {
+    return if (erQuizSøknad(data)) {
+        QuizSøknadFormat(data)
+    } else if (erBrukerdiaglogSøknadFormat(data)) {
+        BrukerdialogSøknadFormat(data)
+    } else {
+        NullSøknadData(data)
     }
+}
+
+private fun erBrukerdiaglogSøknadFormat(data: JsonNode): Boolean {
+    val verdi = data.path("@løsning").path("Søknadsdata").path("verdi")
+    return !verdi.isMissingNode && !verdi.isNull && verdi.isObject
 }
 
 private fun erQuizSøknad(data: JsonNode) =
     data["versjon_navn"]?.let {
         !it.isNull && it.asText() == "Dagpenger"
-    }
+    } ?: false
 
 class NullSøknadData(private val data: JsonNode) : RutingOppslag {
     override fun data() = data
