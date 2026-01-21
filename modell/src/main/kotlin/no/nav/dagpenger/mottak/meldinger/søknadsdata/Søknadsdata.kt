@@ -51,10 +51,6 @@ class NullSøknadData(private val data: JsonNode) : RutingOppslag {
 
     override fun avsluttetArbeidsforhold() = emptyList<AvsluttetArbeidsforhold>()
 
-    override fun harBarn() = false
-
-    override fun harAndreYtelser() = false
-
     override fun søknadId(): String? = null
 
     override fun permittertFraFiskeForedling() = false

@@ -37,13 +37,5 @@ class BrukerdialogSøknadFormat(private val data: JsonNode) : RutingOppslag {
         } ?: emptyList()
     }
 
-    override fun harBarn(): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun harAndreYtelser(): Boolean {
-        TODO("Not yet implemented")
-    }
-
     override fun søknadId(): String? = verdi["søknadId"]?.asText()
 }

@@ -16,10 +16,6 @@ interface SøknadOppslag {
 
     fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold
 
-    fun harBarn(): Boolean
-
-    fun harAndreYtelser(): Boolean
-
     fun søknadId(): String?
 }
 
