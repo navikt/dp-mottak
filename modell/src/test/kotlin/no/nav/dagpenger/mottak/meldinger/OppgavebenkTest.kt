@@ -103,7 +103,7 @@ class OppgavebenkTest {
         ) {
             val oppgaveBenk = jp.oppgaveBenk(person = person, rutingOppslag = it)
             assertEquals("Konkurs\n", oppgaveBenk.beskrivelse)
-            assertEquals("4401", oppgaveBenk.id)
+            assertEquals("4457", oppgaveBenk.id)
         }
     }
 
