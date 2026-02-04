@@ -20,7 +20,7 @@ dependencies {
     implementation("no.nav.dagpenger:oauth2-klient:2025.12.19-08.15.2e150cd55270")
     implementation("io.prometheus:prometheus-metrics-core:1.4.3")
     implementation(libs.rapids.and.rivers)
-    implementation("io.getunleash:unleash-client-java:12.0.1")
+    implementation("io.getunleash:unleash-client-java:12.1.0")
 
     implementation(libs.bundles.postgres)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.10.2")
@@ -33,7 +33,7 @@ dependencies {
     implementation(libs.bundles.ktor.client)
     implementation("io.ktor:ktor-client-logging-jvm:${libs.versions.ktor.get()}")
     implementation("de.slub-dresden:urnlib:3.0.0")
-    implementation("io.ktor:ktor-client-logging:3.3.3")
+    implementation("io.ktor:ktor-client-logging:3.4.0")
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter-params:${libs.versions.junit.get()}")
