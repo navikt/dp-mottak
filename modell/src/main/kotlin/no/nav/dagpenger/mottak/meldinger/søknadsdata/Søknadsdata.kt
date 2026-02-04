@@ -20,12 +20,17 @@ class Søknadsdata(
 }
 
 fun rutingOppslag(data: JsonNode): RutingOppslag {
-    return runCatching {
-        BrukerdialogSøknadFormat(data)
-    }.getOrElse {
-        if (erQuizSøknad(data)) {
+    return when {
+        BrukerdialogSøknadFormat.erBrukerdialogSøknadFormat(data) -> {
+            BrukerdialogSøknadFormat(data)
+
+        }
+
+        erQuizSøknad(data) -> {
             QuizSøknadFormat(data)
-        } else {
+        }
+
+        else -> {
             NullSøknadData(data)
         }
     }

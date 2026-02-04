@@ -7,10 +7,16 @@ import no.nav.dagpenger.mottak.RutingOppslag
 import no.nav.dagpenger.mottak.SøknadVisitor
 
 class BrukerdialogSøknadFormat(private val data: JsonNode) : RutingOppslag {
-    private val verdi: JsonNode = data.path("@løsning").path("Søknadsdata").path("verdi")
+    companion object {
+        fun erBrukerdialogSøknadFormat(data: JsonNode): Boolean = data.verdi().isObject
+
+        private fun JsonNode.verdi(): JsonNode = this.path("@løsning").path("Søknadsdata").path("verdi")
+    }
+
+    private val verdi: JsonNode = data.verdi()
 
     init {
-        require(verdi.isObject) {
+        require(erBrukerdialogSøknadFormat(data)) {
             "Data er ikke i forventet brukerdialog søknadsformat"
         }
     }
