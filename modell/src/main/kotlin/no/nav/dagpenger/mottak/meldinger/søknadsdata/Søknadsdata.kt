@@ -23,7 +23,6 @@ fun rutingOppslag(data: JsonNode): RutingOppslag {
     return when {
         BrukerdialogSøknadFormat.erBrukerdialogSøknadFormat(data) -> {
             BrukerdialogSøknadFormat(data)
-
         }
 
         erQuizSøknad(data) -> {

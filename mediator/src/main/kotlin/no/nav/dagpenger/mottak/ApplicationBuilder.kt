@@ -18,7 +18,6 @@ import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApiClient
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.OppdaterJournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.SafClient
-import no.nav.dagpenger.mottak.behov.journalpost.SøknadsdataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.PdlPersondataOppslag
 import no.nav.dagpenger.mottak.behov.person.PersondataBehovLøser
 import no.nav.dagpenger.mottak.behov.person.SkjermingOppslag
@@ -102,7 +101,7 @@ internal class ApplicationBuilder(
                     createPersonOppslag(PdlPersondataOppslag(Config.properties), SkjermingOppslag(Config.properties)),
                     this,
                 )
-                SøknadsdataBehovLøser(safClient, this)
+//                SøknadsdataBehovLøser(safClient, this)
                 ArenaBehovLøser(arenaApiClient, this)
                 OpprettGosysOppgaveLøser(gosysOppslag, this)
                 VedtakFattetMottak(
