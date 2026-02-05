@@ -19,17 +19,26 @@ class Søknadsdata(
     }
 }
 
-internal fun rutingOppslag(data: JsonNode): RutingOppslag {
-    return when (erQuizSøknad(data)) {
-        true -> QuizSøknadFormat(data)
-        else -> NullSøknadData(data)
+fun rutingOppslag(data: JsonNode): RutingOppslag {
+    return when {
+        BrukerdialogSøknadFormat.erBrukerdialogSøknadFormat(data) -> {
+            BrukerdialogSøknadFormat(data)
+        }
+
+        erQuizSøknad(data) -> {
+            QuizSøknadFormat(data)
+        }
+
+        else -> {
+            NullSøknadData(data)
+        }
     }
 }
 
 private fun erQuizSøknad(data: JsonNode) =
     data["versjon_navn"]?.let {
         !it.isNull && it.asText() == "Dagpenger"
-    }
+    } ?: false
 
 class NullSøknadData(private val data: JsonNode) : RutingOppslag {
     override fun data() = data
@@ -46,9 +55,7 @@ class NullSøknadData(private val data: JsonNode) : RutingOppslag {
 
     override fun avsluttetArbeidsforhold() = emptyList<AvsluttetArbeidsforhold>()
 
-    override fun harBarn() = false
-
-    override fun harAndreYtelser() = false
+    override fun søknadId(): String? = null
 
     override fun permittertFraFiskeForedling() = false
 
