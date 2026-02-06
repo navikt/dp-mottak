@@ -111,7 +111,7 @@ sealed class KategorisertJournalpost(
                 "NAV 04-08.04",
             )
         private val UTLAND_BREVKODER =
-            listOf("NAV 04-02.01", "NAVe 04-02.01", "NAV 04-02.03", "NAV 04-02.05", "NAVe 04-02.05", "UTL")
+            listOf("NAV 04-02.01", "NAVe 04-02.01", "NAV 04-02.03", "NAV 04-02.05", "NAVe 04-02.05", "UTL", "NAV 00-10.04")
     }
 }
 
