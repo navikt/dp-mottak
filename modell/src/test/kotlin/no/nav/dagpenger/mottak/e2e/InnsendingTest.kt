@@ -54,7 +54,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         assertBehovDetaljer(Persondata, setOf("brukerId"))
         håndterPersonInformasjon()
 
-        assertBehovDetaljer(Søknadsdata, setOf("dokumentInfoId"))
+        assertBehovDetaljer(Søknadsdata, setOf("ident", "dokumentInfoId"))
         håndterSøknadsdata()
 
         assertBehovDetaljer(
@@ -172,7 +172,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         assertBehovDetaljer(Persondata, setOf("brukerId"))
         håndterPersonInformasjon()
 
-        assertBehovDetaljer(Søknadsdata, setOf("dokumentInfoId"))
+        assertBehovDetaljer(Søknadsdata, setOf("ident", "dokumentInfoId"))
         håndterSøknadsdata()
 
         assertBehovDetaljer(
