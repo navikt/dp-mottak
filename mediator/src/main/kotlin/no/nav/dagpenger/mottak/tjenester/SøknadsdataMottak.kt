@@ -68,6 +68,7 @@ internal class SøknadsdataMottak(
                                 |  harAndreYtelser=${harAndreYtelser()}
                                 |  avsluttedeArbeidsforhold=${avsluttetArbeidsforhold().isEmpty()}
                                 |  rutingoppslag=${this.javaClass.simpleName}
+                                |  søknadsId=${søknadId()}
                                 """.trimMargin()
                             }
                         }

@@ -17,7 +17,6 @@ import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.RekjørHendelse
-import no.nav.dagpenger.mottak.meldinger.søknadsdata.QuizSøknadFormat
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
 import java.time.Duration
 
@@ -651,7 +650,7 @@ class Innsending private constructor(
         val journalpostData = requireNotNull(journalpost) { " Journalpost må være innhentet " }
         val person = requireNotNull(person) { " Person må være innhentet " }
         val kategorisertJournalpost = journalpostData.kategorisertJournalpost()
-        val søknadId = rutingOppslag?.let { QuizSøknadFormat(it.data()).søknadId() }
+        val søknadId = rutingOppslag?.søknadId()
 
         val detaljer =
             buildMap<String, Any> {

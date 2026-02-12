@@ -19,14 +19,14 @@ interface SøknadOppslag {
     fun harBarn(): Boolean
 
     fun harAndreYtelser(): Boolean
+
+    fun søknadId(): String?
 }
 
 interface QuizOppslag : SøknadOppslag {
     fun fangstOgFisk(): Boolean
 
     fun ønskerDagpengerFraDato(): LocalDate
-
-    fun søknadId(): String?
 
     fun reellArbeidsSøker(): ReellArbeidsSøker
 }

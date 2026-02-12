@@ -22,7 +22,12 @@ class Søknadsdata(
 internal fun rutingOppslag(data: JsonNode): RutingOppslag {
     return when (erQuizSøknad(data)) {
         true -> QuizSøknadFormat(data)
-        else -> NullSøknadData(data)
+        else -> {
+            when (OrkestratorSøknadFormat.erOrkestratorSøknad(data)) {
+                true -> OrkestratorSøknadFormat(data)
+                else -> NullSøknadData(data)
+            }
+        }
     }
 }
 
@@ -30,6 +35,42 @@ private fun erQuizSøknad(data: JsonNode) =
     data["versjon_navn"]?.let {
         !it.isNull && it.asText() == "Dagpenger"
     }
+
+class OrkestratorSøknadFormat(private val data: JsonNode) : RutingOppslag {
+    companion object {
+        fun erOrkestratorSøknad(data: JsonNode): Boolean {
+            return data["versjon_navn"]?.let {
+                !it.isNull && it.asText() == "OrkestratorSoknad"
+            } ?: false
+        }
+    }
+
+    override fun data() = data
+
+    override fun accept(visitor: SøknadVisitor) {
+        visitor.visitSøknad(this)
+    }
+
+    override fun eøsBostedsland() = false
+
+    override fun eøsArbeidsforhold() = false
+
+    override fun avtjentVerneplikt() = false
+
+    override fun avsluttetArbeidsforhold() = emptyList<AvsluttetArbeidsforhold>()
+
+    override fun harBarn() = false
+
+    override fun harAndreYtelser() = false
+
+    override fun søknadId(): String? = data["søknad_uuid"]?.textValue()
+
+    override fun permittertFraFiskeForedling() = false
+
+    override fun avsluttetArbeidsforholdFraKonkurs() = false
+
+    override fun permittert() = false
+}
 
 class NullSøknadData(private val data: JsonNode) : RutingOppslag {
     override fun data() = data
@@ -49,6 +90,8 @@ class NullSøknadData(private val data: JsonNode) : RutingOppslag {
     override fun harBarn() = false
 
     override fun harAndreYtelser() = false
+
+    override fun søknadId(): String? = null
 
     override fun permittertFraFiskeForedling() = false
 
