@@ -93,7 +93,7 @@ spec:
   gcp:
     sqlInstances:
       - name: dp-mottak
-        type: POSTGRES_16
+        type: POSTGRES_18
         tier:  "{{db_tier}}"
         diskType: SSD
         highAvailability: true
