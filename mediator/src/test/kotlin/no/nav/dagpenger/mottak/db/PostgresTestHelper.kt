@@ -1,13 +1,13 @@
 package no.nav.dagpenger.mottak.db
 
 import org.flywaydb.core.internal.configuration.ConfigUtils
-import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.containers.PostgreSQLContainer.POSTGRESQL_PORT
 import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy
+import org.testcontainers.postgresql.PostgreSQLContainer
+import org.testcontainers.postgresql.PostgreSQLContainer.POSTGRESQL_PORT
 
 internal object PostgresTestHelper {
     val instance by lazy {
-        PostgreSQLContainer<Nothing>("postgres:16").apply {
+        PostgreSQLContainer("postgres:18.1").apply {
             this.waitingFor(HostPortWaitStrategy())
             start()
         }
