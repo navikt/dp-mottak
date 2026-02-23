@@ -18,7 +18,7 @@ dependencies {
     implementation(project(":modell"))
     implementation(project(":openapi"))
     implementation("no.nav.dagpenger:oauth2-klient:2025.12.19-08.15.2e150cd55270")
-    implementation("io.prometheus:prometheus-metrics-core:1.4.3")
+    implementation("io.prometheus:prometheus-metrics-core:1.5.0")
     implementation(libs.rapids.and.rivers)
     implementation("io.getunleash:unleash-client-java:12.1.1")
 
