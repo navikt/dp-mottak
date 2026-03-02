@@ -45,7 +45,7 @@ internal class VedtakFattetMottak(
         val behandlingId = packet["behandlingId"].asUUID()
         val ident = packet["ident"].asText()
         val dagpengerFagsakId = packet["sakId"].asUUID()
-        val behandlingIdSkipSet = setOf("019b3688-05c5-7979-83ca-f4e54d3a485e")
+        val behandlingIdSkipSet = setOf("019bda81-17b3-7134-9732-cd05ad9a43d2")
         withLoggingContext("søknadId" to "$søknadId", "behandlingId" to "$behandlingId") {
             logger.info { "Mottok vedtak_fattet_utenfor_arena" }
             if (behandlingId.toString() in behandlingIdSkipSet) {
