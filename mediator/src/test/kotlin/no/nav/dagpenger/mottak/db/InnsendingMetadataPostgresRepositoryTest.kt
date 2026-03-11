@@ -4,7 +4,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.shouldBe
 import kotliquery.queryOf
 import kotliquery.sessionOf
-import kotliquery.using
 import no.nav.dagpenger.fnr
 import no.nav.dagpenger.innsendingData
 import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
@@ -197,7 +196,7 @@ class InnsendingMetadataPostgresRepositoryTest {
         journalpostId: Int,
         fagsakId: UUID,
     ) {
-        using(sessionOf(this)) { session ->
+        sessionOf(this).use { session ->
             session.run(
                 queryOf(
                     //language=PostgreSQL

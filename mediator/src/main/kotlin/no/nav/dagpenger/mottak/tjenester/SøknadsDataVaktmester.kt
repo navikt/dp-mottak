@@ -5,7 +5,6 @@ import kotlinx.coroutines.runBlocking
 import kotliquery.Session
 import kotliquery.queryOf
 import kotliquery.sessionOf
-import kotliquery.using
 import no.nav.dagpenger.mottak.behov.journalpost.SafClient
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
 import org.postgresql.util.PGobject
@@ -19,7 +18,7 @@ internal class SøknadsDataVaktmester(
     private val ds: DataSource = PostgresDataSourceBuilder.dataSource,
 ) {
     fun fixSoknadsData(jp: Int) {
-        using(sessionOf(ds)) { session ->
+        sessionOf(ds).use { session ->
             try {
                 if (session.lås(jp)) {
                     val (innsendingId, dokumentinfoId) = session.innsendingIdOgDokumentinfoId(jp)

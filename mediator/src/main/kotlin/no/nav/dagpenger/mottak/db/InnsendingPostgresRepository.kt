@@ -5,7 +5,6 @@ import kotliquery.Row
 import kotliquery.TransactionalSession
 import kotliquery.queryOf
 import kotliquery.sessionOf
-import kotliquery.using
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingPeriode
@@ -68,7 +67,7 @@ internal class InnsendingPostgresRepository(
     fun Row.booleanOrNull(columnLabel: String) = this.stringOrNull(columnLabel)?.let { it == "t" }
 
     override fun hent(journalpostId: String): Innsending? =
-        using(sessionOf(datasource)) { session ->
+        sessionOf(datasource).use { session ->
             session
                 .run(
                     queryOf(
@@ -164,8 +163,8 @@ internal class InnsendingPostgresRepository(
         }
 
     override fun lagre(innsending: Innsending): Int {
-        return using(sessionOf(datasource)) { session ->
-            return@using session.transaction { transactionalSession ->
+        return sessionOf(datasource).use { session ->
+            return@use session.transaction { transactionalSession ->
                 val internId =
                     transactionalSession.run(
                         queryOf(
@@ -185,7 +184,7 @@ internal class InnsendingPostgresRepository(
     }
 
     override fun forPeriode(periode: Periode) =
-        using(sessionOf(datasource)) { session ->
+        sessionOf(datasource).use { session ->
             session.run(
                 queryOf(
                     //language=PostgreSQL

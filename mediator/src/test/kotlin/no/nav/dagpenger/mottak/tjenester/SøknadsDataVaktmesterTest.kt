@@ -4,7 +4,6 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import kotliquery.queryOf
 import kotliquery.sessionOf
-import kotliquery.using
 import no.nav.dagpenger.innsendingData
 import no.nav.dagpenger.mottak.behov.JsonMapper
 import no.nav.dagpenger.mottak.behov.journalpost.SafClient
@@ -32,7 +31,7 @@ class SøknadsDataVaktmesterTest {
                     },
             ).fixSoknadsData(jp)
 
-            using(sessionOf(PostgresDataSourceBuilder.dataSource)) { session ->
+            sessionOf(PostgresDataSourceBuilder.dataSource).use { session ->
                 session.run(
                     queryOf(
                         statement = """SELECT data FROM soknad_v1 where id = :id""",
