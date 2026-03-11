@@ -71,6 +71,13 @@ internal object Config {
 
     private fun String.addHttpsrotocoll(): String = "https://$this"
 
+    val isDev by lazy {
+        when (System.getenv().getOrDefault("NAIS_CLUSTER_NAME", "LOCAL")) {
+            "prod-gcp" -> false
+            else -> true
+        }
+    }
+
     val Configuration.dpProxyTokenProvider: () -> String by lazy {
         {
             cachedTokenProvider.clientCredentials(properties[Key("DP_PROXY_SCOPE", stringType)]).access_token ?: tokenfeil()
