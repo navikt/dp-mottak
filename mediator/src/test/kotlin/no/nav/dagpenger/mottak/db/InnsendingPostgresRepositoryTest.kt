@@ -3,7 +3,6 @@ package no.nav.dagpenger.mottak.db
 import io.kotest.matchers.shouldBe
 import kotliquery.queryOf
 import kotliquery.sessionOf
-import kotliquery.using
 import no.nav.dagpenger.dnr
 import no.nav.dagpenger.innsendingData
 import no.nav.dagpenger.journalpostId
@@ -293,7 +292,7 @@ internal class InnsendingPostgresRepositoryTest {
         antallRader: Int,
     ) {
         val faktiskeRader =
-            using(sessionOf(PostgresDataSourceBuilder.dataSource)) { session ->
+            sessionOf(PostgresDataSourceBuilder.dataSource).use { session ->
                 session.run(
                     queryOf("select count(1) from $tabell")
                         .map { row ->

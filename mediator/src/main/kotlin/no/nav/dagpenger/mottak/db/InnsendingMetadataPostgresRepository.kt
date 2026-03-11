@@ -2,7 +2,6 @@ package no.nav.dagpenger.mottak.db
 
 import kotliquery.queryOf
 import kotliquery.sessionOf
-import kotliquery.using
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -11,7 +10,7 @@ internal class InnsendingMetadataPostgresRepository(private val ds: DataSource =
         søknadId: UUID,
         ident: String,
     ): List<ArenaOppgave> {
-        return using(sessionOf(ds)) { session ->
+        return sessionOf(ds).use { session ->
             session.run(
                 queryOf(
                     //language=SQL
@@ -47,7 +46,7 @@ internal class InnsendingMetadataPostgresRepository(private val ds: DataSource =
         søknadId: UUID,
         ident: String,
     ): List<String> {
-        return using(sessionOf(ds)) { session ->
+        return sessionOf(ds).use { session ->
             session.run(
                 queryOf(
                     //language=SQL
@@ -99,7 +98,7 @@ internal class InnsendingMetadataPostgresRepository(private val ds: DataSource =
         innsendingId: Int,
         fagsakId: UUID,
     ) {
-        using(sessionOf(ds)) { session ->
+        sessionOf(ds).use { session ->
             session.run(
                 queryOf(
                     //language=PostgreSQL
