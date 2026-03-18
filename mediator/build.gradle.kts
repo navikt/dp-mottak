@@ -42,7 +42,7 @@ dependencies {
     testImplementation(libs.bundles.postgres.test)
     testImplementation(libs.rapids.and.rivers.test)
     testImplementation(libs.bundles.kotest.assertions)
-    testImplementation("no.bekk.bekkopen:nocommons:0.16.0")
+    testImplementation("no.bekk.bekkopen:nocommons:0.17.0")
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation("io.ktor:ktor-client-mock-jvm:${libs.versions.ktor.get()}")
     testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.11.04-10.54-c831038e")
