@@ -111,7 +111,7 @@ internal class InnsendingApiTest {
                 }.let { response ->
                     assertEquals(HttpStatusCode.OK, response.status)
                     verify(exactly = 1) { innsendingRepository.forPeriode(any()) }
-                    assertEquals("application/json; charset=UTF-8", response.headers[HttpHeaders.ContentType])
+                    assertEquals("application/json", response.headers[HttpHeaders.ContentType])
                     val bodyAsText = response.bodyAsText()
                     val innsendinger = objectMapper.readTree(bodyAsText)
                     assertEquals(1, innsendinger.size())
