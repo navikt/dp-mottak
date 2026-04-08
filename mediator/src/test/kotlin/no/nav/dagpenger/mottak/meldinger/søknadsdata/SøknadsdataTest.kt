@@ -19,11 +19,7 @@ internal class SøknadsdataTest {
             objektMapper.readTree(
                 """
                     {
-                      "@løsning": {
-                        "Søknadsdata": {
-                          "verdi": { "foo": "bar" }
-                        }
-                      }
+                      "verdi": { "foo": "bar" }
                     }
                 """,
             ),

@@ -175,16 +175,12 @@ class BrukerdialogSøknadFormatTest {
         //language=JSON
         return """
             {
-              "@løsning": {
-                "Søknadsdata": {
-                  "verdi": {
-                    "avsluttetArbeidsforhold": [
-                      $arbeidsforholdJson
-                    ]
-                  },
-                  "gjelderFra": "2026-01-20"
-                }
-              }
+              "verdi": {
+                "avsluttetArbeidsforhold": [
+                  $arbeidsforholdJson
+                ]
+              },
+              "gjelderFra": "2026-01-20"
             }
             """.trimIndent().let {
             jacksonObjectMapper().readTree(it)
@@ -200,56 +196,35 @@ class BrukerdialogSøknadFormatTest {
         //language=JSON
         return """
             {
-              "@event_name": "behov",
-              "ident": "12345678910",
-              "søknadId": "9fbfd212-4453-44e0-8b24-2a02ba9bd007",
-              "@behov": [
-                "Søknadsdata"
-              ],
-              "journalpostId": "12345679",
-              "@id": "68efcd4e-c0bc-4b94-8ad2-c3737e82ce52",
-              "@opprettet": "2026-01-20T22:41:23.554212",
-              "system_read_count": 0,
-              "system_participating_services": [
-                {
-                  "id": "68efcd4e-c0bc-4b94-8ad2-c3737e82ce52",
-                  "time": "2026-01-20T22:41:23.554212"
-                }
-              ],
-              "@løsning": {
-                "Søknadsdata": {
-                  "verdi": {
-                    "eøsBostedsland": $eøsBostedsland,
-                    "eøsArbeidsforhold": $eøsArbeidsforhold ,
-                    "avtjentVerneplikt": $avtjentVerneplikt,
-                    "avsluttetArbeidsforhold": [
-                      {
-                        "sluttårsak": "SAGT_OPP_AV_ARBEIDSGIVER",
-                        "fiskeforedling": false,
-                        "land": "NOR"
-                      },
-                      {
-                        "sluttårsak": "PERMITTERT",
-                        "fiskeforedling": true,
-                        "land": "SWE"
-                      }
-                    ],
-                    "harBarn": false,
-                    "harAndreYtelser": false,
-                    "ønskerDagpengerFraDato": "2026-01-20",
-                    "søknadId": "$søknadId",
-                    "reellArbeidssøker": {
-                      "helse": false,
-                      "geografi": false,
-                      "deltid": false,
-                      "yrke": false
-                    }
+              "verdi": {
+                "eøsBostedsland": $eøsBostedsland,
+                "eøsArbeidsforhold": $eøsArbeidsforhold ,
+                "avtjentVerneplikt": $avtjentVerneplikt,
+                "avsluttetArbeidsforhold": [
+                  {
+                    "sluttårsak": "SAGT_OPP_AV_ARBEIDSGIVER",
+                    "fiskeforedling": false,
+                    "land": "NOR"
                   },
-                  "gjelderFra": "2026-01-20"
+                  {
+                    "sluttårsak": "PERMITTERT",
+                    "fiskeforedling": true,
+                    "land": "SWE"
+                  }
+                ],
+                "harBarn": false,
+                "harAndreYtelser": false,
+                "ønskerDagpengerFraDato": "2026-01-20",
+                "søknadId": "$søknadId",
+                "reellArbeidssøker": {
+                  "helse": false,
+                  "geografi": false,
+                  "deltid": false,
+                  "yrke": false
                 }
-              }
+              },
+              "gjelderFra": "2026-01-20"
             }
-            
             """.trimIndent().let {
             jacksonObjectMapper().readTree(it)
         }
@@ -259,13 +234,8 @@ class BrukerdialogSøknadFormatTest {
         //language=JSON
         return """
             {
-              "@løsning": {
-                "Søknadsdata": {
-                  "verdi": {
-                  },
-                  "gjelderFra": "2026-01-20"
-                }
-              }
+              "verdi": {},
+              "gjelderFra": "2026-01-20"
             }
             """.trimIndent().let {
             jacksonObjectMapper().readTree(it)
