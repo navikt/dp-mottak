@@ -29,6 +29,10 @@ fun rutingOppslag(data: JsonNode): RutingOppslag {
             QuizSøknadFormat(data)
         }
 
+        OrkestratorSøknadFormat.erOrkestratorSøknad(data) -> {
+            OrkestratorSøknadFormat(data)
+        }
+
         else -> {
             NullSøknadData(data)
         }
@@ -39,6 +43,38 @@ private fun erQuizSøknad(data: JsonNode) =
     data["versjon_navn"]?.let {
         !it.isNull && it.asText() == "Dagpenger"
     } ?: false
+
+class OrkestratorSøknadFormat(private val data: JsonNode) : RutingOppslag {
+    companion object {
+        fun erOrkestratorSøknad(data: JsonNode): Boolean {
+            return data["versjon_navn"]?.let {
+                !it.isNull && it.asText() == "OrkestratorSoknad"
+            } ?: false
+        }
+    }
+
+    override fun data() = data
+
+    override fun accept(visitor: SøknadVisitor) {
+        visitor.visitSøknad(this)
+    }
+
+    override fun eøsBostedsland() = false
+
+    override fun eøsArbeidsforhold() = false
+
+    override fun avtjentVerneplikt() = false
+
+    override fun avsluttetArbeidsforhold() = emptyList<AvsluttetArbeidsforhold>()
+
+    override fun søknadId(): String? = data["søknad_uuid"]?.textValue()
+
+    override fun permittertFraFiskeForedling() = false
+
+    override fun avsluttetArbeidsforholdFraKonkurs() = false
+
+    override fun permittert() = false
+}
 
 class NullSøknadData(private val data: JsonNode) : RutingOppslag {
     override fun data() = data

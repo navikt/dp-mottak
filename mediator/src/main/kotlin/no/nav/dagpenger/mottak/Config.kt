@@ -32,14 +32,14 @@ internal object Config {
                 "KAFKA_EXTRA_TOPIC" to "teamdagpenger.mottak.v1,teamdagpenger.regel.v1",
                 "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
                 "KAFKA_RESET_POLICY" to "LATEST",
-                "PDL_API_SCOPE" to "api://dev-fss.pdl.pdl-api-q1/.default",
+                "PDL_API_SCOPE" to "api://dev-fss.pdl.pdl-api/.default",
                 "SKJERMING_API_SCOPE" to "api://dev-gcp.nom.skjermede-personer-pip/.default",
                 "SKJERMING_API_URL" to "http://skjermede-personer-pip.nom/skjermet",
                 "AZURE_OPENID_CONFIG_ISSUER" to "azureAd",
                 "AZURE_APP_CLIENT_ID" to "azureClientId",
                 "AZURE_OPENID_CONFIG_JWKS_URI" to "http://localhost:4443",
-                "DOKARKIV_SCOPE" to "api://dev-fss.teamdokumenthandtering.dokarkiv-q1/.default",
-                "DOKARKIV_INGRESS" to "dokarkiv.dev-fss-pub.nais.io",
+                "DOKARKIV_SCOPE" to "api://dev-fss.teamdokumenthandtering.dokarkiv/.default",
+                "DOKARKIV_INGRESS" to "dokarkiv-q2.dev-fss-pub.nais.io",
             ),
         )
     private val prodProperties =
@@ -70,6 +70,13 @@ internal object Config {
     }
 
     private fun String.addHttpsrotocoll(): String = "https://$this"
+
+    val isDev by lazy {
+        when (System.getenv().getOrDefault("NAIS_CLUSTER_NAME", "LOCAL")) {
+            "prod-gcp" -> false
+            else -> true
+        }
+    }
 
     val Configuration.dpProxyTokenProvider: () -> String by lazy {
         {

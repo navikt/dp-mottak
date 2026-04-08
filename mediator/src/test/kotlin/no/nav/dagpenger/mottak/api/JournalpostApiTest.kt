@@ -69,7 +69,7 @@ class JournalpostApiTest {
                 setBody("""{"soknadId": "$søknadId", "ident": "$testIdent"}""")
             }.let { response ->
                 response.status shouldBe HttpStatusCode.OK
-                response.headers["Content-Type"] shouldBe "application/json; charset=UTF-8"
+                response.headers["Content-Type"] shouldBe "application/json"
                 response.bodyAsText() shouldEqualJson
                     //language=json
                     """

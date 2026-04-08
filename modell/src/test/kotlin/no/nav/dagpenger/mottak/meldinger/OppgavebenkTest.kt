@@ -5,6 +5,7 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.RutingOppslag
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.Companion.tilSkjemaType
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -242,10 +243,11 @@ class OppgavebenkTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["NAV 04-02.01", "NAVe 04-02.01", "NAV 04-02.03", "NAV 04-02.05", "NAVe 04-02.05"])
+    @ValueSource(strings = ["NAV 04-02.01", "NAVe 04-02.01", "NAV 04-02.03", "NAV 04-02.05", "NAVe 04-02.05", "NAV 00-10.04"])
     fun `finner riktig benk for brevkoder som skal til utlandet`(brevkode: String) {
         val oppgavebenk = lagjournalpostData(brevkode).kategorisertJournalpost().oppgaveBenk(person = person)
         assertEquals("4470", oppgavebenk.id)
+        assertEquals("${brevkode.tilSkjemaType().tittel}\n", oppgavebenk.beskrivelse)
     }
 
     private fun withSøknad(

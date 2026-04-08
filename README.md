@@ -69,12 +69,5 @@ For å skalere opp igjen:
 kubectl scale deployment/dp-mottak --replicas=2
 ```
 
-# Henvendelser
-
-Spørsmål knyttet til koden eller prosjektet kan rettes mot:
-
-* André Roaldseth, andre.roaldseth@nav.no
-* Eller en annen måte for omverden å kontakte teamet på
-
 ## For NAV-ansatte
 Interne henvendelser kan sendes via Slack i kanalen #team-dagpenger-dev.

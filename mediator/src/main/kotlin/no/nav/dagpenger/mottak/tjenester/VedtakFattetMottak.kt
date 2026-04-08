@@ -7,8 +7,10 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
+import io.ktor.client.plugins.ClientRequestException
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
+import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostDokarkiv
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import no.nav.dagpenger.mottak.serder.asUUID
@@ -45,7 +47,7 @@ internal class VedtakFattetMottak(
         val behandlingId = packet["behandlingId"].asUUID()
         val ident = packet["ident"].asText()
         val dagpengerFagsakId = packet["sakId"].asUUID()
-        val behandlingIdSkipSet = setOf("019ba286-c32c-7173-89c7-a5e6463f7df5")
+        val behandlingIdSkipSet = setOf("019a71e3-7273-7a0f-99c4-dfc71b3b339b")
         withLoggingContext("søknadId" to "$søknadId", "behandlingId" to "$behandlingId") {
             logger.info { "Mottok vedtak_fattet_utenfor_arena" }
             if (behandlingId.toString() in behandlingIdSkipSet) {
@@ -62,18 +64,19 @@ internal class VedtakFattetMottak(
 
             runBlocking {
                 arenaOppgaver.forEach { oppgave ->
-                    val knyttJounalPostTilNySakResponse =
-                        journalpostDokarkiv.knyttJounalPostTilNySak(
-                            journalpostId = oppgave.journalpostId,
-                            dagpengerFagsakId = dagpengerFagsakId.toString(),
-                            ident = ident,
+                    runCatching {
+                        val knyttJounalPostTilNySakResponse =
+                            journalpostDokarkiv.knyttJounalPostTilNySak(
+                                journalpostId = oppgave.journalpostId,
+                                dagpengerFagsakId = dagpengerFagsakId.toString(),
+                                ident = ident,
+                            )
+                        innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(
+                            jounalpostId = knyttJounalPostTilNySakResponse.nyJournalpostId,
+                            innsendingId = oppgave.innsendingId,
+                            fagsakId = dagpengerFagsakId,
                         )
-
-                    innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(
-                        jounalpostId = knyttJounalPostTilNySakResponse.nyJournalpostId,
-                        innsendingId = oppgave.innsendingId,
-                        fagsakId = dagpengerFagsakId,
-                    )
+                    }.getOrElse(Throwable::ignorerManglendeJournalPostIDev)
                 }
             }
 
@@ -89,5 +92,17 @@ internal class VedtakFattetMottak(
                 ).toJson()
             context.publish(ident, message)
         }
+    }
+}
+
+private fun Throwable.ignorerManglendeJournalPostIDev() {
+    when {
+        Config.isDev &&
+            this is ClientRequestException &&
+            response.status.value == 404 -> {
+            logger.warn(this) { "Ignorerer 404 fra journalpostDokarkiv i dev" }
+        }
+
+        else -> throw this
     }
 }

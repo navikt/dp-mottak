@@ -56,6 +56,7 @@ enum class SkjemaType(val skjemakode: String, val tittel: String) {
     FØDSELATTEST_BOSTEDSBEVIS_FOR_BARN_UNDER_18_ÅR("X8", "Fødselsattest/bostedsbevis for barn under 18 år"),
     UTTALELSE_ELLER_VURDERING_FRA_KOMPETENT_FAGPERSONELL("XY", "Uttalelse eller vurdering fra kompetent fagpersonell"),
     MELDEKORT("NAV 00-10.02", "Meldekort"),
+    REGISTRERING_AV_AKTIVITET_VED_IMPORT_AV_DAGPENGER("NAV 00-10.04", "Registrering av aktivitet ved import av dagpenger"),
     ;
 
     companion object {

@@ -41,6 +41,10 @@ internal class SøknadsdataMottak(
         meterRegistry: MeterRegistry,
     ) {
         val journalpostId = packet["journalpostId"].asText()
+        if (journalpostId in setOf("717582885")) {
+            logg.warn { "Skipper journalpostId: $journalpostId" }
+            return
+        }
 
         withLoggingContext("journalpostId" to journalpostId) {
             logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
@@ -62,6 +66,7 @@ internal class SøknadsdataMottak(
                                 |  erPermittert=${permittert()}
                                 |  avsluttedeArbeidsforhold=${avsluttetArbeidsforhold().isEmpty()}
                                 |  rutingoppslag=${this.javaClass.simpleName}
+                                |  søknadsId=${søknadId()}
                                 """.trimMargin()
                             }
                         }

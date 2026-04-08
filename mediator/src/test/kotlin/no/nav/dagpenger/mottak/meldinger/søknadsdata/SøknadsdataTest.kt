@@ -31,6 +31,12 @@ internal class SøknadsdataTest {
     }
 
     @Test
+    fun `skal returnere OrkestratorSøknadFormat når versjon_navn er OrkestratorSoknad`() {
+        rutingOppslag(objektMapper.readTree("""{ "versjon_navn": "OrkestratorSoknad" }"""))
+            .shouldBeInstanceOf<OrkestratorSøknadFormat>()
+    }
+
+    @Test
     fun `skal returnere NullSøknadData når ingen format matcher`() {
         rutingOppslag(objektMapper.readTree("""{ "annen": "verdi" }""")).shouldBeInstanceOf<NullSøknadData>()
     }
