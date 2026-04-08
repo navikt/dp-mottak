@@ -10,7 +10,7 @@ class BrukerdialogSøknadFormat(private val data: JsonNode) : RutingOppslag {
     companion object {
         fun erBrukerdialogSøknadFormat(data: JsonNode): Boolean = data.verdi().isObject
 
-        private fun JsonNode.verdi(): JsonNode = this.path("@løsning").path("Søknadsdata").path("verdi")
+        private fun JsonNode.verdi(): JsonNode = this.path("verdi")
     }
 
     private val verdi: JsonNode = data.verdi()
