@@ -30,6 +30,13 @@ class BrukerdialogSøknadFormatTest {
     }
 
     @Test
+    fun data() {
+        val løsning = løsningJson(eøsBostedsland = true)
+        val brukerdialogSøknadFormat = BrukerdialogSøknadFormat(løsning)
+        brukerdialogSøknadFormat.data() shouldBe løsning.path("verdi")
+    }
+
+    @Test
     fun eøsBostedsland() {
         BrukerdialogSøknadFormat(løsningJson(eøsBostedsland = true)).eøsBostedsland() shouldBe true
         BrukerdialogSøknadFormat(løsningJson(eøsBostedsland = false)).eøsBostedsland() shouldBe false
@@ -156,7 +163,7 @@ class BrukerdialogSøknadFormatTest {
     fun søknadId() {
         val uuid = UUID.randomUUID()
         BrukerdialogSøknadFormat(
-            data = løsningJson(søknadId = uuid),
+            data = løsningJson(søknad_uuid = uuid),
         ).søknadId() shouldBe uuid.toString()
     }
 
@@ -191,7 +198,7 @@ class BrukerdialogSøknadFormatTest {
         eøsBostedsland: Boolean = false,
         eøsArbeidsforhold: Boolean = false,
         avtjentVerneplikt: Boolean = false,
-        søknadId: UUID = UUID.randomUUID(),
+        søknad_uuid: UUID = UUID.randomUUID(),
     ): JsonNode {
         //language=JSON
         return """
@@ -215,7 +222,7 @@ class BrukerdialogSøknadFormatTest {
                 "harBarn": false,
                 "harAndreYtelser": false,
                 "ønskerDagpengerFraDato": "2026-01-20",
-                "søknadId": "$søknadId",
+                "søknad_uuid": "$søknad_uuid",
                 "reellArbeidssøker": {
                   "helse": false,
                   "geografi": false,
