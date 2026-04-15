@@ -64,8 +64,6 @@ internal class SøknadsdataMottak(
                                 |  harAvtjentVerneplikt=${avtjentVerneplikt()}
                                 |  erPermittertFraFiskeforedling=${permittertFraFiskeForedling()}
                                 |  erPermittert=${permittert()}
-                                |  harBarn=${harBarn()}
-                                |  harAndreYtelser=${harAndreYtelser()}
                                 |  avsluttedeArbeidsforhold=${avsluttetArbeidsforhold().isEmpty()}
                                 |  rutingoppslag=${this.javaClass.simpleName}
                                 |  søknadsId=${søknadId()}
