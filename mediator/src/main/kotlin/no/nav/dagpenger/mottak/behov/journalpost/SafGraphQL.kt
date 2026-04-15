@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 
 internal class SafGraphQL {
     data class Bruker(
@@ -67,12 +66,6 @@ internal class SafGraphQL {
             }
 
             class Data(val journalpost: Journalpost)
-        }
-    }
-
-    internal data class SøknadsData(val data: JsonNode) {
-        companion object {
-            fun fromJson(json: String) = SøknadsData(jacksonJsonAdapter.readTree(json))
         }
     }
 
