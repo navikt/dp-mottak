@@ -43,5 +43,5 @@ class BrukerdialogSøknadFormat(data: JsonNode) : RutingOppslag {
         } ?: emptyList()
     }
 
-    override fun søknadId(): String? = verdi["søknad_uuid"]?.asText()
+    override fun søknadId(): String? = verdi["søknad_uuid"]?.textValue()
 }

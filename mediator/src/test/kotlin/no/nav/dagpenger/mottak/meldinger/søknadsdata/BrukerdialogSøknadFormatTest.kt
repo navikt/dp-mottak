@@ -167,6 +167,21 @@ class BrukerdialogSøknadFormatTest {
         ).søknadId() shouldBe uuid.toString()
     }
 
+    @Test
+    fun `søknadId returnerer null når søknad_uuid er null i JSON`() {
+        //language=JSON
+        val data =
+            """
+            {
+              "verdi": {
+                "søknad_uuid": null
+              },
+              "gjelderFra": "2026-01-20"
+            }
+            """.trimIndent().let { jacksonObjectMapper().readTree(it) }
+        BrukerdialogSøknadFormat(data = data).søknadId() shouldBe null
+    }
+
     private fun løsningJsonMedAvsluttetArbedsforhold(vararg arbeidsforhold: AvsluttetArbeidsforhold): JsonNode {
         val arbeidsforholdJson =
             arbeidsforhold.joinToString(",") {
