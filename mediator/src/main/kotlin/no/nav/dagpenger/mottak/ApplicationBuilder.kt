@@ -101,7 +101,6 @@ internal class ApplicationBuilder(
                     createPersonOppslag(PdlPersondataOppslag(Config.properties), SkjermingOppslag(Config.properties)),
                     this,
                 )
-                // SøknadsdataBehovLøser(safClient, this) -- deaktivert: søknadsdata løses nå av dp-soknad-orkestrator
                 ArenaBehovLøser(arenaApiClient, this)
                 OpprettGosysOppgaveLøser(gosysOppslag, this)
                 VedtakFattetMottak(
