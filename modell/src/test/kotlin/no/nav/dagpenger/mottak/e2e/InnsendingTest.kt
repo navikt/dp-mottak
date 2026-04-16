@@ -966,6 +966,27 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     }
 
     @Test
+    fun `HåndterInnsending skal ikke inneholde søknadId når søknad_uuid er null i JSON`() {
+        håndterJoarkHendelse()
+        håndterJournalpostData("NAV 04-01.03")
+        håndterPersonInformasjon()
+
+        håndterSøknadsdataBrukerdialogUtenSøknadId()
+
+        assertBehovDetaljer(
+            type = Behovtype.HåndterInnsending,
+            detaljer =
+                setOf(
+                    "kategori",
+                    "fødselsnummer",
+                    "journalpostId",
+                    "registrertDato",
+                    "skjemaKode",
+                ),
+        )
+    }
+
+    @Test
     fun `Skal ikke håndtere replay eventer for andre tilstander enn ferdigstilt`() {
         håndterJoarkHendelse()
         assertThrows<IllegalArgumentException> { hånderReplayFerdigstilt() }

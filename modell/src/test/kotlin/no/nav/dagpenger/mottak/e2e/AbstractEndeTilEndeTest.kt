@@ -22,6 +22,7 @@ import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
 import no.nav.dagpenger.mottak.meldinger.utenSeksjoner
+import no.nav.dagpenger.mottak.toJsonNode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -137,6 +138,10 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(søknadsdata())
     }
 
+    protected fun håndterSøknadsdataBrukerdialogUtenSøknadId() {
+        innsending.håndter(søknadsdataBrukerdialogUtenSøknadId())
+    }
+
     protected fun håndterInnsending(fagsystem: Fagsystem.FagsystemType) {
         innsending.håndter(innsendingHåndtert(fagsystem))
     }
@@ -227,6 +232,25 @@ abstract class AbstractEndeTilEndeTest {
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = JOURNALPOST_ID,
             data = utenSeksjoner(),
+        )
+
+    private fun søknadsdataBrukerdialogUtenSøknadId(): Søknadsdata =
+        Søknadsdata(
+            aktivitetslogg = Aktivitetslogg(),
+            journalpostId = JOURNALPOST_ID,
+            data =
+                """
+                {
+                  "verdi": {
+                    "søknad_uuid": null,
+                    "eøsBostedsland": false,
+                    "eøsArbeidsforhold": false,
+                    "avtjentVerneplikt": false,
+                    "avsluttetArbeidsforhold": []
+                  },
+                  "gjelderFra": "2026-01-20"
+                }
+                """.trimIndent().toJsonNode(),
         )
 
     private fun personInformasjon(): PersonInformasjon =
