@@ -6,7 +6,7 @@ import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.RutingOppslag
 import no.nav.dagpenger.mottak.SøknadVisitor
 
-class BrukerdialogSøknadFormat(data: JsonNode) : RutingOppslag {
+class BrukerdialogSøknadFormat(private val data: JsonNode) : RutingOppslag {
     companion object {
         fun erBrukerdialogSøknadFormat(data: JsonNode): Boolean = data.verdi().isObject
 
@@ -21,7 +21,7 @@ class BrukerdialogSøknadFormat(data: JsonNode) : RutingOppslag {
         }
     }
 
-    override fun data(): JsonNode = verdi
+    override fun data(): JsonNode = data
 
     override fun accept(visitor: SøknadVisitor) {
         visitor.visitSøknad(this)

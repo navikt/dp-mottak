@@ -33,7 +33,20 @@ class BrukerdialogSøknadFormatTest {
     fun data() {
         val løsning = løsningJson(eøsBostedsland = true)
         val brukerdialogSøknadFormat = BrukerdialogSøknadFormat(løsning)
-        brukerdialogSøknadFormat.data() shouldBe løsning.path("verdi")
+        brukerdialogSøknadFormat.data() shouldBe løsning
+    }
+
+    @Test
+    fun `data() returnerer fullt wrapped objekt slik at rehydrering fra DB fungerer korrekt`() {
+        val løsning = løsningJson(eøsArbeidsforhold = true)
+        val format = BrukerdialogSøknadFormat(løsning)
+
+        // Simuler lagring til DB og rehydrering (slik InnsendingData gjør det)
+        val lagretData = format.data()
+        val rehydrert = rutingOppslag(lagretData)
+
+        rehydrert::class shouldBe BrukerdialogSøknadFormat::class
+        rehydrert.eøsArbeidsforhold() shouldBe true
     }
 
     @Test
