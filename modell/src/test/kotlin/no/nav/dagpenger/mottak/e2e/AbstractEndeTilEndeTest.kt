@@ -142,8 +142,13 @@ abstract class AbstractEndeTilEndeTest {
         innsending.håndter(søknadsdataBrukerdialog(søknadUuid = null))
     }
 
-    protected fun håndterSøknadsdataBrukerdialog(søknadUuid: UUID? = UUID.randomUUID()) {
-        innsending.håndter(søknadsdataBrukerdialog(søknadUuid))
+    protected fun håndterSøknadsdataBrukerdialog(
+        søknadUuid: UUID? = UUID.randomUUID(),
+        eøsArbeidsforhold: Boolean = false,
+        eøsBostedsland: Boolean = false,
+        avtjentVerneplikt: Boolean = false,
+    ) {
+        innsending.håndter(søknadsdataBrukerdialog(søknadUuid, eøsArbeidsforhold, eøsBostedsland, avtjentVerneplikt))
     }
 
     protected fun håndterInnsending(fagsystem: Fagsystem.FagsystemType) {
@@ -238,7 +243,12 @@ abstract class AbstractEndeTilEndeTest {
             data = utenSeksjoner(),
         )
 
-    private fun søknadsdataBrukerdialog(søknadUuid: UUID?): Søknadsdata =
+    private fun søknadsdataBrukerdialog(
+        søknadUuid: UUID?,
+        eøsArbeidsforhold: Boolean = false,
+        eøsBostedsland: Boolean = false,
+        avtjentVerneplikt: Boolean = false,
+    ): Søknadsdata =
         Søknadsdata(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = JOURNALPOST_ID,
@@ -247,9 +257,9 @@ abstract class AbstractEndeTilEndeTest {
                 {
                   "verdi": {
                     "søknad_uuid": ${søknadUuid?.let { "\"$it\"" } ?: "null"},
-                    "eøsBostedsland": false,
-                    "eøsArbeidsforhold": false,
-                    "avtjentVerneplikt": false,
+                    "eøsBostedsland": $eøsBostedsland,
+                    "eøsArbeidsforhold": $eøsArbeidsforhold,
+                    "avtjentVerneplikt": $avtjentVerneplikt,
                     "avsluttetArbeidsforhold": []
                   },
                   "gjelderFra": "2026-01-20"

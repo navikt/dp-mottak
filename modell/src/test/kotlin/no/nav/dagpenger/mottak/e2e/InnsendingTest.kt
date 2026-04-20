@@ -1015,6 +1015,21 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     }
 
     @Test
+    fun `EØS-søknad med BrukerdialogSøknadFormat skal rutes til 4470`() {
+        håndterJoarkHendelse()
+        håndterJournalpostData("NAV 04-01.03")
+        håndterPersonInformasjon()
+        håndterSøknadsdataBrukerdialog(eøsArbeidsforhold = true)
+        håndterInnsending(Fagsystem.FagsystemType.DAGPENGER)
+        håndterJournalpostOppdatert()
+        håndterJournalpostFerdigstilt()
+
+        assertFerdigstilt {
+            it.behandlendeEnhet shouldBe "4470"
+        }
+    }
+
+    @Test
     fun `Skal ikke håndtere replay eventer for andre tilstander enn ferdigstilt`() {
         håndterJoarkHendelse()
         assertThrows<IllegalArgumentException> { hånderReplayFerdigstilt() }
