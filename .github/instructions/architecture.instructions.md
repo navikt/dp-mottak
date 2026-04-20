@@ -37,10 +37,71 @@ dp-mottak publiserer behovet med `ident` og `dokumentInfoId`, og orkestratoren s
 
 - **BrukerdialogSøknadFormat** — nytt format fra innbyggerflate, wrappet i `{ "verdi": {...}, "gjelderFra": "..." }`
 - **QuizSøknadFormat** — gammelt quiz-format med `versjon_navn: "Dagpenger"` og `seksjoner`
-- **OrkestratorSøknadFormat** — orkestrator-format med `versjon_navn: "OrkestratorSoknad"`
+- **OrkestratorSøknadFormat** — orkestrator-format med `versjon_namn: "OrkestratorSoknad"`
 - **NullSøknadData** — fallback når ingen format matcher
 
 Prioritet i `rutingOppslag()`: Brukerdialog → Quiz → Orkestrator → Null
+
+#### Formatdeteksjon
+
+```kotlin
+fun rutingOppslag(data: JsonNode): RutingOppslag = when {
+    data.path("verdi").isObject      -> BrukerdialogSøknadFormat(data)   // har verdi-wrapper
+    data["versjon_navn"] == "Dagpenger"       -> QuizSøknadFormat(data)
+    data["versjon_navn"] == "OrkestratorSoknad" -> OrkestratorSøknadFormat(data)
+    else                                        -> NullSøknadData(data)
+}
+```
+
+Denne logikken brukes **både** ved mottak fra Kafka og ved rehydrering fra DB.
+
+#### `verdi`-wrapper og `data()` vs `eventData()`
+
+BrukerdialogSøknadFormat wrapper all søknadsdata i et `verdi`-objekt:
+
+```json
+{
+  "verdi": { "søknad_uuid": "...", "eøsArbeidsforhold": true, ... },
+  "gjelderFra": "2026-04-17"
+}
+```
+
+De eldre formatene (Quiz, Orkestrator) har **flat** struktur uten wrapper.
+
+Denne forskjellen krever to ulike metoder på `SøknadOppslag`:
+
+| Metode | Hva den returnerer | Brukes til |
+|---|---|---|
+| `data()` | Fullt objekt inkl. wrapper | Lagring i `soknad_v1` og rehydrering |
+| `eventData()` | Indre objekt (uten wrapper) | Kafka-events (`innsending_ferdigstilt`, `innsending_mottatt`) |
+
+Default-implementasjonen er `eventData() = data()`, så kun `BrukerdialogSøknadFormat` overstyrer:
+
+```kotlin
+// BrukerdialogSøknadFormat
+override fun data(): JsonNode = data           // { "verdi": {...}, "gjelderFra": "..." }
+override fun eventData(): JsonNode = verdi     // { "søknad_uuid": "...", ... }
+
+// Quiz/Orkestrator/Null — bruker default
+// eventData() = data()  (flat struktur, ingen wrapper)
+```
+
+**Bakgrunn:** Skillet ble innført etter en produksjonsfeil (april 2026) der `data()` returnerte kun indre objekt → DB-lagring mistet wrapper → rehydrering feilet → `NullSøknadData` → all ruting falt tilbake til 4450. Se `docs/APPLIKASJONSDOKUMENTASJON.md` for detaljer.
+
+#### DB-oppslag med COALESCE
+
+Fordi `soknad_v1` inneholder **begge** formater (gammelt uten wrapper, nytt med wrapper), må SQL-oppslag bruke COALESCE:
+
+```sql
+COALESCE(
+    sokn.data -> 'verdi' ->> 'søknad_uuid',   -- nytt format (BrukerdialogSøknadFormat)
+    sokn.data ->> 'søknad_uuid'                -- gammelt format (Quiz/Orkestrator)
+) = :soknad_id
+```
+
+Nytt format sjekkes først. Hvis `verdi`-nøkkelen ikke finnes, returneres `null` og COALESCE faller til det flate oppslaget. Dette brukes i `InnsendingMetadataPostgresRepository` for `hentArenaOppgaver` og `hentDagpengerJournalpostIder`.
+
+**Viktig:** `soknad_v1` bruker `INSERT ... ON CONFLICT DO NOTHING` — data oppdateres aldri. Gamle rader forblir i gammelt format. COALESCE-mønsteret må opprettholdes så lenge det finnes data i begge formater.
 
 ### HåndterInnsending — løses eksternt
 

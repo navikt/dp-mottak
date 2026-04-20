@@ -44,7 +44,7 @@
 
 | Tjeneste | Formål |
 |----------|--------|
-| **SAF** (Sak og Arkiv Fasade) | Henter journalpostdata og søknadsdata |
+| **SAF** (Sak og Arkiv Fasade) | Henter journalpostdata (GraphQL) |
 | **PDL** (Persondataløsningen) | Henter personinformasjon |
 | **Dokarkiv** | Oppdaterer og ferdigstiller journalposter |
 | **Arena** | Oppretter saker og oppgaver i Arena (via dp-proxy) |
@@ -184,7 +184,7 @@ Applikasjonen bruker behovsmønsteret for asynkron kommunikasjon:
 |-----------|-------|--------|
 | `Journalpost` | JournalpostBehovLøser | Henter journalpostdata fra SAF |
 | `Persondata` | PersondataBehovLøser | Henter persondata fra PDL |
-| `Søknadsdata` | SøknadsdataBehovLøser | Henter søknadsdata fra SAF |
+| `Søknadsdata` | dp-soknad-orkestrator (ekstern) | Henter søknadsdata via Kafka |
 | `HåndterInnsending` | (ekstern) | Beslutter fagsystem (Arena/Dagpenger) |
 | `OpprettStartVedtakOppgave` | ArenaBehovLøser | Oppretter sak/oppgave i Arena |
 | `OpprettVurderhenvendelseOppgave` | ArenaBehovLøser | Oppretter vurder-henvendelse i Arena |
@@ -216,6 +216,74 @@ Publiseres når innsending når `InnsendingFerdigstiltType`. Inneholder:
 - datoRegistrert
 - fagsakId (hvis opprettet)
 - søknadsData (hvis tilgjengelig)
+
+## Søknadsdataformater
+
+### Oversikt
+
+dp-mottak støtter flere søknadsdataformater. Søknadsdata mottas fra `dp-soknad-orkestrator` over Kafka, og lagres i `soknad_v1`-tabellen. Formatet detekteres automatisk av `rutingOppslag()`:
+
+| Format | Deteksjon | Kilde | Status |
+|---|---|---|---|
+| **BrukerdialogSøknadFormat** | `data.path("verdi").isObject` | Ny innbyggerflate | ✅ Aktivt (fra april 2026) |
+| **QuizSøknadFormat** | `versjon_navn == "Dagpenger"` | Gammel quiz-flate | ⚠️ Legacy, fortsatt i prod-data |
+| **OrkestratorSøknadFormat** | `versjon_navn == "OrkestratorSoknad"` | Orkestrator | ⚠️ Legacy |
+| **NullSøknadData** | Fallback | Ukjent format | Ingen ruting-flagg |
+
+Prioritet: Brukerdialog → Quiz → Orkestrator → Null.
+
+### `verdi`-wrapper (BrukerdialogSøknadFormat)
+
+BrukerdialogSøknadFormat skiller seg fra eldre formater ved å wrappe søknadsdata i et `verdi`-objekt:
+
+```json
+{
+  "verdi": {
+    "søknad_uuid": "550e8400-e29b-41d4-a716-446655440000",
+    "eøsArbeidsforhold": true,
+    "eøsBostedsland": false,
+    "avtjentVerneplikt": false,
+    "avsluttetArbeidsforhold": [...]
+  },
+  "gjelderFra": "2026-04-17"
+}
+```
+
+Eldre formater har **flat** struktur med felter direkte på toppnivå.
+
+### `data()` vs `eventData()`
+
+Wrapperen krever at vi skiller mellom lagring og publisering:
+
+| Metode | Returnerer | Brukes av |
+|---|---|---|
+| `data()` | Fullt objekt med `verdi`-wrapper | DB-lagring (`soknad_v1`), rehydrering |
+| `eventData()` | Indre objekt uten wrapper | Kafka-events (`innsending_ferdigstilt`, `innsending_mottatt`) |
+
+Default: `eventData() = data()`. Kun `BrukerdialogSøknadFormat` overstyrer `eventData()` til å returnere kun `verdi`-innholdet. Dette sikrer at downstream-konsumenter (dp-brukerdialog, dp-saksbehandling) mottar data i forventet format.
+
+**Bakgrunn (hendelse april 2026):**
+
+1. **Feil 1:** `data()` returnerte opprinnelig kun indre objekt → wrapper gikk tapt ved DB-lagring → rehydrering via `rutingOppslag()` matchet ikke BrukerdialogSøknadFormat → falt til `NullSøknadData` → **all ruting** (ikke bare EØS) brukte default-enhet 4450.
+2. **Feil 2:** Etter fiks av feil 1 sendte `data()` (med wrapper) på Kafka-events → downstream-tjenester gjenkjente ikke formatet → alle søknader ble behandlet som papirsøknader.
+3. **Løsning:** `eventData()` ble innført for å separere DB-format (med wrapper) fra event-format (uten wrapper).
+
+### DB-oppslag med COALESCE
+
+`soknad_v1` inneholder data i **begge** formater (gammelt uten wrapper, nytt med wrapper). Tabellen bruker `INSERT ... ON CONFLICT DO NOTHING`, så gamle rader oppdateres aldri.
+
+SQL-oppslag på `søknad_uuid` må derfor bruke COALESCE:
+
+```sql
+COALESCE(
+    sokn.data -> 'verdi' ->> 'søknad_uuid',   -- nytt format (BrukerdialogSøknadFormat)
+    sokn.data ->> 'søknad_uuid'                -- gammelt format (Quiz/Orkestrator)
+) = :soknad_id
+```
+
+Nytt format sjekkes først. Hvis `verdi`-nøkkelen ikke finnes, returnerer `->` null og COALESCE faller til det flate oppslaget.
+
+**Viktig:** Dette COALESCE-mønsteret må opprettholdes i `InnsendingMetadataPostgresRepository` (og eventuelle nye queries mot `soknad_v1`) så lenge det finnes data i begge formater i databasen.
 
 ## Database
 
