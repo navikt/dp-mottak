@@ -222,4 +222,62 @@ class InnsendingMetadataPostgresRepositoryTest {
             }
             """.trimIndent(),
         )
+
+    @Test
+    fun `hent journalposter for BrukerdialogSøknadFormat (verdi-wrapper) på Arena sak`() {
+        val søknad =
+            innsendingData.copy(
+                id = 1,
+                søknadsData = søknadsDataBrukerdialogFormat,
+                arenaSakData =
+                    InnsendingData.ArenaSakData(
+                        oppgaveId = "søknad",
+                        fagsakId = "fagsakid",
+                    ),
+                journalpostId = "1",
+                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+            )
+        withMigratedDb {
+            InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource).lagre(søknad.createInnsending())
+            InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
+                hentJournalpostIder(søknadId, fnr) shouldBe listOf("1")
+            }
+        }
+    }
+
+    @Test
+    fun `hent journalposter for BrukerdialogSøknadFormat (verdi-wrapper) på Dagpenger sak`() {
+        val dpSakId = UUID.randomUUID()
+        val søknad =
+            innsendingData.copy(
+                id = 1,
+                søknadsData = søknadsDataBrukerdialogFormat,
+                arenaSakData = null,
+                oppgaveSakData =
+                    InnsendingData.OppgaveSakData(
+                        oppgaveId = null,
+                        fagsakId = dpSakId,
+                    ),
+                journalpostId = "1",
+                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+            )
+        withMigratedDb {
+            InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource).lagre(søknad.createInnsending())
+            InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
+                hentJournalpostIder(søknadId, fnr) shouldBe listOf("1")
+            }
+        }
+    }
+
+    private val søknadsDataBrukerdialogFormat =
+        jacksonObjectMapper().readTree(
+            """
+            {
+                "verdi": {
+                    "søknad_uuid": "$søknadId"
+                },
+                "gjelderFra": "2026-01-20"
+            }
+            """.trimIndent(),
+        )
 }
