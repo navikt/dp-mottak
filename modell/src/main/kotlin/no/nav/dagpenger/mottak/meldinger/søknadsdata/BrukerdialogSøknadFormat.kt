@@ -23,6 +23,8 @@ class BrukerdialogSøknadFormat(private val data: JsonNode) : RutingOppslag {
 
     override fun data(): JsonNode = data
 
+    override fun eventData(): JsonNode = verdi
+
     override fun accept(visitor: SøknadVisitor) {
         visitor.visitSøknad(this)
     }

@@ -852,7 +852,7 @@ class Innsending private constructor(
             fagsakId = fagsakId,
             oppgaveId = oppgaveId,
             datoRegistrert = jp.datoRegistrert(),
-            søknadsData = rutingOppslag?.data(),
+            søknadsData = rutingOppslag?.eventData(),
             behandlendeEnhet =
                 jp
                     .kategorisertJournalpost()
@@ -875,7 +875,7 @@ class Innsending private constructor(
             fagsakId = null,
             oppgaveId = null,
             datoRegistrert = jp.datoRegistrert(),
-            søknadsData = rutingOppslag?.data(),
+            søknadsData = rutingOppslag?.eventData(),
             behandlendeEnhet =
                 jp
                     .kategorisertJournalpost()

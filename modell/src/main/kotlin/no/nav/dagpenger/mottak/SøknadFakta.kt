@@ -6,6 +6,8 @@ import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak
 interface SøknadOppslag {
     fun data(): JsonNode
 
+    fun eventData(): JsonNode = data()
+
     fun accept(visitor: SøknadVisitor)
 
     fun eøsBostedsland(): Boolean
