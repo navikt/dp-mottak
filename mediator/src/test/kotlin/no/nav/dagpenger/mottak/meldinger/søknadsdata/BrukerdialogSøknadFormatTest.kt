@@ -37,6 +37,18 @@ class BrukerdialogSøknadFormatTest {
     }
 
     @Test
+    fun `eventData() returnerer inner object uten verdi-wrapper`() {
+        val løsning = løsningJson(eøsArbeidsforhold = true)
+        val format = BrukerdialogSøknadFormat(løsning)
+
+        val eventData = format.eventData()
+
+        eventData.has("verdi") shouldBe false
+        eventData.has("eøsArbeidsforhold") shouldBe true
+        eventData["eøsArbeidsforhold"].asBoolean() shouldBe true
+    }
+
+    @Test
     fun `data() returnerer fullt wrapped objekt slik at rehydrering fra DB fungerer korrekt`() {
         val løsning = løsningJson(eøsArbeidsforhold = true)
         val format = BrukerdialogSøknadFormat(løsning)

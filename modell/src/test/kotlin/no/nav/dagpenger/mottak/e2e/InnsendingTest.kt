@@ -25,6 +25,7 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType.InnsendingFerdigstiltType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.MottattType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.UkjentBrukerType
+import no.nav.dagpenger.mottak.toJsonNode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
+import java.util.UUID
 
 internal class InnsendingTest : AbstractEndeTilEndeTest() {
     @ParameterizedTest
@@ -984,6 +986,32 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                     "skjemaKode",
                 ),
         )
+    }
+
+    @Test
+    fun `søknadsData i innsending_ferdigstilt event skal ikke ha verdi-wrapper for BrukerdialogSøknadFormat`() {
+        val søknadUuid = UUID.randomUUID()
+        håndterJoarkHendelse()
+        håndterJournalpostData("NAV 04-01.03")
+        håndterPersonInformasjon()
+        håndterSøknadsdataBrukerdialog(søknadUuid)
+        håndterInnsending(Fagsystem.FagsystemType.DAGPENGER)
+        håndterJournalpostOppdatert()
+        håndterJournalpostFerdigstilt()
+
+        val forventet =
+            """
+            {
+              "søknad_uuid": "$søknadUuid",
+              "eøsBostedsland": false,
+              "eøsArbeidsforhold": false,
+              "avtjentVerneplikt": false,
+              "avsluttetArbeidsforhold": []
+            }
+            """.trimIndent().toJsonNode()
+
+        assertFerdigstilt { it.søknadsData shouldBe forventet }
+        assertMottatt { it.søknadsData shouldBe forventet }
     }
 
     @Test

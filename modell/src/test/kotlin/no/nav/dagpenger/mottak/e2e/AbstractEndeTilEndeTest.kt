@@ -139,7 +139,11 @@ abstract class AbstractEndeTilEndeTest {
     }
 
     protected fun håndterSøknadsdataBrukerdialogUtenSøknadId() {
-        innsending.håndter(søknadsdataBrukerdialogUtenSøknadId())
+        innsending.håndter(søknadsdataBrukerdialog(søknadUuid = null))
+    }
+
+    protected fun håndterSøknadsdataBrukerdialog(søknadUuid: UUID? = UUID.randomUUID()) {
+        innsending.håndter(søknadsdataBrukerdialog(søknadUuid))
     }
 
     protected fun håndterInnsending(fagsystem: Fagsystem.FagsystemType) {
@@ -234,7 +238,7 @@ abstract class AbstractEndeTilEndeTest {
             data = utenSeksjoner(),
         )
 
-    private fun søknadsdataBrukerdialogUtenSøknadId(): Søknadsdata =
+    private fun søknadsdataBrukerdialog(søknadUuid: UUID?): Søknadsdata =
         Søknadsdata(
             aktivitetslogg = Aktivitetslogg(),
             journalpostId = JOURNALPOST_ID,
@@ -242,7 +246,7 @@ abstract class AbstractEndeTilEndeTest {
                 """
                 {
                   "verdi": {
-                    "søknad_uuid": null,
+                    "søknad_uuid": ${søknadUuid?.let { "\"$it\"" } ?: "null"},
                     "eøsBostedsland": false,
                     "eøsArbeidsforhold": false,
                     "avtjentVerneplikt": false,
