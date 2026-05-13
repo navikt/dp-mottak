@@ -1,13 +1,13 @@
 package no.nav.dagpenger.mottak.meldinger.søknadsdata
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
+import no.nav.dagpenger.mottak.defaultObjectMapper
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 class BrukerdialogSøknadFormatTest {
@@ -19,7 +19,7 @@ class BrukerdialogSøknadFormatTest {
 
         shouldThrow<IllegalArgumentException> {
             BrukerdialogSøknadFormat(
-                jacksonObjectMapper().readTree(
+                defaultObjectMapper.readTree(
                     //language=JSON
                     """
                     {"hubba": "bubba"}
@@ -203,7 +203,7 @@ class BrukerdialogSøknadFormatTest {
               },
               "gjelderFra": "2026-01-20"
             }
-            """.trimIndent().let { jacksonObjectMapper().readTree(it) }
+            """.trimIndent().let { defaultObjectMapper.readTree(it) }
         BrukerdialogSøknadFormat(data = data).søknadId() shouldBe null
     }
 
@@ -230,7 +230,7 @@ class BrukerdialogSøknadFormatTest {
               "gjelderFra": "2026-01-20"
             }
             """.trimIndent().let {
-            jacksonObjectMapper().readTree(it)
+            defaultObjectMapper.readTree(it)
         }
     }
 
@@ -273,7 +273,7 @@ class BrukerdialogSøknadFormatTest {
               "gjelderFra": "2026-01-20"
             }
             """.trimIndent().let {
-            jacksonObjectMapper().readTree(it)
+            defaultObjectMapper.readTree(it)
         }
     }
 
@@ -285,7 +285,7 @@ class BrukerdialogSøknadFormatTest {
               "gjelderFra": "2026-01-20"
             }
             """.trimIndent().let {
-            jacksonObjectMapper().readTree(it)
+            defaultObjectMapper.readTree(it)
         }
     }
 }

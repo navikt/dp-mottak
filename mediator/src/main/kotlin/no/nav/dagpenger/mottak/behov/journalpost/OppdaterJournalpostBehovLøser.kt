@@ -101,7 +101,7 @@ private fun JsonMessage.tilJournalføringOppdaterRequest(): OppdaterJournalpostR
     )
 
 private fun JsonMessage.dokumenter(): List<JournalpostApi.Dokument> =
-    this["dokumenter"].map {
+    this["dokumenter"].values().map {
         JournalpostApi.Dokument(dokumentInfoId = it["dokumentInfoId"].asText(), tittel = it["tittel"].asText())
     }
 

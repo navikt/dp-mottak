@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.tjenester
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
@@ -14,6 +13,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.JsonMessageExtensions.getOrNull
 import no.nav.dagpenger.mottak.meldinger.Journalpost
+import tools.jackson.databind.JsonNode
 import java.time.LocalDateTime
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype as Behov
 
@@ -65,7 +65,7 @@ internal class JournalpostMottak(
                                     )
                                 },
                             dokumenter =
-                                it["dokumenter"].map { jsonDokument ->
+                                it["dokumenter"].values().map { jsonDokument ->
                                     Journalpost.DokumentInfo(
                                         tittelHvisTilgjengelig = jsonDokument["tittel"].textValue(),
                                         dokumentInfoId = jsonDokument["dokumentInfoId"].asText(),
@@ -75,7 +75,7 @@ internal class JournalpostMottak(
                                 },
                             registrertDato =
                                 it["relevanteDatoer"]
-                                    .firstOrNull { relevantDato ->
+                                    .values().firstOrNull { relevantDato ->
                                         relevantDato["datotype"].asText() == "DATO_REGISTRERT"
                                     }?.get("dato")
                                     ?.asText()

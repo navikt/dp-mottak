@@ -75,7 +75,7 @@ internal class ArenaBehovLøser(
             ) {
                 try {
                     runBlocking(MDCContext()) {
-                        val behovNavn = packet["@behov"].first().asText()
+                        val behovNavn = packet["@behov"].values().first().asText()
 
                         val oppgaveResponse =
                             when (behovNavn) {

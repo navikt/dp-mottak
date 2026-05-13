@@ -80,7 +80,7 @@ internal class OpprettGosysOppgaveLøser(
 private fun JsonMessage.gosysOppgave(): GosysOppgaveRequest =
     GosysOppgaveRequest(
         journalpostId = this["journalpostId"].asText(),
-        aktoerId = this["aktørId"].textValue(),
+        aktoerId = this["aktørId"].takeIf { !it.isMissingNode }?.textValue(),
         tildeltEnhetsnr = this["behandlendeEnhetId"].asText(),
         aktivDato = LocalDate.now(),
         beskrivelse = this["oppgavebeskrivelse"].asText(),

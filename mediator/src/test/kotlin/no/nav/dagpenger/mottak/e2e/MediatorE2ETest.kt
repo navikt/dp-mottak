@@ -15,10 +15,10 @@ import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import java.time.LocalDateTime.now
@@ -454,7 +454,7 @@ internal class MediatorE2ETest {
     ) {
         assertTrue(testRapid.inspektør.size == indexPåMelding + 1, "Ingen melding på index $indexPåMelding, forventet $expectedBehov")
         testRapid.inspektør.message(indexPåMelding).also { jsonNode ->
-            assertEquals(expectedBehov, jsonNode["@behov"].map { it.asText() }.first())
+            assertEquals(expectedBehov, jsonNode["@behov"].values().map { it.asText() }.first())
             assertEquals(journalpostId.toString(), jsonNode["journalpostId"].asText())
         }
     }
@@ -591,10 +591,9 @@ internal class MediatorE2ETest {
           "journalpostId": "$journalpostId",
           "@løsning": {
             "Søknadsdata": {
-        "søknad_uuid": "cfd84357-cdd9-4811-ada5-63d77625e91e",
-        "versjon_navn": "Dagpenger",
-        "seksjoner": [ ]
-              }
+              "søknad_uuid": "cfd84357-cdd9-4811-ada5-63d77625e91e",
+              "versjon_navn": "Dagpenger",
+              "seksjoner": [ ]
             }
           }
         }

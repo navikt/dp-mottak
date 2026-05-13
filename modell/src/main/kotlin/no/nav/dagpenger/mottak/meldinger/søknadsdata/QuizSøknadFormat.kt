@@ -1,12 +1,12 @@
 package no.nav.dagpenger.mottak.meldinger.søknadsdata
 
-import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.mottak.AvsluttedeArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak
 import no.nav.dagpenger.mottak.RutingOppslag
 import no.nav.dagpenger.mottak.SøknadVisitor
+import tools.jackson.databind.JsonNode
 
 private val logger = KotlinLogging.logger { }
 
@@ -27,9 +27,8 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
     override fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
         val faktaFraSeksjon = data.hentNullableFaktaFraSeksjon("din-situasjon")
         val arbeidsforhold =
-            faktaFraSeksjon?.singleOrNull { it["beskrivendeId"].asText() == "faktum.arbeidsforhold" }?.get("svar")
-                ?: emptyList()
-        return arbeidsforhold.filterNot { it.isEmpty }.mapNotNull {
+            faktaFraSeksjon?.values()?.singleOrNull { it["beskrivendeId"].asText() == "faktum.arbeidsforhold" }?.get("svar")
+        return (arbeidsforhold?.values() ?: emptyList()).filterNot { it.isEmpty }.mapNotNull {
             kotlin.runCatching {
                 AvsluttetArbeidsforhold(
                     sluttårsak = it.sluttårsak(),
@@ -52,7 +51,7 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
 }
 
 private fun JsonNode.fiskForedling(): Boolean =
-    this.find { it["beskrivendeId"].asText() == "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering" }
+    this.values().find { it["beskrivendeId"].asText() == "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering" }
         ?.get("svar")?.asBoolean() ?: false
 
 private fun JsonNode.sluttårsak(): Sluttårsak =
@@ -71,13 +70,13 @@ private fun JsonNode.sluttårsak(): Sluttårsak =
     }
 
 private fun JsonNode.hentNullableFaktaFraSeksjon(navn: String): JsonNode? =
-    this["seksjoner"].singleOrNull { it["beskrivendeId"].asText() == navn }?.get("fakta")
+    this["seksjoner"].values().singleOrNull { it["beskrivendeId"].asText() == navn }?.get("fakta")
 
 private fun JsonNode.faktaSvar(navn: String) =
     try {
-        this.single { it["beskrivendeId"].asText() == navn }["svar"]
+        this.values().single { it["beskrivendeId"].asText() == navn }["svar"]
     } catch (e: NoSuchElementException) {
-        val fakta = this.map { it["beskrivendeId"].asText() }
+        val fakta = this.values().map { it["beskrivendeId"].asText() }
         throw NoSuchElementException("Fant ikke fakta med navn=$navn, fakta=$fakta", e)
     }
 

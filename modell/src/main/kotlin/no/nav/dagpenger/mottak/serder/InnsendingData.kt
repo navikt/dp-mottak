@@ -1,12 +1,12 @@
 package no.nav.dagpenger.mottak.serder
 
-import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.rutingOppslag
+import tools.jackson.databind.JsonNode
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.reflect.full.primaryConstructor
@@ -113,12 +113,12 @@ data class InnsendingData(
     ) {
         data class AktivitetData(
             val alvorlighetsgrad: Alvorlighetsgrad,
-            val label: Char,
-            val behovtype: String?,
+            val label: Char = ' ',
+            val behovtype: String? = null,
             val melding: String,
             val tidsstempel: String,
             val kontekster: List<SpesifikkKontekstData>,
-            val detaljer: Map<String, Any>,
+            val detaljer: Map<String, Any> = emptyMap(),
         )
 
         data class SpesifikkKontekstData(

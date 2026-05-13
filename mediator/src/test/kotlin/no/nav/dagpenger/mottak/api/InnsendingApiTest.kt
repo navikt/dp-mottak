@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.api
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
 import io.ktor.client.request.get
 import io.ktor.client.request.put
@@ -15,6 +14,7 @@ import no.nav.dagpenger.mottak.InnsendingPeriode
 import no.nav.dagpenger.mottak.api.TestApplication.autentisert
 import no.nav.dagpenger.mottak.api.TestApplication.withMockAuthServerAndTestApplication
 import no.nav.dagpenger.mottak.db.InnsendingRepository
+import no.nav.dagpenger.mottak.defaultObjectMapper
 import no.nav.dagpenger.mottak.observers.FerdigstiltInnsendingObserver
 import no.nav.dagpenger.mottak.serder.InnsendingData
 import no.nav.dagpenger.mottak.serder.InnsendingData.TilstandData.InnsendingTilstandTypeData.InnsendingFerdigstiltType
@@ -27,7 +27,7 @@ import java.time.LocalDateTime
 
 internal class InnsendingApiTest {
     companion object {
-        val objectMapper = jacksonObjectMapper()
+        val objectMapper = defaultObjectMapper
     }
 
     @Test

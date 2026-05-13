@@ -11,7 +11,7 @@ import no.nav.dagpenger.mottak.InnsendingPeriode
 import no.nav.dagpenger.mottak.InnsendingVisitor
 import no.nav.dagpenger.mottak.SøknadOppslag
 import no.nav.dagpenger.mottak.api.Periode
-import no.nav.dagpenger.mottak.behov.JsonMapper
+import no.nav.dagpenger.mottak.defaultObjectMapper
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.serder.InnsendingData
 import no.nav.dagpenger.mottak.serder.InnsendingData.JournalpostData.BrukerData
@@ -120,12 +120,12 @@ internal class InnsendingPostgresRepository(
                                 },
                             søknadsData =
                                 row.binaryStreamOrNull("søknadsData")?.use {
-                                    JsonMapper.jacksonJsonAdapter.readTree(it)
+                                    defaultObjectMapper.readTree(it)
                                 },
                             mottakskanal = row.stringOrNull("mottakskanal"),
                             aktivitetslogg =
                                 row.binaryStream("aktivitetslogg").use {
-                                    JsonMapper.jacksonJsonAdapter.readValue(
+                                    defaultObjectMapper.readValue(
                                         it,
                                         InnsendingData.AktivitetsloggData::class.java,
                                     )
@@ -436,7 +436,7 @@ internal class InnsendingPostgresRepository(
                         "data" to
                             PGobject().apply {
                                 type = "jsonb"
-                                value = JsonMapper.jacksonJsonAdapter.writeValueAsString(aktivitetslogg.toMap())
+                                value = defaultObjectMapper.writeValueAsString(aktivitetslogg.toMap())
                             },
                     ),
                 ),

@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.tjenester
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
@@ -15,6 +14,7 @@ import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.JsonMessageExtensions.getOrNull
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
+import tools.jackson.databind.JsonNode
 
 private val logg = KotlinLogging.logger {}
 
@@ -45,9 +45,9 @@ internal class OpprettArenaOppgaveMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val arenaLøsning = packet["@løsning"].first()
+        val arenaLøsning = packet["@løsning"].values().first()
         val journalpostId = packet["journalpostId"].asText()
-        logg.info { "Fått løsning for ${packet["@behov"].map { it.asText() }}, journalpostId: $journalpostId" }
+        logg.info { "Fått løsning for ${packet["@behov"].values().map { it.asText() }}, journalpostId: $journalpostId" }
         if (arenaLøsning.has("@feil")) {
             innsendingMediator.håndter(
                 ArenaOppgaveFeilet(

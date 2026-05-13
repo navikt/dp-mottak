@@ -13,10 +13,10 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import io.ktor.serialization.jackson.JacksonConverter
+import io.ktor.serialization.jackson3.JacksonConverter
 import no.nav.dagpenger.mottak.Config.dpGosysTokenProvider
 import no.nav.dagpenger.mottak.Config.gosysUrl
-import no.nav.dagpenger.mottak.behov.JsonMapper
+import no.nav.dagpenger.mottak.defaultObjectMapper
 import java.time.LocalDate
 import kotlin.time.Duration.Companion.minutes
 
@@ -54,7 +54,7 @@ internal class GosysClient(config: Configuration) : GosysOppslag {
                 this.url("${config.gosysUrl()}/api/v1/oppgaver")
             }
             install(ContentNegotiation) {
-                register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
+                register(ContentType.Application.Json, JacksonConverter(defaultObjectMapper))
             }
             install(HttpTimeout) {
                 requestTimeoutMillis = 2.minutes.inWholeMilliseconds

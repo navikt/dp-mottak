@@ -1,8 +1,8 @@
 package no.nav.dagpenger
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_DNUMMER
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
+import no.nav.dagpenger.mottak.defaultObjectMapper
 import no.nav.dagpenger.mottak.serder.InnsendingData
 import java.time.LocalDateTime
 
@@ -65,7 +65,7 @@ private val aktivitetsloggData =
 
 //language=JSON
 private val søknadsjson =
-    jacksonObjectMapper().readTree(
+    defaultObjectMapper.readTree(
         """
         {
         "versjon_navn": "Dagpenger",

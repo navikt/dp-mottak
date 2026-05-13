@@ -1,12 +1,12 @@
 package no.nav.dagpenger.mottak.db
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.shouldBe
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import no.nav.dagpenger.fnr
 import no.nav.dagpenger.innsendingData
 import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
+import no.nav.dagpenger.mottak.defaultObjectMapper
 import no.nav.dagpenger.mottak.serder.InnsendingData
 import org.junit.jupiter.api.Test
 import java.util.UUID
@@ -215,7 +215,7 @@ class InnsendingMetadataPostgresRepositoryTest {
     }
 
     private val søknadsData =
-        jacksonObjectMapper().readTree(
+        defaultObjectMapper.readTree(
             """
             {
                 "søknad_uuid": "$søknadId"
@@ -270,7 +270,7 @@ class InnsendingMetadataPostgresRepositoryTest {
     }
 
     private val søknadsDataBrukerdialogFormat =
-        jacksonObjectMapper().readTree(
+        defaultObjectMapper.readTree(
             """
             {
                 "verdi": {

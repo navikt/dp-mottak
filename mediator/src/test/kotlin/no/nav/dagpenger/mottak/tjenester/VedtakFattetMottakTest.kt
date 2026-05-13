@@ -89,9 +89,9 @@ VedtakFattetMottakTest {
             inspektør.key(0) shouldBe testPersonIdent
             inspektør.message(0).let { message ->
                 message["@event_name"].asText() shouldBe "behov"
-                message["@behov"].map { it.asText() }.single() shouldBe "slett_arena_oppgaver"
+                message["@behov"].values().map { it.asText() }.single() shouldBe "slett_arena_oppgaver"
                 message["behandlingId"].asUUID() shouldBe behandlingId
-                message["oppgaveIder"].map { it.asText() } shouldBe listOf("søknad1", "ettersending1", "ettersending2")
+                message["oppgaveIder"].values().map { it.asText() } shouldBe listOf("søknad1", "ettersending1", "ettersending2")
                 message["ident"].asText() shouldBe testPersonIdent
             }
         }

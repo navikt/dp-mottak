@@ -1,11 +1,5 @@
 package no.nav.dagpenger.mottak.behov.person
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonDeserializer
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.natpryce.konfig.Configuration
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
@@ -21,7 +15,12 @@ import io.ktor.http.HttpMethod
 import no.nav.dagpenger.mottak.Config.pdlApiTokenProvider
 import no.nav.dagpenger.mottak.Config.pdlApiUrl
 import no.nav.dagpenger.mottak.behov.GraphqlQuery
-import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
+import no.nav.dagpenger.mottak.defaultObjectMapper
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ValueDeserializer
+import tools.jackson.databind.annotation.JsonDeserialize
 
 private val logg = KotlinLogging.logger {}
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.Pdl")
@@ -69,20 +68,20 @@ internal class PdlPersondataOppslagException(
 ) : RuntimeException(s)
 
 internal fun hasError(json: String): Boolean {
-    val j = jacksonObjectMapper().readTree(json)
+    val j = defaultObjectMapper.readTree(json)
     return (harGraphqlErrors(j) && !ukjentPersonIdent(j))
 }
 
 internal fun getWarnings(json: String): List<QueryWarning> {
-    val node = jacksonObjectMapper().readTree(json)
-    return node["extensions"]?.get("warnings")?.map {
+    val node = defaultObjectMapper.readTree(json)
+    return node["extensions"]?.get("warnings")?.values()?.map {
         QueryWarning(
             id = it["id"].asText(),
             code = it["code"].asText(),
             message = it["message"].asText(),
             details =
                 WarningDetails(
-                    missing = it["details"]["missing"].map { missing -> missing.asText() },
+                    missing = it["details"]["missing"].values().map { missing -> missing.asText() },
                 ),
         )
     } ?: emptyList()
@@ -101,7 +100,7 @@ data class WarningDetails(
 
 private fun harGraphqlErrors(json: JsonNode) = json["errors"] != null && !json["errors"].isEmpty
 
-private fun ukjentPersonIdent(node: JsonNode) = node["errors"]?.any { it["message"].asText() == "Fant ikke person" } ?: false
+private fun ukjentPersonIdent(node: JsonNode) = node["errors"]?.values()?.any { it["message"].asText() == "Fant ikke person" } ?: false
 
 internal data class PersonQuery(
     val id: String,
@@ -144,21 +143,21 @@ internal class Pdl {
         val diskresjonskode: String?,
     ) {
         internal companion object {
-            fun fromGraphQlJson(json: String): Person? = jacksonJsonAdapter.readValue(json, Person::class.java)
+            fun fromGraphQlJson(json: String): Person? = defaultObjectMapper.readValue(json, Person::class.java)
         }
     }
 
-    object PersonDeserializer : JsonDeserializer<Person>() {
+    object PersonDeserializer : ValueDeserializer<Person>() {
         internal fun JsonNode.aktørId() = this.ident("AKTORID")
 
         internal fun JsonNode.fødselsnummer() = this.ident("FOLKEREGISTERIDENT")
 
         internal fun JsonNode.norskTilknyting(): Boolean = findValue("gtLand")?.isNull ?: false
 
-        internal fun JsonNode.diskresjonsKode(): String? = findValue("adressebeskyttelse").firstOrNull()?.path("gradering")?.asText(null)
+        internal fun JsonNode.diskresjonsKode(): String? = findValue("adressebeskyttelse").values().firstOrNull()?.path("gradering")?.asText(null)
 
         internal fun JsonNode.personNavn(): String =
-            findValue("navn").first().let { node ->
+            findValue("navn").values().first().let { node ->
                 val fornavn = node.path("fornavn").asText()
                 val mellomnavn = node.path("mellomnavn").asText("")
                 val etternavn = node.path("etternavn").asText()
@@ -169,9 +168,9 @@ internal class Pdl {
                 }
             }
 
-        private fun JsonNode.ident(type: String): String = findValue("identer").first { it.path("gruppe").asText() == type }.get("ident").asText()
+        private fun JsonNode.ident(type: String): String = findValue("identer").values().first { it.path("gruppe").asText() == type }.get("ident").asText()
 
-        private fun JsonNode.harIdent(type: String): Boolean = findValue("identer").map { it["gruppe"].asText() }.contains(type)
+        private fun JsonNode.harIdent(type: String): Boolean = findValue("identer").values().map { it["gruppe"].asText() }.contains(type)
 
         override fun deserialize(
             p: JsonParser,

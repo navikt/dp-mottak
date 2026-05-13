@@ -22,12 +22,12 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.URLProtocol
 import io.ktor.http.encodedPath
-import io.ktor.serialization.jackson.JacksonConverter
+import io.ktor.serialization.jackson3.JacksonConverter
 import no.nav.dagpenger.mottak.Config
-import no.nav.dagpenger.mottak.behov.JsonMapper
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApi.Bruker
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApi.SaksType
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApi.SaksType.FAGSAK
+import no.nav.dagpenger.mottak.defaultObjectMapper
 import kotlin.time.Duration.Companion.minutes
 
 internal class JournalpostApiClient(
@@ -56,7 +56,7 @@ internal class JournalpostApiClient(
                 }
             }
             install(ContentNegotiation) {
-                register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
+                register(ContentType.Application.Json, JacksonConverter(defaultObjectMapper))
             }
         }
 

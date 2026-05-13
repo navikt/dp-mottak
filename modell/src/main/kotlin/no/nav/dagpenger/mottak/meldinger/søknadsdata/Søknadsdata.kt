@@ -1,11 +1,11 @@
 package no.nav.dagpenger.mottak.meldinger.søknadsdata
 
-import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.Hendelse
 import no.nav.dagpenger.mottak.RutingOppslag
 import no.nav.dagpenger.mottak.SøknadVisitor
+import tools.jackson.databind.JsonNode
 
 class Søknadsdata(
     aktivitetslogg: Aktivitetslogg,

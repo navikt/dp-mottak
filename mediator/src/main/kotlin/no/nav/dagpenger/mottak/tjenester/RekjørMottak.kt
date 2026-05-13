@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.tjenester
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
@@ -12,6 +11,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.RekjørHendelse
+import tools.jackson.databind.JsonNode
 
 internal class RekjørMottak(
     private val innsendingMediator: InnsendingMediator,

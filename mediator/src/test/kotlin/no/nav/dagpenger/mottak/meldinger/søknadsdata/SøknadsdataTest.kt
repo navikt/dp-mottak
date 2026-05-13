@@ -1,11 +1,11 @@
 package no.nav.dagpenger.mottak.meldinger.søknadsdata
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.types.shouldBeInstanceOf
+import no.nav.dagpenger.mottak.defaultObjectMapper
 import org.junit.jupiter.api.Test
 
 internal class SøknadsdataTest {
-    private val objektMapper = jacksonObjectMapper()
+    private val objektMapper = defaultObjectMapper
 
     @Test
     fun `skal returnere QuizSøknadFormat når versjon_navn er Dagpenger`() {

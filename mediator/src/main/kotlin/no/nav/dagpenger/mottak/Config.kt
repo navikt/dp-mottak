@@ -1,8 +1,5 @@
 package no.nav.dagpenger.mottak
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.natpryce.konfig.Configuration
 import com.natpryce.konfig.ConfigurationMap
 import com.natpryce.konfig.ConfigurationProperties
@@ -113,10 +110,7 @@ internal object Config {
         }
     }
 
-    internal val objectMapper =
-        jacksonObjectMapper()
-            .registerModule(JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+    internal val objectMapper = defaultObjectMapper
 
     private fun tokenfeil(): Nothing = throw RuntimeException("Kunne ikke opprette token")
 

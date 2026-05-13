@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
@@ -9,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import tools.jackson.databind.JsonNode
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -62,7 +62,7 @@ internal class BehovMediatorTest {
             assertDoesNotThrow { UUID.fromString(it["@id"].asText()) }
             assertTrue(it.hasNonNull("@opprettet"))
             assertDoesNotThrow { LocalDateTime.parse(it["@opprettet"].asText()) }
-            assertEquals(listOf("Persondata", "Søknadsdata", "OpprettStartVedtakOppgave"), it["@behov"].map(JsonNode::asText))
+            assertEquals(listOf("Persondata", "Søknadsdata", "OpprettStartVedtakOppgave"), it["@behov"].values().map(JsonNode::asText))
             assertEquals("behov", it["@event_name"].asText())
             assertEquals("12344", it["aktørId"].asText())
             assertEquals(JOURNALPOST_ID, it["journalpostId"].asText())

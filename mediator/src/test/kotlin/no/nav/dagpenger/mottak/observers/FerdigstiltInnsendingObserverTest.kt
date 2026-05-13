@@ -2,7 +2,7 @@ package no.nav.dagpenger.mottak.observers
 
 import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingObserver.Type.NySøknad
-import no.nav.dagpenger.mottak.behov.JsonMapper
+import no.nav.dagpenger.mottak.defaultObjectMapper
 import org.apache.kafka.clients.producer.MockProducer
 import org.apache.kafka.clients.producer.RoundRobinPartitioner
 import org.apache.kafka.common.serialization.StringSerializer
@@ -25,7 +25,7 @@ internal class FerdigstiltInnsendingObserverTest {
         assertEquals(1, mockProducer.history().size)
         val record = mockProducer.history().first()
         assertEquals(journalpostId, record.key())
-        val message = JsonMapper.jacksonJsonAdapter.readTree(record.value())
+        val message = defaultObjectMapper.readTree(record.value())
         assertEquals("innsending_ferdigstilt", message["@event_name"].asText())
         assertNotNull(message["@id"].asText())
         assertNotNull(message["@opprettet"].asText())
@@ -33,10 +33,10 @@ internal class FerdigstiltInnsendingObserverTest {
         assertNotNull(message["aktørId"].asText())
         assertNotNull(message["fødselsnummer"].asText())
         assertNotNull(message["datoRegistrert"].asText())
-        assertNotNull(message["søknadsData"].asText())
-        assertNotNull(message["fagsakId"].asText())
-        assertNotNull(message["skjemaKode"].asText())
-        assertNotNull(message["tittel"].asText())
+        assertNotNull(message["søknadsData"])
+        assertNotNull(message["fagsakId"])
+        assertNotNull(message["skjemaKode"])
+        assertNotNull(message["tittel"])
     }
 
     @Test
@@ -49,18 +49,18 @@ internal class FerdigstiltInnsendingObserverTest {
         assertEquals(1, mockProducer.history().size)
         val record = mockProducer.history().first()
         assertEquals(journalpostId, record.key())
-        val message = JsonMapper.jacksonJsonAdapter.readTree(record.value())
+        val message = defaultObjectMapper.readTree(record.value())
         assertEquals("innsending_mottatt", message["@event_name"].asText())
-        assertNotNull(message["@id"].asText())
-        assertNotNull(message["@opprettet"].asText())
+        assertNotNull(message["@id"])
+        assertNotNull(message["@opprettet"])
         assertEquals(journalpostId, message["journalpostId"].asText())
-        assertNotNull(message["aktørId"].asText())
-        assertNotNull(message["fødselsnummer"].asText())
-        assertNotNull(message["datoRegistrert"].asText())
-        assertNotNull(message["søknadsData"].asText())
-        assertNotNull(message["fagsakId"].asText())
-        assertNotNull(message["skjemaKode"].asText())
-        assertNotNull(message["tittel"].asText())
+        assertNotNull(message["aktørId"])
+        assertNotNull(message["fødselsnummer"])
+        assertNotNull(message["datoRegistrert"])
+        assertNotNull(message["søknadsData"])
+        assertNotNull(message["fagsakId"])
+        assertNotNull(message["skjemaKode"])
+        assertNotNull(message["tittel"])
     }
 
     @Test
@@ -73,7 +73,7 @@ internal class FerdigstiltInnsendingObserverTest {
         val record = mockProducer.history().first()
 
         assertEquals(journalpostId, record.key())
-        val message = JsonMapper.jacksonJsonAdapter.readTree(record.value())
+        val message = defaultObjectMapper.readTree(record.value())
         assertEquals("innsending_ferdigstilt", message["@event_name"].asText())
         assertNotNull(message["@id"].asText())
         assertNotNull(message["@opprettet"].asText())
@@ -105,7 +105,7 @@ internal class FerdigstiltInnsendingObserverTest {
             oppgaveId = "oppgaveId",
             datoRegistrert = LocalDateTime.now(),
             søknadsData =
-                JsonMapper.jacksonJsonAdapter.createObjectNode().also {
+                defaultObjectMapper.createObjectNode().also {
                     it.put("test", "test")
                 },
             behandlendeEnhet = "Tadda",
