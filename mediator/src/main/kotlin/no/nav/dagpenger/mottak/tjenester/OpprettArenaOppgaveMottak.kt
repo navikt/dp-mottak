@@ -46,13 +46,13 @@ internal class OpprettArenaOppgaveMottak(
         meterRegistry: MeterRegistry,
     ) {
         val arenaLøsning = packet["@løsning"].values().first()
-        val journalpostId = packet["journalpostId"].asText()
-        logg.info { "Fått løsning for ${packet["@behov"].values().map { it.asText() }}, journalpostId: $journalpostId" }
+        val journalpostId = packet["journalpostId"].asString()
+        logg.info { "Fått løsning for ${packet["@behov"].values().map { it.asString() }}, journalpostId: $journalpostId" }
         if (arenaLøsning.has("@feil")) {
             innsendingMediator.håndter(
                 ArenaOppgaveFeilet(
                     aktivitetslogg = Aktivitetslogg(),
-                    journalpostId = packet["journalpostId"].asText(),
+                    journalpostId = packet["journalpostId"].asString(),
                 ),
             )
         } else {
@@ -60,8 +60,8 @@ internal class OpprettArenaOppgaveMottak(
                 ArenaOppgaveOpprettet(
                     aktivitetslogg = Aktivitetslogg(),
                     journalpostId = journalpostId,
-                    oppgaveId = arenaLøsning["oppgaveId"].asText(),
-                    fagsakId = arenaLøsning.getOrNull("fagsakId")?.asText(),
+                    oppgaveId = arenaLøsning["oppgaveId"].asString(),
+                    fagsakId = arenaLøsning.getOrNull("fagsakId")?.asString(),
                 ),
             )
         }

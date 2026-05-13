@@ -99,9 +99,9 @@ internal class DokumentInfoDeserializer : ValueDeserializer<List<SafGraphQL.Doku
         val node: JsonNode = p.readValueAsTree()
         return node.values().mapIndexed { index, dokument ->
             SafGraphQL.DokumentInfo(
-                tittel = dokument["tittel"].textValue(),
-                brevkode = dokument["brevkode"].textValue(),
-                dokumentInfoId = dokument["dokumentInfoId"].asText(),
+                tittel = dokument["tittel"].stringValue(),
+                brevkode = dokument["brevkode"].stringValue(),
+                dokumentInfoId = dokument["dokumentInfoId"].asString(),
                 hovedDokument = index == 0,
             )
         }

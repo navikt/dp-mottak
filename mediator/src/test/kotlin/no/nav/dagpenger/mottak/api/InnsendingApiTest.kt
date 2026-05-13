@@ -115,9 +115,9 @@ internal class InnsendingApiTest {
                     val bodyAsText = response.bodyAsText()
                     val innsendinger = objectMapper.readTree(bodyAsText)
                     assertEquals(1, innsendinger.size())
-                    assertEquals("1234556777", innsendinger[0]["ident"].asText())
+                    assertEquals("1234556777", innsendinger[0]["ident"].asString())
                     assertEquals(idag, innsendinger[0]["registrertDato"].asLocalDateTime())
-                    assertEquals("124433", innsendinger[0]["journalpostId"].asText())
+                    assertEquals("124433", innsendinger[0]["journalpostId"].asString())
                 }
         }
     }

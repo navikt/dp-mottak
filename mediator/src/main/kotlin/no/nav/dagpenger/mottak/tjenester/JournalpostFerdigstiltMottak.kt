@@ -39,7 +39,7 @@ internal class JournalpostFerdigstiltMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
         logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
         val journalpostFerdigstilt =
             JournalpostFerdigstilt(

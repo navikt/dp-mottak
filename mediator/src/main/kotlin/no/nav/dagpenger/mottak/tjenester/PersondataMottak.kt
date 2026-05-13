@@ -40,7 +40,7 @@ internal class PersondataMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
         logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
         val persondata = packet[løsning]
         if (persondata.isNull) {
@@ -49,10 +49,10 @@ internal class PersondataMottak(
             PersonInformasjon(
                 aktivitetslogg = Aktivitetslogg(),
                 journalpostId = journalpostId,
-                aktørId = persondata["aktørId"].asText(),
-                ident = persondata["fødselsnummer"].asText(),
-                diskresjonskode = persondata["diskresjonskode"].textValue(),
-                navn = persondata["navn"].asText(),
+                aktørId = persondata["aktørId"].asString(),
+                ident = persondata["fødselsnummer"].asString(),
+                diskresjonskode = persondata["diskresjonskode"].stringValue(),
+                navn = persondata["navn"].asString(),
                 norskTilknytning = persondata["norskTilknytning"].asBoolean(),
                 egenAnsatt = persondata.get("egenAnsatt")?.asBoolean() ?: false,
             ).also { innsendingMediator.håndter(it) }

@@ -38,12 +38,12 @@ class BrukerdialogSøknadFormat(private val data: JsonNode) : RutingOppslag {
     override fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
         return verdi["avsluttetArbeidsforhold"]?.values()?.map {
             AvsluttetArbeidsforhold(
-                sluttårsak = AvsluttetArbeidsforhold.Sluttårsak.valueOf(it["sluttårsak"].asText()),
+                sluttårsak = AvsluttetArbeidsforhold.Sluttårsak.valueOf(it["sluttårsak"].asString()),
                 fiskeforedling = it["fiskeforedling"]?.asBoolean() ?: false,
-                land = it["land"].asText(),
+                land = it["land"].asString(),
             )
         } ?: emptyList()
     }
 
-    override fun søknadId(): String? = verdi["søknad_uuid"]?.textValue()
+    override fun søknadId(): String? = verdi["søknad_uuid"]?.stringValue()
 }

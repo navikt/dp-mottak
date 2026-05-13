@@ -40,7 +40,7 @@ internal class SøknadsdataMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
         if (journalpostId in setOf("717582885")) {
             logg.warn { "Skipper journalpostId: $journalpostId" }
             return

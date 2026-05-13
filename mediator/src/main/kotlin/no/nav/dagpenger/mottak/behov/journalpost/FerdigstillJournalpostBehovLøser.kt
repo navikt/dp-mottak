@@ -37,8 +37,8 @@ internal class FerdigstillJournalpostBehovLøser(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
-        val behovId = packet["@behovId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
+        val behovId = packet["@behovId"].asString()
 
         withMDC(
             mapOf(

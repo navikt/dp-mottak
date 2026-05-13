@@ -38,8 +38,8 @@ internal class OpprettGosysOppgaveLøser(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
-        val behovId = packet["@behovId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
+        val behovId = packet["@behovId"].asString()
 
         withMDC(
             mapOf(
@@ -79,9 +79,9 @@ internal class OpprettGosysOppgaveLøser(
 
 private fun JsonMessage.gosysOppgave(): GosysOppgaveRequest =
     GosysOppgaveRequest(
-        journalpostId = this["journalpostId"].asText(),
-        aktoerId = this["aktørId"].takeIf { !it.isMissingNode }?.textValue(),
-        tildeltEnhetsnr = this["behandlendeEnhetId"].asText(),
+        journalpostId = this["journalpostId"].asString(),
+        aktoerId = this["aktørId"].takeIf { !it.isMissingNode }?.stringValue(),
+        tildeltEnhetsnr = this["behandlendeEnhetId"].asString(),
         aktivDato = LocalDate.now(),
-        beskrivelse = this["oppgavebeskrivelse"].asText(),
+        beskrivelse = this["oppgavebeskrivelse"].asString(),
     )

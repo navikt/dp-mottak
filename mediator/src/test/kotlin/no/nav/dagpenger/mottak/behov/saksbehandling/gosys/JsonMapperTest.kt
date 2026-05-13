@@ -21,7 +21,7 @@ internal class JsonMapperTest {
 
         val json = defaultObjectMapper.writeValueAsString(oppgaveRequest)
         val res = defaultObjectMapper.readTree(json)
-        assertEquals("2021-05-04", res["aktivDato"].asText())
-        assertEquals("2021-05-04", res["fristFerdigstillelse"].asText())
+        assertEquals("2021-05-04", res["aktivDato"].asString())
+        assertEquals("2021-05-04", res["fristFerdigstillelse"].asString())
     }
 }

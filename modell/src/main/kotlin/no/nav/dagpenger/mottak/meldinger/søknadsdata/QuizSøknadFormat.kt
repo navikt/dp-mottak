@@ -14,7 +14,7 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
     override fun eøsBostedsland(): Boolean =
         data
             .hentNullableFaktaFraSeksjon("bostedsland")
-            ?.faktaSvar("faktum.hvilket-land-bor-du-i")?.asText()?.erEøsLand() ?: false
+            ?.faktaSvar("faktum.hvilket-land-bor-du-i")?.asString()?.erEøsLand() ?: false
 
     override fun eøsArbeidsforhold(): Boolean =
         data.hentNullableFaktaFraSeksjon("eos-arbeidsforhold")
@@ -27,13 +27,13 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
     override fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
         val faktaFraSeksjon = data.hentNullableFaktaFraSeksjon("din-situasjon")
         val arbeidsforhold =
-            faktaFraSeksjon?.values()?.singleOrNull { it["beskrivendeId"].asText() == "faktum.arbeidsforhold" }?.get("svar")
+            faktaFraSeksjon?.values()?.singleOrNull { it["beskrivendeId"].asString() == "faktum.arbeidsforhold" }?.get("svar")
         return (arbeidsforhold?.values() ?: emptyList()).filterNot { it.isEmpty }.mapNotNull {
             kotlin.runCatching {
                 AvsluttetArbeidsforhold(
                     sluttårsak = it.sluttårsak(),
                     fiskeforedling = it.fiskForedling(),
-                    land = it.faktaSvar("faktum.arbeidsforhold.land").asText(),
+                    land = it.faktaSvar("faktum.arbeidsforhold.land").asString(),
                 )
             }.onFailure { exception ->
                 logger.info(exception) { "Klarte ikke å finne AvsluttetArbeidsforhold" }
@@ -41,7 +41,7 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
         }
     }
 
-    override fun søknadId(): String? = data["søknad_uuid"]?.textValue()
+    override fun søknadId(): String? = data["søknad_uuid"]?.stringValue()
 
     override fun data(): JsonNode = data
 
@@ -51,11 +51,11 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
 }
 
 private fun JsonNode.fiskForedling(): Boolean =
-    this.values().find { it["beskrivendeId"].asText() == "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering" }
+    this.values().find { it["beskrivendeId"].asString() == "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering" }
         ?.get("svar")?.asBoolean() ?: false
 
 private fun JsonNode.sluttårsak(): Sluttårsak =
-    this.faktaSvar("faktum.arbeidsforhold.endret").asText().let {
+    this.faktaSvar("faktum.arbeidsforhold.endret").asString().let {
         when (it) {
             "faktum.arbeidsforhold.endret.svar.ikke-endret" -> Sluttårsak.IKKE_ENDRET
             "faktum.arbeidsforhold.endret.svar.avskjediget" -> Sluttårsak.AVSKJEDIGET
@@ -70,13 +70,13 @@ private fun JsonNode.sluttårsak(): Sluttårsak =
     }
 
 private fun JsonNode.hentNullableFaktaFraSeksjon(navn: String): JsonNode? =
-    this["seksjoner"].values().singleOrNull { it["beskrivendeId"].asText() == navn }?.get("fakta")
+    this["seksjoner"].values().singleOrNull { it["beskrivendeId"].asString() == navn }?.get("fakta")
 
 private fun JsonNode.faktaSvar(navn: String) =
     try {
-        this.values().single { it["beskrivendeId"].asText() == navn }["svar"]
+        this.values().single { it["beskrivendeId"].asString() == navn }["svar"]
     } catch (e: NoSuchElementException) {
-        val fakta = this.values().map { it["beskrivendeId"].asText() }
+        val fakta = this.values().map { it["beskrivendeId"].asString() }
         throw NoSuchElementException("Fant ikke fakta med navn=$navn, fakta=$fakta", e)
     }
 

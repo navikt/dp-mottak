@@ -26,7 +26,7 @@ internal interface JournalpostFeil {
                 logger.info { "CONTENT -> ${journalpostException.content}" }
                 val json = defaultObjectMapper.readTree(journalpostException.content)
 
-                val feilmelding = json["message"].asText()
+                val feilmelding = json["message"].asString()
 
                 when {
                     feilmelding in whitelistFeilmeldinger -> {

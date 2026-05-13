@@ -39,12 +39,12 @@ internal class GosysOppgaveOpprettetMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val oppgaveId = packet[løsning]["oppgaveId"].asText()
+        val oppgaveId = packet[løsning]["oppgaveId"].asString()
         logg.info { "Motatt løsning for $løsning med journalpostId: ${packet["journalpostId"]} og oppgavevId $oppgaveId" }
         val oppgaveOpprettet =
             GosysOppgaveOpprettet(
                 aktivitetslogg = Aktivitetslogg(),
-                journalpostId = packet[løsning]["journalpostId"].asText(),
+                journalpostId = packet[løsning]["journalpostId"].asString(),
                 oppgaveId = oppgaveId,
             )
 

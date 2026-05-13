@@ -57,15 +57,15 @@ internal class BehovMediatorTest {
         assertEquals(JOURNALPOST_ID, inspektør.key(0))
 
         inspektør.message(0).also {
-            assertEquals("behov", it["@event_name"].asText())
+            assertEquals("behov", it["@event_name"].asString())
             assertTrue(it.hasNonNull("@id"))
-            assertDoesNotThrow { UUID.fromString(it["@id"].asText()) }
+            assertDoesNotThrow { UUID.fromString(it["@id"].asString()) }
             assertTrue(it.hasNonNull("@opprettet"))
-            assertDoesNotThrow { LocalDateTime.parse(it["@opprettet"].asText()) }
+            assertDoesNotThrow { LocalDateTime.parse(it["@opprettet"].asString()) }
             assertEquals(listOf("Persondata", "Søknadsdata", "OpprettStartVedtakOppgave"), it["@behov"].values().map(JsonNode::asText))
-            assertEquals("behov", it["@event_name"].asText())
-            assertEquals("12344", it["aktørId"].asText())
-            assertEquals(JOURNALPOST_ID, it["journalpostId"].asText())
+            assertEquals("behov", it["@event_name"].asString())
+            assertEquals("12344", it["aktørId"].asString())
+            assertEquals(JOURNALPOST_ID, it["journalpostId"].asString())
         }
     }
 

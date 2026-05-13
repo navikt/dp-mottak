@@ -40,7 +40,7 @@ internal class OpprettGosysOppgaveLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
-            assertEquals("dfghjkl", field(0, "@løsning")["OpprettGosysoppgave"]["oppgaveId"].asText())
+            assertEquals("dfghjkl", field(0, "@løsning")["OpprettGosysoppgave"]["oppgaveId"].asString())
         }
         requireNotNull(expectedOppgave).also {
             assertEquals(LocalDate.now(), it.fristFerdigstillelse)
@@ -53,7 +53,7 @@ internal class OpprettGosysOppgaveLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
-            assertEquals("dfghjkl", field(0, "@løsning")["OpprettGosysoppgave"]["oppgaveId"].asText())
+            assertEquals("dfghjkl", field(0, "@løsning")["OpprettGosysoppgave"]["oppgaveId"].asString())
         }
         requireNotNull(expectedOppgave).also {
             assertNull(it.aktoerId)

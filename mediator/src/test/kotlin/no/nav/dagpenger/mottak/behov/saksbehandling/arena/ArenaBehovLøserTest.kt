@@ -47,9 +47,9 @@ internal class ArenaBehovLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
-            assertEquals("123", field(0, "@løsning")["OpprettStartVedtakOppgave"]["fagsakId"].asText())
-            assertEquals("123", field(0, "@løsning")["OpprettStartVedtakOppgave"]["oppgaveId"].asText())
-            assertEquals(JOURNALPOST_ID, field(0, "@løsning")["OpprettStartVedtakOppgave"]["journalpostId"].asText())
+            assertEquals("123", field(0, "@løsning")["OpprettStartVedtakOppgave"]["fagsakId"].asString())
+            assertEquals("123", field(0, "@løsning")["OpprettStartVedtakOppgave"]["oppgaveId"].asString())
+            assertEquals(JOURNALPOST_ID, field(0, "@løsning")["OpprettStartVedtakOppgave"]["journalpostId"].asString())
         }
     }
 
@@ -59,9 +59,9 @@ internal class ArenaBehovLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
-            assertEquals(null, field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["fagsakId"].textValue())
-            assertEquals("123", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["oppgaveId"].asText())
-            assertEquals(JOURNALPOST_ID, field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["journalpostId"].asText())
+            assertEquals(null, field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["fagsakId"].stringValue())
+            assertEquals("123", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["oppgaveId"].asString())
+            assertEquals(JOURNALPOST_ID, field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["journalpostId"].asString())
         }
     }
 
@@ -72,7 +72,7 @@ internal class ArenaBehovLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
-            assertEquals("Kunne ikke opprette Arena oppgave", field(0, "@løsning")["OpprettStartVedtakOppgave"]["@feil"].asText())
+            assertEquals("Kunne ikke opprette Arena oppgave", field(0, "@løsning")["OpprettStartVedtakOppgave"]["@feil"].asString())
         }
     }
 
@@ -83,7 +83,7 @@ internal class ArenaBehovLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertDoesNotThrow { field(0, "@løsning") }
-            assertEquals("Kunne ikke opprette Arena oppgave", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["@feil"].asText())
+            assertEquals("Kunne ikke opprette Arena oppgave", field(0, "@løsning")["OpprettVurderhenvendelseOppgave"]["@feil"].asString())
         }
     }
 

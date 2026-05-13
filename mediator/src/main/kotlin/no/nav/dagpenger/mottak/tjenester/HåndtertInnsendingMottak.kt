@@ -44,7 +44,7 @@ internal class HåndtertInnsendingMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
         val løsningNode: JsonNode = packet[løsning]
 
         withLoggingContext("journalpostId" to "$journalpostId") {

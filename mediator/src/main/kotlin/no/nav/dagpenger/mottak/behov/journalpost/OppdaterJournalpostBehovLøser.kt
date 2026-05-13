@@ -39,8 +39,8 @@ internal class OppdaterJournalpostBehovLøser(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
-        val behovId = packet["@behovId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
+        val behovId = packet["@behovId"].asString()
         if (listOf("723891751", "723892358", "723892366").contains(journalpostId)) {
             logger.warn { "Skipper journalpost $journalpostId fra OppdaterJournalpostBehovLøser" }
             return
@@ -80,12 +80,12 @@ private fun JsonMessage.oppdatereAvsender() =
         else -> true
     }
 
-private fun JsonMessage.mottakskanal(): String? = this["mottakskanal"].asText("ukjent")
+private fun JsonMessage.mottakskanal(): String? = this["mottakskanal"].asString("ukjent")
 
 private fun JsonMessage.avsender(): JournalpostApi.Avsender? =
     if (oppdatereAvsender()) {
         JournalpostApi.Avsender(
-            id = this["fødselsnummer"].asText(),
+            id = this["fødselsnummer"].asString(),
         )
     } else {
         null
@@ -94,7 +94,7 @@ private fun JsonMessage.avsender(): JournalpostApi.Avsender? =
 private fun JsonMessage.tilJournalføringOppdaterRequest(): OppdaterJournalpostRequest =
     OppdaterJournalpostRequest(
         bruker = this.bruker(),
-        tittel = this["tittel"].asText(),
+        tittel = this["tittel"].asString(),
         sak = this.sak(),
         dokumenter = this.dokumenter(),
         avsenderMottaker = this.avsender(),
@@ -102,15 +102,15 @@ private fun JsonMessage.tilJournalføringOppdaterRequest(): OppdaterJournalpostR
 
 private fun JsonMessage.dokumenter(): List<JournalpostApi.Dokument> =
     this["dokumenter"].values().map {
-        JournalpostApi.Dokument(dokumentInfoId = it["dokumentInfoId"].asText(), tittel = it["tittel"].asText())
+        JournalpostApi.Dokument(dokumentInfoId = it["dokumentInfoId"].asString(), tittel = it["tittel"].asString())
     }
 
 private fun JsonMessage.sak(): JournalpostApi.Sak =
     JournalpostApi.Sak(
-        fagsakId = this["fagsakId"].asText(null),
+        fagsakId = this["fagsakId"].asString(null),
     )
 
 private fun JsonMessage.bruker(): JournalpostApi.Bruker =
     JournalpostApi.Bruker(
-        id = this["fødselsnummer"].asText(),
+        id = this["fødselsnummer"].asString(),
     )

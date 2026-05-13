@@ -34,7 +34,7 @@ internal class RekjørMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
         logg.info { "Fått rekjøringshendelse for journalpostId: $journalpostId" }
         val rekjørHendelse =
             RekjørHendelse(

@@ -35,7 +35,7 @@ internal class FerdigstillJournalpostBehovLøserTest {
         with(testRapid.inspektør) {
             assertEquals(1, size)
             assertNotNull(field(0, "@løsning")["FerdigstillJournalpost"])
-            assertEquals(journalpostId, field(0, "@løsning")["FerdigstillJournalpost"]["journalpostId"].asText())
+            assertEquals(journalpostId, field(0, "@løsning")["FerdigstillJournalpost"]["journalpostId"].asString())
         }
     }
 

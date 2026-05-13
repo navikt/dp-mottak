@@ -76,12 +76,12 @@ internal fun getWarnings(json: String): List<QueryWarning> {
     val node = defaultObjectMapper.readTree(json)
     return node["extensions"]?.get("warnings")?.values()?.map {
         QueryWarning(
-            id = it["id"].asText(),
-            code = it["code"].asText(),
-            message = it["message"].asText(),
+            id = it["id"].asString(),
+            code = it["code"].asString(),
+            message = it["message"].asString(),
             details =
                 WarningDetails(
-                    missing = it["details"]["missing"].values().map { missing -> missing.asText() },
+                    missing = it["details"]["missing"].values().map { missing -> missing.asString() },
                 ),
         )
     } ?: emptyList()
@@ -100,7 +100,7 @@ data class WarningDetails(
 
 private fun harGraphqlErrors(json: JsonNode) = json["errors"] != null && !json["errors"].isEmpty
 
-private fun ukjentPersonIdent(node: JsonNode) = node["errors"]?.values()?.any { it["message"].asText() == "Fant ikke person" } ?: false
+private fun ukjentPersonIdent(node: JsonNode) = node["errors"]?.values()?.any { it["message"].asString() == "Fant ikke person" } ?: false
 
 internal data class PersonQuery(
     val id: String,
@@ -154,13 +154,13 @@ internal class Pdl {
 
         internal fun JsonNode.norskTilknyting(): Boolean = findValue("gtLand")?.isNull ?: false
 
-        internal fun JsonNode.diskresjonsKode(): String? = findValue("adressebeskyttelse").values().firstOrNull()?.path("gradering")?.asText(null)
+        internal fun JsonNode.diskresjonsKode(): String? = findValue("adressebeskyttelse").values().firstOrNull()?.path("gradering")?.asString(null)
 
         internal fun JsonNode.personNavn(): String =
             findValue("navn").values().first().let { node ->
-                val fornavn = node.path("fornavn").asText()
-                val mellomnavn = node.path("mellomnavn").asText("")
-                val etternavn = node.path("etternavn").asText()
+                val fornavn = node.path("fornavn").asString()
+                val mellomnavn = node.path("mellomnavn").asString("")
+                val etternavn = node.path("etternavn").asString()
 
                 when (mellomnavn.isEmpty()) {
                     true -> "$fornavn $etternavn"
@@ -168,9 +168,9 @@ internal class Pdl {
                 }
             }
 
-        private fun JsonNode.ident(type: String): String = findValue("identer").values().first { it.path("gruppe").asText() == type }.get("ident").asText()
+        private fun JsonNode.ident(type: String): String = findValue("identer").values().first { it.path("gruppe").asString() == type }.get("ident").asString()
 
-        private fun JsonNode.harIdent(type: String): Boolean = findValue("identer").values().map { it["gruppe"].asText() }.contains(type)
+        private fun JsonNode.harIdent(type: String): Boolean = findValue("identer").values().map { it["gruppe"].asString() }.contains(type)
 
         override fun deserialize(
             p: JsonParser,
