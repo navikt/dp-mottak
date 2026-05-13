@@ -1,13 +1,14 @@
 package no.nav.dagpenger.mottak.api
 
-import com.github.navikt.tbd_libs.naisful.test.TestContext
-import com.github.navikt.tbd_libs.naisful.test.naisfulTestApp
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.serialization.jackson.JacksonConverter
 import io.ktor.server.routing.Route
-import io.micrometer.prometheusmetrics.PrometheusConfig
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import io.ktor.server.testing.testApplication
 import no.nav.dagpenger.mottak.Config
 import no.nav.security.mock.oauth2.MockOAuth2Server
 
@@ -36,16 +37,19 @@ internal object TestApplication {
         try {
             System.setProperty("AZURE_OPENID_CONFIG_JWKS_URI", "${mockOAuth2Server.jwksUrl(Config.AzureAd.NAME)}")
             System.setProperty("AZURE_OPENID_CONFIG_ISSUER", "${mockOAuth2Server.issuerUrl(Config.AzureAd.NAME)}")
-            return naisfulTestApp(
-                {
-                    this.installPlugins {
+            testApplication {
+                application {
+                    installPlugins {
                         moduleFunction()
                     }
-                },
-                Config.objectMapper,
-                PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
-            ) {
-                test()
+                }
+                val testClient =
+                    createClient {
+                        install(ContentNegotiation) {
+                            register(ContentType.Application.Json, JacksonConverter(Config.objectMapper))
+                        }
+                    }
+                test(TestContext(testClient))
             }
         } finally {
         }
@@ -55,3 +59,5 @@ internal object TestApplication {
         this.header(HttpHeaders.Authorization, "Bearer $token")
     }
 }
+
+internal class TestContext(val client: HttpClient)

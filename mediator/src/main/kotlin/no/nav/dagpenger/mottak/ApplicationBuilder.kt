@@ -1,18 +1,11 @@
 package no.nav.dagpenger.mottak
 
-import com.github.navikt.tbd_libs.naisful.naisApp
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.micrometer.core.instrument.Clock
-import io.micrometer.prometheusmetrics.PrometheusConfig
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
-import io.prometheus.metrics.model.registry.PrometheusRegistry
 import no.nav.dagpenger.mottak.Config.dokarkivTokenProvider
-import no.nav.dagpenger.mottak.Config.objectMapper
 import no.nav.dagpenger.mottak.api.innsendingApi
 import no.nav.dagpenger.mottak.api.installPlugins
 import no.nav.dagpenger.mottak.api.journalpostRoute
-import no.nav.dagpenger.mottak.api.statusPages
 import no.nav.dagpenger.mottak.behov.journalpost.FerdigstillJournalpostBehovLøser
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApiClient
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostBehovLøser
@@ -36,7 +29,6 @@ import no.nav.dagpenger.mottak.observers.MetrikkObserver
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import no.nav.dagpenger.mottak.tjenester.VedtakFattetMottak
 import no.nav.helse.rapids_rivers.RapidApplication
-import org.slf4j.LoggerFactory
 
 private val logg = KotlinLogging.logger {}
 
@@ -52,32 +44,12 @@ internal class ApplicationBuilder(
     private val ferdigstiltInnsendingObserver = FerdigstiltInnsendingObserver(Config.kafkaProducerProperties)
     private val rapidsConnection =
         RapidApplication
-            .create(env = env, builder = {
-                withKtor { preStopHook, rapid ->
-                    naisApp(
-                        meterRegistry =
-                            PrometheusMeterRegistry(
-                                PrometheusConfig.DEFAULT,
-                                PrometheusRegistry.defaultRegistry,
-                                Clock.SYSTEM,
-                            ),
-                        objectMapper = objectMapper,
-                        applicationLogger = LoggerFactory.getLogger("ApplicationLogger"),
-                        callLogger = LoggerFactory.getLogger("CallLogger"),
-                        aliveCheck = rapid::isReady,
-                        readyCheck = rapid::isReady,
-                        preStopHook = preStopHook::handlePreStopRequest,
-                        statusPagesConfig = {
-                            statusPages()
-                        },
-                    ) {
-                        installPlugins {
-                            journalpostRoute(innsendingMetadataRepository)
-                            innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver)
-                        }
-                    }
+            .create(env = env) { server, _ ->
+                server.application.installPlugins {
+                    journalpostRoute(innsendingMetadataRepository)
+                    innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver)
                 }
-            })
+            }
             .apply {
                 val mediator =
                     InnsendingMediator(

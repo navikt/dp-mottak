@@ -25,13 +25,13 @@ dependencies {
     implementation(libs.bundles.postgres)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.10.2")
 
-    implementation("com.github.navikt.tbd-libs:naisful-app:2025.11.04-10.54-c831038e")
-
     implementation(libs.bundles.jackson)
 
     implementation(libs.bundles.ktor.server)
     implementation(libs.bundles.ktor.client)
     implementation("io.ktor:ktor-client-logging-jvm:${libs.versions.ktor.get()}")
+    implementation("io.ktor:ktor-server-call-id:${libs.versions.ktor.get()}")
+    implementation("io.ktor:ktor-server-call-logging:${libs.versions.ktor.get()}")
     implementation("de.slub-dresden:urnlib:3.0.0")
     implementation("io.ktor:ktor-client-logging:3.4.3")
 
@@ -45,7 +45,7 @@ dependencies {
     testImplementation("no.bekk.bekkopen:nocommons:0.17.0")
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation("io.ktor:ktor-client-mock-jvm:${libs.versions.ktor.get()}")
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.11.04-10.54-c831038e")
+    testImplementation("io.ktor:ktor-client-content-negotiation:${libs.versions.ktor.get()}")
 }
 
 tasks.withType<ShadowJar> {
