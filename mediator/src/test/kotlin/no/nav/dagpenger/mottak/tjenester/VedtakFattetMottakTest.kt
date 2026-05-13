@@ -88,11 +88,11 @@ VedtakFattetMottakTest {
             inspektør.size shouldBe 1
             inspektør.key(0) shouldBe testPersonIdent
             inspektør.message(0).let { message ->
-                message["@event_name"].asText() shouldBe "behov"
-                message["@behov"].map { it.asText() }.single() shouldBe "slett_arena_oppgaver"
+                message["@event_name"].asString() shouldBe "behov"
+                message["@behov"].values().map { it.asString() }.single() shouldBe "slett_arena_oppgaver"
                 message["behandlingId"].asUUID() shouldBe behandlingId
-                message["oppgaveIder"].map { it.asText() } shouldBe listOf("søknad1", "ettersending1", "ettersending2")
-                message["ident"].asText() shouldBe testPersonIdent
+                message["oppgaveIder"].values().map { it.asString() } shouldBe listOf("søknad1", "ettersending1", "ettersending2")
+                message["ident"].asString() shouldBe testPersonIdent
             }
         }
         coVerify(exactly = 1) {

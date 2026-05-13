@@ -15,10 +15,10 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import io.ktor.serialization.jackson.JacksonConverter
+import io.ktor.serialization.jackson3.JacksonConverter
 import no.nav.dagpenger.mottak.Config.dpProxyTokenProvider
 import no.nav.dagpenger.mottak.Config.dpProxyUrl
-import no.nav.dagpenger.mottak.behov.JsonMapper
+import no.nav.dagpenger.mottak.defaultObjectMapper
 import java.time.Duration
 import java.time.LocalDate
 
@@ -54,7 +54,7 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
                 socketTimeoutMillis = Duration.ofSeconds(30).toMillis()
             }
             install(ContentNegotiation) {
-                register(ContentType.Application.Json, JacksonConverter(JsonMapper.jacksonJsonAdapter))
+                register(ContentType.Application.Json, JacksonConverter(defaultObjectMapper))
             }
         }
 

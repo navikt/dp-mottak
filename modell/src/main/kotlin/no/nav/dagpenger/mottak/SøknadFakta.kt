@@ -1,7 +1,7 @@
 package no.nav.dagpenger.mottak
 
-import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold.Sluttårsak
+import tools.jackson.databind.JsonNode
 
 interface SøknadOppslag {
     fun data(): JsonNode

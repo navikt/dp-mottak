@@ -66,10 +66,10 @@ internal class JournalpostBehovLøserTest {
         testRapid.sendTestMessage(journalpostBehov())
         with(testRapid.inspektør) {
             assertEquals(1, size)
-            assertEquals("124567", field(0, "@løsning")["Journalpost"]["journalpostId"].asText())
-            assertEquals("NAV 04-01.03", field(0, "@løsning")["Journalpost"]["dokumenter"][0]["brevkode"].asText())
+            assertEquals("124567", field(0, "@løsning")["Journalpost"]["journalpostId"].asString())
+            assertEquals("NAV 04-01.03", field(0, "@løsning")["Journalpost"]["dokumenter"][0]["brevkode"].asString())
             assertTrue(field(0, "@løsning")["Journalpost"]["dokumenter"][0]["hovedDokument"].asBoolean())
-            assertEquals("N6", field(0, "@løsning")["Journalpost"]["dokumenter"][1]["brevkode"].asText())
+            assertEquals("N6", field(0, "@løsning")["Journalpost"]["dokumenter"][1]["brevkode"].asString())
             assertFalse(field(0, "@løsning")["Journalpost"]["dokumenter"][1]["hovedDokument"].asBoolean())
             assertDoesNotThrow { field(0, "@løsning")["Journalpost"]["relevanteDatoer"][0]["dato"].asLocalDateTime() }
         }

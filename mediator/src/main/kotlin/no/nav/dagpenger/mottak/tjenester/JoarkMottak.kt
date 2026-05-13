@@ -35,7 +35,7 @@ internal class JoarkMottak(
                 validate { it.requireAny("hendelsesType", listOf("MidlertidigJournalført", "JournalpostMottatt")) }
                 validate {
                     it.require("mottaksKanal") { mottaksKanal ->
-                        val kanal = mottaksKanal.asText()
+                        val kanal = mottaksKanal.asString()
                         if (kanal in forbudteMottaksKanaler) throw IllegalArgumentException("Kan ikke håndtere '$kanal' mottakskanal")
                     }
                 }
@@ -50,26 +50,26 @@ internal class JoarkMottak(
         meterRegistry: MeterRegistry,
     ) {
         logg.info(
-            """Received journalpost with journalpost id: ${packet["journalpostId"].asText()} 
-              |tema: ${packet["temaNytt"].asText()}, 
-              |hendelsesType: ${packet["hendelsesType"].asText()}, 
-              |mottakskanal, ${packet["mottaksKanal"].asText()}, 
-              |behandlingstema: ${packet["behandlingstema"].asText()}
-              |journalpostStatus: ${packet["journalpostStatus"].asText()}
+            """Received journalpost with journalpost id: ${packet["journalpostId"].asString()} 
+              |tema: ${packet["temaNytt"].asString()}, 
+              |hendelsesType: ${packet["hendelsesType"].asString()}, 
+              |mottakskanal, ${packet["mottaksKanal"].asString()}, 
+              |behandlingstema: ${packet["behandlingstema"].asString()}
+              |journalpostStatus: ${packet["journalpostStatus"].asString()}
               |
             """.trimMargin(),
         )
 
-        Metrics.mottakskanalInc(packet["mottaksKanal"].asText())
+        Metrics.mottakskanalInc(packet["mottaksKanal"].asString())
 
         val joarkHendelse =
             JoarkHendelse(
                 aktivitetslogg = Aktivitetslogg(),
-                journalpostId = packet["journalpostId"].asText(),
-                hendelseType = packet["hendelsesType"].asText(),
-                journalpostStatus = packet["journalpostStatus"].asText(),
-                behandlingstema = packet["behandlingstema"].asText() ?: null,
-                mottakskanal = packet["mottaksKanal"].asText(),
+                journalpostId = packet["journalpostId"].asString(),
+                hendelseType = packet["hendelsesType"].asString(),
+                journalpostStatus = packet["journalpostStatus"].asString(),
+                behandlingstema = packet["behandlingstema"].asString() ?: null,
+                mottakskanal = packet["mottaksKanal"].asString(),
             )
 
         innsendingMediator.håndter(joarkHendelse)

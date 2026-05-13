@@ -1,11 +1,11 @@
 package no.nav.dagpenger.mottak.behov.person
 
-import no.nav.dagpenger.mottak.behov.JsonMapper.jacksonJsonAdapter
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.aktørId
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.diskresjonsKode
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.fødselsnummer
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.norskTilknyting
 import no.nav.dagpenger.mottak.behov.person.Pdl.PersonDeserializer.personNavn
+import no.nav.dagpenger.mottak.defaultObjectMapper
 import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -18,7 +18,7 @@ internal class PersonDeserialiseringTest {
     fun `riktig navn`() {
         assertEquals(
             "LITEN hubba BRANNHYDRANT",
-            jacksonJsonAdapter.readTree(
+            defaultObjectMapper.readTree(
                 """{"data" :{"navn": [ { "fornavn": "LITEN", "mellomnavn": "hubba",  "etternavn": "BRANNHYDRANT" } ] }} """.trimIndent(),
             ).personNavn(),
         )
@@ -131,14 +131,14 @@ internal class PersonDeserialiseringTest {
     fun `Takler manglende mellom navn`() {
         assertEquals(
             "LITEN BRANNHYDRANT",
-            jacksonJsonAdapter.readTree(
+            defaultObjectMapper.readTree(
                 """{ "data": {"navn": [ { "fornavn": "LITEN", "etternavn": "BRANNHYDRANT" } ] } }""".trimIndent(),
             ).personNavn(),
         )
 
         assertEquals(
             "LITEN BRANNHYDRANT",
-            jacksonJsonAdapter.readTree(
+            defaultObjectMapper.readTree(
                 """{ "data": {"navn": [ { "fornavn": "LITEN", "mellomnavn": null,  "etternavn": "BRANNHYDRANT" } ] } }""".trimIndent(),
             ).personNavn(),
         )
@@ -149,7 +149,7 @@ internal class PersonDeserialiseringTest {
     fun `riktig identer`() {
         @Language("JSON")
         val json =
-            jacksonJsonAdapter.readTree(
+            defaultObjectMapper.readTree(
                 """{ "data": {"identer": [ { "ident": "13086824072", "gruppe": "FOLKEREGISTERIDENT" }, { "ident": "2797593735308", "gruppe": "AKTORID" } ] }} """.trimIndent(),
             )
 
@@ -161,16 +161,16 @@ internal class PersonDeserialiseringTest {
     fun `riktig norsk tilknytning`() {
         //language=JSON
         val jsonTrue =
-            jacksonJsonAdapter.readTree("""{ "data": { "hentGeografiskTilknytning": { "gtLand": null } } } """.trimIndent())
+            defaultObjectMapper.readTree("""{ "data": { "hentGeografiskTilknytning": { "gtLand": null } } } """.trimIndent())
         assertTrue(jsonTrue.norskTilknyting())
 
         //language=JSON
         val jsonNull =
-            jacksonJsonAdapter.readTree("""{ "data": { "hentGeografiskTilknytning": null } } """.trimIndent())
+            defaultObjectMapper.readTree("""{ "data": { "hentGeografiskTilknytning": null } } """.trimIndent())
         assertFalse(jsonNull.norskTilknyting())
 
         val jsonFalse =
-            jacksonJsonAdapter.readTree("""{ "data": { "hentGeografiskTilknytning": { "gtLand": "sdfsafd" } } } """.trimIndent())
+            defaultObjectMapper.readTree("""{ "data": { "hentGeografiskTilknytning": { "gtLand": "sdfsafd" } } } """.trimIndent())
         assertFalse(jsonFalse.norskTilknyting())
     }
 
@@ -178,27 +178,27 @@ internal class PersonDeserialiseringTest {
     fun `riktig diskresjonskode`() {
         //language=JSON
         val strengtFortroligJson =
-            jacksonJsonAdapter.readTree(
+            defaultObjectMapper.readTree(
                 """{ "data": { "hentPerson": { "adressebeskyttelse": [ { "gradering": "STRENGT_FORTROLIG_UTLAND" } ] } } } """.trimIndent(),
             )
         assertEquals("STRENGT_FORTROLIG_UTLAND", strengtFortroligJson.diskresjonsKode())
 
         //language=JSON
         val ukjentGraderingJsone =
-            jacksonJsonAdapter.readTree(
+            defaultObjectMapper.readTree(
                 """{ "data": { "hentPerson": { "adressebeskyttelse": [ { "gradering": null } ] } } } """.trimIndent(),
             )
         assertNull(ukjentGraderingJsone.diskresjonsKode())
 
         @Language("JSON")
         val ingenBeskyttelseJson =
-            jacksonJsonAdapter.readTree("""{ "data": { "hentPerson": { "adressebeskyttelse":[] } } } """.trimIndent())
+            defaultObjectMapper.readTree("""{ "data": { "hentPerson": { "adressebeskyttelse":[] } } } """.trimIndent())
         assertNull(ingenBeskyttelseJson.diskresjonsKode())
     }
 
     @Test
     fun `Person ikke funnet skal returnere null objekt`() {
-        jacksonJsonAdapter.readValue(fantIkkePersonResponse, Pdl.Person::class.java).also {
+        defaultObjectMapper.readValue(fantIkkePersonResponse, Pdl.Person::class.java).also {
             assertNull(it)
         }
     }

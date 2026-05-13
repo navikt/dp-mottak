@@ -41,10 +41,10 @@ internal class PersondataBehovLøserTest {
         testRapid.sendTestMessage(persondataBehov())
         with(testRapid.inspektør) {
             assertEquals(1, size)
-            assertEquals("12345678", field(0, "@løsning")["Persondata"]["aktørId"].asText())
-            assertEquals("1234567891", field(0, "@løsning")["Persondata"]["fødselsnummer"].asText())
-            assertEquals("true", field(0, "@løsning")["Persondata"]["norskTilknytning"].asText())
-            assertEquals("diskresjonskode", field(0, "@løsning")["Persondata"]["diskresjonskode"].asText())
+            assertEquals("12345678", field(0, "@løsning")["Persondata"]["aktørId"].asString())
+            assertEquals("1234567891", field(0, "@løsning")["Persondata"]["fødselsnummer"].asString())
+            assertEquals("true", field(0, "@løsning")["Persondata"]["norskTilknytning"].asString())
+            assertEquals("diskresjonskode", field(0, "@løsning")["Persondata"]["diskresjonskode"].asString())
             assertEquals(false, field(0, "@løsning")["Persondata"]["egenAnsatt"].asBoolean())
         }
     }

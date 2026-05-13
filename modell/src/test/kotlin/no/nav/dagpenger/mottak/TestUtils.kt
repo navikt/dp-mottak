@@ -1,10 +1,9 @@
 package no.nav.dagpenger.mottak
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import tools.jackson.databind.JsonNode
 import java.io.FileNotFoundException
 
-internal val jackson = jacksonObjectMapper()
+internal val jackson = defaultObjectMapper
 
 internal fun String.toJsonNode(): JsonNode = jackson.readTree(this)
 

@@ -1,7 +1,7 @@
 package no.nav.dagpenger.mottak.serder
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
+import no.nav.dagpenger.mottak.defaultObjectMapper
 import no.nav.dagpenger.mottak.serder.InnsendingData.AktivitetsloggData
 import no.nav.dagpenger.mottak.serder.InnsendingData.ArenaSakData
 import no.nav.dagpenger.mottak.serder.InnsendingData.JournalpostData
@@ -75,7 +75,7 @@ internal class InnsendingDataTest {
 
     //language=JSON
     private val søknadsjson =
-        jacksonObjectMapper().readTree(
+        defaultObjectMapper.readTree(
             """
             {
             "tadda":"it´s short for"

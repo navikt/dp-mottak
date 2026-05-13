@@ -1,8 +1,8 @@
 package no.nav.dagpenger.mottak.meldinger
 
-import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.mottak.toJsonNode
 import org.intellij.lang.annotations.Language
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 fun utenSeksjoner(søknadUUID: UUID = UUID.fromString("cfd84357-cdd9-4811-ada5-63d77625e91e")): JsonNode =

@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.tjenester
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
@@ -14,6 +13,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.JsonMessageExtensions.getOrNull
 import no.nav.dagpenger.mottak.meldinger.Journalpost
+import tools.jackson.databind.JsonNode
 import java.time.LocalDateTime
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype as Behov
 
@@ -44,11 +44,11 @@ internal class JournalpostMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
         logg.info { "Fått løsning for $løsning, journalpostId=$journalpostId" }
         withLoggingContext(
             "journalpostId" to journalpostId,
-            "behovId" to packet["@behovId"].asText(),
+            "behovId" to packet["@behovId"].asString(),
         ) {
             val journalpostData =
                 try {
@@ -56,33 +56,33 @@ internal class JournalpostMottak(
                         Journalpost(
                             aktivitetslogg = Aktivitetslogg(),
                             journalpostId = journalpostId,
-                            journalpostStatus = it["journalstatus"].asText(),
+                            journalpostStatus = it["journalstatus"].asString(),
                             bruker =
                                 it.getOrNull("bruker")?.let { jsonBruker ->
                                     Journalpost.Bruker(
-                                        id = jsonBruker["id"].asText(),
-                                        type = Journalpost.BrukerType.valueOf(jsonBruker["type"].asText()),
+                                        id = jsonBruker["id"].asString(),
+                                        type = Journalpost.BrukerType.valueOf(jsonBruker["type"].asString()),
                                     )
                                 },
                             dokumenter =
-                                it["dokumenter"].map { jsonDokument ->
+                                it["dokumenter"].values().map { jsonDokument ->
                                     Journalpost.DokumentInfo(
-                                        tittelHvisTilgjengelig = jsonDokument["tittel"].textValue(),
-                                        dokumentInfoId = jsonDokument["dokumentInfoId"].asText(),
-                                        brevkode = jsonDokument["brevkode"].asText(),
+                                        tittelHvisTilgjengelig = jsonDokument["tittel"].stringValue(),
+                                        dokumentInfoId = jsonDokument["dokumentInfoId"].asString(),
+                                        brevkode = jsonDokument["brevkode"].asString(),
                                         hovedDokument = jsonDokument["hovedDokument"].asBoolean(),
                                     )
                                 },
                             registrertDato =
                                 it["relevanteDatoer"]
-                                    .firstOrNull { relevantDato ->
-                                        relevantDato["datotype"].asText() == "DATO_REGISTRERT"
+                                    .values().firstOrNull { relevantDato ->
+                                        relevantDato["datotype"].asString() == "DATO_REGISTRERT"
                                     }?.get("dato")
-                                    ?.asText()
+                                    ?.asString()
                                     ?.let { relevantDato -> LocalDateTime.parse(relevantDato) }
                                     ?: LocalDateTime.now(),
-                            behandlingstema = it["behandlingstema"].textValue(),
-                            journalførendeEnhet = it["journalfoerendeEnhet"]?.asText(),
+                            behandlingstema = it["behandlingstema"].stringValue(),
+                            journalførendeEnhet = it["journalfoerendeEnhet"]?.asString(),
                         ).also {
                             logg.info {
                                 """Mottok ny journalpost. 
@@ -90,7 +90,7 @@ internal class JournalpostMottak(
                             |brevkode=${it.hovedDokument().brevkode}, 
                             |registrertDato=${it.datoRegistrert()}, 
                             |journalførendeEnhet=${it.journalførendeEnhet()},
-                            |behandlingstema=${packet[løsning]["behandlingstema"].textValue()}
+                            |behandlingstema=${packet[løsning]["behandlingstema"].stringValue()}
                                 """.trimMargin()
                             }
                         }

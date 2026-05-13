@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.tjenester
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
@@ -16,6 +15,7 @@ import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.HåndtertInnsending
 import no.nav.dagpenger.mottak.serder.asUUID
+import tools.jackson.databind.JsonNode
 
 private val logg = KotlinLogging.logger {}
 
@@ -44,7 +44,7 @@ internal class HåndtertInnsendingMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
         val løsningNode: JsonNode = packet[løsning]
 
         withLoggingContext("journalpostId" to "$journalpostId") {

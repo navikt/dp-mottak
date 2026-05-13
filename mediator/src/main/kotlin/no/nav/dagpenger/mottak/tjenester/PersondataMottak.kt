@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.tjenester
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
@@ -14,6 +13,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.Personda
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
+import tools.jackson.databind.JsonNode
 
 private val logg = KotlinLogging.logger {}
 
@@ -40,7 +40,7 @@ internal class PersondataMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
         logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
         val persondata = packet[løsning]
         if (persondata.isNull) {
@@ -49,10 +49,10 @@ internal class PersondataMottak(
             PersonInformasjon(
                 aktivitetslogg = Aktivitetslogg(),
                 journalpostId = journalpostId,
-                aktørId = persondata["aktørId"].asText(),
-                ident = persondata["fødselsnummer"].asText(),
-                diskresjonskode = persondata["diskresjonskode"].textValue(),
-                navn = persondata["navn"].asText(),
+                aktørId = persondata["aktørId"].asString(),
+                ident = persondata["fødselsnummer"].asString(),
+                diskresjonskode = persondata["diskresjonskode"].stringValue(),
+                navn = persondata["navn"].asString(),
                 norskTilknytning = persondata["norskTilknytning"].asBoolean(),
                 egenAnsatt = persondata.get("egenAnsatt")?.asBoolean() ?: false,
             ).also { innsendingMediator.håndter(it) }

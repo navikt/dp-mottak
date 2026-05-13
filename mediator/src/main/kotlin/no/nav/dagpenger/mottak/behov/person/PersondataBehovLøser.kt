@@ -38,18 +38,18 @@ internal class PersondataBehovLøser(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
-        val behovId = packet["@behovId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
+        val behovId = packet["@behovId"].asString()
         withMDC(
             mapOf(
                 "behovId" to behovId,
                 "journalpostId" to journalpostId,
             ),
         ) {
-            runBlocking(MDCContext()) { personOppslag.hentPerson(packet["brukerId"].asText()) }.also {
+            runBlocking(MDCContext()) { personOppslag.hentPerson(packet["brukerId"].asString()) }.also {
                 packet["@løsning"] = mapOf("Persondata" to it)
                 context.publish(packet.toJson())
-                logger.info("Løst behov Persondata for journalpost med id ${packet["journalpostId"].asText()}")
+                logger.info("Løst behov Persondata for journalpost med id ${packet["journalpostId"].asString()}")
             }
         }
     }

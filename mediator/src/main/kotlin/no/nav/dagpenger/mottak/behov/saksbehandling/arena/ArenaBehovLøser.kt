@@ -59,8 +59,8 @@ internal class ArenaBehovLøser(
             metadata: MessageMetadata,
             meterRegistry: MeterRegistry,
         ) {
-            val journalpostId = packet["journalpostId"].asText()
-            val behovId = packet["@behovId"].asText()
+            val journalpostId = packet["journalpostId"].asString()
+            val behovId = packet["@behovId"].asString()
 
             if (listOf("717560009").contains(journalpostId)) {
                 logger.info { "Skipper journalpost $journalpostId fra ArenaBehovLøser" }
@@ -75,7 +75,7 @@ internal class ArenaBehovLøser(
             ) {
                 try {
                     runBlocking(MDCContext()) {
-                        val behovNavn = packet["@behov"].first().asText()
+                        val behovNavn = packet["@behov"].values().first().asString()
 
                         val oppgaveResponse =
                             when (behovNavn) {
@@ -138,9 +138,9 @@ internal class ArenaBehovLøser(
 
 internal fun JsonMessage.arenaOppgaveParametre(): OpprettArenaOppgaveParametere =
     OpprettArenaOppgaveParametere(
-        naturligIdent = this["fødselsnummer"].asText(),
-        behandlendeEnhetId = this["behandlendeEnhetId"].asText(),
-        tilleggsinformasjon = this["tilleggsinformasjon"].asText(),
+        naturligIdent = this["fødselsnummer"].asString(),
+        behandlendeEnhetId = this["behandlendeEnhetId"].asString(),
+        tilleggsinformasjon = this["tilleggsinformasjon"].asString(),
         registrertDato = this["registrertDato"].asLocalDateTime().toLocalDate(),
-        oppgavebeskrivelse = this["oppgavebeskrivelse"].asText(),
+        oppgavebeskrivelse = this["oppgavebeskrivelse"].asString(),
     )

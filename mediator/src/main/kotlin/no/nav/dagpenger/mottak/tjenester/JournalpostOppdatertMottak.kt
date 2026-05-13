@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.tjenester
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
@@ -13,6 +12,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
+import tools.jackson.databind.JsonNode
 
 private val logg = KotlinLogging.logger {}
 
@@ -39,7 +39,7 @@ internal class JournalpostOppdatertMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
         logg.info { "Fått løsning for $løsning, journalpostId: $journalpostId" }
         val journalpostOppdatert =
             JournalpostOppdatert(

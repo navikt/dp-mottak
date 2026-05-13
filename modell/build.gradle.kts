@@ -3,9 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.jackson.core)
-    implementation(libs.jackson.kotlin)
-    implementation(libs.jackson.datatype.jsr310)
+    implementation(libs.bundles.jackson)
     api(libs.kotlin.logging)
     implementation("org.slf4j:slf4j-api:2.0.17")
 

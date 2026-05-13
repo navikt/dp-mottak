@@ -1,6 +1,5 @@
 package no.nav.dagpenger.mottak.tjenester
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDateTime
@@ -14,6 +13,7 @@ import no.nav.dagpenger.mottak.Aktivitetslogg
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype
 import no.nav.dagpenger.mottak.InnsendingMediator
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
+import tools.jackson.databind.JsonNode
 
 private val logg = KotlinLogging.logger {}
 
@@ -26,8 +26,8 @@ internal class SøknadsdataMottak(
     init {
         River(rapidsConnection)
             .apply {
-                validate { it.requireValue("@event_name", "behov") }
-                validate { it.requireValue("@final", true) }
+                precondition { it.requireValue("@event_name", "behov") }
+                precondition { it.requireValue("@final", true) }
                 validate { it.require("@opprettet", JsonNode::asLocalDateTime) }
                 validate { it.requireKey(løsning) }
                 validate { it.requireKey("journalpostId") }
@@ -40,7 +40,7 @@ internal class SøknadsdataMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val journalpostId = packet["journalpostId"].asText()
+        val journalpostId = packet["journalpostId"].asString()
         if (journalpostId in setOf("717582885")) {
             logg.warn { "Skipper journalpostId: $journalpostId" }
             return

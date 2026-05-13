@@ -1,7 +1,7 @@
 package no.nav.dagpenger.mottak.behov.journalpost
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.nav.dagpenger.mottak.behov.JsonMapper
+import no.nav.dagpenger.mottak.defaultObjectMapper
 
 internal interface JournalpostFeil {
     private companion object {
@@ -24,9 +24,9 @@ internal interface JournalpostFeil {
         when (journalpostException.statusCode) {
             400 -> {
                 logger.info { "CONTENT -> ${journalpostException.content}" }
-                val json = JsonMapper.jacksonJsonAdapter.readTree(journalpostException.content)
+                val json = defaultObjectMapper.readTree(journalpostException.content)
 
-                val feilmelding = json["message"].asText()
+                val feilmelding = json["message"].asString()
 
                 when {
                     feilmelding in whitelistFeilmeldinger -> {

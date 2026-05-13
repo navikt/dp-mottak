@@ -1,10 +1,10 @@
 package no.nav.dagpenger.mottak.meldinger.søknadsdata
 
-import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.mottak.AvsluttedeArbeidsforhold
 import no.nav.dagpenger.mottak.AvsluttetArbeidsforhold
 import no.nav.dagpenger.mottak.RutingOppslag
 import no.nav.dagpenger.mottak.SøknadVisitor
+import tools.jackson.databind.JsonNode
 
 class BrukerdialogSøknadFormat(private val data: JsonNode) : RutingOppslag {
     companion object {
@@ -36,14 +36,14 @@ class BrukerdialogSøknadFormat(private val data: JsonNode) : RutingOppslag {
     override fun avtjentVerneplikt(): Boolean = verdi["avtjentVerneplikt"]?.asBoolean() ?: false
 
     override fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
-        return verdi["avsluttetArbeidsforhold"]?.map {
+        return verdi["avsluttetArbeidsforhold"]?.values()?.map {
             AvsluttetArbeidsforhold(
-                sluttårsak = AvsluttetArbeidsforhold.Sluttårsak.valueOf(it["sluttårsak"].asText()),
+                sluttårsak = AvsluttetArbeidsforhold.Sluttårsak.valueOf(it["sluttårsak"].asString()),
                 fiskeforedling = it["fiskeforedling"]?.asBoolean() ?: false,
-                land = it["land"].asText(),
+                land = it["land"].asString(),
             )
         } ?: emptyList()
     }
 
-    override fun søknadId(): String? = verdi["søknad_uuid"]?.textValue()
+    override fun søknadId(): String? = verdi["søknad_uuid"]?.stringValue()
 }
