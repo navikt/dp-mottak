@@ -23,7 +23,7 @@ dependencies {
     implementation("io.getunleash:unleash-client-java:12.2.1")
 
     implementation(libs.bundles.postgres)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j:1.11.0")
 
     implementation(libs.bundles.jackson)
 
