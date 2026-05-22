@@ -33,7 +33,7 @@ dependencies {
     implementation("io.ktor:ktor-server-call-id:${libs.versions.ktor.get()}")
     implementation("io.ktor:ktor-server-call-logging:${libs.versions.ktor.get()}")
     implementation("de.slub-dresden:urnlib:3.0.0")
-    implementation("io.ktor:ktor-client-logging:3.4.3")
+    implementation("io.ktor:ktor-client-logging:3.5.0")
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter-params:${libs.versions.junit.get()}")
