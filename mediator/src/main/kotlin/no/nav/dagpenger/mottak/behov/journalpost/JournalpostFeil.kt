@@ -15,10 +15,14 @@ internal interface JournalpostFeil {
         private val nyWhitelistFeilmeldinger =
             setOf(
                 "bruker kan ikke oppdateres for journalpost med journalpoststatus=J og journalposttype=I",
+                "Den har journalstatus=J",
             )
     }
 
-    class JournalpostException(val statusCode: Int, val content: String?) : RuntimeException()
+    class JournalpostException(
+        val statusCode: Int,
+        val content: String?,
+    ) : RuntimeException()
 
     fun ignorerKjenteTilstander(journalpostException: JournalpostException) {
         when (journalpostException.statusCode) {
