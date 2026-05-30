@@ -50,8 +50,6 @@ spec:
   env:
     - name: JDK_JAVA_OPTIONS
       value: -XX:+UseZGC -XX:MaxRAMPercentage=50.0 -XX:ActiveProcessorCount=4
-    - name: KAFKA_MAX_RECORDS
-      value: "100"
     - name: DP_PROXY_HOST
       value: "{{dp_proxy.ingress}}"
     - name: PDL_API_HOST
