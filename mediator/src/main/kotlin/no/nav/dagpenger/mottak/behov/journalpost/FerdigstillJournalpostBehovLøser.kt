@@ -51,7 +51,9 @@ internal class FerdigstillJournalpostBehovLøser(
                     journalpostDokarkiv.ferdigstill(journalpostId, behovId)
                 }
             } catch (e: JournalpostFeil.JournalpostException) {
-                ignorerKjenteTilstander(e)
+                if (journalpostId != "754145802") {
+                    ignorerKjenteTilstander(e)
+                }
             }
 
             packet["@løsning"] =
