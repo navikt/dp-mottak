@@ -35,10 +35,10 @@ spec:
     max: {{replicas_max}}
   resources:
     limits:
-      memory: 640Mi
+      memory: 512Mi
     requests:
-      cpu: 140m
-      memory: 480Mi
+      cpu: 100m
+      memory: 256Mi
   kafka:
     pool: "{{kafka_pool}}"
   azure:
@@ -49,7 +49,7 @@ spec:
           - id: "4edb2ce5-4f0e-4f6f-9b82-b8e75e9dd09e"
   env:
     - name: JDK_JAVA_OPTIONS
-      value: -XX:+UseZGC -XX:MaxRAMPercentage=50.0 -XX:ActiveProcessorCount=4
+      value: -XX:+UseParallelGC -XX:MaxRAMPercentage=25.0 -XX:ActiveProcessorCount=4
     - name: DP_PROXY_HOST
       value: "{{dp_proxy.ingress}}"
     - name: PDL_API_HOST
