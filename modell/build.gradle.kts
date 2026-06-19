@@ -10,6 +10,6 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:${libs.versions.junit.get()}")
     testImplementation(libs.mockk)
     testImplementation("no.bekk.bekkopen:nocommons:0.17.0")
-    testImplementation("com.approvaltests:approvaltests:26.7.1")
+    testImplementation("com.approvaltests:approvaltests:30.1.1")
     testImplementation(libs.kotest.assertions.core)
 }
