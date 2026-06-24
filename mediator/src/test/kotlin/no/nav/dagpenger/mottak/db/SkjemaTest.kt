@@ -8,7 +8,7 @@ internal class SkjemaTest {
     @Test
     fun `riktig antall migreringer`() {
         withCleanDb {
-            assertEquals(20, PostgresDataSourceBuilder.runMigration())
+            assertEquals(21, PostgresDataSourceBuilder.runMigration())
         }
     }
 }
