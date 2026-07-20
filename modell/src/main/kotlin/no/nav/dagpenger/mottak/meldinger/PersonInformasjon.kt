@@ -51,6 +51,7 @@ class PersonInformasjon(
     ) {
         init {
             require(ident.matches(Regex("[0-9]{11}"))) { "Ident må ha 11 siffer" }
+            require(navn.isNotBlank()) { "Navn kan ikke være tomt" }
         }
 
         fun accept(visitor: PersonVisitor) {

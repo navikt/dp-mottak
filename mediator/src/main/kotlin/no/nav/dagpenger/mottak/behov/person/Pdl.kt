@@ -157,7 +157,7 @@ internal class Pdl {
         internal fun JsonNode.diskresjonsKode(): String? = findValue("adressebeskyttelse").values().firstOrNull()?.path("gradering")?.asString(null)
 
         internal fun JsonNode.personNavn(): String =
-            findValue("navn").values().first().let { node ->
+            findValue("navn").values().firstOrNull()?.let { node ->
                 val fornavn = node.path("fornavn").asString()
                 val mellomnavn = node.path("mellomnavn").asString("")
                 val etternavn = node.path("etternavn").asString()
@@ -166,7 +166,7 @@ internal class Pdl {
                     true -> "$fornavn $etternavn"
                     else -> "$fornavn $mellomnavn $etternavn"
                 }
-            }
+            } ?: ""
 
         private fun JsonNode.ident(type: String): String = findValue("identer").values().first { it.path("gruppe").asString() == type }.get("ident").asString()
 

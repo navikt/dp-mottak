@@ -10,6 +10,21 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 internal class PersonInformasjonTest {
+    @Test
+    fun `Skal ikke validere riktig hvis navn er tomt`() {
+        val personInformasjon =
+            PersonInformasjon(
+                Aktivitetslogg(),
+                journalpostId = "12345",
+                aktørId = "12345678",
+                ident = GENERERT_FØDSELSNUMMER,
+                norskTilknytning = true,
+                navn = "",
+                diskresjonskode = null,
+            )
+        assertFalse(personInformasjon.validate())
+    }
+
     @ParameterizedTest
     @ValueSource(strings = ["1234", "xyz"])
     fun `Skal ikke validere riktig hvis ikke det er gyldig fødselsnummer eller dnummer`(ident: String) {

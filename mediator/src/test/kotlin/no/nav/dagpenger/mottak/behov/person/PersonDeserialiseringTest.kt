@@ -128,6 +128,16 @@ internal class PersonDeserialiseringTest {
     }
 
     @Test
+    fun `Takler tom navn-liste fra PDL`() {
+        assertEquals(
+            "",
+            defaultObjectMapper.readTree(
+                """{ "data": {"navn": [] } }""".trimIndent(),
+            ).personNavn(),
+        )
+    }
+
+    @Test
     fun `Takler manglende mellom navn`() {
         assertEquals(
             "LITEN BRANNHYDRANT",
