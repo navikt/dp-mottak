@@ -583,6 +583,8 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
     @CsvSource(
         "GENERELL_INNSENDING, ARENA",
         "GENERELL_INNSENDING, DAGPENGER",
+        "N6, ARENA",
+        "N6, DAGPENGER",
     )
     fun `skal håndtere joark hendelsene generell innsending`(
         brevkode: String,

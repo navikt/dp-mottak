@@ -31,6 +31,7 @@ import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_PERMITTERT
 import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_PERMITTERT_ETTERSENDING
 import no.nav.dagpenger.mottak.meldinger.SkjemaType.DAGPENGESØKNAD_UTDANNING
 import no.nav.dagpenger.mottak.meldinger.SkjemaType.GENERELL
+import no.nav.dagpenger.mottak.meldinger.SkjemaType.GENERELL_FYLLUT
 import no.nav.dagpenger.mottak.meldinger.SkjemaType.KLAGE
 import no.nav.dagpenger.mottak.meldinger.SkjemaType.KLAGE_ETTERSENDING
 import no.nav.dagpenger.mottak.meldinger.SkjemaType.KLAGE_OG_ANKE
@@ -203,7 +204,7 @@ class Journalpost constructor(
                 DAGPENGESØKNAD_PERMITTERT_ETTERSENDING.skjemakode,
             ),
             -> Ettersending(this)
-            in setOf(GENERELL.skjemakode) -> Generell(this)
+            in setOf(GENERELL.skjemakode, GENERELL_FYLLUT.skjemakode) -> Generell(this)
             else -> UkjentSkjemaKode(this)
         }
     }

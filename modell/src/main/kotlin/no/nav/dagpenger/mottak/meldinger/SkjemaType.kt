@@ -17,6 +17,7 @@ enum class SkjemaType(val skjemakode: String, val tittel: String) {
     ANKE("NAV 90-00.08 A", "Anke"),
     ANKE_ETTERSENDING("NAVe 90-00.08 A", "Ettersendelse til anke"),
     GENERELL("GENERELL_INNSENDING", "Generell innsending"),
+    GENERELL_FYLLUT("N6", "Generell innsending (fyllut)"),
     DOKUMENTASJON_ANDRE_YTELSER("K1", "Dokumentasjon av andre ytelser"),
     TIMELISTER("M6", "Timelister"),
     BREV_FRA_BOBESTYRER_KONKURSFORVALTER("M7", "Brev fra bobestyrer/konkursforvalter"),
