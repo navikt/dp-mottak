@@ -42,9 +42,9 @@ class BehovMediator(
                 (kontekst + behovMap + behovParametere)
                     .let { JsonMessage.newNeed(behovMap.keys, it + final) }
                     .also { message ->
-                        sikkerLogg.info("sender behov for {}:\n{}", behovMap.keys, message.toJson())
+                        sikkerLogg.info { "sender behov for ${behovMap.keys}:\n${message.toJson()}" }
                         rapidsConnection.publish(hendelse.journalpostId(), message.toJson())
-                        logger.info("Sender behov for {}", behovMap.keys)
+                        logger.info { "Sender behov for ${behovMap.keys}" }
                     }
             }
     }

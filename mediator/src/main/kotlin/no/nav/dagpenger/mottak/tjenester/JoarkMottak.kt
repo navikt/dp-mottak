@@ -49,7 +49,7 @@ internal class JoarkMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        logg.info(
+        logg.info {
             """Received journalpost with journalpost id: ${packet["journalpostId"].asString()} 
               |tema: ${packet["temaNytt"].asString()}, 
               |hendelsesType: ${packet["hendelsesType"].asString()}, 
@@ -57,8 +57,8 @@ internal class JoarkMottak(
               |behandlingstema: ${packet["behandlingstema"].asString()}
               |journalpostStatus: ${packet["journalpostStatus"].asString()}
               |
-            """.trimMargin(),
-        )
+            """.trimMargin()
+        }
 
         Metrics.mottakskanalInc(packet["mottaksKanal"].asString())
 

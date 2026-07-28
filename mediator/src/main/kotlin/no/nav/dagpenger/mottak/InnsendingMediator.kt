@@ -149,8 +149,8 @@ internal class InnsendingMediator(
     ) {
         innsendingRepository.lagre(innsending)
         if (!hendelse.hasMessages()) return
-        if (hendelse.hasErrors()) return sikkerlogg.info("aktivitetslogg inneholder errors: ${hendelse.toLogString()}")
-        sikkerlogg.info("aktivitetslogg inneholder meldinger: ${hendelse.toLogString()}")
+        if (hendelse.hasErrors()) return sikkerlogg.info { "aktivitetslogg inneholder errors: ${hendelse.toLogString()}" }
+        sikkerlogg.info { "aktivitetslogg inneholder meldinger: ${hendelse.toLogString()}" }
         behovMediator.håndter(hendelse)
     }
 }

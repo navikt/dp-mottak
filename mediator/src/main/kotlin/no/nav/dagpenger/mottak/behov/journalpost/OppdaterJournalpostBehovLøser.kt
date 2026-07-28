@@ -59,7 +59,7 @@ internal class OppdaterJournalpostBehovLøser(
                 }
             }
             packet["@løsning"] = mapOf("OppdaterJournalpost" to mapOf("journalpostId" to journalpostId))
-            logger.info("løser behov OppdaterJournalpost (mottakskanal ${packet.mottakskanal()})")
+            logger.info { "løser behov OppdaterJournalpost (mottakskanal ${packet.mottakskanal()})" }
             context.publish(packet.toJson())
         }
     }

@@ -49,7 +49,7 @@ internal class PersondataBehovLøser(
             runBlocking(MDCContext()) { personOppslag.hentPerson(packet["brukerId"].asString()) }.also {
                 packet["@løsning"] = mapOf("Persondata" to it)
                 context.publish(packet.toJson())
-                logger.info("Løst behov Persondata for journalpost med id ${packet["journalpostId"].asString()}")
+                logger.info { "Løst behov Persondata for journalpost med id ${packet["journalpostId"].asString()}" }
             }
         }
     }
