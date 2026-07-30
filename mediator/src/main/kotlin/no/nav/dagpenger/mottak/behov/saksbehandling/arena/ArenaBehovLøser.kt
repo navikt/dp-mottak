@@ -11,6 +11,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.slf4j.MDCContext
+import no.nav.dagpenger.mottak.Config
 
 internal class ArenaBehovLøser(
     arenaOppslag: ArenaOppslag,
@@ -62,7 +63,7 @@ internal class ArenaBehovLøser(
             val journalpostId = packet["journalpostId"].asString()
             val behovId = packet["@behovId"].asString()
 
-            if (listOf("717560009").contains(journalpostId)) {
+            if (Config.isDev && listOf("454154312").contains(journalpostId)) {
                 logger.info { "Skipper journalpost $journalpostId fra ArenaBehovLøser" }
                 return
             }
