@@ -37,7 +37,12 @@ internal class FerdigstillJournalpostBehovLøser(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
+        val skipSetJournalpostIder = setOf("761545197")
         val journalpostId = packet["journalpostId"].asString()
+        if (journalpostId in skipSetJournalpostIder) {
+            logger.info { "Skipper journalpost $journalpostId pga. feil ved ferdigstilling." }
+            return
+        }
         val behovId = packet["@behovId"].asString()
 
         withMDC(
