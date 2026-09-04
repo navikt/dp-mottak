@@ -5,7 +5,7 @@ plugins {
 dependencies {
     implementation(libs.bundles.jackson)
     api(libs.kotlin.logging)
-    implementation("org.slf4j:slf4j-api:2.0.18")
+    implementation("org.slf4j:slf4j-api:2.0.19")
 
     testImplementation("org.junit.jupiter:junit-jupiter-params:${libs.versions.junit.get()}")
     testImplementation(libs.mockk)
