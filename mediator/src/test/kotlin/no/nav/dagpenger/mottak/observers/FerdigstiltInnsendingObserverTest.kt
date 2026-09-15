@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.observers
 
+import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.InnsendingObserver
 import no.nav.dagpenger.mottak.InnsendingObserver.Type.NySøknad
 import no.nav.dagpenger.mottak.defaultObjectMapper
@@ -37,6 +38,18 @@ internal class FerdigstiltInnsendingObserverTest {
         assertNotNull(message["fagsakId"])
         assertNotNull(message["skjemaKode"])
         assertNotNull(message["tittel"])
+        assertEquals("DAGPENGER", message["fagsystem"].asString())
+    }
+
+    @Test
+    fun `fagsystem utelates når innsendingen ikke er knyttet til et fagsystem`() {
+        val mockProducer = MockProducer(true, RoundRobinPartitioner(), StringSerializer(), StringSerializer())
+        val observer = FerdigstiltInnsendingObserver(mockProducer)
+
+        observer.innsendingFerdigstilt(ferdigstiltEvent().copy(fagsystem = null))
+
+        val message = defaultObjectMapper.readTree(mockProducer.history().first().value())
+        assertFalse(message.has("fagsystem"))
     }
 
     @Test
@@ -103,6 +116,7 @@ internal class FerdigstiltInnsendingObserverTest {
             fødselsnummer = "12345678901",
             fagsakId = "1234",
             oppgaveId = "oppgaveId",
+            fagsystem = Fagsystem.FagsystemType.DAGPENGER,
             datoRegistrert = LocalDateTime.now(),
             søknadsData =
                 defaultObjectMapper.createObjectNode().also {

@@ -842,6 +842,12 @@ class Innsending private constructor(
         val oppgaveId: String? =
             arenaSak?.oppgaveId
                 ?: oppgaveSak?.oppgaveId?.toString()
+        val fagsystem: Fagsystem.FagsystemType? =
+            when {
+                oppgaveSak != null -> Fagsystem.FagsystemType.DAGPENGER
+                arenaSak != null -> Fagsystem.FagsystemType.ARENA
+                else -> null
+            }
 
         InnsendingEvent(
             type = mapToHendelseType(jp),
@@ -851,6 +857,7 @@ class Innsending private constructor(
             fødselsnummer = person?.ident,
             fagsakId = fagsakId,
             oppgaveId = oppgaveId,
+            fagsystem = fagsystem,
             datoRegistrert = jp.datoRegistrert(),
             søknadsData = rutingOppslag?.eventData(),
             behandlendeEnhet =

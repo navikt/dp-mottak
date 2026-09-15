@@ -36,6 +36,7 @@ interface InnsendingObserver {
         val fødselsnummer: String?,
         val fagsakId: String?,
         val oppgaveId: String?,
+        val fagsystem: Fagsystem.FagsystemType? = null,
         val datoRegistrert: LocalDateTime,
         val søknadsData: JsonNode?,
         val behandlendeEnhet: String,

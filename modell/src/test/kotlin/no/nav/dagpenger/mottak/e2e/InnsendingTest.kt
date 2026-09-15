@@ -28,6 +28,7 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType.UkjentBrukerType
 import no.nav.dagpenger.mottak.toJsonNode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -454,6 +455,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             val expected = setOf("Klage")
             assertTrue(it.type.name in expected, "Forventet at ${it.type.name} var en av $expected")
             assertNotNull(it.fagsakId)
+            assertEquals(fagsystemType, it.fagsystem)
             when (fagsystemType) {
                 Fagsystem.FagsystemType.ARENA -> {
                     assertEquals(ARENA_FAGSAK_ID, it.fagsakId)
@@ -561,6 +563,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
         assertFerdigstilt {
             assertEquals("Ettersending", it.type.name)
             assertNotNull(it.fagsakId)
+            assertEquals(fagsystemType, it.fagsystem)
             when (fagsystemType) {
                 Fagsystem.FagsystemType.ARENA -> {
                     assertEquals(ARENA_FAGSAK_ID, it.fagsakId)
@@ -722,6 +725,10 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
 
         assertFerdigstilt {
             assertEquals("UkjentSkjemaKode", it.type.name)
+            when (fagsystemType) {
+                Fagsystem.FagsystemType.DAGPENGER -> assertEquals(fagsystemType, it.fagsystem)
+                Fagsystem.FagsystemType.ARENA -> assertNull(it.fagsystem)
+            }
             assertNotNull(it.aktørId)
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)

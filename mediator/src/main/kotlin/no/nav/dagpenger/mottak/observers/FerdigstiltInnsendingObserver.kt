@@ -104,5 +104,6 @@ private fun InnsendingObserver.InnsendingEvent.toPayload() =
         fødselsnummer?.let { set("fødselsnummer", it) }
         aktørId?.let { set("aktørId", it) }
         fagsakId?.let { set("fagsakId", it) }
+        fagsystem?.let { set("fagsystem", it.name) }
         søknadsData?.let { set("søknadsData", it) }
     }
