@@ -214,7 +214,7 @@ Publiseres når innsending når `InnsendingFerdigstiltType`. Inneholder:
 - tittel
 - type (kategori)
 - datoRegistrert
-- fagsakId (hvis opprettet)
+- fagsakId (hvis opprettet) — UUID når `fagsystem` er `DAGPENGER`, numerisk Arena-id når det er `ARENA`
 - fagsystem — `DAGPENGER` når vi vet sikkert at innsendingen skal behandles i dp-sak. `ARENA` er fallback: dp-sak har ikke bekreftet at den tar saken. Feltet utelates når innsendingen ikke er knyttet til en sak i noen av fagsystemene. Konsumenter bør sjekke `fagsystem == "DAGPENGER"`, ikke det motsatte
 - søknadsData (hvis tilgjengelig)
 
