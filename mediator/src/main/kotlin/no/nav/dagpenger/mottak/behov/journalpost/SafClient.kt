@@ -11,7 +11,9 @@ import io.ktor.http.HttpMethod
 import no.nav.dagpenger.mottak.Config.safTokenProvider
 import no.nav.dagpenger.mottak.Config.safUrl
 
-internal class SafClient(config: Configuration) : JournalpostArkiv {
+internal class SafClient(
+    config: Configuration,
+) : JournalpostArkiv {
     private val tokenProvider = config.safTokenProvider
     private val safUrl = config.safUrl()
 
@@ -21,12 +23,13 @@ internal class SafClient(config: Configuration) : JournalpostArkiv {
         }
 
     override suspend fun hentJournalpost(journalpostId: String): SafGraphQL.Journalpost =
-        joarkClient.request("$safUrl/graphql") {
-            header("Content-Type", "application/json")
-            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
-            method = HttpMethod.Post
-            setBody(JournalPostQuery(journalpostId).toJson())
-        }.let {
-            SafGraphQL.Journalpost.fromGraphQlJson(it.bodyAsText())
-        }
+        joarkClient
+            .request("$safUrl/graphql") {
+                header("Content-Type", "application/json")
+                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+                method = HttpMethod.Post
+                setBody(JournalPostQuery(journalpostId).toJson())
+            }.let {
+                SafGraphQL.Journalpost.fromGraphQlJson(it.bodyAsText())
+            }
 }

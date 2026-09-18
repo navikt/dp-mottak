@@ -11,7 +11,9 @@ import org.approvaltests.core.Options
 import org.approvaltests.namer.NamerWrapper
 import java.nio.file.Paths
 
-class TestInnsendingInspektør(innsending: Innsending) : InnsendingVisitor {
+class TestInnsendingInspektør(
+    innsending: Innsending,
+) : InnsendingVisitor {
     lateinit var gjeldendetilstand: InnsendingTilstandType
     internal lateinit var innsendingLogg: Aktivitetslogg
 
@@ -28,12 +30,18 @@ class TestInnsendingInspektør(innsending: Innsending) : InnsendingVisitor {
     }
 }
 
-class PlantUmlObservatør() : InnsendingObserver {
+class PlantUmlObservatør : InnsendingObserver {
     private val tilstander = mutableListOf<Pair<String, String>>()
     private val innsendingdetaljer = mutableListOf<String>()
 
     private companion object {
-        val path = Paths.get("").toAbsolutePath().parent.resolve("docs/arkitektur").toString()
+        val path =
+            Paths
+                .get("")
+                .toAbsolutePath()
+                .parent
+                .resolve("docs/arkitektur")
+                .toString()
         val options =
             Options()
                 .forFile()

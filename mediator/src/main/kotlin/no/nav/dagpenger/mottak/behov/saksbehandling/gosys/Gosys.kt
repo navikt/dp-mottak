@@ -38,9 +38,13 @@ internal data class GosysOppgaveRequest(
     val tema: String = "DAG"
 }
 
-internal data class GosysOppgaveResponse(val id: String)
+internal data class GosysOppgaveResponse(
+    val id: String,
+)
 
-internal class GosysClient(config: Configuration) : GosysOppslag {
+internal class GosysClient(
+    config: Configuration,
+) : GosysOppslag {
     companion object {
         private val logger = KotlinLogging.logger {}
     }
@@ -61,20 +65,21 @@ internal class GosysClient(config: Configuration) : GosysOppslag {
             }
         }
 
-    override suspend fun opprettOppgave(oppgave: GosysOppgaveRequest): String {
-        return try {
+    override suspend fun opprettOppgave(oppgave: GosysOppgaveRequest): String =
+        try {
             logger.info { "Forsøker å opprette oppgave i gosys for sak med journalpostId ${oppgave.journalpostId}" }
-            gosysClient.request {
-                header("X-Correlation-ID", oppgave.journalpostId)
-                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
-                header(HttpHeaders.ContentType, "application/json")
-                header(HttpHeaders.Accept, "application/json")
-                method = HttpMethod.Post
-                setBody(oppgave)
-            }.body<GosysOppgaveResponse>().id
+            gosysClient
+                .request {
+                    header("X-Correlation-ID", oppgave.journalpostId)
+                    header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+                    header(HttpHeaders.ContentType, "application/json")
+                    header(HttpHeaders.Accept, "application/json")
+                    method = HttpMethod.Post
+                    setBody(oppgave)
+                }.body<GosysOppgaveResponse>()
+                .id
         } catch (e: Exception) {
             logger.error(e) { "Kunne ikke opprette gosys oppgave for journalpost med id ${oppgave.journalpostId}" }
             throw e
         }
-    }
 }

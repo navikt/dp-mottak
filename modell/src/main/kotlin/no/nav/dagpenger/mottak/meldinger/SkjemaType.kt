@@ -1,6 +1,9 @@
 package no.nav.dagpenger.mottak.meldinger
 
-enum class SkjemaType(val skjemakode: String, val tittel: String) {
+enum class SkjemaType(
+    val skjemakode: String,
+    val tittel: String,
+) {
     DAGPENGESØKNAD_ORDINÆR("NAV 04-01.03", "Søknad om dagpenger (ikke permittert)"),
     DAGPENGESØKNAD_ORDINÆR_ETTERSENDING("NAVe 04-01.03", "Ettersendelse til søknad om dagpenger ved arbeidsledighet (ikke permittert)"),
     DAGPENGESØKNAD_PERMITTERT("NAV 04-01.04", "Søknad om dagpenger ved permittering"),
@@ -61,11 +64,12 @@ enum class SkjemaType(val skjemakode: String, val tittel: String) {
     ;
 
     companion object {
-        fun String.tilSkjemaType(): SkjemaType {
-            return entries.firstOrNull { it.skjemakode == this }
+        fun String.tilSkjemaType(): SkjemaType =
+            entries.firstOrNull { it.skjemakode == this }
                 ?: throw UkjentSkjemaException("Ukjent skjemakode: $this")
-        }
     }
 }
 
-class UkjentSkjemaException(message: String) : RuntimeException(message)
+class UkjentSkjemaException(
+    message: String,
+) : RuntimeException(message)

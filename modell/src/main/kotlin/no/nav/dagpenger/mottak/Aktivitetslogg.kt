@@ -8,7 +8,9 @@ import java.time.format.DateTimeFormatter
 // Understands issues that arose when analyzing a JSON message
 // Implements Collecting Parameter in Refactoring by Martin Fowler
 // Implements Visitor pattern to traverse the messages
-class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitetslogg {
+class Aktivitetslogg(
+    private var forelder: Aktivitetslogg? = null,
+) : IAktivitetslogg {
     private val aktiviteter = mutableListOf<Aktivitet>()
     private val kontekster = mutableListOf<Aktivitetskontekst>() // Doesn't need serialization
 
@@ -86,11 +88,10 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
         kontekst(innsending as Aktivitetskontekst)
     }
 
-    internal fun logg(kontekst: Aktivitetskontekst): Aktivitetslogg {
-        return Aktivitetslogg(this).also {
+    internal fun logg(kontekst: Aktivitetskontekst): Aktivitetslogg =
+        Aktivitetslogg(this).also {
             it.aktiviteter.addAll(this.aktiviteter.filter { aktivitet -> kontekst in aktivitet })
         }
-    }
 
     override fun kontekster() =
         aktiviteter
@@ -107,15 +108,16 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
 
     private fun severe() = Aktivitet.Severe.filter(aktiviteter)
 
-    class AktivitetException internal constructor(private val aktivitetslogg: Aktivitetslogg) :
-        RuntimeException(aktivitetslogg.toString()) {
-            fun kontekst() =
-                aktivitetslogg.kontekster.fold(mutableMapOf<String, String>()) { result, kontekst ->
-                    result.apply { putAll(kontekst.toSpesifikkKontekst().kontekstMap) }
-                }
+    class AktivitetException internal constructor(
+        private val aktivitetslogg: Aktivitetslogg,
+    ) : RuntimeException(aktivitetslogg.toString()) {
+        fun kontekst() =
+            aktivitetslogg.kontekster.fold(mutableMapOf<String, String>()) { result, kontekst ->
+                result.apply { putAll(kontekst.toSpesifikkKontekst().kontekstMap) }
+            }
 
-            fun aktivitetslogg() = aktivitetslogg
-        }
+        fun aktivitetslogg() = aktivitetslogg
+    }
 
     sealed class Aktivitet(
         private val alvorlighetsgrad: Int,
@@ -136,16 +138,15 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
                 .fold(mutableMapOf()) { result, kontekst -> result.apply { putAll(kontekst.kontekstMap) } }
 
         override fun compareTo(other: Aktivitet) =
-            this.tidsstempel.compareTo(other.tidsstempel)
+            this.tidsstempel
+                .compareTo(other.tidsstempel)
                 .let { if (it == 0) other.alvorlighetsgrad.compareTo(this.alvorlighetsgrad) else it }
 
         internal fun inOrder() = label + "\t" + this.toString()
 
         override fun toString() = tidsstempel + "\t" + melding + meldingerString()
 
-        private fun meldingerString(): String {
-            return kontekster.joinToString(separator = " ") { "(${it.melding()})" }
-        }
+        private fun meldingerString(): String = kontekster.joinToString(separator = " ") { "(${it.melding()})" }
 
         internal abstract fun accept(visitor: AktivitetsloggVisitor)
 
@@ -157,9 +158,7 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
             private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
         ) : Aktivitet(0, 'I', melding, tidsstempel, kontekster) {
             companion object {
-                internal fun filter(aktiviteter: List<Aktivitet>): List<Info> {
-                    return aktiviteter.filterIsInstance<Info>()
-                }
+                internal fun filter(aktiviteter: List<Aktivitet>): List<Info> = aktiviteter.filterIsInstance<Info>()
             }
 
             override fun accept(visitor: AktivitetsloggVisitor) {
@@ -173,9 +172,7 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
             private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
         ) : Aktivitet(25, 'W', melding, tidsstempel, kontekster) {
             companion object {
-                internal fun filter(aktiviteter: List<Aktivitet>): List<Warn> {
-                    return aktiviteter.filterIsInstance<Warn>()
-                }
+                internal fun filter(aktiviteter: List<Aktivitet>): List<Warn> = aktiviteter.filterIsInstance<Warn>()
             }
 
             override fun accept(visitor: AktivitetsloggVisitor) {
@@ -191,9 +188,7 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
             private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
         ) : Aktivitet(50, 'N', melding, tidsstempel, kontekster) {
             companion object {
-                internal fun filter(aktiviteter: List<Aktivitet>): List<Behov> {
-                    return aktiviteter.filterIsInstance<Behov>()
-                }
+                internal fun filter(aktiviteter: List<Aktivitet>): List<Behov> = aktiviteter.filterIsInstance<Behov>()
             }
 
             fun detaljer() = detaljer
@@ -233,9 +228,7 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
             private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
         ) : Aktivitet(75, 'E', melding, tidsstempel, kontekster) {
             companion object {
-                internal fun filter(aktiviteter: List<Aktivitet>): List<Error> {
-                    return aktiviteter.filterIsInstance<Error>()
-                }
+                internal fun filter(aktiviteter: List<Aktivitet>): List<Error> = aktiviteter.filterIsInstance<Error>()
             }
 
             override fun accept(visitor: AktivitetsloggVisitor) {
@@ -249,9 +242,7 @@ class Aktivitetslogg(private var forelder: Aktivitetslogg? = null) : IAktivitets
             private val tidsstempel: String = LocalDateTime.now().format(tidsstempelformat),
         ) : Aktivitet(100, 'S', melding, tidsstempel, kontekster) {
             companion object {
-                internal fun filter(aktiviteter: List<Aktivitet>): List<Severe> {
-                    return aktiviteter.filterIsInstance<Severe>()
-                }
+                internal fun filter(aktiviteter: List<Aktivitet>): List<Severe> = aktiviteter.filterIsInstance<Severe>()
             }
 
             override fun accept(visitor: AktivitetsloggVisitor) {
@@ -363,7 +354,10 @@ interface Aktivitetskontekst {
     fun toSpesifikkKontekst(): SpesifikkKontekst
 }
 
-class SpesifikkKontekst(internal val kontekstType: String, internal val kontekstMap: Map<String, String> = mapOf()) {
+class SpesifikkKontekst(
+    internal val kontekstType: String,
+    internal val kontekstMap: Map<String, String> = mapOf(),
+) {
     internal fun melding() = kontekstType + kontekstMap.entries.joinToString(separator = ", ", prefix = " - ") { "${it.key}: ${it.value}" }
 
     override fun equals(other: Any?) = this === other || other is SpesifikkKontekst && this.kontekstMap == other.kontekstMap

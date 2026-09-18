@@ -67,16 +67,17 @@ internal class JournalpostApiClient(
     ) {
         val feilmelding = "Kunne ikke oppdatere journalpost"
         try {
-            client.put {
-                url { encodedPath = "$basePath/journalpost/$journalpostId" }
-                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
-                header(HttpHeaders.XRequestId, eksternReferanseId)
-                header(HttpHeaders.ContentType, "application/json")
-                header(HttpHeaders.Accept, "application/json")
-                setBody(journalpost)
-            }.also {
-                logger.info { "Oppdaterte journalpost $journalpostId" }
-            }
+            client
+                .put {
+                    url { encodedPath = "$basePath/journalpost/$journalpostId" }
+                    header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+                    header(HttpHeaders.XRequestId, eksternReferanseId)
+                    header(HttpHeaders.ContentType, "application/json")
+                    header(HttpHeaders.Accept, "application/json")
+                    setBody(journalpost)
+                }.also {
+                    logger.info { "Oppdaterte journalpost $journalpostId" }
+                }
         } catch (e: ClientRequestException) {
             logger.error(e) { feilmelding }
             throw JournalpostFeil.JournalpostException(
@@ -118,19 +119,19 @@ internal class JournalpostApiClient(
         journalpostId: String,
         dagpengerFagsakId: String,
         ident: String,
-    ): KnyttJounalPostTilNySakResponse {
-        return client.put("/$basePath/journalpost/$journalpostId/knyttTilAnnenSak") {
-            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
-            header(HttpHeaders.ContentType, "application/json")
-            header(HttpHeaders.Accept, "application/json")
-            setBody(
-                KnyttTilAnnenSakRequest(
-                    fagsakId = dagpengerFagsakId,
-                    bruker = Bruker(id = ident),
-                ),
-            )
-        }.body()
-    }
+    ): KnyttJounalPostTilNySakResponse =
+        client
+            .put("/$basePath/journalpost/$journalpostId/knyttTilAnnenSak") {
+                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+                header(HttpHeaders.ContentType, "application/json")
+                header(HttpHeaders.Accept, "application/json")
+                setBody(
+                    KnyttTilAnnenSakRequest(
+                        fagsakId = dagpengerFagsakId,
+                        bruker = Bruker(id = ident),
+                    ),
+                )
+            }.body()
 
     private data class KnyttTilAnnenSakRequest(
         val fagsakId: String,
@@ -142,5 +143,7 @@ internal class JournalpostApiClient(
         val journalfoerendeEnhet: String = "9999"
     }
 
-    private data class FerdigstillJournalpostRequest(val journalfoerendeEnhet: String = "9999")
+    private data class FerdigstillJournalpostRequest(
+        val journalfoerendeEnhet: String = "9999",
+    )
 }

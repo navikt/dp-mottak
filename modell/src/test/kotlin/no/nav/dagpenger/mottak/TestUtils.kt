@@ -7,9 +7,8 @@ internal val jackson = defaultObjectMapper
 
 internal fun String.toJsonNode(): JsonNode = jackson.readTree(this)
 
-internal fun String.lesFil(): String {
-    return object {}.javaClass.getResource(this)?.readText()
+internal fun String.lesFil(): String =
+    object {}.javaClass.getResource(this)?.readText()
         ?: throw FileNotFoundException("Fant ikke $this på classpath")
-}
 
 internal fun String.jsonFraFil() = this.lesFil().toJsonNode()

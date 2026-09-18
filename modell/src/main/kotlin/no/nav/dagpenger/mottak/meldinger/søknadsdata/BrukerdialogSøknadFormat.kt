@@ -6,7 +6,9 @@ import no.nav.dagpenger.mottak.RutingOppslag
 import no.nav.dagpenger.mottak.SøknadVisitor
 import tools.jackson.databind.JsonNode
 
-class BrukerdialogSøknadFormat(private val data: JsonNode) : RutingOppslag {
+class BrukerdialogSøknadFormat(
+    private val data: JsonNode,
+) : RutingOppslag {
     companion object {
         fun erBrukerdialogSøknadFormat(data: JsonNode): Boolean = data.verdi().isObject
 
@@ -35,15 +37,14 @@ class BrukerdialogSøknadFormat(private val data: JsonNode) : RutingOppslag {
 
     override fun avtjentVerneplikt(): Boolean = verdi["avtjentVerneplikt"]?.asBoolean() ?: false
 
-    override fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
-        return verdi["avsluttetArbeidsforhold"]?.values()?.map {
+    override fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold =
+        verdi["avsluttetArbeidsforhold"]?.values()?.map {
             AvsluttetArbeidsforhold(
                 sluttårsak = AvsluttetArbeidsforhold.Sluttårsak.valueOf(it["sluttårsak"].asString()),
                 fiskeforedling = it["fiskeforedling"]?.asBoolean() ?: false,
                 land = it["land"].asString(),
             )
         } ?: emptyList()
-    }
 
     override fun søknadId(): String? = verdi["søknad_uuid"]?.stringValue()
 }

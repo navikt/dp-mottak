@@ -11,8 +11,7 @@ import no.nav.dagpenger.mottak.Config
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
-internal fun AuthenticationContext.fnr(): String =
-    principal<JWTPrincipal>()?.subject ?: throw IllegalArgumentException("Fant ikke subject(fødselsnummer) i JWT")
+internal fun AuthenticationContext.fnr(): String = principal<JWTPrincipal>()?.subject ?: throw IllegalArgumentException("Fant ikke subject(fødselsnummer) i JWT")
 
 internal fun AuthenticationConfig.jwtBuilder(
     name: String,
@@ -30,8 +29,8 @@ internal fun AuthenticationConfig.jwtBuilder(
     }
 }
 
-private fun cachedJwkProvider(jwksUri: String): JwkProvider {
-    return JwkProviderBuilder(URI(jwksUri).toURL())
+private fun cachedJwkProvider(jwksUri: String): JwkProvider =
+    JwkProviderBuilder(URI(jwksUri).toURL())
         .cached(10, 24, TimeUnit.HOURS) // cache up to 10 JWKs for 24 hours
         .rateLimited(
             10,
@@ -39,4 +38,3 @@ private fun cachedJwkProvider(jwksUri: String): JwkProvider {
             TimeUnit.MINUTES,
         ) // if not cached, only allow max 10 different keys per minute to be fetched from external provider
         .build()
-}

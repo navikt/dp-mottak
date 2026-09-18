@@ -10,34 +10,43 @@ import tools.jackson.databind.JsonNode
 
 private val logger = KotlinLogging.logger { }
 
-class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
+class QuizSøknadFormat(
+    private val data: JsonNode,
+) : RutingOppslag {
     override fun eøsBostedsland(): Boolean =
         data
             .hentNullableFaktaFraSeksjon("bostedsland")
-            ?.faktaSvar("faktum.hvilket-land-bor-du-i")?.asString()?.erEøsLand() ?: false
+            ?.faktaSvar("faktum.hvilket-land-bor-du-i")
+            ?.asString()
+            ?.erEøsLand() ?: false
 
     override fun eøsArbeidsforhold(): Boolean =
-        data.hentNullableFaktaFraSeksjon("eos-arbeidsforhold")
-            ?.faktaSvar("faktum.eos-arbeid-siste-36-mnd")?.asBoolean() ?: false
+        data
+            .hentNullableFaktaFraSeksjon("eos-arbeidsforhold")
+            ?.faktaSvar("faktum.eos-arbeid-siste-36-mnd")
+            ?.asBoolean() ?: false
 
     override fun avtjentVerneplikt(): Boolean =
-        data.hentNullableFaktaFraSeksjon("verneplikt")
-            ?.faktaSvar("faktum.avtjent-militaer-sivilforsvar-tjeneste-siste-12-mnd")?.asBoolean() ?: false
+        data
+            .hentNullableFaktaFraSeksjon("verneplikt")
+            ?.faktaSvar("faktum.avtjent-militaer-sivilforsvar-tjeneste-siste-12-mnd")
+            ?.asBoolean() ?: false
 
     override fun avsluttetArbeidsforhold(): AvsluttedeArbeidsforhold {
         val faktaFraSeksjon = data.hentNullableFaktaFraSeksjon("din-situasjon")
         val arbeidsforhold =
             faktaFraSeksjon?.values()?.singleOrNull { it["beskrivendeId"].asString() == "faktum.arbeidsforhold" }?.get("svar")
         return (arbeidsforhold?.values() ?: emptyList()).filterNot { it.isEmpty }.mapNotNull {
-            kotlin.runCatching {
-                AvsluttetArbeidsforhold(
-                    sluttårsak = it.sluttårsak(),
-                    fiskeforedling = it.fiskForedling(),
-                    land = it.faktaSvar("faktum.arbeidsforhold.land").asString(),
-                )
-            }.onFailure { exception ->
-                logger.info(exception) { "Klarte ikke å finne AvsluttetArbeidsforhold" }
-            }.getOrNull()
+            kotlin
+                .runCatching {
+                    AvsluttetArbeidsforhold(
+                        sluttårsak = it.sluttårsak(),
+                        fiskeforedling = it.fiskForedling(),
+                        land = it.faktaSvar("faktum.arbeidsforhold.land").asString(),
+                    )
+                }.onFailure { exception ->
+                    logger.info(exception) { "Klarte ikke å finne AvsluttetArbeidsforhold" }
+                }.getOrNull()
         }
     }
 
@@ -51,8 +60,11 @@ class QuizSøknadFormat(private val data: JsonNode) : RutingOppslag {
 }
 
 private fun JsonNode.fiskForedling(): Boolean =
-    this.values().find { it["beskrivendeId"].asString() == "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering" }
-        ?.get("svar")?.asBoolean() ?: false
+    this
+        .values()
+        .find { it["beskrivendeId"].asString() == "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering" }
+        ?.get("svar")
+        ?.asBoolean() ?: false
 
 private fun JsonNode.sluttårsak(): Sluttårsak =
     this.faktaSvar("faktum.arbeidsforhold.endret").asString().let {
@@ -69,8 +81,7 @@ private fun JsonNode.sluttårsak(): Sluttårsak =
         }
     }
 
-private fun JsonNode.hentNullableFaktaFraSeksjon(navn: String): JsonNode? =
-    this["seksjoner"].values().singleOrNull { it["beskrivendeId"].asString() == navn }?.get("fakta")
+private fun JsonNode.hentNullableFaktaFraSeksjon(navn: String): JsonNode? = this["seksjoner"].values().singleOrNull { it["beskrivendeId"].asString() == navn }?.get("fakta")
 
 private fun JsonNode.faktaSvar(navn: String) =
     try {

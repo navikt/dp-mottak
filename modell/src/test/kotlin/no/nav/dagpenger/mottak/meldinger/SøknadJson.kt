@@ -644,12 +644,11 @@ internal fun avsluttedeArbeidsforholdQuizJson(
 private fun årsak(
     permittert: Boolean,
     konkurs: Boolean,
-): String {
-    return if (permittert) {
+): String =
+    if (permittert) {
         "faktum.arbeidsforhold.endret.svar.permittert"
     } else if (konkurs) {
         "faktum.arbeidsforhold.endret.svar.arbeidsgiver-konkurs"
     } else {
         "faktum.arbeidsforhold.endret.svar.ikke-endret"
     }
-}

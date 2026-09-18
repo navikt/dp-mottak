@@ -12,9 +12,7 @@ internal class SafGraphQL {
         val type: BrukerType,
         val id: String,
     ) {
-        override fun toString(): String {
-            return "Bruker(type=$type, id='<REDACTED>')"
-        }
+        override fun toString(): String = "Bruker(type=$type, id='<REDACTED>')"
     }
 
     enum class BrukerType {
@@ -28,10 +26,13 @@ internal class SafGraphQL {
         val datotype: Datotype,
     )
 
-    class DokumentInfo(val tittel: String?, val dokumentInfoId: String, val brevkode: String?, val hovedDokument: Boolean) {
-        override fun toString(): String {
-            return "DokumentInfo(tittel=$tittel, dokumentInfoId=$dokumentInfoId, brevkode=$brevkode)"
-        }
+    class DokumentInfo(
+        val tittel: String?,
+        val dokumentInfoId: String,
+        val brevkode: String?,
+        val hovedDokument: Boolean,
+    ) {
+        override fun toString(): String = "DokumentInfo(tittel=$tittel, dokumentInfoId=$dokumentInfoId, brevkode=$brevkode)"
     }
 
     internal data class Journalpost(
@@ -54,14 +55,19 @@ internal class SafGraphQL {
                     ?: throw IllegalArgumentException("SAF response har ingen data")
         }
 
-        private data class GraphQlJournalpostResponse(val data: Data?, val errors: List<String>?) {
+        private data class GraphQlJournalpostResponse(
+            val data: Data?,
+            val errors: List<String>?,
+        ) {
             init {
                 if (errors?.isNotEmpty() == true) {
                     throw IllegalArgumentException("SAF returnerte liste med feil: ${errors.joinToString("\n")}")
                 }
             }
 
-            class Data(val journalpost: Journalpost)
+            class Data(
+                val journalpost: Journalpost,
+            )
         }
     }
 

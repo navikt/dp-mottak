@@ -25,10 +25,11 @@ class JournalpostApiTest {
     @Test
     fun `Endepunkt for henting av journalpost krever autentisering`() {
         withMockAuthServerAndTestApplication({ journalpostRoute(mockk()) }) {
-            client.post("v1/journalpost/sok") {
-                contentType(ContentType.Application.Json)
-                setBody("""{"soknadId": "$søknadId", "ident": "$testIdent"}""")
-            }.status shouldBe HttpStatusCode.Unauthorized
+            client
+                .post("v1/journalpost/sok") {
+                    contentType(ContentType.Application.Json)
+                    setBody("""{"soknadId": "$søknadId", "ident": "$testIdent"}""")
+                }.status shouldBe HttpStatusCode.Unauthorized
         }
     }
 
@@ -38,20 +39,21 @@ class JournalpostApiTest {
         val søknadId = "MikkeMus"
 
         withMockAuthServerAndTestApplication({ journalpostRoute(mockk()) }) {
-            client.post("v1/journalpost/sok") {
-                autentisert()
-                contentType(ContentType.Application.Json)
-                setBody("""{"soknadId": "$søknadId", "ident": "$testIdent"}""")
-            }.let { response ->
-                response.status shouldBe HttpStatusCode.BadRequest
-                response.bodyAsText() shouldEqualJson
-                    //language=json
-                    """
+            client
+                .post("v1/journalpost/sok") {
+                    autentisert()
+                    contentType(ContentType.Application.Json)
+                    setBody("""{"soknadId": "$søknadId", "ident": "$testIdent"}""")
+                }.let { response ->
+                    response.status shouldBe HttpStatusCode.BadRequest
+                    response.bodyAsText() shouldEqualJson
+                        //language=json
+                        """
                     {
                         "journalpostIder": ["123456789" , "987654321"]
                     }
-                    """.trimMargin()
-            }
+                        """.trimMargin()
+                }
         }
     }
 
@@ -63,21 +65,22 @@ class JournalpostApiTest {
                 every { it.hentJournalpostIder(søknadId, testIdent) } returns listOf("123456789", "987654321")
             }
         withMockAuthServerAndTestApplication({ journalpostRoute(repository) }) {
-            client.post("v1/journalpost/sok") {
-                autentisert()
-                contentType(ContentType.Application.Json)
-                setBody("""{"soknadId": "$søknadId", "ident": "$testIdent"}""")
-            }.let { response ->
-                response.status shouldBe HttpStatusCode.OK
-                response.headers["Content-Type"] shouldBe "application/json"
-                response.bodyAsText() shouldEqualJson
-                    //language=json
-                    """
+            client
+                .post("v1/journalpost/sok") {
+                    autentisert()
+                    contentType(ContentType.Application.Json)
+                    setBody("""{"soknadId": "$søknadId", "ident": "$testIdent"}""")
+                }.let { response ->
+                    response.status shouldBe HttpStatusCode.OK
+                    response.headers["Content-Type"] shouldBe "application/json"
+                    response.bodyAsText() shouldEqualJson
+                        //language=json
+                        """
                     {
                         "journalpostIder": ["123456789" , "987654321"]
                     }
-                    """.trimMargin()
-            }
+                        """.trimMargin()
+                }
         }
     }
 }
