@@ -7,7 +7,7 @@ import tools.jackson.module.kotlin.jacksonMapperBuilder
 val defaultObjectMapper: ObjectMapper =
     jacksonMapperBuilder()
         .accessorNaming(
-            DefaultAccessorNamingStrategy.Provider()
+            DefaultAccessorNamingStrategy
+                .Provider()
                 .withFirstCharAcceptance(true, true),
-        )
-        .build()
+        ).build()

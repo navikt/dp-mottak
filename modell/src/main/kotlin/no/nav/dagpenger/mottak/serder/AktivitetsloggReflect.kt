@@ -13,7 +13,9 @@ import no.nav.dagpenger.mottak.serder.InnsendingData.AktivitetsloggData.Alvorlig
 import no.nav.dagpenger.mottak.serder.InnsendingData.AktivitetsloggData.Alvorlighetsgrad.SEVERE
 import no.nav.dagpenger.mottak.serder.InnsendingData.AktivitetsloggData.Alvorlighetsgrad.WARN
 
-internal class AktivitetsloggReflect(aktivitetslogg: Aktivitetslogg) {
+internal class AktivitetsloggReflect(
+    aktivitetslogg: Aktivitetslogg,
+) {
     private val aktiviteter = Aktivitetslogginspektør(aktivitetslogg).aktiviteter
 
     internal fun toMap() =
@@ -21,7 +23,9 @@ internal class AktivitetsloggReflect(aktivitetslogg: Aktivitetslogg) {
             "aktiviteter" to aktiviteter,
         )
 
-    private inner class Aktivitetslogginspektør(aktivitetslogg: Aktivitetslogg) : AktivitetsloggVisitor {
+    private inner class Aktivitetslogginspektør(
+        aktivitetslogg: Aktivitetslogg,
+    ) : AktivitetsloggVisitor {
         internal val aktiviteter = mutableListOf<Map<String, Any>>()
 
         init {
@@ -119,13 +123,12 @@ internal class AktivitetsloggReflect(aktivitetslogg: Aktivitetslogg) {
             )
         }
 
-        private fun map(kontekster: List<SpesifikkKontekst>): List<Map<String, Any>> {
-            return kontekster.map {
+        private fun map(kontekster: List<SpesifikkKontekst>): List<Map<String, Any>> =
+            kontekster.map {
                 mutableMapOf(
                     "kontekstType" to it.kontekstType,
                     "kontekstMap" to it.kontekstMap,
                 )
             }
-        }
     }
 }

@@ -18,9 +18,10 @@ internal class PersonDeserialiseringTest {
     fun `riktig navn`() {
         assertEquals(
             "LITEN hubba BRANNHYDRANT",
-            defaultObjectMapper.readTree(
-                """{"data" :{"navn": [ { "fornavn": "LITEN", "mellomnavn": "hubba",  "etternavn": "BRANNHYDRANT" } ] }} """.trimIndent(),
-            ).personNavn(),
+            defaultObjectMapper
+                .readTree(
+                    """{"data" :{"navn": [ { "fornavn": "LITEN", "mellomnavn": "hubba",  "etternavn": "BRANNHYDRANT" } ] }} """.trimIndent(),
+                ).personNavn(),
         )
     }
 
@@ -131,9 +132,10 @@ internal class PersonDeserialiseringTest {
     fun `Takler tom navn-liste fra PDL`() {
         assertEquals(
             "",
-            defaultObjectMapper.readTree(
-                """{ "data": {"navn": [] } }""".trimIndent(),
-            ).personNavn(),
+            defaultObjectMapper
+                .readTree(
+                    """{ "data": {"navn": [] } }""".trimIndent(),
+                ).personNavn(),
         )
     }
 
@@ -141,16 +143,18 @@ internal class PersonDeserialiseringTest {
     fun `Takler manglende mellom navn`() {
         assertEquals(
             "LITEN BRANNHYDRANT",
-            defaultObjectMapper.readTree(
-                """{ "data": {"navn": [ { "fornavn": "LITEN", "etternavn": "BRANNHYDRANT" } ] } }""".trimIndent(),
-            ).personNavn(),
+            defaultObjectMapper
+                .readTree(
+                    """{ "data": {"navn": [ { "fornavn": "LITEN", "etternavn": "BRANNHYDRANT" } ] } }""".trimIndent(),
+                ).personNavn(),
         )
 
         assertEquals(
             "LITEN BRANNHYDRANT",
-            defaultObjectMapper.readTree(
-                """{ "data": {"navn": [ { "fornavn": "LITEN", "mellomnavn": null,  "etternavn": "BRANNHYDRANT" } ] } }""".trimIndent(),
-            ).personNavn(),
+            defaultObjectMapper
+                .readTree(
+                    """{ "data": {"navn": [ { "fornavn": "LITEN", "mellomnavn": null,  "etternavn": "BRANNHYDRANT" } ] } }""".trimIndent(),
+                ).personNavn(),
         )
     }
 

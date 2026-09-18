@@ -5,12 +5,14 @@ import kotliquery.sessionOf
 import java.util.UUID
 import javax.sql.DataSource
 
-internal class InnsendingMetadataPostgresRepository(private val ds: DataSource = PostgresDataSourceBuilder.dataSource) : InnsendingMetadataRepository {
+internal class InnsendingMetadataPostgresRepository(
+    private val ds: DataSource = PostgresDataSourceBuilder.dataSource,
+) : InnsendingMetadataRepository {
     override fun hentArenaOppgaver(
         søknadId: UUID,
         ident: String,
-    ): List<ArenaOppgave> {
-        return sessionOf(ds).use { session ->
+    ): List<ArenaOppgave> =
+        sessionOf(ds).use { session ->
             session.run(
                 queryOf(
                     //language=SQL
@@ -43,13 +45,12 @@ internal class InnsendingMetadataPostgresRepository(private val ds: DataSource =
                 }.asList,
             )
         }
-    }
 
     private fun hentDagpengerJournalpostIder(
         søknadId: UUID,
         ident: String,
-    ): List<String> {
-        return sessionOf(ds).use { session ->
+    ): List<String> =
+        sessionOf(ds).use { session ->
             session.run(
                 queryOf(
                     //language=SQL
@@ -89,7 +90,6 @@ internal class InnsendingMetadataPostgresRepository(private val ds: DataSource =
                 }.asList,
             )
         }
-    }
 
     override fun hentJournalpostIder(
         søknadId: UUID,

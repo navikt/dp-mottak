@@ -14,13 +14,11 @@ class Søknadsdata(
 ) : Hendelse(aktivitetslogg) {
     override fun journalpostId(): String = journalpostId
 
-    fun søknad(): RutingOppslag {
-        return rutingOppslag(data)
-    }
+    fun søknad(): RutingOppslag = rutingOppslag(data)
 }
 
-fun rutingOppslag(data: JsonNode): RutingOppslag {
-    return when {
+fun rutingOppslag(data: JsonNode): RutingOppslag =
+    when {
         BrukerdialogSøknadFormat.erBrukerdialogSøknadFormat(data) -> {
             BrukerdialogSøknadFormat(data)
         }
@@ -37,20 +35,20 @@ fun rutingOppslag(data: JsonNode): RutingOppslag {
             NullSøknadData(data)
         }
     }
-}
 
 private fun erQuizSøknad(data: JsonNode) =
     data["versjon_navn"]?.let {
         !it.isNull && it.asString() == "Dagpenger"
     } ?: false
 
-class OrkestratorSøknadFormat(private val data: JsonNode) : RutingOppslag {
+class OrkestratorSøknadFormat(
+    private val data: JsonNode,
+) : RutingOppslag {
     companion object {
-        fun erOrkestratorSøknad(data: JsonNode): Boolean {
-            return data["versjon_navn"]?.let {
+        fun erOrkestratorSøknad(data: JsonNode): Boolean =
+            data["versjon_navn"]?.let {
                 !it.isNull && it.asString() == "OrkestratorSoknad"
             } ?: false
-        }
     }
 
     override fun data() = data
@@ -76,7 +74,9 @@ class OrkestratorSøknadFormat(private val data: JsonNode) : RutingOppslag {
     override fun permittert() = false
 }
 
-class NullSøknadData(private val data: JsonNode) : RutingOppslag {
+class NullSøknadData(
+    private val data: JsonNode,
+) : RutingOppslag {
     override fun data() = data
 
     override fun accept(visitor: SøknadVisitor) {

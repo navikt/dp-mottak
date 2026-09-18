@@ -60,4 +60,6 @@ internal object TestApplication {
     }
 }
 
-internal class TestContext(val client: HttpClient)
+internal class TestContext(
+    val client: HttpClient,
+)

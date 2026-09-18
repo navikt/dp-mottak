@@ -32,7 +32,8 @@ internal fun konverterTilAktivitetslogg(aktivitetsloggData: InnsendingData.Aktiv
                     )
                 InnsendingData.AktivitetsloggData.Alvorlighetsgrad.BEHOV ->
                     Aktivitetslogg.Aktivitet.Behov(
-                        Aktivitetslogg.Aktivitet.Behov.Behovtype.valueOf(it.behovtype!!),
+                        Aktivitetslogg.Aktivitet.Behov.Behovtype
+                            .valueOf(it.behovtype!!),
                         kontekster,
                         it.melding,
                         it.detaljer,

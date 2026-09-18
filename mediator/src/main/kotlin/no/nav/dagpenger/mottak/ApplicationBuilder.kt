@@ -49,8 +49,7 @@ internal class ApplicationBuilder(
                     journalpostRoute(innsendingMetadataRepository)
                     innsendingApi(innsendingRepository, ferdigstiltInnsendingObserver)
                 }
-            }
-            .apply {
+            }.apply {
                 val mediator =
                     InnsendingMediator(
                         innsendingRepository = innsendingRepository,

@@ -724,7 +724,9 @@ internal class MediatorE2ETest {
         }
         """.trimIndent()
 
-    private class TestInnsendingSakVisitor(innsending: Innsending) : InnsendingVisitor {
+    private class TestInnsendingSakVisitor(
+        innsending: Innsending,
+    ) : InnsendingVisitor {
         var arenaSak: ArenaOppgaveOpprettet.ArenaSak? = null
         var oppgaveSak: DagpengerOppgaveOpprettet.OppgaveSak? = null
 

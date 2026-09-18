@@ -162,8 +162,22 @@ internal class AktivitetsloggTest {
         )
 
         assertEquals(1, aktivitetslogg.behov().size)
-        assertEquals(1, aktivitetslogg.behov().first().kontekst().size)
-        assertEquals(2, aktivitetslogg.behov().first().detaljer().size)
+        assertEquals(
+            1,
+            aktivitetslogg
+                .behov()
+                .first()
+                .kontekst()
+                .size,
+        )
+        assertEquals(
+            2,
+            aktivitetslogg
+                .behov()
+                .first()
+                .detaljer()
+                .size,
+        )
         assertEquals("Innsending", aktivitetslogg.behov().first().kontekst()["Innsending"])
         assertEquals(param1, aktivitetslogg.behov().first().detaljer()["param1"])
         assertEquals(param2, aktivitetslogg.behov().first().detaljer()["param2"])
@@ -262,7 +276,8 @@ internal class AktivitetsloggTest {
     private class TestHendelse(
         private val melding: String,
         internal val logg: Aktivitetslogg,
-    ) : Aktivitetskontekst, IAktivitetslogg by logg {
+    ) : Aktivitetskontekst,
+        IAktivitetslogg by logg {
         init {
             logg.kontekst(this)
         }

@@ -36,7 +36,9 @@ internal interface ArenaOppslag {
     ): OpprettVedtakOppgaveResponse?
 }
 
-internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
+internal class ArenaApiClient(
+    config: Configuration,
+) : ArenaOppslag {
     companion object {
         private val logger = KotlinLogging.logger {}
         private val sikkerlogg = KotlinLogging.logger("tjenestekall.ArenaApiClient")
@@ -68,13 +70,14 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
         parametereBody: OpprettArenaOppgaveParametere,
     ): OpprettVedtakOppgaveResponse? =
         try {
-            proxyArenaClient.request(url) {
-                header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
-                header(HttpHeaders.ContentType, "application/json")
-                header(HttpHeaders.Accept, "application/json")
-                method = HttpMethod.Post
-                setBody(parametereBody)
-            }.body()
+            proxyArenaClient
+                .request(url) {
+                    header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+                    header(HttpHeaders.ContentType, "application/json")
+                    header(HttpHeaders.Accept, "application/json")
+                    method = HttpMethod.Post
+                    setBody(parametereBody)
+                }.body()
         } catch (e: ClientRequestException) {
             val message = e.response.bodyAsText()
             if (e.response.status.value == 400) {
@@ -91,9 +94,13 @@ internal class ArenaApiClient(config: Configuration) : ArenaOppslag {
     ): OpprettVedtakOppgaveResponse? = opprettArenaOppgave("$baseUrl/sak/henvendelse", parametere)
 }
 
-private data class AktivSakRequest(val fnr: String)
+private data class AktivSakRequest(
+    val fnr: String,
+)
 
-private data class AktivSakResponse(val harAktivSak: Boolean)
+private data class AktivSakResponse(
+    val harAktivSak: Boolean,
+)
 
 internal data class OpprettArenaOppgaveParametere(
     val naturligIdent: String,

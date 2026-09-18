@@ -81,15 +81,16 @@ internal class VedtakFattetMottak(
             }
 
             val message =
-                JsonMessage.newNeed(
-                    behov = listOf("slett_arena_oppgaver"),
-                    map =
-                        mapOf(
-                            "behandlingId" to behandlingId,
-                            "oppgaveIder" to oppgaveIder,
-                            "ident" to ident,
-                        ),
-                ).toJson()
+                JsonMessage
+                    .newNeed(
+                        behov = listOf("slett_arena_oppgaver"),
+                        map =
+                            mapOf(
+                                "behandlingId" to behandlingId,
+                                "oppgaveIder" to oppgaveIder,
+                                "ident" to ident,
+                            ),
+                    ).toJson()
             context.publish(ident, message)
         }
     }

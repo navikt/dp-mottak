@@ -12,7 +12,9 @@ import io.ktor.http.HttpHeaders
 import no.nav.dagpenger.mottak.Config.skjermingApiTokenProvider
 import no.nav.dagpenger.mottak.Config.skjermingApiUrl
 
-internal class SkjermingOppslag(config: Configuration) {
+internal class SkjermingOppslag(
+    config: Configuration,
+) {
     private val tokenProvider = config.skjermingApiTokenProvider
     private val httpClient by lazy {
         HttpClient(CIO) {
@@ -25,11 +27,12 @@ internal class SkjermingOppslag(config: Configuration) {
         }
     }
 
-    suspend fun egenAnsatt(id: String): Result<Boolean> {
-        return kotlin.runCatching {
-            httpClient.post {
-                this.setBody("""{"personident":"$id"}""")
-            }.bodyAsText().toBoolean()
+    suspend fun egenAnsatt(id: String): Result<Boolean> =
+        kotlin.runCatching {
+            httpClient
+                .post {
+                    this.setBody("""{"personident":"$id"}""")
+                }.bodyAsText()
+                .toBoolean()
         }
-    }
 }

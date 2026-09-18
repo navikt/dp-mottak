@@ -75,7 +75,8 @@ internal class JournalpostMottak(
                                 },
                             registrertDato =
                                 it["relevanteDatoer"]
-                                    .values().firstOrNull { relevantDato ->
+                                    .values()
+                                    .firstOrNull { relevantDato ->
                                         relevantDato["datotype"].asString() == "DATO_REGISTRERT"
                                     }?.get("dato")
                                     ?.asString()

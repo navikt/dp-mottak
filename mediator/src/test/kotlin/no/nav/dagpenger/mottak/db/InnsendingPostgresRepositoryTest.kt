@@ -48,13 +48,14 @@ internal class InnsendingPostgresRepositoryTest {
     @Test
     fun `skal kunne lagre innsending med oppgaveSak som har null oppgaveId`() {
         val innsending =
-            innsendingData.copy(
-                oppgaveSakData =
-                    InnsendingData.OppgaveSakData(
-                        oppgaveId = null,
-                        fagsakId = UUID.randomUUID(),
-                    ),
-            ).createInnsending()
+            innsendingData
+                .copy(
+                    oppgaveSakData =
+                        InnsendingData.OppgaveSakData(
+                            oppgaveId = null,
+                            fagsakId = UUID.randomUUID(),
+                        ),
+                ).createInnsending()
 
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
@@ -71,7 +72,9 @@ internal class InnsendingPostgresRepositoryTest {
 
     @Test
     fun `skal kunne oppdatere en  innsending med oppgaveId for oppgaveSak `() {
-        class OppgaveSakTestVisitor(innsending: Innsending?) : InnsendingVisitor {
+        class OppgaveSakTestVisitor(
+            innsending: Innsending?,
+        ) : InnsendingVisitor {
             init {
                 require(innsending != null)
                 innsending.accept(this)
@@ -93,10 +96,11 @@ internal class InnsendingPostgresRepositoryTest {
                 fagsakId = UUID.randomUUID(),
             )
         val innsending =
-            innsendingData.copy(
-                oppgaveSakData =
-                oppgaveSakData,
-            ).createInnsending()
+            innsendingData
+                .copy(
+                    oppgaveSakData =
+                    oppgaveSakData,
+                ).createInnsending()
 
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {

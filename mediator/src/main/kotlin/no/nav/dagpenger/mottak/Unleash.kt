@@ -12,7 +12,8 @@ import java.net.InetAddress
 val unleash: Unleash by lazy {
     if (properties.getOrNull(Key("UNLEASH_SERVER_API_URL", stringType)) == null) return@lazy FakeUnleash()
     DefaultUnleash(
-        UnleashConfig.builder()
+        UnleashConfig
+            .builder()
             .appName(properties[Key("NAIS_APP_NAME", stringType)])
             .instanceId(runCatching { InetAddress.getLocalHost().hostName }.getOrElse { "ukjent" })
             .unleashAPI(properties[Key("UNLEASH_SERVER_API_URL", stringType)] + "/api/")

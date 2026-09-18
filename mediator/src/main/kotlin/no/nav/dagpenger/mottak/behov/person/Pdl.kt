@@ -154,7 +154,12 @@ internal class Pdl {
 
         internal fun JsonNode.norskTilknyting(): Boolean = findValue("gtLand")?.isNull ?: false
 
-        internal fun JsonNode.diskresjonsKode(): String? = findValue("adressebeskyttelse").values().firstOrNull()?.path("gradering")?.asString(null)
+        internal fun JsonNode.diskresjonsKode(): String? =
+            findValue("adressebeskyttelse")
+                .values()
+                .firstOrNull()
+                ?.path("gradering")
+                ?.asString(null)
 
         internal fun JsonNode.personNavn(): String =
             findValue("navn").values().firstOrNull()?.let { node ->
@@ -168,7 +173,12 @@ internal class Pdl {
                 }
             } ?: ""
 
-        private fun JsonNode.ident(type: String): String = findValue("identer").values().first { it.path("gruppe").asString() == type }.get("ident").asString()
+        private fun JsonNode.ident(type: String): String =
+            findValue("identer")
+                .values()
+                .first { it.path("gruppe").asString() == type }
+                .get("ident")
+                .asString()
 
         private fun JsonNode.harIdent(type: String): Boolean = findValue("identer").values().map { it["gruppe"].asString() }.contains(type)
 

@@ -65,7 +65,8 @@ private class ModelDeepEquals {
         one: Any,
         other: Any,
     ) {
-        one::class.memberProperties
+        one::class
+            .memberProperties
             .filterNot { it.isLateinit }
             .map { it.apply { isAccessible = true } }
             .forEach { prop ->
