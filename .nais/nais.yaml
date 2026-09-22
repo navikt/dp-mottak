@@ -5,6 +5,7 @@ metadata:
   namespace: teamdagpenger
   labels:
     team: teamdagpenger
+    subteam: stsb
   annotations:
     config.linkerd.io/proxy-outbound-connect-timeout: 3000ms
 spec:
