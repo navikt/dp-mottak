@@ -60,38 +60,39 @@ internal class VedtakFattetMottak(
                     ident = ident,
                 )
 
-            val oppgaveIder = arenaOppgaver.map { it.oppgaveId }
-
-            runBlocking {
-                arenaOppgaver.forEach { oppgave ->
-                    runCatching {
-                        val knyttJounalPostTilNySakResponse =
-                            journalpostDokarkiv.knyttJounalPostTilNySak(
-                                journalpostId = oppgave.journalpostId,
-                                dagpengerFagsakId = dagpengerFagsakId.toString(),
-                                ident = ident,
+            if (arenaOppgaver.isNotEmpty()) {
+                val oppgaveIder = arenaOppgaver.map { it.oppgaveId }
+                runBlocking {
+                    arenaOppgaver.forEach { oppgave ->
+                        runCatching {
+                            val knyttJounalPostTilNySakResponse =
+                                journalpostDokarkiv.knyttJounalPostTilNySak(
+                                    journalpostId = oppgave.journalpostId,
+                                    dagpengerFagsakId = dagpengerFagsakId.toString(),
+                                    ident = ident,
+                                )
+                            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(
+                                jounalpostId = knyttJounalPostTilNySakResponse.nyJournalpostId,
+                                innsendingId = oppgave.innsendingId,
+                                fagsakId = dagpengerFagsakId,
                             )
-                        innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(
-                            jounalpostId = knyttJounalPostTilNySakResponse.nyJournalpostId,
-                            innsendingId = oppgave.innsendingId,
-                            fagsakId = dagpengerFagsakId,
-                        )
-                    }.getOrElse(Throwable::ignorerManglendeJournalPostIDev)
+                        }.getOrElse(Throwable::ignorerManglendeJournalPostIDev)
+                    }
                 }
-            }
 
-            val message =
-                JsonMessage
-                    .newNeed(
-                        behov = listOf("slett_arena_oppgaver"),
-                        map =
-                            mapOf(
-                                "behandlingId" to behandlingId,
-                                "oppgaveIder" to oppgaveIder,
-                                "ident" to ident,
-                            ),
-                    ).toJson()
-            context.publish(ident, message)
+                val message =
+                    JsonMessage
+                        .newNeed(
+                            behov = listOf("slett_arena_oppgaver"),
+                            map =
+                                mapOf(
+                                    "behandlingId" to behandlingId,
+                                    "oppgaveIder" to oppgaveIder,
+                                    "ident" to ident,
+                                ),
+                        ).toJson()
+                context.publish(ident, message)
+            }
         }
     }
 }

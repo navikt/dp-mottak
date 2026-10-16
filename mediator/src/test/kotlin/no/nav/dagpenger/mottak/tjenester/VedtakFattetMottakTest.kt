@@ -20,6 +20,7 @@ import java.util.UUID
 class
 VedtakFattetMottakTest {
     private val søknadId = UUID.randomUUID()
+    private val søknadIdForPersonIDpSak = UUID.randomUUID()
     private val behandlingId = UUID.randomUUID()
     private val dagpengerFagsakId = UUID.randomUUID()
     private val testPersonIdent = "12345678901"
@@ -58,6 +59,13 @@ VedtakFattetMottakTest {
             } returns testOppgaver
 
             every {
+                it.hentArenaOppgaver(
+                    søknadId = søknadIdForPersonIDpSak,
+                    ident = testPersonIdent,
+                )
+            } returns emptyList()
+
+            every {
                 it.opprettKoblingTilNyJournalpostForSak(
                     jounalpostId = any(),
                     innsendingId = any(),
@@ -82,8 +90,21 @@ VedtakFattetMottakTest {
     }
 
     @Test
+    fun `Skal ikke sende ut behov om sletting av Arena oppgaver  eller oppdatere fagsak i Joark når oppgave ikke finnes i Arena`() {
+        testRapid.sendTestMessage(vedtakFattetIDagpengerJson(søknadIdForPersonIDpSak))
+
+        testRapid.inspektør.size shouldBe 0
+        coVerify(exactly = 0) {
+            journalpostDokarkiv.knyttJounalPostTilNySak(any(), any(), any())
+        }
+        verify(exactly = 0) {
+            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(any(), any(), any())
+        }
+    }
+
+    @Test
     fun `Skal sende ut behov for sletting av Arena-oppgaver når vedtak er fattet i fagsystem Dagpenger`() {
-        testRapid.sendTestMessage(vedtakFattetIDagpengerJson)
+        testRapid.sendTestMessage(vedtakFattetIDagpengerJson(søknadId))
         testRapid.inspektør.let { inspektør ->
             inspektør.size shouldBe 1
             inspektør.key(0) shouldBe testPersonIdent
@@ -108,7 +129,7 @@ VedtakFattetMottakTest {
         }
     }
 
-    private val vedtakFattetIDagpengerJson =
+    private fun vedtakFattetIDagpengerJson(søknadId: UUID) =
         """
         {
             "@event_name": "vedtak_fattet_utenfor_arena",
