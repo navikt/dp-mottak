@@ -72,9 +72,9 @@ internal class VedtakFattetMottak(
                                     ident = ident,
                                 )
                             innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(
-                                jounalpostId = knyttJounalPostTilNySakResponse.nyJournalpostId,
+                                nyJournalpostId = knyttJounalPostTilNySakResponse.nyJournalpostId,
                                 innsendingId = oppgave.innsendingId,
-                                fagsakId = dagpengerFagsakId,
+                                sakId = dagpengerFagsakId,
                             )
                         }.getOrElse(Throwable::ignorerManglendeJournalPostIDev)
                     }
