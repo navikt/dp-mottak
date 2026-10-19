@@ -1,5 +1,6 @@
 package no.nav.dagpenger.mottak.db
 
+import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import kotliquery.queryOf
 import kotliquery.sessionOf
@@ -180,6 +181,48 @@ class InnsendingMetadataPostgresRepositoryTest {
                 PostgresDataSourceBuilder.dataSource.sjekkAtNyJournalPostErLagret(nyJournalpostIdEttersending, nyDagpengerFagsakId)
                 val dagpengerJournalpostIder = hentJournalpostIder(søknadId, fnr)
                 dagpengerJournalpostIder shouldBe listOf("111", "222")
+            }
+        }
+    }
+
+    @Test
+    fun `hent journalposter for en søknad med både flyttet Arena-innsending og innsending direkte på Dagpenger sak`() {
+        val dpSakId = UUID.randomUUID()
+        val flyttetSøknad =
+            innsendingData.copy(
+                id = 1,
+                søknadsData = søknadsData,
+                arenaSakData =
+                    InnsendingData.ArenaSakData(
+                        oppgaveId = "søknad",
+                        fagsakId = "fagsakid",
+                    ),
+                sakId = null,
+                journalpostId = "1",
+                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+            )
+        val ettersendingDirekteTilDp =
+            innsendingData.copy(
+                id = 2,
+                søknadsData = søknadsData,
+                arenaSakData = null,
+                sakId = dpSakId,
+                journalpostId = "2",
+                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "2"),
+            )
+
+        withMigratedDb {
+            InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
+                lagre(flyttetSøknad.createInnsending())
+                lagre(ettersendingDirekteTilDp.createInnsending())
+            }
+            InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
+                opprettKoblingTilNyJournalpostForSak(
+                    nyJournalpostId = 111,
+                    innsendingId = 1,
+                    sakId = dpSakId,
+                )
+                hentJournalpostIder(søknadId, fnr) shouldContainExactlyInAnyOrder listOf("111", "2")
             }
         }
     }
