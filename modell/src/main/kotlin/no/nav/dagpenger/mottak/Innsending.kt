@@ -821,15 +821,22 @@ class Innsending private constructor(
     private fun emitFerdigstilt() {
         val jp = requireNotNull(journalpost) { "Journalpost ikke satt på dette tidspunktet!! Det er veldig rart" }
 
-        val fagsakId: String? =
-            arenaSak?.fagsakId
-                ?: sakId?.toString()
-        val oppgaveId: String? =
-            arenaSak?.oppgaveId
         val fagsystem: Fagsystem.FagsystemType? =
             when {
                 sakId != null -> Fagsystem.FagsystemType.DAGPENGER
                 arenaSak != null -> Fagsystem.FagsystemType.ARENA
+                else -> null
+            }
+
+        val fagsakId: String? =
+            when (fagsystem) {
+                Fagsystem.FagsystemType.DAGPENGER -> sakId.toString()
+                Fagsystem.FagsystemType.ARENA -> arenaSak?.fagsakId
+                else -> null
+            }
+        val oppgaveId: String? =
+            when (fagsystem) {
+                Fagsystem.FagsystemType.ARENA -> arenaSak?.oppgaveId
                 else -> null
             }
 
