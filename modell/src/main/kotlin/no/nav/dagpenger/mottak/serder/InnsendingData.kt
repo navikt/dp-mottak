@@ -2,8 +2,8 @@ package no.nav.dagpenger.mottak.serder
 
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Journalpost
+import no.nav.dagpenger.mottak.meldinger.OppgaveSak
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.rutingOppslag
 import tools.jackson.databind.JsonNode
@@ -63,7 +63,7 @@ data class InnsendingData(
                 },
                 arenaSakData?.let { ArenaOppgaveOpprettet.ArenaSak(oppgaveId = it.oppgaveId, fagsakId = it.fagsakId) },
                 mottakskanal,
-                oppgaveSakData?.let { DagpengerOppgaveOpprettet.OppgaveSak(oppgaveId = it.oppgaveId, fagsakId = it.fagsakId) },
+                oppgaveSakData?.let { OppgaveSak(oppgaveId = it.oppgaveId, fagsakId = it.fagsakId) },
                 aktivitetslogg.let(::konverterTilAktivitetslogg),
             )
 

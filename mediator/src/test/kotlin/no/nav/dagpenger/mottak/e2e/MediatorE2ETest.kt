@@ -12,7 +12,7 @@ import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
 import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
+import no.nav.dagpenger.mottak.meldinger.OppgaveSak
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -728,7 +728,7 @@ internal class MediatorE2ETest {
         innsending: Innsending,
     ) : InnsendingVisitor {
         var arenaSak: ArenaOppgaveOpprettet.ArenaSak? = null
-        var oppgaveSak: DagpengerOppgaveOpprettet.OppgaveSak? = null
+        var oppgaveSak: OppgaveSak? = null
 
         init {
             innsending.accept(this)
@@ -750,7 +750,7 @@ internal class MediatorE2ETest {
             fagsakId: UUID,
         ) {
             this.oppgaveSak =
-                DagpengerOppgaveOpprettet.OppgaveSak(
+                OppgaveSak(
                     oppgaveId = oppgaveId,
                     fagsakId = fagsakId,
                 )
