@@ -25,7 +25,7 @@ internal class VedtakFattetMottak(
     companion object {
         val rapidFilter: River.() -> Unit = {
             precondition {
-                it.requireValue("@event_name", "vedtak_fattet_utenfor_arena")
+                it.requireAny("@event_name", listOf("vedtak_fattet_utenfor_arena"))
             }
             validate {
                 it.requireKey("behandlingId", "søknadId", "ident", "sakId")
