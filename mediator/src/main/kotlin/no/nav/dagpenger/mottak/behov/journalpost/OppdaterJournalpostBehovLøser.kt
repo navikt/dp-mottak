@@ -9,6 +9,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
+import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OppdaterJournalpost
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApi.OppdaterJournalpostRequest
 
 internal class OppdaterJournalpostBehovLøser(
@@ -25,7 +26,7 @@ internal class OppdaterJournalpostBehovLøser(
             .apply {
                 precondition {
                     it.requireValue("@event_name", "behov")
-                    it.requireAllOrAny("@behov", listOf("OppdaterJournalpost"))
+                    it.requireAllOrAny("@behov", listOf(OppdaterJournalpost.name))
                     it.forbid("@løsning")
                 }
                 validate { it.requireKey("@behovId", "journalpostId") }
