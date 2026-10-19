@@ -12,7 +12,6 @@ import no.nav.dagpenger.mottak.db.InnsendingPostgresRepository
 import no.nav.dagpenger.mottak.db.PostgresDataSourceBuilder
 import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.tjenester.MottakMediator
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -308,8 +307,8 @@ internal class MediatorE2ETest {
             håndterHendelse(ferdigstiltJournalpostMotattHendelse())
 
             assertInnsending(journalpostId.toString()) { testInnsendingVisitor ->
-                assertNotNull(testInnsendingVisitor.oppgaveSak)
-                testInnsendingVisitor.oppgaveSak!!.fagsakId shouldBe fagsakId
+                assertNotNull(testInnsendingVisitor.sakId)
+                testInnsendingVisitor.sakId shouldBe fagsakId
             }
             assertTrue(
                 testRapid.inspektør.size == 6,
@@ -370,8 +369,8 @@ internal class MediatorE2ETest {
             assertBehov("HåndterInnsending", 2)
             håndterHendelse(håndtertInnsending(sakId = TestDagpengerOppgave.fagsakId.toString(), håndtert = true))
             assertInnsending(journalpostId.toString()) { testInnsendingVisitor ->
-                assertNotNull(testInnsendingVisitor.oppgaveSak)
-                testInnsendingVisitor.oppgaveSak!!.fagsakId shouldBe TestDagpengerOppgave.fagsakId
+                assertNotNull(testInnsendingVisitor.sakId)
+                testInnsendingVisitor.sakId shouldBe TestDagpengerOppgave.fagsakId
             }
             assertBehov("OppdaterJournalpost", 3)
             håndterHendelse(oppdatertJournalpostMotattHendelse())
@@ -728,7 +727,7 @@ internal class MediatorE2ETest {
         innsending: Innsending,
     ) : InnsendingVisitor {
         var arenaSak: ArenaOppgaveOpprettet.ArenaSak? = null
-        var oppgaveSak: DagpengerOppgaveOpprettet.OppgaveSak? = null
+        var sakId: UUID? = innsending.sakId()
 
         init {
             innsending.accept(this)
@@ -740,17 +739,6 @@ internal class MediatorE2ETest {
         ) {
             this.arenaSak =
                 ArenaOppgaveOpprettet.ArenaSak(
-                    oppgaveId = oppgaveId,
-                    fagsakId = fagsakId,
-                )
-        }
-
-        override fun visitOppgaveSak(
-            oppgaveId: UUID?,
-            fagsakId: UUID,
-        ) {
-            this.oppgaveSak =
-                DagpengerOppgaveOpprettet.OppgaveSak(
                     oppgaveId = oppgaveId,
                     fagsakId = fagsakId,
                 )

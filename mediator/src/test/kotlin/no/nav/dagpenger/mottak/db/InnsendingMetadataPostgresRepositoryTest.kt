@@ -97,11 +97,7 @@ class InnsendingMetadataPostgresRepositoryTest {
                 id = 1,
                 søknadsData = søknadsData,
                 arenaSakData = null,
-                oppgaveSakData =
-                    InnsendingData.OppgaveSakData(
-                        oppgaveId = null,
-                        fagsakId = dpSakId,
-                    ),
+                sakId = dpSakId,
                 journalpostId = "1",
                 journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
             )
@@ -110,11 +106,7 @@ class InnsendingMetadataPostgresRepositoryTest {
                 id = 2,
                 søknadsData = søknadsData,
                 arenaSakData = null,
-                oppgaveSakData =
-                    InnsendingData.OppgaveSakData(
-                        oppgaveId = null,
-                        fagsakId = dpSakId,
-                    ),
+                sakId = dpSakId,
                 journalpostId = "2",
                 journalpostData = innsendingData.journalpostData?.copy(journalpostId = "2"),
             )
@@ -253,11 +245,7 @@ class InnsendingMetadataPostgresRepositoryTest {
                 id = 1,
                 søknadsData = søknadsDataBrukerdialogFormat,
                 arenaSakData = null,
-                oppgaveSakData =
-                    InnsendingData.OppgaveSakData(
-                        oppgaveId = null,
-                        fagsakId = dpSakId,
-                    ),
+                sakId = dpSakId,
                 journalpostId = "1",
                 journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
             )

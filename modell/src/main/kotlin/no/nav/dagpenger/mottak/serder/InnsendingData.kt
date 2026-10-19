@@ -2,7 +2,6 @@ package no.nav.dagpenger.mottak.serder
 
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
-import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.rutingOppslag
@@ -21,7 +20,7 @@ data class InnsendingData(
     val arenaSakData: ArenaSakData?,
     val søknadsData: JsonNode?,
     val mottakskanal: String?,
-    val oppgaveSakData: OppgaveSakData? = null,
+    val sakId: UUID? = null,
     val aktivitetslogg: AktivitetsloggData,
 ) {
     fun createInnsending(): Innsending =
@@ -63,7 +62,7 @@ data class InnsendingData(
                 },
                 arenaSakData?.let { ArenaOppgaveOpprettet.ArenaSak(oppgaveId = it.oppgaveId, fagsakId = it.fagsakId) },
                 mottakskanal,
-                oppgaveSakData?.let { DagpengerOppgaveOpprettet.OppgaveSak(oppgaveId = it.oppgaveId, fagsakId = it.fagsakId) },
+                sakId,
                 aktivitetslogg.let(::konverterTilAktivitetslogg),
             )
 
@@ -138,11 +137,6 @@ data class InnsendingData(
     data class ArenaSakData(
         val oppgaveId: String,
         val fagsakId: String?,
-    )
-
-    data class OppgaveSakData(
-        val oppgaveId: UUID?,
-        val fagsakId: UUID,
     )
 
     data class PersonData(
