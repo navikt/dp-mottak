@@ -11,13 +11,13 @@ import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
 import no.nav.dagpenger.mottak.meldinger.Journalpost
 import no.nav.dagpenger.mottak.meldinger.JournalpostFerdigstilt
 import no.nav.dagpenger.mottak.meldinger.JournalpostOppdatert
-import no.nav.dagpenger.mottak.meldinger.OppgaveSak
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjon.Person
 import no.nav.dagpenger.mottak.meldinger.PersonInformasjonIkkeFunnet
 import no.nav.dagpenger.mottak.meldinger.RekjørHendelse
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
 import java.time.Duration
+import java.util.UUID
 
 @Suppress("NonAsciiCharacters")
 class Innsending private constructor(
@@ -28,7 +28,7 @@ class Innsending private constructor(
     private var person: Person?,
     private var arenaSak: ArenaSak?,
     private var mottakskanal: String? = null,
-    private var oppgaveSak: OppgaveSak? = null,
+    private var sakId: UUID? = null,
     internal val aktivitetslogg: Aktivitetslogg,
 ) : Aktivitetskontekst {
     private val observers = mutableSetOf<InnsendingObserver>()
@@ -44,6 +44,8 @@ class Innsending private constructor(
         arenaSak = null,
         aktivitetslogg = Aktivitetslogg(),
     )
+
+    fun sakId(): UUID? = sakId
 
     fun journalpostId(): String = journalpostId
 
@@ -380,11 +382,7 @@ class Innsending private constructor(
         ) {
             when (håndtertInnsending.fagsystem) {
                 is Fagsystem.Dagpenger -> {
-                    innsending.oppgaveSak =
-                        OppgaveSak(
-                            fagsakId = håndtertInnsending.fagsystem.sakId,
-                            oppgaveId = null,
-                        )
+                    innsending.sakId = håndtertInnsending.fagsystem.sakId
                     innsending.oppdatereJournalpost(håndtertInnsending)
                 }
 
@@ -723,8 +721,8 @@ class Innsending private constructor(
         val arenaSakId = arenaSak?.fagsakId?.let { mapOf("fagsakId" to it) } ?: emptyMap()
         val sak =
             buildMap {
-                oppgaveSak?.let {
-                    put("fagsakId", it.fagsakId)
+                sakId?.let {
+                    put("fagsakId", it)
                 }
             }
         val mottakskanal = mottakskanal() ?: "ukjent"
@@ -825,13 +823,12 @@ class Innsending private constructor(
 
         val fagsakId: String? =
             arenaSak?.fagsakId
-                ?: oppgaveSak?.fagsakId?.toString()
+                ?: sakId?.toString()
         val oppgaveId: String? =
             arenaSak?.oppgaveId
-                ?: oppgaveSak?.oppgaveId?.toString()
         val fagsystem: Fagsystem.FagsystemType? =
             when {
-                oppgaveSak != null -> Fagsystem.FagsystemType.DAGPENGER
+                sakId != null -> Fagsystem.FagsystemType.DAGPENGER
                 arenaSak != null -> Fagsystem.FagsystemType.ARENA
                 else -> null
             }
@@ -899,9 +896,9 @@ class Innsending private constructor(
     fun accept(visitor: InnsendingVisitor) {
         visitor.preVisitInnsending(this, journalpostId)
         visitor.visitTilstand(tilstand)
+        visitor.visitSakId(sakId)
         journalpost?.accept(visitor)
         arenaSak?.accept(visitor)
-        oppgaveSak?.accept(visitor)
         person?.accept(visitor)
         rutingOppslag?.accept(visitor)
         visitor.visitInnsendingAktivitetslogg(aktivitetslogg)

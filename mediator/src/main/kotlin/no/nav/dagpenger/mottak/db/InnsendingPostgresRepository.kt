@@ -111,13 +111,7 @@ internal class InnsendingPostgresRepository(
                                         fagsakId = row.stringOrNull("fagsak_id_arena"),
                                     )
                                 },
-                            oppgaveSakData =
-                                row.uuidOrNull("fagsak_id_dagpenger")?.let { fagsakId ->
-                                    InnsendingData.OppgaveSakData(
-                                        oppgaveId = row.uuidOrNull("oppgave_id_dagpenger"),
-                                        fagsakId = fagsakId,
-                                    )
-                                },
+                            sakId = row.uuidOrNull("fagsak_id_dagpenger"),
                             søknadsData =
                                 row.binaryStreamOrNull("søknadsData")?.use {
                                     defaultObjectMapper.readTree(it)
@@ -403,24 +397,22 @@ internal class InnsendingPostgresRepository(
             )
         }
 
-        override fun visitOppgaveSak(
-            oppgaveId: UUID?,
-            fagsakId: UUID,
-        ) {
-            lagreQueries.add(
-                queryOf(
-                    //language=PostgreSQL
-                    """
-                        INSERT INTO oppgave_sak_v1(fagsak_id, oppgave_id, id) VALUES (:fagsak_id, :oppgave_id, :id) 
-                        ON CONFLICT(id) DO UPDATE SET fagsak_id = :fagsak_id, oppgave_id = :oppgave_id
+        override fun visitSakId(sakId: UUID?) {
+            sakId?.let {
+                lagreQueries.add(
+                    queryOf(
+                        //language=PostgreSQL
+                        """
+                        INSERT INTO oppgave_sak_v1(fagsak_id, id) VALUES (:fagsak_id, :id) 
+                        ON CONFLICT(id) DO UPDATE SET fagsak_id = :fagsak_id
                         """,
-                    mapOf(
-                        "id" to internId,
-                        "fagsak_id" to fagsakId,
-                        "oppgave_id" to oppgaveId,
+                        mapOf(
+                            "id" to internId,
+                            "fagsak_id" to sakId,
+                        ),
                     ),
-                ),
-            )
+                )
+            }
         }
 
         override fun preVisitAktivitetslogg(aktivitetslogg: Aktivitetslogg) {

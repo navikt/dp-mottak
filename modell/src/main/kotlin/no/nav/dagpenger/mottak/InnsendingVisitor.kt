@@ -40,10 +40,9 @@ interface ArenaSakVisitor {
     ) {}
 }
 
-interface OppgaveSakVisitor {
-    fun visitOppgaveSak(
-        oppgaveId: UUID?,
-        fagsakId: UUID,
+interface SakIdVisitor {
+    fun visitSakId(
+        sakId: UUID?,
     ) {}
 }
 
@@ -52,7 +51,7 @@ interface InnsendingVisitor :
     SøknadVisitor,
     PersonVisitor,
     ArenaSakVisitor,
-    OppgaveSakVisitor,
+    SakIdVisitor,
     AktivitetsloggVisitor {
     fun preVisitInnsending(
         innsending: Innsending,
