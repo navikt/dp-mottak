@@ -830,7 +830,7 @@ class Innsending private constructor(
 
         val fagsakId: String? =
             when (fagsystem) {
-                Fagsystem.FagsystemType.DAGPENGER -> sakId.toString()
+                Fagsystem.FagsystemType.DAGPENGER -> sakId?.toString()
                 Fagsystem.FagsystemType.ARENA -> arenaSak?.fagsakId
                 else -> null
             }

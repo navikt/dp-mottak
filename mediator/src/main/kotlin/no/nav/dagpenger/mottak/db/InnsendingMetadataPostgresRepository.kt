@@ -74,7 +74,7 @@ internal class InnsendingMetadataPostgresRepository(
                             "soknad_id" to søknadId.toString(),
                         ),
                 ).map { row ->
-                    row.int(columnLabel = "journalpost_id").toString()
+                    row.long(columnLabel = "journalpost_id").toString()
                 }.asList,
             )
         }
