@@ -5,7 +5,6 @@ import no.nav.dagpenger.mottak.InnsendingObserver.InnsendingEvent
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveFeilet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.ArenaOppgaveOpprettet.ArenaSak
-import no.nav.dagpenger.mottak.meldinger.DagpengerOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.GosysOppgaveOpprettet
 import no.nav.dagpenger.mottak.meldinger.HåndtertInnsending
 import no.nav.dagpenger.mottak.meldinger.JoarkHendelse
@@ -20,6 +19,7 @@ import no.nav.dagpenger.mottak.meldinger.RekjørHendelse
 import no.nav.dagpenger.mottak.meldinger.søknadsdata.Søknadsdata
 import java.time.Duration
 
+@Suppress("NonAsciiCharacters")
 class Innsending private constructor(
     private val journalpostId: String,
     private var tilstand: Tilstand,
@@ -102,12 +102,6 @@ class Innsending private constructor(
         if (journalpostId != arenaOppgave.journalpostId()) return
         kontekst(arenaOppgave, "Mottatt informasjon om opprettet Arena oppgave")
         tilstand.håndter(this, arenaOppgave)
-    }
-
-    fun håndter(dagpengerOppgaveOpprettet: DagpengerOppgaveOpprettet) {
-        if (journalpostId != dagpengerOppgaveOpprettet.journalpostId()) return
-        kontekst(dagpengerOppgaveOpprettet, "Mottatt informasjon om opprettet oppgave")
-        tilstand.håndter(this, dagpengerOppgaveOpprettet)
     }
 
     fun håndter(arenaOppgaveFeilet: ArenaOppgaveFeilet) {
@@ -201,13 +195,6 @@ class Innsending private constructor(
             arenaOppgave: ArenaOppgaveOpprettet,
         ) {
             arenaOppgave.warn("Forventet ikke ArenaOppgaveOpprettet i tilstand $type.name")
-        }
-
-        fun håndter(
-            innsending: Innsending,
-            dagpengerOppgaveOpprettet: DagpengerOppgaveOpprettet,
-        ) {
-            dagpengerOppgaveOpprettet.warn("Forventet ikke OppgaveOpprettet i tilstand $type.name")
         }
 
         fun håndter(
