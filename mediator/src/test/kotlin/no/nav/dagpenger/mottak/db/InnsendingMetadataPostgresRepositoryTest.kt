@@ -97,7 +97,7 @@ class InnsendingMetadataPostgresRepositoryTest {
             }
 
             InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
-                finnJournalpostIderForSøknad(ident = fnr, søknadId = søknadId) shouldContainExactlyInAnyOrder listOf("1", "2")
+                finnJournalpostIderForSøknad(ident = fnr, søknadId = søknadId) shouldContainExactlyInAnyOrder listOf(Pair("1", 1L), Pair("2", 2L))
             }
         }
     }

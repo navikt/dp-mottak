@@ -33,7 +33,7 @@ interface InnsendingMetadataRepository {
     fun finnJournalpostIderForSøknad(
         ident: String,
         søknadId: UUID,
-    ): List<String>
+    ): List<Pair<String, Long>>
 }
 
 data class ArenaOppgave(

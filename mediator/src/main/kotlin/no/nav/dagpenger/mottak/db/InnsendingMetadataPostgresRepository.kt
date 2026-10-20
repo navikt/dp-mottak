@@ -117,7 +117,7 @@ internal class InnsendingMetadataPostgresRepository(
     override fun finnJournalpostIderForSøknad(
         ident: String,
         søknadId: UUID,
-    ): List<String> =
+    ): List<Pair<String, Long>> =
         sessionOf(ds).use { session ->
             session.run(
                 queryOf(
@@ -125,6 +125,7 @@ internal class InnsendingMetadataPostgresRepository(
                     statement =
                         """
                         SELECT    inns.journalpostid AS journalpost_id
+                                , inns.id AS innsending_id
                         FROM      innsending_v1 inns
                         JOIN      person_innsending_v1 peri ON inns.id = peri.id
                         JOIN      person_v1 pers            ON pers.id = peri.personid
@@ -141,7 +142,7 @@ internal class InnsendingMetadataPostgresRepository(
                             "soknad_id" to søknadId.toString(),
                         ),
                 ).map { row ->
-                    row.long(columnLabel = "journalpost_id").toString()
+                    Pair(row.long(columnLabel = "journalpost_id").toString(), row.long(columnLabel = "innsending_id"))
                 }.asList,
             )
         }

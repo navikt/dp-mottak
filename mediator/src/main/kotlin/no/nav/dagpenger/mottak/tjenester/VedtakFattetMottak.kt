@@ -17,6 +17,7 @@ import no.nav.dagpenger.mottak.serder.asUUID
 import no.nav.dagpenger.mottak.tjenester.VedtakFattetEvent.Companion.tilVedtakFattetEvent
 
 private val logger = KotlinLogging.logger {}
+private val sikkerLogg = KotlinLogging.logger("tjenestekall")
 
 enum class VedtakFattetEvent(
     val eventName: String,
@@ -114,7 +115,28 @@ internal class VedtakFattetMottak(
                 }
                 VedtakFattetEvent.VEDTAK_FATTET_I_NY_SAK -> {
                     runBlocking {
-                        innsendingMetadataRepository.finnJournalpostIderForSøknad(ident = ident, søknadId = søknadId)
+                        val journalpostIder = innsendingMetadataRepository.finnJournalpostIderForSøknad(ident = ident, søknadId = søknadId)
+                        if (journalpostIder.isEmpty()) {
+                            sikkerLogg.error { "Fant ingen journalpostIder for søknadId=$søknadId og ident=$ident" }
+                            throw IllegalStateException("Fant ikke journalpostIder for søknadId=$søknadId")
+                        }
+                        journalpostIder.forEach { pair ->
+                            val (journalpostId, innsendingId) = pair
+                            runCatching {
+                                val knyttJounalPostTilNySakResponse =
+                                    journalpostDokarkiv.knyttJounalPostTilNySak(
+                                        journalpostId = journalpostId,
+                                        dagpengerFagsakId = dagpengerFagsakId.toString(),
+                                        ident = ident,
+                                    )
+                                innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(
+                                    nyJournalpostId = knyttJounalPostTilNySakResponse.nyJournalpostId,
+                                    innsendingId = innsendingId,
+                                    sakId = dagpengerFagsakId,
+                                )
+                                journalpostDokarkiv.feilregistrerSakstilknytning(journalpostId)
+                            }.getOrElse(Throwable::ignorerManglendeJournalPostIDev)
+                        }
                     }
                 }
             }
