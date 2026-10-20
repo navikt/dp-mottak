@@ -97,7 +97,7 @@ class InnsendingMetadataPostgresRepositoryTest {
             }
 
             InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
-                finnJournalpostIderForSøknad(ident = fnr, søknadId = søknadId) shouldContainExactlyInAnyOrder listOf(Pair("1", 1L), Pair("2", 2L))
+                finnJournalpostIderForSøknad(ident = fnr, søknadId = søknadId) shouldContainExactlyInAnyOrder listOf(Pair("1", 1), Pair("2", 2))
             }
         }
     }
@@ -107,7 +107,7 @@ class InnsendingMetadataPostgresRepositoryTest {
         withMigratedDb {
             val innsendingPostgresRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
             innsendingPostgresRepository.lagre(innsendingDataMedArenaSak.createInnsending())
-            val nyJournalPost = 112312
+            val nyJournalPost = "112312"
             val innsendingId = 1
             val sakId = UUID.randomUUID()
             InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
@@ -194,8 +194,8 @@ class InnsendingMetadataPostgresRepositoryTest {
                 val arenaJournalpostIder = hentJournalpostIder(søknadId, fnr)
                 arenaJournalpostIder shouldBe listOf("1", "2")
 
-                val nyJournalpostIdSøknad = 111
-                val nyJournalpostIdEttersending = 222
+                val nyJournalpostIdSøknad = "111"
+                val nyJournalpostIdEttersending = "222"
                 val nyDagpengerFagsakId = UUID.randomUUID()
                 opprettKoblingTilNyJournalpostForSak(
                     nyJournalpostId = nyJournalpostIdSøknad,
@@ -249,7 +249,7 @@ class InnsendingMetadataPostgresRepositoryTest {
             }
             InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
                 opprettKoblingTilNyJournalpostForSak(
-                    nyJournalpostId = 111,
+                    nyJournalpostId = "111",
                     innsendingId = 1,
                     sakId = dpSakId,
                 )
@@ -259,7 +259,7 @@ class InnsendingMetadataPostgresRepositoryTest {
     }
 
     fun DataSource.sjekkAtNyJournalPostErLagret(
-        nyJournalpostId: Int,
+        nyJournalpostId: String,
         sakId: UUID,
     ) {
         sessionOf(this).use { session ->
@@ -272,7 +272,7 @@ class InnsendingMetadataPostgresRepositoryTest {
                         WHERE  ny_journalpost_id = :ny_journalpost_id AND sak_id = :sak_id 
                     """.trimMargin(),
                     mapOf(
-                        "ny_journalpost_id" to nyJournalpostId,
+                        "ny_journalpost_id" to nyJournalpostId.toLong(),
                         "sak_id" to sakId,
                     ),
                 ).map { row ->

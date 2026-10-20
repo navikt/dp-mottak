@@ -25,7 +25,7 @@ interface InnsendingMetadataRepository {
     ): List<String>
 
     fun opprettKoblingTilNyJournalpostForSak(
-        nyJournalpostId: Int,
+        nyJournalpostId: String,
         innsendingId: Int,
         sakId: UUID,
     )
@@ -33,7 +33,7 @@ interface InnsendingMetadataRepository {
     fun finnJournalpostIderForSøknad(
         ident: String,
         søknadId: UUID,
-    ): List<Pair<String, Long>>
+    ): List<Pair<String, Int>>
 }
 
 data class ArenaOppgave(

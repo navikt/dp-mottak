@@ -85,9 +85,9 @@ class JournalpostApiClientTest {
     fun `skal kunne knytte en journalpost til en annen fagsak`() {
         runBlocking {
             val gammelJournalpostId = "123"
-            val nyJournalpostId = 456
+            val nyJournalpostId = "456"
             val mockHttpEngine =
-                MockEngine { request ->
+                MockEngine { _ ->
                     respond(
                         //language=json
                         content = """{"nyJournalpostId": "$nyJournalpostId"}""",

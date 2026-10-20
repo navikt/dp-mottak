@@ -24,7 +24,7 @@ VedtakFattetMottakTest {
     private val behandlingId = UUID.randomUUID()
     private val dagpengerFagsakId = UUID.randomUUID()
     private val testPersonIdent = "12345678901"
-    private val knyttJounalPostTilNySakResponse = KnyttJounalPostTilNySakResponse(12)
+    private val knyttJounalPostTilNySakResponse = KnyttJounalPostTilNySakResponse("12")
     private val testOppgaver =
         listOf(
             ArenaOppgave(

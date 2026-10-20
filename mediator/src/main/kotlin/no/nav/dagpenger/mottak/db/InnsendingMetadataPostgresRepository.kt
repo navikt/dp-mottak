@@ -91,7 +91,7 @@ internal class InnsendingMetadataPostgresRepository(
     }
 
     override fun opprettKoblingTilNyJournalpostForSak(
-        nyJournalpostId: Int,
+        nyJournalpostId: String,
         innsendingId: Int,
         sakId: UUID,
     ) {
@@ -107,7 +107,7 @@ internal class InnsendingMetadataPostgresRepository(
                     mapOf(
                         "innsending_id" to innsendingId,
                         "sak_id" to sakId,
-                        "ny_journalpost_id" to nyJournalpostId,
+                        "ny_journalpost_id" to nyJournalpostId.toLong(),
                     ),
                 ).asUpdate,
             )
@@ -117,7 +117,7 @@ internal class InnsendingMetadataPostgresRepository(
     override fun finnJournalpostIderForSøknad(
         ident: String,
         søknadId: UUID,
-    ): List<Pair<String, Long>> =
+    ): List<Pair<String, Int>> =
         sessionOf(ds).use { session ->
             session.run(
                 queryOf(
@@ -142,7 +142,7 @@ internal class InnsendingMetadataPostgresRepository(
                             "soknad_id" to søknadId.toString(),
                         ),
                 ).map { row ->
-                    Pair(row.long(columnLabel = "journalpost_id").toString(), row.long(columnLabel = "innsending_id"))
+                    Pair(row.string(columnLabel = "journalpost_id"), row.int(columnLabel = "innsending_id"))
                 }.asList,
             )
         }
