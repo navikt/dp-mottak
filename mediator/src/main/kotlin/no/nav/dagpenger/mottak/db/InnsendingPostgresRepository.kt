@@ -1,7 +1,6 @@
 package no.nav.dagpenger.mottak.db
 
 import kotliquery.Query
-import kotliquery.Row
 import kotliquery.TransactionalSession
 import kotliquery.queryOf
 import kotliquery.sessionOf
@@ -42,8 +41,7 @@ internal class InnsendingPostgresRepository(
                journalpost.journalforendeEnhet           as "journalforendeEnhet",
                arenasak.fagsakid                         as "fagsak_id_arena",
                arenasak.oppgaveId                        as "oppgave_id_arena",
-               oppgave_sak.fagsak_id                     as "fagsak_id_dagpenger",
-               oppgave_sak.oppgave_id                    as "oppgave_id_dagpenger",
+               sak.sak_id                               as "sak_id",
                soknad.data                               as "søknadsData",
                person_innsending.navn                    as "navn",
                person_innsending.diskresjonskode         as "diskresjonsKode",
@@ -57,14 +55,12 @@ internal class InnsendingPostgresRepository(
                  left join journalpost_v1 journalpost on innsending.id = journalpost.id
                  left join aktivitetslogg_v1 aktivitetslogg on innsending.id = aktivitetslogg.id
                  left join arenasak_v1 arenasak on innsending.id = arenasak.id
-                 left join oppgave_sak_v1 oppgave_sak on innsending.id = oppgave_sak.id
+                 left join sak_v1 sak on innsending.id = sak.innsending_id
                  left join soknad_v1 soknad on innsending.id = soknad.id
                  left join person_innsending_v1 person_innsending on innsending.id = person_innsending.id
                  left join person_v1 person on person_innsending.personid = person.id
         where innsending.journalpostId = :jpId;
         """.trimIndent()
-
-    fun Row.booleanOrNull(columnLabel: String) = this.stringOrNull(columnLabel)?.let { it == "t" }
 
     override fun hent(journalpostId: String): Innsending? =
         sessionOf(datasource).use { session ->
@@ -111,7 +107,7 @@ internal class InnsendingPostgresRepository(
                                         fagsakId = row.stringOrNull("fagsak_id_arena"),
                                     )
                                 },
-                            sakId = row.uuidOrNull("fagsak_id_dagpenger"),
+                            sakId = row.uuidOrNull("sak_id"),
                             søknadsData =
                                 row.binaryStreamOrNull("søknadsData")?.use {
                                     defaultObjectMapper.readTree(it)
@@ -403,12 +399,12 @@ internal class InnsendingPostgresRepository(
                     queryOf(
                         //language=PostgreSQL
                         """
-                        INSERT INTO oppgave_sak_v1(fagsak_id, id) VALUES (:fagsak_id, :id) 
-                        ON CONFLICT(id) DO UPDATE SET fagsak_id = :fagsak_id
+                        INSERT INTO sak_v1(innsending_id, sak_id) VALUES (:innsending_id, :sak_id) 
+                        ON CONFLICT(innsending_id) DO UPDATE SET sak_id = :sak_id
                         """,
                         mapOf(
-                            "id" to internId,
-                            "fagsak_id" to sakId,
+                            "innsending_id" to internId,
+                            "sak_id" to sakId,
                         ),
                     ),
                 )

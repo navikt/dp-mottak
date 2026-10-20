@@ -25,9 +25,9 @@ interface InnsendingMetadataRepository {
     ): List<String>
 
     fun opprettKoblingTilNyJournalpostForSak(
-        jounalpostId: Int,
+        nyJournalpostId: Int,
         innsendingId: Int,
-        fagsakId: UUID,
+        sakId: UUID,
     )
 }
 

@@ -56,24 +56,12 @@ internal class InnsendingMetadataPostgresRepository(
                     //language=SQL
                     statement =
                         """
-                        SELECT    jour.journalpost_id as journalpost_id
+                        SELECT    COALESCE(sak.ny_journalpost_id, inns.journalpostid) as journalpost_id
                         FROM      innsending_v1 inns
                         JOIN      person_innsending_v1 peri         ON peri.id = inns.id
                         JOIN      person_v1 pers                    ON pers.id = peri.personid
                         JOIN      soknad_v1 sokn                    ON sokn.id = inns.id
-                        JOIN      journalpost_dagpenger_sak_v1 jour ON jour.innsending_id = inns.id 
-                        WHERE     pers.ident =  :ident
-                        AND       COALESCE(
-                                      sokn.data -> 'verdi' ->> 'søknad_uuid',
-                                      sokn.data ->> 'søknad_uuid'
-                                  ) = :soknad_id
-                        UNION ALL
-                        SELECT    inns.journalpostid as journalpost_id
-                        FROM      innsending_v1 inns
-                        JOIN      person_innsending_v1 peri         ON peri.id = inns.id
-                        JOIN      person_v1 pers                    ON pers.id = peri.personid
-                        JOIN      soknad_v1 sokn                    ON sokn.id = inns.id
-                        JOIN      oppgave_sak_v1 osak               ON osak.id = inns.id 
+                        JOIN      sak_v1 sak ON sak.innsending_id = inns.id 
                         WHERE     pers.ident =  :ident
                         AND       COALESCE(
                                       sokn.data -> 'verdi' ->> 'søknad_uuid',
@@ -86,7 +74,7 @@ internal class InnsendingMetadataPostgresRepository(
                             "soknad_id" to søknadId.toString(),
                         ),
                 ).map { row ->
-                    row.int(columnLabel = "journalpost_id").toString()
+                    row.long(columnLabel = "journalpost_id").toString()
                 }.asList,
             )
         }
@@ -103,22 +91,23 @@ internal class InnsendingMetadataPostgresRepository(
     }
 
     override fun opprettKoblingTilNyJournalpostForSak(
-        jounalpostId: Int,
+        nyJournalpostId: Int,
         innsendingId: Int,
-        fagsakId: UUID,
+        sakId: UUID,
     ) {
         sessionOf(ds).use { session ->
             session.run(
                 queryOf(
                     //language=PostgreSQL
                     """
-                        INSERT INTO journalpost_dagpenger_sak_v1(journalpost_id, fagsak_id, innsending_id)
-                        VALUES(:journalpost_id, :fagsak_id, :innsending_id)
+                        INSERT INTO sak_v1(innsending_id, sak_id, ny_journalpost_id)
+                        VALUES(:innsending_id, :sak_id, :ny_journalpost_id)
+                        ON CONFLICT (innsending_id) DO UPDATE SET sak_id = :sak_id, ny_journalpost_id = :ny_journalpost_id
                         """,
                     mapOf(
-                        "journalpost_id" to jounalpostId,
-                        "fagsak_id" to fagsakId,
                         "innsending_id" to innsendingId,
+                        "sak_id" to sakId,
+                        "ny_journalpost_id" to nyJournalpostId,
                     ),
                 ).asUpdate,
             )

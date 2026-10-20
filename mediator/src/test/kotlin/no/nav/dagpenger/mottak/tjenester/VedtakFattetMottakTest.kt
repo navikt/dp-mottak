@@ -67,9 +67,9 @@ VedtakFattetMottakTest {
 
             every {
                 it.opprettKoblingTilNyJournalpostForSak(
-                    jounalpostId = any(),
+                    nyJournalpostId = any(),
                     innsendingId = any(),
-                    fagsakId = any(),
+                    sakId = any(),
                 )
             } just Runs
         }
