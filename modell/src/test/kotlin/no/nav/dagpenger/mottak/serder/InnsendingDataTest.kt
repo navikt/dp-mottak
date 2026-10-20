@@ -80,7 +80,7 @@ internal class InnsendingDataTest {
     }
 
     @Test
-    fun `innsending med både Arena-sak og Dagpenger-sak ferdigstilles som Dagpenger`() {
+    fun `Hvis innsendingen både er koblet til fagsystem Arena og Dagpenger, skal Dagpenger trumfe`() {
         val sakId = UUID.randomUUID()
         val innsendingData =
             InnsendingData(

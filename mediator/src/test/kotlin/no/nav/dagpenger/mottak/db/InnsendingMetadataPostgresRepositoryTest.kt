@@ -186,9 +186,9 @@ class InnsendingMetadataPostgresRepositoryTest {
     }
 
     @Test
-    fun `hent journalposter for en søknad med både flyttet Arena-innsending og innsending direkte på Dagpenger sak`() {
+    fun `Hent journalposter for en søknad som opprinnelig ble journalført med Arena-sak og deretter fattet vedtak i DP-sak`() {
         val dpSakId = UUID.randomUUID()
-        val flyttetSøknad =
+        val søknad =
             innsendingData.copy(
                 id = 1,
                 søknadsData = søknadsData,
@@ -201,7 +201,7 @@ class InnsendingMetadataPostgresRepositoryTest {
                 journalpostId = "1",
                 journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
             )
-        val ettersendingDirekteTilDp =
+        val ettersendingHåndtertAvDPSak =
             innsendingData.copy(
                 id = 2,
                 søknadsData = søknadsData,
@@ -213,8 +213,8 @@ class InnsendingMetadataPostgresRepositoryTest {
 
         withMigratedDb {
             InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
-                lagre(flyttetSøknad.createInnsending())
-                lagre(ettersendingDirekteTilDp.createInnsending())
+                lagre(søknad.createInnsending())
+                lagre(ettersendingHåndtertAvDPSak.createInnsending())
             }
             InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
                 opprettKoblingTilNyJournalpostForSak(
