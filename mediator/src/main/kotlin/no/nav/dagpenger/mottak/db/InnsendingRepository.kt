@@ -30,7 +30,10 @@ interface InnsendingMetadataRepository {
         sakId: UUID,
     )
 
-    fun finnJournalpostIderForSøknad(ident: String, søknadId: UUID): List<String>
+    fun finnJournalpostIderForSøknad(
+        ident: String,
+        søknadId: UUID,
+    ): List<String>
 }
 
 data class ArenaOppgave(

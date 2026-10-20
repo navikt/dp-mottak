@@ -114,14 +114,17 @@ internal class InnsendingMetadataPostgresRepository(
         }
     }
 
-    override fun finnJournalpostIderForSøknad(ident: String, søknadId: UUID): List<String> {
-        return sessionOf(ds).use { session ->
+    override fun finnJournalpostIderForSøknad(
+        ident: String,
+        søknadId: UUID,
+    ): List<String> =
+        sessionOf(ds).use { session ->
             session.run(
                 queryOf(
                     //language=SQL
                     statement =
                         """
-                        SELECT    inns.journalpostid
+                        SELECT    inns.journalpostid AS journalpost_id
                         FROM      innsending_v1 inns
                         JOIN      person_innsending_v1 peri ON inns.id = peri.id
                         JOIN      person_v1 pers            ON pers.id = peri.personid
@@ -139,8 +142,7 @@ internal class InnsendingMetadataPostgresRepository(
                         ),
                 ).map { row ->
                     row.long(columnLabel = "journalpost_id").toString()
-                }.asList
+                }.asList,
             )
         }
-    }
 }

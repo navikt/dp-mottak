@@ -18,15 +18,15 @@ import no.nav.dagpenger.mottak.tjenester.VedtakFattetEvent.Companion.tilVedtakFa
 
 private val logger = KotlinLogging.logger {}
 
-
-enum class VedtakFattetEvent(val eventName: String) {
+enum class VedtakFattetEvent(
+    val eventName: String,
+) {
     VEDTAK_FATTET_UTENFOR_ARENA("vedtak_fattet_utenfor_arena"),
-    VEDTAK_FATTET_I_NY_SAK("vedtak_fattet_i_ny_sak");
+    VEDTAK_FATTET_I_NY_SAK("vedtak_fattet_i_ny_sak"),
+    ;
 
     companion object {
-        fun String.tilVedtakFattetEvent(): VedtakFattetEvent {
-            return entries.single { it.eventName == this }
-        }
+        fun String.tilVedtakFattetEvent(): VedtakFattetEvent = entries.single { it.eventName == this }
     }
 }
 
@@ -35,9 +35,7 @@ internal class VedtakFattetMottak(
     private val innsendingMetadataRepository: InnsendingMetadataRepository,
     private val journalpostDokarkiv: JournalpostDokarkiv,
 ) : River.PacketListener {
-
     companion object {
-
         val rapidFilter: River.() -> Unit = {
             precondition {
                 it.requireAny(
@@ -45,7 +43,7 @@ internal class VedtakFattetMottak(
                     listOf(
                         VedtakFattetEvent.VEDTAK_FATTET_UTENFOR_ARENA.eventName,
                         VedtakFattetEvent.VEDTAK_FATTET_I_NY_SAK.eventName,
-                    )
+                    ),
                 )
             }
             validate {
@@ -57,7 +55,6 @@ internal class VedtakFattetMottak(
     init {
         River(rapidsConnection).apply(rapidFilter).register(this)
     }
-
 
     override fun onPacket(
         packet: JsonMessage,
@@ -128,8 +125,8 @@ internal class VedtakFattetMottak(
 private fun Throwable.ignorerManglendeJournalPostIDev() {
     when {
         Config.isDev &&
-                this is ClientRequestException &&
-                response.status.value == 404 -> {
+            this is ClientRequestException &&
+            response.status.value == 404 -> {
             logger.warn(this) { "Ignorerer 404 fra journalpostDokarkiv i dev" }
         }
 

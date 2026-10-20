@@ -5,7 +5,8 @@ import io.kotest.matchers.shouldBe
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import no.nav.dagpenger.fnr
-import no.nav.dagpenger.innsendingData
+import no.nav.dagpenger.innsendingDataMedArenaSak
+import no.nav.dagpenger.innsendingDataMedSakId
 import no.nav.dagpenger.mottak.db.PostgresTestHelper.withMigratedDb
 import no.nav.dagpenger.mottak.defaultObjectMapper
 import no.nav.dagpenger.mottak.serder.InnsendingData
@@ -19,7 +20,7 @@ class InnsendingMetadataPostgresRepositoryTest {
     @Test
     fun `skal kunne hente ut oppgaveIder og fagsakId for en gitt søknadId og ident`() {
         val søknad =
-            innsendingData.copy(
+            innsendingDataMedArenaSak.copy(
                 id = 1,
                 søknadsData = søknadsData,
                 arenaSakData =
@@ -28,11 +29,11 @@ class InnsendingMetadataPostgresRepositoryTest {
                         fagsakId = "fagsakid",
                     ),
                 journalpostId = "1",
-                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+                journalpostData = innsendingDataMedArenaSak.journalpostData?.copy(journalpostId = "1"),
             )
 
         val ettersending =
-            innsendingData.copy(
+            innsendingDataMedArenaSak.copy(
                 id = 2,
                 søknadsData = søknadsData,
                 arenaSakData =
@@ -41,7 +42,7 @@ class InnsendingMetadataPostgresRepositoryTest {
                         fagsakId = null,
                     ),
                 journalpostId = "2",
-                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+                journalpostData = innsendingDataMedArenaSak.journalpostData?.copy(journalpostId = "2"),
             )
         withMigratedDb {
             val innsendingPostgresRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
@@ -72,10 +73,40 @@ class InnsendingMetadataPostgresRepositoryTest {
     }
 
     @Test
+    fun `skal kunne hente ut journalpostIder for en gitt søknadId og ident`() {
+        val søknad =
+            innsendingDataMedSakId.copy(
+                id = 1,
+                søknadsData = søknadsData,
+                journalpostId = "1",
+                journalpostData = innsendingDataMedSakId.journalpostData?.copy(journalpostId = "1"),
+            )
+
+        val ettersending =
+            innsendingDataMedSakId.copy(
+                id = 2,
+                søknadsData = søknadsData,
+                journalpostId = "2",
+                journalpostData = innsendingDataMedSakId.journalpostData?.copy(journalpostId = "2"),
+            )
+        withMigratedDb {
+            val innsendingPostgresRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
+            innsendingPostgresRepository.apply {
+                lagre(søknad.createInnsending())
+                lagre(ettersending.createInnsending())
+            }
+
+            InnsendingMetadataPostgresRepository(PostgresDataSourceBuilder.dataSource).apply {
+                finnJournalpostIderForSøknad(ident = fnr, søknadId = søknadId) shouldContainExactlyInAnyOrder listOf("1", "2")
+            }
+        }
+    }
+
+    @Test
     fun `opprett ny JournalpostSak`() {
         withMigratedDb {
             val innsendingPostgresRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
-            innsendingPostgresRepository.lagre(innsendingData.createInnsending())
+            innsendingPostgresRepository.lagre(innsendingDataMedArenaSak.createInnsending())
             val nyJournalPost = 112312
             val innsendingId = 1
             val sakId = UUID.randomUUID()
@@ -94,22 +125,22 @@ class InnsendingMetadataPostgresRepositoryTest {
     fun `hent journalposter for en søknad som er journalført på Dagpenger sak`() {
         val dpSakId = UUID.randomUUID()
         val søknad =
-            innsendingData.copy(
+            innsendingDataMedArenaSak.copy(
                 id = 1,
                 søknadsData = søknadsData,
                 arenaSakData = null,
                 sakId = dpSakId,
                 journalpostId = "1",
-                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+                journalpostData = innsendingDataMedArenaSak.journalpostData?.copy(journalpostId = "1"),
             )
         val ettersending =
-            innsendingData.copy(
+            innsendingDataMedArenaSak.copy(
                 id = 2,
                 søknadsData = søknadsData,
                 arenaSakData = null,
                 sakId = dpSakId,
                 journalpostId = "2",
-                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "2"),
+                journalpostData = innsendingDataMedArenaSak.journalpostData?.copy(journalpostId = "2"),
             )
         withMigratedDb {
             val innsendingPostgresRepository = InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)
@@ -127,7 +158,7 @@ class InnsendingMetadataPostgresRepositoryTest {
     @Test
     fun `hent journalposter for en søknad avhengig av om journalpost er knyttet til ny sak i Dagpenger eller kun til Arena sak`() {
         val søknad =
-            innsendingData.copy(
+            innsendingDataMedArenaSak.copy(
                 id = 1,
                 søknadsData = søknadsData,
                 arenaSakData =
@@ -136,11 +167,11 @@ class InnsendingMetadataPostgresRepositoryTest {
                         fagsakId = "fagsakid",
                     ),
                 journalpostId = "1",
-                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+                journalpostData = innsendingDataMedArenaSak.journalpostData?.copy(journalpostId = "1"),
             )
 
         val ettersending =
-            innsendingData.copy(
+            innsendingDataMedArenaSak.copy(
                 id = 2,
                 søknadsData = søknadsData,
                 arenaSakData =
@@ -149,7 +180,7 @@ class InnsendingMetadataPostgresRepositoryTest {
                         fagsakId = null,
                     ),
                 journalpostId = "2",
-                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "2"),
+                journalpostData = innsendingDataMedArenaSak.journalpostData?.copy(journalpostId = "2"),
             )
 
         withMigratedDb {
@@ -189,7 +220,7 @@ class InnsendingMetadataPostgresRepositoryTest {
     fun `Hent journalposter for en søknad som opprinnelig ble journalført med Arena-sak og deretter fattet vedtak i DP-sak`() {
         val dpSakId = UUID.randomUUID()
         val søknad =
-            innsendingData.copy(
+            innsendingDataMedArenaSak.copy(
                 id = 1,
                 søknadsData = søknadsData,
                 arenaSakData =
@@ -199,16 +230,16 @@ class InnsendingMetadataPostgresRepositoryTest {
                     ),
                 sakId = null,
                 journalpostId = "1",
-                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+                journalpostData = innsendingDataMedArenaSak.journalpostData?.copy(journalpostId = "1"),
             )
         val ettersendingHåndtertAvDPSak =
-            innsendingData.copy(
+            innsendingDataMedArenaSak.copy(
                 id = 2,
                 søknadsData = søknadsData,
                 arenaSakData = null,
                 sakId = dpSakId,
                 journalpostId = "2",
-                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "2"),
+                journalpostData = innsendingDataMedArenaSak.journalpostData?.copy(journalpostId = "2"),
             )
 
         withMigratedDb {
@@ -235,8 +266,10 @@ class InnsendingMetadataPostgresRepositoryTest {
             session.run(
                 queryOf(
                     //language=PostgreSQL
-                    """SELECT count(*) FROM sak_v1 
-                        WHERE ny_journalpost_id = :ny_journalpost_id AND sak_id = :sak_id 
+                    """
+                        SELECT count(*) 
+                        FROM   sak_v1 
+                        WHERE  ny_journalpost_id = :ny_journalpost_id AND sak_id = :sak_id 
                     """.trimMargin(),
                     mapOf(
                         "ny_journalpost_id" to nyJournalpostId,
@@ -261,7 +294,7 @@ class InnsendingMetadataPostgresRepositoryTest {
     @Test
     fun `hent journalposter for BrukerdialogSøknadFormat (verdi-wrapper) på Arena sak`() {
         val søknad =
-            innsendingData.copy(
+            innsendingDataMedArenaSak.copy(
                 id = 1,
                 søknadsData = søknadsDataBrukerdialogFormat,
                 arenaSakData =
@@ -270,7 +303,7 @@ class InnsendingMetadataPostgresRepositoryTest {
                         fagsakId = "fagsakid",
                     ),
                 journalpostId = "1",
-                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+                journalpostData = innsendingDataMedArenaSak.journalpostData?.copy(journalpostId = "1"),
             )
         withMigratedDb {
             InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource).lagre(søknad.createInnsending())
@@ -284,13 +317,13 @@ class InnsendingMetadataPostgresRepositoryTest {
     fun `hent journalposter for BrukerdialogSøknadFormat (verdi-wrapper) på Dagpenger sak`() {
         val dpSakId = UUID.randomUUID()
         val søknad =
-            innsendingData.copy(
+            innsendingDataMedArenaSak.copy(
                 id = 1,
                 søknadsData = søknadsDataBrukerdialogFormat,
                 arenaSakData = null,
                 sakId = dpSakId,
                 journalpostId = "1",
-                journalpostData = innsendingData.journalpostData?.copy(journalpostId = "1"),
+                journalpostData = innsendingDataMedArenaSak.journalpostData?.copy(journalpostId = "1"),
             )
         withMigratedDb {
             InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource).lagre(søknad.createInnsending())

@@ -4,7 +4,7 @@ import io.kotest.matchers.shouldBe
 import kotliquery.queryOf
 import kotliquery.sessionOf
 import no.nav.dagpenger.dnr
-import no.nav.dagpenger.innsendingData
+import no.nav.dagpenger.innsendingDataMedArenaSak
 import no.nav.dagpenger.journalpostId
 import no.nav.dagpenger.mottak.Innsending
 import no.nav.dagpenger.mottak.InnsendingVisitor
@@ -48,7 +48,7 @@ internal class InnsendingPostgresRepositoryTest {
     @Test
     fun `skal kunne oppdatere en innsending med sakId `() {
         val innsending =
-            innsendingData
+            innsendingDataMedArenaSak
                 .copy(
                     sakId = null,
                 ).createInnsending()
@@ -59,7 +59,7 @@ internal class InnsendingPostgresRepositoryTest {
                     assertTrue(it > 0, "lagring av innsending feilet")
                 }
                 val sakId = UUID.randomUUID()
-                lagre(innsendingData.copy(sakId = sakId).createInnsending())
+                lagre(innsendingDataMedArenaSak.copy(sakId = sakId).createInnsending())
 
                 val innsending =
                     requireNotNull(
@@ -72,7 +72,7 @@ internal class InnsendingPostgresRepositoryTest {
 
     @Test
     fun `hent skal kunne hente innsending`() {
-        val innsending = innsendingData.createInnsending()
+        val innsending = innsendingDataMedArenaSak.createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending).also {
@@ -89,9 +89,9 @@ internal class InnsendingPostgresRepositoryTest {
 
     @Test
     fun `håndterer ny lagring av aktivitetslogg`() {
-        val innsending = innsendingData.createInnsending()
+        val innsending = innsendingDataMedArenaSak.createInnsending()
         val nyLogg =
-            innsendingData.aktivitetslogg.aktiviteter.toMutableList().also {
+            innsendingDataMedArenaSak.aktivitetslogg.aktiviteter.toMutableList().also {
                 it.add(
                     InnsendingData.AktivitetsloggData.AktivitetData(
                         alvorlighetsgrad = InnsendingData.AktivitetsloggData.Alvorlighetsgrad.INFO,
@@ -111,7 +111,7 @@ internal class InnsendingPostgresRepositoryTest {
                 )
             }
         val innsending2 =
-            innsendingData
+            innsendingDataMedArenaSak
                 .copy(
                     aktivitetslogg = InnsendingData.AktivitetsloggData(nyLogg.toList()),
                     tilstand =
@@ -138,7 +138,7 @@ internal class InnsendingPostgresRepositoryTest {
 
     @Test
     fun `Dobbellagrer ikke verdier som skal være unike`() {
-        val innsending = innsendingData.createInnsending()
+        val innsending = innsendingDataMedArenaSak.createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending)
@@ -158,8 +158,8 @@ internal class InnsendingPostgresRepositoryTest {
 
     @Test
     fun `håndterer flere innsendinger for samme person`() {
-        val innsending = innsendingData.createInnsending()
-        val innsending2 = innsendingData.copy(journalpostId = "287689").createInnsending()
+        val innsending = innsendingDataMedArenaSak.createInnsending()
+        val innsending2 = innsendingDataMedArenaSak.copy(journalpostId = "287689").createInnsending()
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {
                 lagre(innsending).also {
@@ -181,14 +181,14 @@ internal class InnsendingPostgresRepositoryTest {
     @Test
     @Ignore
     fun `håndterer flere innsendinger for samme person men med dnr og fnr skille`() {
-        val innsending = innsendingData.createInnsending()
+        val innsending = innsendingDataMedArenaSak.createInnsending()
 
         val innsending2 =
-            innsendingData
+            innsendingDataMedArenaSak
                 .copy(
                     journalpostId = "287689",
                     personData =
-                        innsendingData.personData!!.copy(
+                        innsendingDataMedArenaSak.personData!!.copy(
                             fødselsnummer = dnr,
                         ),
                 ).createInnsending()
@@ -213,7 +213,7 @@ internal class InnsendingPostgresRepositoryTest {
     @Test
     fun `Lagring der arena sak er null`() {
         val innsending =
-            innsendingData
+            innsendingDataMedArenaSak
                 .copy(
                     arenaSakData =
                         InnsendingData.ArenaSakData(
@@ -236,7 +236,7 @@ internal class InnsendingPostgresRepositoryTest {
 
     @Test
     fun `Skal kunne hente innsedninger for en gitt periode`() {
-        val innsending = innsendingData.createInnsending()
+        val innsending = innsendingDataMedArenaSak.createInnsending()
 
         withMigratedDb {
             with(InnsendingPostgresRepository(PostgresDataSourceBuilder.dataSource)) {

@@ -5,8 +5,10 @@ import no.nav.dagpenger.mottak.PersonTestData.GENERERT_FØDSELSNUMMER
 import no.nav.dagpenger.mottak.defaultObjectMapper
 import no.nav.dagpenger.mottak.serder.InnsendingData
 import java.time.LocalDateTime
+import java.util.UUID
 
 internal val journalpostId = "187689"
+internal val sakId = UUID.randomUUID()
 internal val journalpostStatus = "aktiv"
 internal val fnr = GENERERT_FØDSELSNUMMER
 internal val dnr = GENERERT_DNUMMER
@@ -74,7 +76,7 @@ private val søknadsjson =
         """.trimIndent(),
     )
 
-val innsendingData =
+val innsendingDataMedArenaSak =
     InnsendingData(
         id = 1,
         journalpostId = journalpostId,
@@ -109,4 +111,37 @@ val innsendingData =
         søknadsData = søknadsjson,
         aktivitetslogg = aktivitetsloggData,
         mottakskanal = "NAV_NO",
+    )
+val innsendingDataMedSakId =
+    InnsendingData(
+        id = 1,
+        journalpostId = journalpostId,
+        tilstand =
+            InnsendingData.TilstandData(
+                InnsendingData.TilstandData.InnsendingTilstandTypeData.AventerArenaOppgaveType,
+            ),
+        journalpostData =
+            InnsendingData.JournalpostData(
+                journalpostId = journalpostId,
+                journalpostStatus = journalpostStatus,
+                bruker = InnsendingData.JournalpostData.BrukerData(InnsendingData.JournalpostData.BrukerTypeData.FNR, fnr),
+                behandlingstema = "DAG",
+                registertDato = registrertdato,
+                dokumenter = søknadDokumenter,
+                journalførendeEnhet = "ENHET",
+            ),
+        personData =
+            InnsendingData.PersonData(
+                navn = "Hubba Bubba's",
+                fødselsnummer = fnr,
+                aktørId = "345678",
+                norskTilknytning = true,
+                diskresjonskode = false,
+                egenAnsatt = false,
+            ),
+        søknadsData = søknadsjson,
+        aktivitetslogg = aktivitetsloggData,
+        mottakskanal = "NAV_NO",
+        sakId = sakId,
+        arenaSakData = null,
     )

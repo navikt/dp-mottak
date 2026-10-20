@@ -9,7 +9,7 @@ import io.ktor.http.HttpStatusCode
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.dagpenger.innsendingData
+import no.nav.dagpenger.innsendingDataMedArenaSak
 import no.nav.dagpenger.mottak.InnsendingPeriode
 import no.nav.dagpenger.mottak.api.TestApplication.autentisert
 import no.nav.dagpenger.mottak.api.TestApplication.withMockAuthServerAndTestApplication
@@ -36,7 +36,7 @@ internal class InnsendingApiTest {
 
         val mockProducer = MockProducer(true, RoundRobinPartitioner(), StringSerializer(), StringSerializer())
         val innsending =
-            innsendingData
+            innsendingDataMedArenaSak
                 .copy(
                     tilstand =
                         InnsendingData.TilstandData(
@@ -67,7 +67,7 @@ internal class InnsendingApiTest {
         val journalpostId = "187689"
 
         val mockProducer = MockProducer(true, RoundRobinPartitioner(), StringSerializer(), StringSerializer())
-        val innsending = innsendingData.createInnsending()
+        val innsending = innsendingDataMedArenaSak.createInnsending()
 
         val innsendingRepository =
             mockk<InnsendingRepository>().also {
