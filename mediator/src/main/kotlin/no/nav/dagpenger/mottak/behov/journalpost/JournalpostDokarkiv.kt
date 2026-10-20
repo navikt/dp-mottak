@@ -17,6 +17,10 @@ internal interface JournalpostDokarkiv {
         dagpengerFagsakId: String,
         ident: String,
     ): KnyttJounalPostTilNySakResponse
+
+    suspend fun feilregistrerSakstilknytning(
+        journalpostId: String,
+    )
 }
 
 internal data class KnyttJounalPostTilNySakResponse(

@@ -40,6 +40,26 @@ class JournalpostApiClientTest {
         }
 
     @Test
+    fun `skal kunne feilregistrere sakstilknytning for en journalpost`() =
+        runBlocking {
+            val mockHttpEngine = mockEngine(statusCode = HttpStatusCode.OK)
+            val journalpostApi = JournalpostApiClient(engine = mockHttpEngine, { "token" })
+            journalpostApi.feilregistrerSakstilknytning(
+                "123",
+            )
+
+            val requestData = mockHttpEngine.requestHistory.first()
+            assertEquals("PATCH", requestData.method.value)
+            assertEquals(
+                "/rest/journalpostapi/v1/journalpost/123/feilregistrer/feilregistrerSakstilknytning",
+                requestData.url.encodedPathAndQuery,
+            )
+            assertEquals(URLProtocol.HTTPS, requestData.url.protocol)
+            assertEquals("dokarkiv-q2.dev-fss-pub.nais.io", requestData.url.host)
+            assertEquals("Bearer token", requestData.headers["Authorization"])
+        }
+
+    @Test
     fun `skal kunne ferdigstille journalpost`() =
         runBlocking {
             val mockHttpEngine = mockEngine(statusCode = HttpStatusCode.OK)

@@ -133,6 +133,12 @@ internal class JournalpostApiClient(
                 )
             }.body()
 
+    override suspend fun feilregistrerSakstilknytning(journalpostId: String) {
+        client.patch("/$basePath/journalpost/$journalpostId/feilregistrer/feilregistrerSakstilknytning") {
+            header(HttpHeaders.Authorization, "Bearer ${tokenProvider.invoke()}")
+        }
+    }
+
     private data class KnyttTilAnnenSakRequest(
         val fagsakId: String,
         val bruker: Bruker,
