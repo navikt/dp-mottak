@@ -113,4 +113,34 @@ internal class InnsendingMetadataPostgresRepository(
             )
         }
     }
+
+    override fun finnJournalpostIderForSøknad(ident: String, søknadId: UUID): List<String> {
+        return sessionOf(ds).use { session ->
+            session.run(
+                queryOf(
+                    //language=SQL
+                    statement =
+                        """
+                        SELECT    inns.journalpostid
+                        FROM      innsending_v1 inns
+                        JOIN      person_innsending_v1 peri ON inns.id = peri.id
+                        JOIN      person_v1 pers            ON pers.id = peri.personid
+                        JOIN      soknad_v1 sokn            ON inns.id = sokn.id
+                        WHERE     pers.ident =  :ident
+                        AND       COALESCE(
+                                      sokn.data -> 'verdi' ->> 'søknad_uuid',
+                                      sokn.data ->> 'søknad_uuid'
+                                  ) = :soknad_id
+                        """.trimIndent(),
+                    paramMap =
+                        mapOf(
+                            "ident" to ident,
+                            "soknad_id" to søknadId.toString(),
+                        ),
+                ).map { row ->
+                    row.long(columnLabel = "journalpost_id").toString()
+                }.asList
+            )
+        }
+    }
 }

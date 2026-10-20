@@ -14,18 +14,39 @@ import no.nav.dagpenger.mottak.Config
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostDokarkiv
 import no.nav.dagpenger.mottak.db.InnsendingMetadataRepository
 import no.nav.dagpenger.mottak.serder.asUUID
+import no.nav.dagpenger.mottak.tjenester.VedtakFattetEvent.Companion.tilVedtakFattetEvent
 
 private val logger = KotlinLogging.logger {}
+
+
+enum class VedtakFattetEvent(val eventName: String) {
+    VEDTAK_FATTET_UTENFOR_ARENA("vedtak_fattet_utenfor_arena"),
+    VEDTAK_FATTET_I_NY_SAK("vedtak_fattet_i_ny_sak");
+
+    companion object {
+        fun String.tilVedtakFattetEvent(): VedtakFattetEvent {
+            return entries.single { it.eventName == this }
+        }
+    }
+}
 
 internal class VedtakFattetMottak(
     rapidsConnection: RapidsConnection,
     private val innsendingMetadataRepository: InnsendingMetadataRepository,
     private val journalpostDokarkiv: JournalpostDokarkiv,
 ) : River.PacketListener {
+
     companion object {
+
         val rapidFilter: River.() -> Unit = {
             precondition {
-                it.requireAny("@event_name", listOf("vedtak_fattet_utenfor_arena"))
+                it.requireAny(
+                    "@event_name",
+                    listOf(
+                        VedtakFattetEvent.VEDTAK_FATTET_UTENFOR_ARENA.eventName,
+                        VedtakFattetEvent.VEDTAK_FATTET_I_NY_SAK.eventName,
+                    )
+                )
             }
             validate {
                 it.requireKey("behandlingId", "søknadId", "ident", "sakId")
@@ -37,6 +58,7 @@ internal class VedtakFattetMottak(
         River(rapidsConnection).apply(rapidFilter).register(this)
     }
 
+
     override fun onPacket(
         packet: JsonMessage,
         context: MessageContext,
@@ -47,51 +69,57 @@ internal class VedtakFattetMottak(
         val behandlingId = packet["behandlingId"].asUUID()
         val ident = packet["ident"].asString()
         val dagpengerFagsakId = packet["sakId"].asUUID()
-        val behandlingIdSkipSet = setOf("019a71e3-7273-7a0f-99c4-dfc71b3b339b")
         withLoggingContext("søknadId" to "$søknadId", "behandlingId" to "$behandlingId") {
-            logger.info { "Mottok vedtak_fattet_utenfor_arena" }
-            if (behandlingId.toString() in behandlingIdSkipSet) {
-                logger.info { "Skipper behandlingId $behandlingId fra mottak vedtak_fattet_utenfor_arena" }
-                return
-            }
-            val arenaOppgaver =
-                innsendingMetadataRepository.hentArenaOppgaver(
-                    søknadId = søknadId,
-                    ident = ident,
-                )
+            val vedtakFattetEvent = packet["@event_name"].stringValue().tilVedtakFattetEvent()
+            logger.info { "Mottok $vedtakFattetEvent" }
 
-            if (arenaOppgaver.isNotEmpty()) {
-                val oppgaveIder = arenaOppgaver.map { it.oppgaveId }
-                runBlocking {
-                    arenaOppgaver.forEach { oppgave ->
-                        runCatching {
-                            val knyttJounalPostTilNySakResponse =
-                                journalpostDokarkiv.knyttJounalPostTilNySak(
-                                    journalpostId = oppgave.journalpostId,
-                                    dagpengerFagsakId = dagpengerFagsakId.toString(),
-                                    ident = ident,
-                                )
-                            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(
-                                nyJournalpostId = knyttJounalPostTilNySakResponse.nyJournalpostId,
-                                innsendingId = oppgave.innsendingId,
-                                sakId = dagpengerFagsakId,
-                            )
-                        }.getOrElse(Throwable::ignorerManglendeJournalPostIDev)
+            when (vedtakFattetEvent) {
+                VedtakFattetEvent.VEDTAK_FATTET_UTENFOR_ARENA -> {
+                    val arenaOppgaver =
+                        innsendingMetadataRepository.hentArenaOppgaver(
+                            søknadId = søknadId,
+                            ident = ident,
+                        )
+
+                    if (arenaOppgaver.isNotEmpty()) {
+                        val oppgaveIder = arenaOppgaver.map { it.oppgaveId }
+                        runBlocking {
+                            arenaOppgaver.forEach { oppgave ->
+                                runCatching {
+                                    val knyttJounalPostTilNySakResponse =
+                                        journalpostDokarkiv.knyttJounalPostTilNySak(
+                                            journalpostId = oppgave.journalpostId,
+                                            dagpengerFagsakId = dagpengerFagsakId.toString(),
+                                            ident = ident,
+                                        )
+                                    innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(
+                                        nyJournalpostId = knyttJounalPostTilNySakResponse.nyJournalpostId,
+                                        innsendingId = oppgave.innsendingId,
+                                        sakId = dagpengerFagsakId,
+                                    )
+                                }.getOrElse(Throwable::ignorerManglendeJournalPostIDev)
+                            }
+                        }
+
+                        val message =
+                            JsonMessage
+                                .newNeed(
+                                    behov = listOf("slett_arena_oppgaver"),
+                                    map =
+                                        mapOf(
+                                            "behandlingId" to behandlingId,
+                                            "oppgaveIder" to oppgaveIder,
+                                            "ident" to ident,
+                                        ),
+                                ).toJson()
+                        context.publish(ident, message)
                     }
                 }
-
-                val message =
-                    JsonMessage
-                        .newNeed(
-                            behov = listOf("slett_arena_oppgaver"),
-                            map =
-                                mapOf(
-                                    "behandlingId" to behandlingId,
-                                    "oppgaveIder" to oppgaveIder,
-                                    "ident" to ident,
-                                ),
-                        ).toJson()
-                context.publish(ident, message)
+                VedtakFattetEvent.VEDTAK_FATTET_I_NY_SAK -> {
+                    runBlocking {
+                        innsendingMetadataRepository.finnJournalpostIderForSøknad(ident = ident, søknadId = søknadId)
+                    }
+                }
             }
         }
     }
@@ -100,8 +128,8 @@ internal class VedtakFattetMottak(
 private fun Throwable.ignorerManglendeJournalPostIDev() {
     when {
         Config.isDev &&
-            this is ClientRequestException &&
-            response.status.value == 404 -> {
+                this is ClientRequestException &&
+                response.status.value == 404 -> {
             logger.warn(this) { "Ignorerer 404 fra journalpostDokarkiv i dev" }
         }
 
