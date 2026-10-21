@@ -100,9 +100,19 @@ internal class InnsendingMetadataPostgresRepository(
                 queryOf(
                     //language=PostgreSQL
                     """
-                        INSERT INTO sak_v1(innsending_id, sak_id, ny_journalpost_id)
-                        VALUES(:innsending_id, :sak_id, :ny_journalpost_id)
-                        ON CONFLICT (innsending_id) DO UPDATE SET sak_id = :sak_id, ny_journalpost_id = :ny_journalpost_id
+                        INSERT INTO sak_v1
+                            ( innsending_id
+                            , sak_id
+                            , ny_journalpost_id
+                            )
+                        VALUES
+                            ( :innsending_id
+                            , :sak_id
+                            , :ny_journalpost_id
+                            )
+                        ON CONFLICT (innsending_id) DO UPDATE 
+                        SET   sak_id            = :sak_id
+                            , ny_journalpost_id = :ny_journalpost_id
                         """,
                     mapOf(
                         "innsending_id" to innsendingId,

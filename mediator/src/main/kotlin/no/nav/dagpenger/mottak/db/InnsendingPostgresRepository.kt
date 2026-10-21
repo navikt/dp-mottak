@@ -29,37 +29,37 @@ internal class InnsendingPostgresRepository(
     // language=PostgreSQL
     private val hentDataSql =
         """
-        select innsending.id                             as "internId",
-               innsending.journalpostid                  as "journalpostId",
-               innsending.tilstand                       as "tilstand",
-               innsending.opprettet                      as "opprettet",
-               journalpost.status                        as "status",
-               journalpost.brukerid                      as "brukerId",
-               journalpost.brukertype                    as "brukerType",
-               journalpost.behandlingstema               as "behandlingstema",
-               journalpost.registrertdato                as "registrertdato",
-               journalpost.journalforendeEnhet           as "journalforendeEnhet",
-               arenasak.fagsakid                         as "fagsak_id_arena",
-               arenasak.oppgaveId                        as "oppgave_id_arena",
-               sak.sak_id                               as "sak_id",
-               soknad.data                               as "søknadsData",
-               person_innsending.navn                    as "navn",
-               person_innsending.diskresjonskode         as "diskresjonsKode",
-               person_innsending.norsktilknytning        as "norsktilknytning",
-               person_innsending.egenansatt              as "egenansatt",
-               person.ident                              as "ident",
-               person.aktørid                            as "aktørid",
-               innsending.mottakskanal                   as "mottakskanal",
-               aktivitetslogg.data                       as "aktivitetslogg"
-        from innsending_v1 as innsending
-                 left join journalpost_v1 journalpost on innsending.id = journalpost.id
-                 left join aktivitetslogg_v1 aktivitetslogg on innsending.id = aktivitetslogg.id
-                 left join arenasak_v1 arenasak on innsending.id = arenasak.id
-                 left join sak_v1 sak on innsending.id = sak.innsending_id
-                 left join soknad_v1 soknad on innsending.id = soknad.id
-                 left join person_innsending_v1 person_innsending on innsending.id = person_innsending.id
-                 left join person_v1 person on person_innsending.personid = person.id
-        where innsending.journalpostId = :jpId;
+        SELECT      inns.id                     AS "internId",
+                    inns.journalpostid          AS "journalpostId",
+                    inns.tilstand               AS "tilstand",
+                    inns.opprettet              AS "opprettet",
+                    jour.status                 AS "status",
+                    jour.brukerid               AS "brukerId",
+                    jour.brukertype             AS "brukerType",
+                    jour.behandlingstema        AS "behandlingstema",
+                    jour.registrertdato         AS "registrertdato",
+                    jour.journalforendeEnhet    AS "journalforendeEnhet",
+                    aren.fagsakid               AS "fagsak_id_arena",
+                    aren.oppgaveId              AS "oppgave_id_arena",
+                    sak.sak_id                  AS "sak_id",
+                    sokn.data                   AS "søknadsData",
+                    peri.navn                   AS "navn",
+                    peri.diskresjonskode        AS "diskresjonsKode",
+                    peri.norsktilknytning       AS "norsktilknytning",
+                    peri.egenansatt             AS "egenansatt",
+                    pers.ident                  AS "ident",
+                    pers.aktørid                AS "aktørid",
+                    inns.mottakskanal           AS "mottakskanal",
+                    akti.data                   AS "aktivitetslogg"
+        FROM        innsending_v1           inns
+        LEFT JOIN   journalpost_v1          jour ON inns.id = jour.id
+        LEFT JOIN   aktivitetslogg_v1       akti ON inns.id = akti.id
+        LEFT JOIN   arenasak_v1             aren ON inns.id = aren.id
+        LEFT JOIN   sak_v1                  sak  ON inns.id = sak.innsending_id
+        LEFT JOIN   soknad_v1               sokn ON inns.id = sokn.id
+        LEFT JOIN   person_innsending_v1    peri ON inns.id = peri.id
+        LEFT JOIN   person_v1               pers ON pers.id = peri.personid
+        WHERE       inns.journalpostId = :jpId;
         """.trimIndent()
 
     override fun hent(journalpostId: String): Innsending? =
