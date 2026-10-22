@@ -14,4 +14,5 @@ enum class InnsendingTilstandType {
     MottattType,
     UkjentBrukerType,
     HåndterInnsendingType,
+    VurderKlageOgAnkeType,
 }

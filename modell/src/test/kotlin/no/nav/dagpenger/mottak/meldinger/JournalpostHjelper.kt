@@ -8,6 +8,7 @@ internal fun lagjournalpostData(
     dato: LocalDateTime = LocalDateTime.now(),
     vedlegg: String = "Vedlegg: Arbeidsavtale",
     behandlingstema: String? = null,
+    journalførendeEnhet: String? = null,
 ): Journalpost {
     val journalpostData =
         Journalpost(
@@ -32,6 +33,7 @@ internal fun lagjournalpostData(
                     ),
                 ),
             behandlingstema = behandlingstema,
+            journalførendeEnhet = journalførendeEnhet,
         )
     return journalpostData
 }
