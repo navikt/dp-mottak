@@ -77,9 +77,12 @@ stateDiagram-v2
     AvventerPersondataType --> KategoriseringType
     AvventerPersondataType --> UkjentBrukerType : Person ikke funnet
     KategoriseringType --> AvventerSøknadsdataType : NySøknad/Gjenopptak/Ettersending/Generell
+    KategoriseringType --> VurderKlageOgAnkeType : Klage/Anke
     KategoriseringType --> HåndterInnsendingType : Andre kategorier
     KategoriseringType --> AvventerGosysType : KlageForskudd
     KategoriseringType --> UkjentBrukerType : Uten bruker
+    VurderKlageOgAnkeType --> AvventerGosysType : Har journalførende enhet
+    VurderKlageOgAnkeType --> HåndterInnsendingType : Mangler journalførende enhet
     AvventerSøknadsdataType --> HåndterInnsendingType
     HåndterInnsendingType --> AventerArenaStartVedtakType : Arena + NySøknad
     HåndterInnsendingType --> AventerArenaOppgaveType : Arena + Andre
@@ -104,6 +107,7 @@ stateDiagram-v2
 | `AvventerJournalpostType` | Venter på journalpostdata fra SAF |
 | `AvventerPersondataType` | Venter på persondata fra PDL |
 | `KategoriseringType` | Kategoriserer journalposten basert på skjemakode |
+| `VurderKlageOgAnkeType` | Sender klage og anke med journalførende enhet til Gosys, ellers til `HåndterInnsending` |
 | `AvventerSøknadsdataType` | Venter på søknadsdata for søknader/gjenopptak |
 | `HåndterInnsendingType` | Beslutter om innsending skal til Arena eller dp-saksbehandling |
 | `AventerArenaStartVedtakType` | Oppretter sak og oppgave i Arena for nye søknader |
@@ -147,6 +151,7 @@ Basert på kategorisering og søknadsdata rutes journalposter til ulike enheter:
 | **4153** | Klage - Forskudd |
 | **2103** | Diskresjonskode (fortrolig adresse) |
 | **4483** | Egen ansatt |
+| **Journalførende enhet** | Klage og anke der journalposten har `journalførendeEnhet`. Gjelder også egne ansatte og kode 7. Kode 6 går fortsatt til 2103. |
 
 ## Hendelsesflyt
 

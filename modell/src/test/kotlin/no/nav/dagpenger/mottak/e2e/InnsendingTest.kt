@@ -25,6 +25,7 @@ import no.nav.dagpenger.mottak.InnsendingTilstandType.InnsendingFerdigstiltType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.KategoriseringType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.MottattType
 import no.nav.dagpenger.mottak.InnsendingTilstandType.UkjentBrukerType
+import no.nav.dagpenger.mottak.InnsendingTilstandType.VurderKlageOgAnkeType
 import no.nav.dagpenger.mottak.toJsonNode
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -434,6 +435,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 add(AvventerJournalpostType)
                 add(AvventerPersondataType)
                 add(KategoriseringType)
+                add(VurderKlageOgAnkeType)
                 add(HåndterInnsendingType)
                 if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
                     add(AventerArenaOppgaveType)
@@ -470,6 +472,94 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
             assertNotNull(it.fødselsnummer)
             assertNotNull(it.datoRegistrert)
         }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["NAV 90-00.08", "NAV 90-00.08 K", "NAVe 90-00.08 K", "NAV 90-00.08 A", "NAVe 90-00.08 A"])
+    fun `klage og anke med journalførende enhet skal gi Gosys-oppgave til journalførende enhet`(brevkode: String) {
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode = brevkode, journalførendeEnhet = "4812")
+        håndterPersonInformasjon()
+
+        inspektør.innsendingLogg.behov().find { it.type == OpprettGosysoppgave }!!.also {
+            it.detaljer()["behandlendeEnhetId"] shouldBe "4812"
+        }
+        assertNull(inspektør.innsendingLogg.behov().find { it.type == Behovtype.HåndterInnsending })
+
+        håndterGosysOppgaveOpprettet()
+        håndterJournalpostOppdatert()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            VurderKlageOgAnkeType,
+            AvventerGosysType,
+            InnsendingFerdigstiltType,
+        )
+        inspektør.also {
+            assertNoErrors(it)
+            assertMessages(it)
+        }
+        assertFerdigstilt {
+            assertEquals("4812", it.behandlendeEnhet)
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = ["NAV 90-00.08 A", "NAVe 90-00.08 A"])
+    fun `anke uten journalførende enhet skal til HåndterInnsending`(brevkode: String) {
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode = brevkode, journalførendeEnhet = " ")
+        håndterPersonInformasjon()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            VurderKlageOgAnkeType,
+            HåndterInnsendingType,
+        )
+        assertNull(inspektør.innsendingLogg.behov().find { it.type == OpprettGosysoppgave })
+    }
+
+    @Test
+    fun `klage med ukjent person og journalførende enhet skal gi Gosys-oppgave til journalførende enhet`() {
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode = "NAV 90-00.08", journalførendeEnhet = "4812")
+        håndterPersonInformasjonIkkeFunnet()
+        håndterGosysOppgaveOpprettet()
+
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            UkjentBrukerType,
+            InnsendingFerdigstiltType,
+        )
+        assertFerdigstilt {
+            assertEquals("4812", it.behandlendeEnhet)
+        }
+    }
+
+    @Test
+    fun `klage forskudd med journalførende enhet skal fortsatt til 4153`() {
+        håndterJoarkHendelse()
+        håndterJournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0451", journalførendeEnhet = "4812")
+        håndterPersonInformasjon()
+
+        inspektør.innsendingLogg.behov().find { it.type == OpprettGosysoppgave }!!.also {
+            it.detaljer()["behandlendeEnhetId"] shouldBe "4153"
+        }
+        assertTilstander(
+            MottattType,
+            AvventerJournalpostType,
+            AvventerPersondataType,
+            KategoriseringType,
+            AvventerGosysType,
+        )
     }
 
     @ParameterizedTest
