@@ -6,6 +6,8 @@ metadata:
   labels:
     team: teamdagpenger
     subteam: stsb
+    okonomisystem: "false"
+    fagsystem: DAGPENGER
   annotations:
     config.linkerd.io/proxy-outbound-connect-timeout: 3000ms
 spec:
