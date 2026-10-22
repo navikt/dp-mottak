@@ -72,6 +72,12 @@ VedtakFattetMottakTest {
                     sakId = any(),
                 )
             } just Runs
+            every {
+                it.finnJournalpostIderForSøknad(
+                    ident = testPersonIdent,
+                    søknadId = søknadIdForPersonIDpSak,
+                )
+            } returns listOf(Pair("1", 1), Pair("2", 2), Pair("3", 3))
         }
 
     private val journalpostDokarkiv =
@@ -79,6 +85,9 @@ VedtakFattetMottakTest {
             coEvery {
                 it.knyttJounalPostTilNySak(any(), any(), any())
             } returns knyttJounalPostTilNySakResponse
+            coEvery {
+                it.feilregistrerSakstilknytning(any())
+            } just Runs
         }
 
     init {
@@ -90,8 +99,8 @@ VedtakFattetMottakTest {
     }
 
     @Test
-    fun `Skal ikke sende ut behov om sletting av Arena oppgaver  eller oppdatere fagsak i Joark når oppgave ikke finnes i Arena`() {
-        testRapid.sendTestMessage(vedtakFattetIDagpengerJson(søknadIdForPersonIDpSak))
+    fun `Skal ikke sende ut behov om sletting av Arena oppgaver eller oppdatere fagsak i Joark når vedtak_fattet_utenfor_arena mottas og oppgave ikke finnes i Arena`() {
+        testRapid.sendTestMessage(vedtakFattetIDagpengerJson(søknadId = søknadIdForPersonIDpSak, eventName = "vedtak_fattet_utenfor_arena"))
 
         testRapid.inspektør.size shouldBe 0
         coVerify(exactly = 0) {
@@ -103,8 +112,8 @@ VedtakFattetMottakTest {
     }
 
     @Test
-    fun `Skal sende ut behov for sletting av Arena-oppgaver når vedtak er fattet i fagsystem Dagpenger`() {
-        testRapid.sendTestMessage(vedtakFattetIDagpengerJson(søknadId))
+    fun `Skal knytte journalpost til DP-sak og sende ut behov for sletting av Arena-oppgaver når vedtak_fattet_utenfor_arena mottas og det er opprettet oppgave i Arena`() {
+        testRapid.sendTestMessage(vedtakFattetIDagpengerJson(søknadId = søknadId, eventName = "vedtak_fattet_utenfor_arena"))
         testRapid.inspektør.let { inspektør ->
             inspektør.size shouldBe 1
             inspektør.key(0) shouldBe testPersonIdent
@@ -129,10 +138,34 @@ VedtakFattetMottakTest {
         }
     }
 
-    private fun vedtakFattetIDagpengerJson(søknadId: UUID) =
-        """
+    @Test
+    fun `Skal knytte journalpost til ny DP-sak og feilregistrere gammel journalpost når vedtak_fattet_i_ny_sak mottas`() {
+        testRapid.sendTestMessage(vedtakFattetIDagpengerJson(søknadId = søknadIdForPersonIDpSak, eventName = "vedtak_fattet_i_ny_sak"))
+        testRapid.inspektør.let { inspektør ->
+            inspektør.size shouldBe 0
+        }
+        coVerify(exactly = 1) {
+            journalpostDokarkiv.knyttJounalPostTilNySak("1", dagpengerFagsakId.toString(), testPersonIdent)
+            journalpostDokarkiv.knyttJounalPostTilNySak("2", dagpengerFagsakId.toString(), testPersonIdent)
+            journalpostDokarkiv.knyttJounalPostTilNySak("3", dagpengerFagsakId.toString(), testPersonIdent)
+            journalpostDokarkiv.feilregistrerSakstilknytning("1")
+            journalpostDokarkiv.feilregistrerSakstilknytning("2")
+            journalpostDokarkiv.feilregistrerSakstilknytning("3")
+        }
+
+        verify {
+            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(knyttJounalPostTilNySakResponse.nyJournalpostId, 1, dagpengerFagsakId)
+            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(knyttJounalPostTilNySakResponse.nyJournalpostId, 2, dagpengerFagsakId)
+            innsendingMetadataRepository.opprettKoblingTilNyJournalpostForSak(knyttJounalPostTilNySakResponse.nyJournalpostId, 3, dagpengerFagsakId)
+        }
+    }
+
+    private fun vedtakFattetIDagpengerJson(
+        søknadId: UUID,
+        eventName: String,
+    ) = """
         {
-            "@event_name": "vedtak_fattet_utenfor_arena",
+            "@event_name": "$eventName",
             "behandlingId": "$behandlingId",
             "søknadId": "$søknadId",
             "ident": "$testPersonIdent",
