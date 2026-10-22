@@ -1,5 +1,7 @@
 package no.nav.dagpenger.mottak.meldinger
 
+// Oversikt over skjemakoder kan en finne på https://kodeverk.ansatt.nav.no/kodeverk/Vedleggskoder
+
 enum class SkjemaType(
     val skjemakode: String,
     val tittel: String,
@@ -53,6 +55,7 @@ enum class SkjemaType(
     OPPHOLDS_OG_ARBEIDSTILLATELSE_ELLER_REGISTRERINGSBEVIS_FOR_EØS_BORGERE("T4", "Oppholds- og arbeidstillatelse, eller registreringsbevis for EØS-borgere"),
     SED_U006_FAMILIEINFORMASJON("T5", "SED U006 Familieinformasjon"),
     PERMITTERINGSVARSEL("T6", "Permitteringsvarsel"),
+    DOKUMENTASJON_AV_INNTEKT("T7", "Dokumentasjon av inntekt"),
     DOKUMENTASJON_AV_ARBEIDSFORHOLD("T8", "Dokumentasjon av arbeidsforhold"),
     DOKUMENTASJON_AV_HELSE_OG_FUNKSJONSNIVÅ("T9", "Dokumentasjon av helse og funksjonsnivå"),
     U1_PERIODER_AV_BETYDNING_FOR_RETTEN_TIL_DAGPENGER("U1", "U1 Perioder av betydning for retten til dagpenger"),
