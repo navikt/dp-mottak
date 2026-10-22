@@ -44,25 +44,29 @@ sealed class KategorisertJournalpost(
         }
     }
 
+    protected open fun journalførendeEnhet(): String? = null
+
     internal fun oppgaveBenk(
         person: Person?,
         rutingOppslag: RutingOppslag? = null,
     ): OppgaveBenk {
         val oppgaveBenk = finnOppgaveBenk(rutingOppslag, person)
+        val journalførendeEnhet = journalførendeEnhet()
 
-        return when (person?.diskresjonskode) {
-            true ->
+        return when {
+            person?.diskresjonskode == true ->
                 oppgaveBenk.copy(
                     id = "2103",
                     beskrivelse = henvendelseNavn(),
                 )
 
-            else -> {
-                when (person?.egenAnsatt == true && oppgaveBenk.id == "4450") {
-                    true -> oppgaveBenk.copy(id = "4483", beskrivelse = henvendelseNavn())
-                    else -> oppgaveBenk
-                }
-            }
+            // Journalførende enhet går foran egen ansatt-regelen, men ikke foran kode 6
+            journalførendeEnhet != null -> oppgaveBenk.copy(id = journalførendeEnhet)
+
+            person?.egenAnsatt == true && oppgaveBenk.id == "4450" ->
+                oppgaveBenk.copy(id = "4483", beskrivelse = henvendelseNavn())
+
+            else -> oppgaveBenk
         }
     }
 
@@ -246,6 +250,8 @@ data class Klage(
 ) : KategorisertJournalpost(journalpost) {
     override val kategori: Kategori = Kategori.KLAGE
 
+    override fun journalførendeEnhet(): String? = journalpost.journalførendeEnhet()?.takeIf { it.isNotBlank() }
+
     override fun henvendelseNavn(): String =
         when (journalpost.erEttersending()) {
             true -> "Ettersending til klage\n"
@@ -257,6 +263,8 @@ data class Anke(
     override val journalpost: Journalpost,
 ) : KategorisertJournalpost(journalpost) {
     override val kategori: Kategori = Kategori.ANKE
+
+    override fun journalførendeEnhet(): String? = journalpost.journalførendeEnhet()?.takeIf { it.isNotBlank() }
 
     override fun henvendelseNavn(): String =
         when (journalpost.erEttersending()) {

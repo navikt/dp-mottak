@@ -113,6 +113,7 @@ abstract class AbstractEndeTilEndeTest {
         behandlingstema: String? = null,
         bruker: Bruker? = Bruker(id = "1234", type = Journalpost.BrukerType.AKTOERID),
         journalpostStatus: String = "MOTTATT",
+        journalførendeEnhet: String? = null,
     ) {
         innsending.håndter(
             journalpostData(
@@ -120,6 +121,7 @@ abstract class AbstractEndeTilEndeTest {
                 behandlingstema = behandlingstema,
                 bruker = bruker,
                 journalpostStatus = journalpostStatus,
+                journalførendeEnhet = journalførendeEnhet,
             ),
         )
     }
@@ -262,6 +264,7 @@ abstract class AbstractEndeTilEndeTest {
         behandlingstema: String? = null,
         bruker: Bruker?,
         journalpostStatus: String,
+        journalførendeEnhet: String? = null,
     ): Journalpost =
         Journalpost(
             aktivitetslogg = Aktivitetslogg(),
@@ -269,6 +272,7 @@ abstract class AbstractEndeTilEndeTest {
             journalpostStatus = journalpostStatus,
             bruker = bruker,
             behandlingstema = behandlingstema,
+            journalførendeEnhet = journalførendeEnhet,
             registrertDato = LocalDateTime.now(),
             dokumenter =
                 listOf(

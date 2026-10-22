@@ -86,6 +86,7 @@ data class InnsendingData(
                 InnsendingTilstandTypeData.MottattType -> Innsending.Mottatt
                 InnsendingTilstandTypeData.UkjentBrukerType -> Innsending.UkjentBruker
                 InnsendingTilstandTypeData.HåndterInnsendingType -> Innsending.HåndterInnsending
+                InnsendingTilstandTypeData.VurderKlageOgAnkeType -> Innsending.VurderKlageOgAnke
             }
 
         enum class InnsendingTilstandTypeData {
@@ -104,6 +105,7 @@ data class InnsendingData(
             MottattType,
             UkjentBrukerType,
             HåndterInnsendingType,
+            VurderKlageOgAnkeType,
         }
     }
 

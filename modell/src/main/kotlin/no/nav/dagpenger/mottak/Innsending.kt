@@ -347,11 +347,31 @@ class Innsending private constructor(
                 is Generell -> innsending.tilstand(hendelse, AvventerSøknadsdata)
                 is Utdanning -> innsending.tilstand(hendelse, HåndterInnsending)
                 is Etablering -> innsending.tilstand(hendelse, HåndterInnsending)
-                is Klage -> innsending.tilstand(hendelse, HåndterInnsending)
-                is Anke -> innsending.tilstand(hendelse, HåndterInnsending)
+                is Klage -> innsending.tilstand(hendelse, VurderKlageOgAnke)
+                is Anke -> innsending.tilstand(hendelse, VurderKlageOgAnke)
                 is UkjentSkjemaKode -> innsending.tilstand(hendelse, HåndterInnsending)
                 is UtenBruker -> innsending.tilstand(hendelse, UkjentBruker)
                 is KlageForskudd -> innsending.tilstand(hendelse, AvventerGosysOppgave)
+            }
+        }
+    }
+
+    internal object VurderKlageOgAnke : Tilstand {
+        override val type: InnsendingTilstandType
+            get() = InnsendingTilstandType.VurderKlageOgAnkeType
+        override val timeout: Duration
+            get() = Duration.ofDays(1)
+
+        override fun entering(
+            innsending: Innsending,
+            hendelse: Hendelse,
+        ) {
+            val journalførendeEnhet = requireNotNull(innsending.journalpost) { " Journalpost må være innhentet " }.journalførendeEnhet()
+            if (journalførendeEnhet.isNullOrBlank()) {
+                innsending.tilstand(hendelse, HåndterInnsending)
+            } else {
+                hendelse.info("Klage/anke har journalførende enhet $journalførendeEnhet, oppretter Gosys-oppgave")
+                innsending.tilstand(hendelse, AvventerGosysOppgave)
             }
         }
     }

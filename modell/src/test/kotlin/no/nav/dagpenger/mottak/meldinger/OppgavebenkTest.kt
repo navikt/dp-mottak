@@ -232,6 +232,44 @@ class OppgavebenkTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = ["NAV 90-00.08", "NAV 90-00.08 K", "NAVe 90-00.08 K", "NAV 90-00.08 A", "NAVe 90-00.08 A"])
+    fun `klage og anke med journalførende enhet skal til journalførende enhet`(brevkode: String) {
+        val jp = lagjournalpostData(brevkode = brevkode, journalførendeEnhet = "4812").kategorisertJournalpost()
+        assertEquals("4812", jp.oppgaveBenk(person = person).id)
+        assertEquals("4812", jp.oppgaveBenk(person = null).id)
+    }
+
+    @Test
+    fun `journalførende enhet skal prioriteres fremfor egen ansatt`() {
+        val jp = lagjournalpostData(brevkode = "NAV 90-00.08 K", journalførendeEnhet = "4450").kategorisertJournalpost()
+        assertEquals("4450", jp.oppgaveBenk(person = person.copy(egenAnsatt = true)).id)
+    }
+
+    @Test
+    fun `kode 6 skal prioriteres fremfor journalførende enhet`() {
+        val jp = lagjournalpostData(brevkode = "NAV 90-00.08 K", journalførendeEnhet = "4812").kategorisertJournalpost()
+        assertEquals("2103", jp.oppgaveBenk(person = person.copy(diskresjonskode = true)).id)
+    }
+
+    @Test
+    fun `blank journalførende enhet skal gi dagens benk`() {
+        val jp = lagjournalpostData(brevkode = "NAV 90-00.08 A", journalførendeEnhet = " ").kategorisertJournalpost()
+        assertEquals("4270", jp.oppgaveBenk(person = person).id)
+    }
+
+    @Test
+    fun `journalførende enhet skal ignoreres for andre kategorier enn klage og anke`() {
+        withSøknad {
+            val nySøknad = lagjournalpostData(brevkode = "NAV 04-01.03", journalførendeEnhet = "4812").kategorisertJournalpost()
+            assertEquals("4450", nySøknad.oppgaveBenk(person = person, rutingOppslag = it).id)
+        }
+        val forskudd =
+            lagjournalpostData(brevkode = "NAV 90-00.08", behandlingstema = "ab0451", journalførendeEnhet = "4812")
+                .kategorisertJournalpost()
+        assertEquals("4153", forskudd.oppgaveBenk(person = person).id)
+    }
+
     @Test
     fun `Finn riktig oppgavebenk når søknad er gjenopptak `() {
         withSøknad {
