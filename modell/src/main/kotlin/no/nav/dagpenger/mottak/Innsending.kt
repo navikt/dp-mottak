@@ -738,11 +738,16 @@ class Innsending private constructor(
     private fun oppdatereJournalpost(hendelse: Hendelse) {
         val person = requireNotNull(person) { "Krever at person er satt her, $journalpostId" }
         val journalpost = requireNotNull(journalpost) { "Krever at journalpost her" }
-        val arenaSakId = arenaSak?.fagsakId?.let { mapOf("fagsakId" to it) } ?: emptyMap()
-        val sak =
+        val arenaSakId = arenaSak?.fagsakId
+        val sakId = sakId
+        val sak: Map<String, Any> =
             buildMap {
-                sakId?.let {
-                    put("fagsakId", it)
+                if (sakId != null) {
+                    put("fagsystem", Fagsystem.FagsystemType.DAGPENGER.name)
+                    put("fagsakId", sakId)
+                } else if (arenaSakId != null) {
+                    put("fagsystem", Fagsystem.FagsystemType.ARENA.name)
+                    put("fagsakId", arenaSakId)
                 }
             }
         val mottakskanal = mottakskanal() ?: "ukjent"
@@ -760,7 +765,7 @@ class Innsending private constructor(
                             "dokumentInfoId" to it.dokumentInfoId,
                         )
                     },
-            ) + arenaSakId + sak
+            ) + sak
 
         hendelse.behov(
             Behovtype.OppdaterJournalpost,

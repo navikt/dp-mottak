@@ -35,10 +35,32 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
+import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 import java.util.UUID
 
 internal class InnsendingTest : AbstractEndeTilEndeTest() {
+    @ParameterizedTest
+    @EnumSource(
+        value = Fagsystem.FagsystemType::class,
+    )
+    fun `Skal sende ut riktig g fagsystem på oppdater journalpost behovet`(
+        fagsystemType: Fagsystem.FagsystemType,
+    ) {
+        håndterJoarkHendelse()
+        håndterJournalpostData()
+        håndterPersonInformasjon()
+        håndterSøknadsdata()
+        håndterInnsending(fagsystemType)
+        if (fagsystemType == Fagsystem.FagsystemType.ARENA) {
+            håndterArenaOppgaveOpprettet()
+        }
+        inspektør.innsendingLogg.behov().find { it.type == OppdaterJournalpost }.let { behov ->
+            requireNotNull(behov)
+            behov.detaljer()["fagsystem"] shouldBe fagsystemType.name
+        }
+    }
+
     @ParameterizedTest
     @CsvSource(
         "NAV 04-16.04, ARENA",
@@ -96,6 +118,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "fødselsnummer",
                 "navn",
                 "fagsakId",
+                "fagsystem",
                 "tittel",
                 "mottakskanal",
                 "dokumenter",
@@ -214,6 +237,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "fødselsnummer",
                 "navn",
                 "fagsakId",
+                "fagsystem",
                 "tittel",
                 "mottakskanal",
                 "dokumenter",
@@ -324,6 +348,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "aktørId",
                 "fødselsnummer",
                 "fagsakId",
+                "fagsystem",
                 "navn",
                 "tittel",
                 "mottakskanal",
@@ -420,6 +445,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "aktørId",
                 "fødselsnummer",
                 "fagsakId",
+                "fagsystem",
                 "navn",
                 "mottakskanal",
                 "tittel",
@@ -616,6 +642,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "aktørId",
                 "fødselsnummer",
                 "fagsakId",
+                "fagsystem",
                 "navn",
                 "mottakskanal",
                 "tittel",
@@ -722,6 +749,7 @@ internal class InnsendingTest : AbstractEndeTilEndeTest() {
                 "aktørId",
                 "fødselsnummer",
                 "fagsakId",
+                "fagsystem",
                 "navn",
                 "tittel",
                 "mottakskanal",
