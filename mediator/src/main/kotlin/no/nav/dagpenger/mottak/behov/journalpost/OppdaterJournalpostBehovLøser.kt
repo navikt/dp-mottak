@@ -10,6 +10,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.mottak.Aktivitetslogg.Aktivitet.Behov.Behovtype.OppdaterJournalpost
+import no.nav.dagpenger.mottak.Fagsystem
 import no.nav.dagpenger.mottak.behov.journalpost.JournalpostApi.OppdaterJournalpostRequest
 
 internal class OppdaterJournalpostBehovLøser(
@@ -30,7 +31,7 @@ internal class OppdaterJournalpostBehovLøser(
                     it.forbid("@løsning")
                 }
                 validate { it.requireKey("@behovId", "journalpostId") }
-                validate { it.interestedIn("navn", "fødselsnummer", "tittel", "dokumenter", "fagsakId", "mottakskanal") }
+                validate { it.interestedIn("navn", "fødselsnummer", "tittel", "dokumenter", "fagsakId", "fagsystem", "mottakskanal") }
             }.register(this)
     }
 
@@ -109,6 +110,7 @@ private fun JsonMessage.dokumenter(): List<JournalpostApi.Dokument> =
 private fun JsonMessage.sak(): JournalpostApi.Sak =
     JournalpostApi.Sak(
         fagsakId = this["fagsakId"].asString(null),
+        fagsystem = this["fagsystem"].asString(null)?.let { Fagsystem.FagsystemType.valueOf(it) },
     )
 
 private fun JsonMessage.bruker(): JournalpostApi.Bruker =

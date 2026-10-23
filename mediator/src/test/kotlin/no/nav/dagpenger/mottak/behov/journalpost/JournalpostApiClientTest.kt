@@ -11,6 +11,7 @@ import io.ktor.http.URLProtocol
 import io.ktor.http.headersOf
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.runBlocking
+import no.nav.dagpenger.mottak.Fagsystem
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
@@ -164,7 +165,7 @@ class JournalpostApiClientTest {
                 ),
             bruker = JournalpostApi.Bruker(id = "eam", idType = "nascetur"),
             tittel = "nonumes",
-            sak = JournalpostApi.Sak(fagsakId = "122343"),
+            sak = JournalpostApi.Sak(fagsakId = "122343", fagsystem = Fagsystem.FagsystemType.DAGPENGER),
             dokumenter =
                 listOf(
                     JournalpostApi.Dokument(
