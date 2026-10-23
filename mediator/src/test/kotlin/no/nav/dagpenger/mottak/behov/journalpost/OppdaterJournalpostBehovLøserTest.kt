@@ -16,6 +16,7 @@ import java.util.UUID
 internal class OppdaterJournalpostBehovLøserTest {
     private val testRapid = TestRapid()
     private val fagsakId = "23456"
+    private val fagsystem = "DAGPENGER"
     private val fødselsnummer = "12345678910"
 
     private val slot = slot<JournalpostApi.OppdaterJournalpostRequest>()
@@ -139,6 +140,7 @@ internal class OppdaterJournalpostBehovLøserTest {
           "@opprettet" : "${LocalDateTime.now()}",
           "journalpostId": "$journalpostId",
           "fagsakId": "$fagsakId",
+          "fagsystem": "$fagsystem",
           "fødselsnummer": "$fødselsnummer",
           "mottakskanal" : "$mottakskanal",
           "aktørId": "123474",
