@@ -151,7 +151,13 @@ private fun Throwable.ignorerManglendeJournalPostIDev() {
             response.status.value == 404 -> {
             logger.warn(this) { "Ignorerer 404 fra journalpostDokarkiv i dev" }
         }
-
+        this is ClientRequestException &&
+            response.status.value == 400 &&
+            this.message.contains("Saksrelasjonen er allerede feilregistrert") == true -> {
+            logger.warn(this) {
+                "Ignorerer 400 fra journalpostDokarkiv pga at saksrelasjonen allerede er feilregistrert"
+            }
+        }
         else -> throw this
     }
 }
